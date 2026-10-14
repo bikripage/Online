@@ -134,7 +134,7 @@
     <script>
         // 🚨 REAL SECURITY CHECK: Firebase Auth से चेक करेगा कि असली एडमिन है या नहीं
         firebase.auth().onAuthStateChanged((user) => {
-            if (!user || user.email !== 'BikriPage@gmail.com') {
+            if (!user || user.email !== 'bikripage@gmail.com') {
                 alert("🚨 Access Denied! Unauthorized User.");
                 window.location.replace("index.html");
             }

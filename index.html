@@ -499,63 +499,60 @@
 </section>
 
 
-        <!-- ✨ MARKETPLACE / PRODUCTS SECTION ✨ -->
-        <section id="marketplace" class="flex-1 py-16 sm:py-20 px-4 bg-white border-t border-gray-100 relative z-20 rounded-t-[2.5rem] shadow-[0_-5px_30px_rgba(0,0,0,0.02)]">
-            <div class="max-w-6xl mx-auto">
+            <!-- ✨ MARKETPLACE / PRODUCTS SECTION ✨ -->
+        <section id="marketplace" class="flex-1 pt-6 pb-16 sm:pt-8 px-4 bg-white relative z-20 rounded-t-[2rem] sm:rounded-t-[2.5rem] shadow-[0_-8px_30px_rgba(0,0,0,0.04)] -mt-2">
+            <div class="max-w-5xl mx-auto">
                 
-                <div class="mb-6 flex flex-row items-center justify-between gap-3 reveal">
-    <div class="flex-1 min-w-0">
-        <h3 id="section-title" class="text-2xl sm:text-4xl font-black text-gray-900 tracking-tight truncate">Live Local Shops</h3>
-        <p id="section-subtitle" class="text-[12px] sm:text-base text-gray-500 mt-1 font-medium truncate">Support neighborhood businesses.</p>
-    </div>
-    
-    <button onclick="findNearbyShops(this)" class="shrink-0 bg-white hover:bg-gray-50 text-gray-800 px-3 sm:px-5 py-2.5 sm:py-3 rounded-[12px] sm:rounded-2xl border border-gray-200 transition-all flex items-center gap-1.5 font-bold text-xs sm:text-sm shadow-sm active:scale-95 cursor-pointer">
-        <i class="fas fa-location-arrow text-blue-500"></i> 
-        <span class="hidden sm:inline">Near Me</span>
-        <span class="sm:hidden">Locate</span>
-    </button>
-</div>
-
-                <!-- ✨ NAYA PARENT CONTAINER START ✨ -->
-<div id="filter-search-container">
-            <!-- 🔍 SEARCH BAR YAHAN AAGAYA 🔍 -->
-        <div class="w-full bg-white pb-4 z-50 relative">
-            <div class="relative w-full bg-[#f0f5ff] rounded-[8px] flex items-center overflow-hidden border border-[#dbeafe]">
-                <div class="pl-3 pr-2 flex items-center justify-center">
-                    <i class="fas fa-search text-blue-600 text-[15px]"></i>
+                <!-- 🏷️ Premium Header -->
+                <div class="mb-5 flex flex-row items-center justify-between gap-3 reveal active">
+                    <div class="flex-1 min-w-0">
+                        <h3 id="section-title" class="text-[22px] sm:text-3xl font-black text-gray-900 tracking-tight truncate">Trending Products</h3>
+                        <p id="section-subtitle" class="text-[13px] sm:text-[15px] text-gray-500 mt-0.5 font-medium truncate">Explore and buy directly from your local stores.</p>
+                    </div>
+                    
+                    <button onclick="findNearbyShops(this)" class="shrink-0 bg-[#F5F5F7] hover:bg-[#E8E8ED] text-gray-800 px-4 py-2.5 rounded-[14px] transition-all flex items-center gap-1.5 font-bold text-[13px] shadow-sm active:scale-95 cursor-pointer">
+                        <i class="fas fa-location-arrow text-blue-600"></i> 
+                        <span class="hidden sm:inline">Near Me</span>
+                        <span class="sm:hidden">Locate</span>
+                    </button>
                 </div>
-                <input type="text" id="top-search-input" oninput="handleGlobalSearch(this.value)" onfocus="handleGlobalSearch(this.value)" placeholder="Search products, brands..." autocomplete="off" class="w-full bg-transparent py-2.5 pr-3 outline-none text-[13.5px] font-semibold text-gray-800">
-                <div onclick="startVoiceSearch()" class="pr-3 pl-2 flex items-center justify-center cursor-pointer bg-transparent active:opacity-50">
-                    <i class="fas fa-microphone text-blue-600 text-[16px] mic-icon"></i>
+
+                <!-- 🔍 Premium iOS Search & Filters -->
+                <div id="filter-search-container" class="relative z-50 mb-6">
+                    
+                    <!-- Search Bar -->
+                    <div class="w-full bg-white pb-4 sticky top-[60px] z-[60]">
+                        <div class="relative w-full bg-[#F5F5F7] hover:bg-[#E8E8ED] transition-colors duration-300 rounded-[16px] flex items-center overflow-hidden border border-gray-200/50 shadow-inner">
+                            <div class="pl-4 pr-2 flex items-center justify-center">
+                                <i class="fas fa-search text-gray-500 text-[15px]"></i>
+                            </div>
+                            <input type="text" id="top-search-input" oninput="handleGlobalSearch(this.value)" onfocus="handleGlobalSearch(this.value)" placeholder="Search products, brands..." autocomplete="off" class="w-full bg-transparent py-3.5 pr-3 outline-none text-[15px] font-medium text-gray-900 placeholder-gray-500">
+                            <div onclick="startVoiceSearch()" class="pr-4 pl-2 flex items-center justify-center cursor-pointer bg-transparent active:scale-90 transition-transform">
+                                <i class="fas fa-microphone text-blue-600 text-[18px] mic-icon drop-shadow-sm"></i>
+                            </div>
+                        </div>
+                        <div id="search-dropdown" class="absolute left-0 right-0 top-[55px] bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden hidden max-h-80 overflow-y-auto custom-scrollbar flex-col divide-y divide-gray-50 z-[100]"></div>
+                    </div>
+                    
+                    <!-- Filter Pills (Apple Style) -->
+                    <div id="shopkeeper-filters-hide" class="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar reveal active">
+                        <button id="tab-all" onclick="switchMarketTab('all')" class="market-tab shrink-0 bg-gray-900 text-white px-5 py-2 rounded-full text-[13px] font-semibold shadow-md transition-all active:scale-95 whitespace-nowrap">
+                            All
+                        </button>
+                        <button id="tab-products" onclick="switchMarketTab('products')" class="market-tab shrink-0 bg-[#F5F5F7] text-gray-600 px-5 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap hover:bg-gray-200 transition-all active:scale-95">
+                            Products
+                        </button>
+                        <button id="tab-services" onclick="switchMarketTab('services')" class="market-tab shrink-0 bg-[#F5F5F7] text-gray-600 px-5 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap hover:bg-gray-200 transition-all active:scale-95">
+                            Services
+                        </button>
+                        <button id="tab-shops" onclick="switchMarketTab('shops')" class="market-tab shrink-0 bg-[#F5F5F7] text-gray-600 px-5 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap hover:bg-gray-200 transition-all active:scale-95">
+                            Shops
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <div id="search-dropdown" class="absolute left-0 right-0 top-[45px] bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hidden max-h-80 overflow-y-auto custom-scrollbar flex-col divide-y divide-gray-100 z-[100]"></div>
-        </div>
-        
-                              <!-- ✨ COMPACT FILTER PILLS (Near Me ke bagal mein fit hone ke liye) ✨ -->
-                <div id="shopkeeper-filters-hide" class="flex items-center gap-2 overflow-x-auto pb-2 mb-4 custom-scrollbar reveal delay-100">
 
-                  
-
-                  <!-- ✨ NAYA 'ALL' BUTTON (Default Active) ✨ -->
-    <button id="tab-all" onclick="switchMarketTab('all')" class="market-tab shrink-0 bg-gray-900 text-white px-4 py-2.5 rounded-2xl text-xs font-bold shadow-sm transition-all active:scale-95 whitespace-nowrap">
-    All
-</button>
-
-    <button id="tab-products" onclick="switchMarketTab('products')" class="market-tab shrink-0 bg-white text-gray-600 border border-gray-200 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
-         Products
-    </button>
-    <button id="tab-services" onclick="switchMarketTab('services')" class="market-tab shrink-0 bg-white text-gray-600 border border-gray-200 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
-         Services
-    </button>
-    <button id="tab-shops" onclick="switchMarketTab('shops')" class="market-tab shrink-0 bg-white text-gray-600 border border-gray-200 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
-        Shops
-    </button>
-</div>
-
-              
-                </div>
-              <div id="dynamic-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+                <!-- Product Grid -->
+                <div id="dynamic-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
 
                     <div class="col-span-full text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
                         <i class="fas fa-circle-notch fa-spin text-4xl text-blue-600 mb-3"></i>
@@ -565,6 +562,7 @@
 
             </div>
         </section>
+
 <!-- ✨ BikriPage MONTHLY PRICING (CENTERED iOS BADGES) ✨ -->
 <section id="merchant-upgrade-plans" class="hidden py-16 px-4 max-w-6xl mx-auto border-t border-gray-100 relative z-20 bg-white w-full">
     <div class="text-center mb-12 reveal active">
@@ -1231,103 +1229,143 @@ async function handleShopSubmit(e) {
                     </div>
                 `;
 
-                                             heroContent.innerHTML = `
-                
+const premiumCustomerHero = `
+<style>
+    /* Premium Animations & Effects */
+    @keyframes ambient-drift {
+        0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+        33% { transform: translate(30px, -50px) scale(1.1); opacity: 0.6; }
+        66% { transform: translate(-20px, 20px) scale(0.9); opacity: 0.5; }
+        100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+    }
+    @keyframes fade-up-smooth {
+        0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .animate-ambient-1 { animation: ambient-drift 12s infinite cubic-bezier(0.4, 0, 0.2, 1); }
+    .animate-ambient-2 { animation: ambient-drift 15s infinite cubic-bezier(0.4, 0, 0.2, 1) reverse; }
+    
+    .premium-glass-panel {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        border-top: 1px solid rgba(255, 255, 255, 0.8);
+        border-left: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.08), 0 0 0 1px rgba(255,255,255,0.4) inset;
+    }
 
-                                                       <!-- 🖼️ FLIPKART STYLE 16:9 CENTERED PROMO SLIDER -->
-                    <div class="w-full px-3 py-2 bg-gray-50 relative z-0 border-b border-gray-200">
-                        <div class="relative w-full aspect-[16/7] sm:aspect-[16/6] rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-gray-100">
-                            <div id="promo-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar" style="-ms-overflow-style: none; scrollbar-width: none;">
-                                <!-- Database se banners yahan aayenge -->
-                            </div>
-                            
-                            <!-- Bottom Dark Gradient for Dots -->
-                            <div class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-black/40 to-transparent pointer-events-none z-10"></div>
-                            
-                            <!-- ⚪ SLIDER DOTS -->
-                            <div id="promo-slider-dots" class="absolute bottom-2.5 left-0 right-0 flex justify-center gap-1.5 z-20 pointer-events-none">
-                            </div>
-                        </div>
-                    </div>
+    .stagger-item {
+        opacity: 0;
+        animation: fade-up-smooth 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+</style>
+
+<!-- 🎨 PREMIUM ANIMATED AMBIENT BACKGROUND & SLIDER -->
+<div class="w-full px-4 sm:px-6 lg:px-8 pt-6 pb-16 bg-[#F5F5F9] relative z-0 flex justify-center overflow-hidden">
+    
+    <!-- ✨ Floating Ambient Orbs (Apple Style) -->
+    <div class="absolute top-[-10%] left-[-10%] w-[70vw] h-[70vw] max-w-[600px] max-h-[600px] rounded-full bg-gradient-to-tr from-blue-300 to-purple-300 blur-[90px] animate-ambient-1 pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] max-w-[500px] max-h-[500px] rounded-full bg-gradient-to-bl from-pink-300 to-orange-200 blur-[80px] animate-ambient-2 pointer-events-none"></div>
+
+    <!-- 🖼️ 3D Shadow Slider Container -->
+    <div class="relative w-full max-w-5xl aspect-[16/7] sm:aspect-[21/6] rounded-[24px] sm:rounded-[36px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.15)] bg-white group z-10 border border-white/80 transform hover:scale-[1.01] transition-transform duration-700 ease-out">
+        <div id="promo-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar" style="-ms-overflow-style: none; scrollbar-width: none;">
+            <!-- Database se banners yahan aayenge -->
+        </div>
+        
+        <!-- Premium Vignette/Gradient overlay for text readability -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none z-10 opacity-80"></div>
+        
+        <!-- ⚪ SLIDER DOTS (Dynamic width style) -->
+        <div id="promo-slider-dots" class="absolute bottom-4 sm:bottom-5 left-0 right-0 flex justify-center gap-2 z-20 pointer-events-none">
+        </div>
+    </div>
+</div>
+
+<!-- 🛍️ PREMIUM GLASSMORPHISM BENTO GRID CATEGORIES -->
+<div class="w-full px-4 sm:px-6 lg:px-8 relative z-20 flex justify-center -mt-12 sm:-mt-16 mb-4">
+    <div class="w-full max-w-5xl premium-glass-panel rounded-[2rem] sm:rounded-[2.5rem] px-5 sm:px-8 pt-8 pb-10">
+        
+        <div class="flex items-center justify-between mb-8 px-1 stagger-item" style="animation-delay: 0.1s;">
+            <h3 class="text-[20px] sm:text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+                Explore Categories <span class="text-xl opacity-80">✨</span>
+            </h3>
+        </div>
+        
+        <!-- Category Grid with Staggered Animations -->
+        <div class="grid grid-cols-4 md:grid-cols-8 gap-y-8 gap-x-3 sm:gap-x-4">
+            
+            <!-- 1: Grocery -->
+            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.15s;">
+                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-blue-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(26,115,232,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
+                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/29327f40e9c4d26b.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-blue-600 text-center tracking-tight transition-colors">Grocery</span>
+            </div>
+            
+            <!-- 2: Mobiles -->
+            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.2s;">
+                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-red-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(217,48,37,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
+                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/22fddf3c7da4c4f4.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-red-500 text-center tracking-tight transition-colors">Mobiles</span>
+            </div>
+            
+            <!-- 3: Fashion -->
+            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.25s;">
+                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-purple-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(161,66,244,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
+                     <img src="https://rukminim2.flixcart.com/fk-p-flap/128/128/image/0d75b34f7d8fbcb3.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-purple-600 text-center tracking-tight transition-colors">Fashion</span>
+            </div>
+            
+            <!-- 4: Electronics -->
+            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.3s;">
+                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-cyan-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(24,160,251,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
+                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/69c6589653afdb9a.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-cyan-600 text-center tracking-tight transition-colors">Electronics</span>
+            </div>
+            
+            <!-- 5: Home -->
+            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.35s;">
+                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-yellow-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(244,180,0,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
+                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/ee162bad964c46ae.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-yellow-600 text-center tracking-tight transition-colors">Home</span>
+            </div>
+            
+            <!-- 6: Appliances -->
+            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.4s;">
+                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-green-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(52,168,83,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
+                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/0ff199d1bd27eb98.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-green-600 text-center tracking-tight transition-colors">Appliances</span>
+            </div>
+            
+            <!-- 7: Beauty -->
+            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.45s;">
+                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-pink-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(233,30,99,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
+                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/dff3f7adcf3a90c6.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-pink-600 text-center tracking-tight transition-colors">Beauty</span>
+            </div>
+
+            <!-- 8: Offers -->
+            <div onclick="switchMarketTab('services')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.5s;">
+                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-orange-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(255,109,0,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
+                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/f15c02bfeb02d15d.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-orange-600 text-center tracking-tight transition-colors">Offers</span>
+            </div>
+            
+        </div>
+    </div>
+</div>
+`;
 
 
-                    <!-- 🛍️ ADVANCED FLIPKART CATEGORY GRID -->
-                    <div class="w-full bg-white px-1 py-4 shadow-sm border-b border-gray-200 relative z-10">
-                        <div class="grid grid-cols-4 gap-y-5 gap-x-1 sm:gap-x-2">
-                            <!-- Item 1: Grocery -->
-                            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
-                                <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
-                                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/29327f40e9c4d26b.png?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform">
-                                     <div class="w-full h-4 bg-gradient-to-t from-blue-100 to-transparent rounded-b-[14px] absolute bottom-0 z-0"></div>
-                                </div>
-                                <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Grocery</span>
-                            </div>
-                            
-                            <!-- Item 2: Mobiles -->
-                            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
-                                <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
-                                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/22fddf3c7da4c4f4.png?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform">
-                                     <div class="w-full h-4 bg-gradient-to-t from-blue-100 to-transparent rounded-b-[14px] absolute bottom-0 z-0"></div>
-                                </div>
-                                <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Mobiles</span>
-                            </div>
-                            
-                            <!-- Item 3: Fashion -->
-                            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
-                                <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
-                                     <img src="https://rukminim2.flixcart.com/fk-p-flap/128/128/image/0d75b34f7d8fbcb3.png?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform">
-                                     <div class="w-full h-4 bg-gradient-to-t from-blue-100 to-transparent rounded-b-[14px] absolute bottom-0 z-0"></div>
-                                </div>
-                                <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Fashion</span>
-                            </div>
-                            
-                            <!-- Item 4: Electronics -->
-                            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
-                                <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
-                                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/69c6589653afdb9a.png?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform">
-                                     <div class="w-full h-4 bg-gradient-to-t from-blue-100 to-transparent rounded-b-[14px] absolute bottom-0 z-0"></div>
-                                </div>
-                                <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Electronics</span>
-                            </div>
-                            
-                            <!-- Item 5: Home & Furniture (🔥 FULLY FIXED FLIPKART ICON) -->
-                            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
-                                <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
-                                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/ee162bad964c46ae.png?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform">
-                                     <div class="w-full h-4 bg-gradient-to-t from-blue-100 to-transparent rounded-b-[14px] absolute bottom-0 z-0"></div>
-                                </div>
-                                <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Home</span>
-                            </div>
-                            
-                            <!-- Item 6: Appliances -->
-                            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
-                                <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
-                                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/0ff199d1bd27eb98.png?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform">
-                                     <div class="w-full h-4 bg-gradient-to-t from-blue-100 to-transparent rounded-b-[14px] absolute bottom-0 z-0"></div>
-                                </div>
-                                <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Appliances</span>
-                            </div>
-                            
-                            <!-- Item 7: Beauty, Toys -->
-                            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
-                                <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
-                                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/dff3f7adcf3a90c6.png?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform">
-                                     <div class="w-full h-4 bg-gradient-to-t from-blue-100 to-transparent rounded-b-[14px] absolute bottom-0 z-0"></div>
-                                </div>
-                                <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Beauty</span>
-                            </div>
-
-                            <!-- Item 8: Offers -->
-                            <div onclick="switchMarketTab('services')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
-                                <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
-                                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/f15c02bfeb02d15d.png?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform">
-                                     <div class="w-full h-4 bg-gradient-to-t from-blue-100 to-transparent rounded-b-[14px] absolute bottom-0 z-0"></div>
-                                </div>
-                                <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Offers</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
+heroContent.innerHTML = premiumCustomerHero;
 
 
                 document.getElementById('section-title').innerText = "Trending Products";
@@ -1348,103 +1386,144 @@ async function handleShopSubmit(e) {
                     </button>
                 `;
                 
-                            heroContent.innerHTML = `
-                
-                                                  <!-- 🖼️ FLIPKART STYLE 16:9 CENTERED PROMO SLIDER -->
-                    <div class="w-full px-3 py-2 bg-gray-50 relative z-0 border-b border-gray-200">
-                        <div class="relative w-full aspect-[16/7] sm:aspect-[16/6] rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-gray-100">
-                            <div id="promo-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar" style="-ms-overflow-style: none; scrollbar-width: none;">
-                                <!-- Database se banners yahan aayenge -->
-                            </div>
-                            
-                            <!-- Bottom Dark Gradient for Dots -->
-                            <div class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-black/40 to-transparent pointer-events-none z-10"></div>
-                            
-                            <!-- ⚪ SLIDER DOTS -->
-                            <div id="promo-slider-dots" class="absolute bottom-2.5 left-0 right-0 flex justify-center gap-1.5 z-20 pointer-events-none">
-                            </div>
-                        </div>
-                    </div>
+               const premiumCustomerHero = `
+<style>
+    /* Premium Animations & Effects */
+    @keyframes ambient-drift {
+        0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+        33% { transform: translate(30px, -50px) scale(1.1); opacity: 0.6; }
+        66% { transform: translate(-20px, 20px) scale(0.9); opacity: 0.5; }
+        100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+    }
+    @keyframes fade-up-smooth {
+        0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .animate-ambient-1 { animation: ambient-drift 12s infinite cubic-bezier(0.4, 0, 0.2, 1); }
+    .animate-ambient-2 { animation: ambient-drift 15s infinite cubic-bezier(0.4, 0, 0.2, 1) reverse; }
+    
+    .premium-glass-panel {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        border-top: 1px solid rgba(255, 255, 255, 0.8);
+        border-left: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.08), 0 0 0 1px rgba(255,255,255,0.4) inset;
+    }
+
+    .stagger-item {
+        opacity: 0;
+        animation: fade-up-smooth 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+</style>
+
+<!-- 🎨 PREMIUM ANIMATED AMBIENT BACKGROUND & SLIDER -->
+<div class="w-full px-4 sm:px-6 lg:px-8 pt-6 pb-16 bg-[#F5F5F9] relative z-0 flex justify-center overflow-hidden">
+    
+    <!-- ✨ Floating Ambient Orbs (Apple Style) -->
+    <div class="absolute top-[-10%] left-[-10%] w-[70vw] h-[70vw] max-w-[600px] max-h-[600px] rounded-full bg-gradient-to-tr from-blue-300 to-purple-300 blur-[90px] animate-ambient-1 pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] max-w-[500px] max-h-[500px] rounded-full bg-gradient-to-bl from-pink-300 to-orange-200 blur-[80px] animate-ambient-2 pointer-events-none"></div>
+
+    <!-- 🖼️ 3D Shadow Slider Container -->
+    <div class="relative w-full max-w-5xl aspect-[16/7] sm:aspect-[21/6] rounded-[24px] sm:rounded-[36px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.15)] bg-white group z-10 border border-white/80 transform hover:scale-[1.01] transition-transform duration-700 ease-out">
+        <div id="promo-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar" style="-ms-overflow-style: none; scrollbar-width: none;">
+            <!-- Database se banners yahan aayenge -->
+        </div>
+        
+        <!-- Premium Vignette/Gradient overlay for text readability -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none z-10 opacity-80"></div>
+        
+        <!-- ⚪ SLIDER DOTS (Dynamic width style) -->
+        <div id="promo-slider-dots" class="absolute bottom-4 sm:bottom-5 left-0 right-0 flex justify-center gap-2 z-20 pointer-events-none">
+        </div>
+    </div>
+</div>
+
+<!-- 🛍️ PREMIUM GLASSMORPHISM BENTO GRID CATEGORIES -->
+<div class="w-full px-4 sm:px-6 lg:px-8 relative z-20 flex justify-center -mt-12 sm:-mt-16 mb-4">
+    <div class="w-full max-w-5xl premium-glass-panel rounded-[2rem] sm:rounded-[2.5rem] px-5 sm:px-8 pt-8 pb-10">
+        
+        <div class="flex items-center justify-between mb-8 px-1 stagger-item" style="animation-delay: 0.1s;">
+            <h3 class="text-[20px] sm:text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+                Explore Categories <span class="text-xl opacity-80">✨</span>
+            </h3>
+        </div>
+        
+        <!-- Category Grid with Staggered Animations -->
+        <div class="grid grid-cols-4 md:grid-cols-8 gap-y-8 gap-x-3 sm:gap-x-4">
+            
+            <!-- 1: Grocery -->
+            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.15s;">
+                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-blue-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(26,115,232,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
+                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/29327f40e9c4d26b.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-blue-600 text-center tracking-tight transition-colors">Grocery</span>
+            </div>
+            
+            <!-- 2: Mobiles -->
+            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.2s;">
+                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-red-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(217,48,37,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
+                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/22fddf3c7da4c4f4.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-red-500 text-center tracking-tight transition-colors">Mobiles</span>
+            </div>
+            
+            <!-- 3: Fashion -->
+            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.25s;">
+                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-purple-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(161,66,244,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
+                     <img src="https://rukminim2.flixcart.com/fk-p-flap/128/128/image/0d75b34f7d8fbcb3.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-purple-600 text-center tracking-tight transition-colors">Fashion</span>
+            </div>
+            
+            <!-- 4: Electronics -->
+            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.3s;">
+                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-cyan-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(24,160,251,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
+                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/69c6589653afdb9a.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-cyan-600 text-center tracking-tight transition-colors">Electronics</span>
+            </div>
+            
+            <!-- 5: Home -->
+            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.35s;">
+                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-yellow-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(244,180,0,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
+                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/ee162bad964c46ae.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-yellow-600 text-center tracking-tight transition-colors">Home</span>
+            </div>
+            
+            <!-- 6: Appliances -->
+            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.4s;">
+                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-green-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(52,168,83,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
+                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/0ff199d1bd27eb98.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-green-600 text-center tracking-tight transition-colors">Appliances</span>
+            </div>
+            
+            <!-- 7: Beauty -->
+            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.45s;">
+                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-pink-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(233,30,99,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
+                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/dff3f7adcf3a90c6.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-pink-600 text-center tracking-tight transition-colors">Beauty</span>
+            </div>
+
+            <!-- 8: Offers -->
+            <div onclick="switchMarketTab('services')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.5s;">
+                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-orange-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(255,109,0,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
+                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/f15c02bfeb02d15d.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-orange-600 text-center tracking-tight transition-colors">Offers</span>
+            </div>
+            
+        </div>
+    </div>
+</div>
+`;
 
 
+heroContent.innerHTML = premiumCustomerHero;
 
-                    <!-- 🛍️ ADVANCED FLIPKART CATEGORY GRID -->
-                    <div class="w-full bg-white px-1 py-4 shadow-sm border-b border-gray-200 relative z-10">
-                        <div class="grid grid-cols-4 gap-y-5 gap-x-1 sm:gap-x-2">
-                            <!-- Item 1: Grocery -->
-                            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
-                                <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
-                                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/29327f40e9c4d26b.png?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform">
-                                     <div class="w-full h-4 bg-gradient-to-t from-blue-100 to-transparent rounded-b-[14px] absolute bottom-0 z-0"></div>
-                                </div>
-                                <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Grocery</span>
-                            </div>
-                            
-                            <!-- Item 2: Mobiles -->
-                            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
-                                <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
-                                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/22fddf3c7da4c4f4.png?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform">
-                                     <div class="w-full h-4 bg-gradient-to-t from-blue-100 to-transparent rounded-b-[14px] absolute bottom-0 z-0"></div>
-                                </div>
-                                <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Mobiles</span>
-                            </div>
-                            
-                            <!-- Item 3: Fashion -->
-                            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
-                                <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
-                                     <img src="https://rukminim2.flixcart.com/fk-p-flap/128/128/image/0d75b34f7d8fbcb3.png?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform">
-                                     <div class="w-full h-4 bg-gradient-to-t from-blue-100 to-transparent rounded-b-[14px] absolute bottom-0 z-0"></div>
-                                </div>
-                                <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Fashion</span>
-                            </div>
-                            
-                            <!-- Item 4: Electronics -->
-                            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
-                                <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
-                                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/69c6589653afdb9a.png?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform">
-                                     <div class="w-full h-4 bg-gradient-to-t from-blue-100 to-transparent rounded-b-[14px] absolute bottom-0 z-0"></div>
-                                </div>
-                                <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Electronics</span>
-                            </div>
-                            
-                            <!-- Item 5: Home & Furniture (🔥 FULLY FIXED FLIPKART ICON) -->
-                            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
-                                <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
-                                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/ee162bad964c46ae.png?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform">
-                                     <div class="w-full h-4 bg-gradient-to-t from-blue-100 to-transparent rounded-b-[14px] absolute bottom-0 z-0"></div>
-                                </div>
-                                <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Home</span>
-                            </div>
-                            
-                            <!-- Item 6: Appliances -->
-                            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
-                                <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
-                                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/0ff199d1bd27eb98.png?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform">
-                                     <div class="w-full h-4 bg-gradient-to-t from-blue-100 to-transparent rounded-b-[14px] absolute bottom-0 z-0"></div>
-                                </div>
-                                <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Appliances</span>
-                            </div>
-                            
-                            <!-- Item 7: Beauty, Toys -->
-                            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
-                                <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
-                                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/dff3f7adcf3a90c6.png?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform">
-                                     <div class="w-full h-4 bg-gradient-to-t from-blue-100 to-transparent rounded-b-[14px] absolute bottom-0 z-0"></div>
-                                </div>
-                                <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Beauty</span>
-                            </div>
-
-                            <!-- Item 8: Offers -->
-                            <div onclick="switchMarketTab('services')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
-                                <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
-                                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/f15c02bfeb02d15d.png?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform">
-                                     <div class="w-full h-4 bg-gradient-to-t from-blue-100 to-transparent rounded-b-[14px] absolute bottom-0 z-0"></div>
-                                </div>
-                                <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Offers</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
 
 loadHomeBanners();
                 return false;

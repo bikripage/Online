@@ -917,6 +917,37 @@ async function handleShopSubmit(e) {
     }
 }
 
+        // ✨ SMART PLAN EXPIRATION & AUTO-DOWNGRADE CHECKER ✨
+        function checkActivePlan(shopData) {
+            let activePlan = shopData.plan || 'starter';
+            let isVerified = shopData.isVerified === true; // Sirf manual verify true rahega
+            let isExpired = false;
+
+            if (activePlan === 'plus' || activePlan === 'pro') {
+                if (shopData.createdAt) {
+                    let createdDate = shopData.createdAt.toDate ? shopData.createdAt.toDate() : new Date(shopData.createdAt);
+                    let daysLeft = 30 - Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24));
+                    
+                    if (daysLeft <= 0) {
+                        activePlan = 'starter'; // ❌ Downgrade to Basic
+                        isExpired = true;
+                        
+                        // 🚀 Background Database Auto-Downgrade (Self-Cleaning)
+                        if (shopData.plan !== 'starter' && shopData.shopId && typeof db !== 'undefined') {
+                            db.collection('shops').doc(shopData.shopId).update({
+                                plan: 'starter',
+                                searchRank: 1 // Rank wapas basic
+                            }).catch(e => console.log('Downgrade skipped'));
+                        }
+                    } else {
+                        isVerified = true; // ✅ Valid Premium
+                    }
+                } else {
+                    isVerified = true;
+                }
+            }
+            return { plan: activePlan, isVerified: isVerified, isExpired: isExpired, dbPlan: shopData.plan || 'starter' };
+        }
 
         function getInitials(name) {
             if (!name) return 'U';
@@ -1061,10 +1092,11 @@ async function handleShopSubmit(e) {
                     pricingSec.classList.remove('hidden');
                     db.collection('shops').doc(activeShop).get().then(doc => {
                         if(doc.exists) {
-                            const bType = doc.data().businessType || 'Retailer';
-                            const shopPlan = doc.data().plan || 'starter'; 
+                                                        const bType = doc.data().businessType || 'Retailer';
+                            const pStatus = checkActivePlan(doc.data());
                             updateDynamicPricing(bType);
-                            updatePlanUI(shopPlan); 
+                            updatePlanUI(pStatus.plan); // Expired hone par wapas Upgrade options aayenge
+
                         }
                     });
                 }
@@ -1308,7 +1340,7 @@ const premiumCustomerHero = `
         
         <div class="flex items-center justify-between mb-8 px-1 stagger-item" style="animation-delay: 0.1s;">
             <h3 class="text-[20px] sm:text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
-                Explore Categories <span class="text-xl opacity-80">✨</span>
+                Explore Categories <span class="text-xl opacity-80"></span>
             </h3>
         </div>
         
@@ -1612,10 +1644,10 @@ trackSearchImpression(shopId);
                             distanceHtml = `<span class="flex items-center gap-1 truncate"><i class="fas fa-location-arrow text-gray-400 opacity-70 text-[10px]"></i> Turn on GPS</span>`;
                         }
                         
-                        // ✨ DYNAMIC VIP CHECK (Plan ke hisaab se) ✨
-                        const isVIP = shop.isVerified || shop.plan === 'plus' || shop.plan === 'pro';
-                        const verifiedTick = getVIPBadge(isVIP, shop.plan);
-                        
+                                             // ✨ DYNAMIC VIP CHECK (Plan ke hisaab se) ✨
+                        const pStatus = checkActivePlan(shop);
+                        const verifiedTick = getVIPBadge(pStatus.isVerified, pStatus.plan);
+
                         
                         
                         const logoHtml = shop.storeLogo 
@@ -1735,10 +1767,12 @@ trackSearchImpression(shopId);
 
                         const sData = globalShopCache[shopId];
                         if (sData) {
-                            shopName = sData.shopName || "Local Shop"; 
+                                                  shopName = sData.shopName || "Local Shop"; 
                             shopPhone = sData.phone || ""; 
-                            shopPlan = sData.plan || ""; 
-                            isVerified = sData.isVerified || sData.plan === 'plus' || sData.plan === 'pro';
+                            const pStatus = checkActivePlan(sData);
+                            shopPlan = pStatus.plan; 
+                            isVerified = pStatus.isVerified;
+
                             if (sData.businessType === 'Service Provider') { isService = true; }
                         }
                     }
@@ -1784,10 +1818,12 @@ trackSearchImpression(shopId);
 
                         const sData = globalShopCache[shopId];
                         if (sData) {
-                            shopName = sData.shopName || "Local Shop"; 
+                                                   shopName = sData.shopName || "Local Shop"; 
                             shopPhone = sData.phone || ""; 
-                            shopPlan = sData.plan || ""; 
-                            isVerified = sData.isVerified || sData.plan === 'plus' || sData.plan === 'pro';
+                            const pStatus = checkActivePlan(sData);
+                            shopPlan = pStatus.plan; 
+                            isVerified = pStatus.isVerified;
+
                             if (sData.businessType === 'Service Provider') { isService = true; }
                         }
                     }
@@ -2989,14 +3025,17 @@ function getVIPBadge(isVerified, plan) {
                                 const planEl = document.getElementById('prof-active-plan');
                                 const validEl = document.getElementById('prof-plan-validity');
                                 
-                                const plan = shopData.plan || 'basic';
-                                const isVerified = shopData.isVerified || plan === 'plus' || plan === 'pro';
-                                let badge = typeof getVIPBadge === 'function' ? getVIPBadge(isVerified, plan) : ''; 
-                                
+                                                           const pStatus = checkActivePlan(shopData);
+                                const activePlan = pStatus.plan; 
+                                const isVerified = pStatus.isVerified;
+                                let badge = typeof getVIPBadge === 'function' ? getVIPBadge(isVerified, activePlan) : ''; 
+
                                 if(planEl) {
-                                    if (plan === 'pro') {
+                                    if (pStatus.isExpired) {
+                                        planEl.innerHTML = `<span class="bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded uppercase tracking-wider text-[10px] font-black">EXPIRED</span> <span class="line-through text-gray-400 font-medium ml-1 text-[11px]">${pStatus.dbPlan}</span>`;
+                                    } else if (activePlan === 'pro') {
                                         planEl.innerHTML = `${badge} <span class="text-yellow-500 drop-shadow-sm font-black">Pro VIP</span>`;
-                                    } else if (plan === 'plus') {
+                                    } else if (activePlan === 'plus') {
                                         planEl.innerHTML = `${badge} <span class="text-purple-600 drop-shadow-sm font-black">Plus</span>`;
                                     } else {
                                         planEl.innerHTML = `Basic <span class="line-through text-gray-400 font-medium ml-1 text-[11px]">₹99/mo</span> <span class="text-green-600 font-black ml-1 text-[10px] bg-green-50 px-2 py-0.5 rounded border border-green-200 uppercase tracking-wider">FREE</span>`;
@@ -3004,27 +3043,20 @@ function getVIPBadge(isVerified, plan) {
                                 }
                                 
                                 if(validEl) {
-                                   if (plan === 'basic' || plan === 'starter') {
+                                   if (pStatus.isExpired) {
+                                        validEl.innerHTML = `<i class="fas fa-exclamation-circle text-red-500 text-[12px]"></i> Plan Expired`;
+                                        validEl.className = "flex items-center gap-1.5 text-[13px] font-bold text-red-600";
+                                   } else if (activePlan === 'basic' || activePlan === 'starter') {
                                         validEl.innerHTML = `<i class="fas fa-infinity text-gray-400 text-[11px]"></i> Lifetime`;
                                         validEl.className = "flex items-center gap-1.5 text-[13px] font-bold text-gray-700";
                                     } else {
-                                        let daysLeft = 30; 
-                                        if (shopData.createdAt) {
-                                            let createdDate = shopData.createdAt.toDate ? shopData.createdAt.toDate() : new Date(shopData.createdAt);
-                                            let diff = new Date() - createdDate;
-                                            daysLeft = 30 - Math.floor(diff / (1000 * 60 * 60 * 24));
-                                        }
-                                        if(daysLeft <= 0) daysLeft = 0;
-                                        
-                                        if (daysLeft > 0) {
-                                            validEl.innerHTML = `<i class="fas fa-clock text-blue-500 text-[12px]"></i> ${daysLeft} Days Left`;
-                                            validEl.className = "flex items-center gap-1.5 text-[13px] font-bold text-blue-600";
-                                        } else {
-                                            validEl.innerHTML = `<i class="fas fa-exclamation-circle text-red-500 text-[12px]"></i> Expired`;
-                                            validEl.className = "flex items-center gap-1.5 text-[13px] font-bold text-red-600";
-                                        }
+                                        let createdDate = shopData.createdAt.toDate ? shopData.createdAt.toDate() : new Date(shopData.createdAt);
+                                        let daysLeft = 30 - Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24));
+                                        validEl.innerHTML = `<i class="fas fa-clock text-blue-500 text-[12px]"></i> ${daysLeft} Days Left`;
+                                        validEl.className = "flex items-center gap-1.5 text-[13px] font-bold text-blue-600";
                                     }
                                 }
+
                             }
                         }
                     }).catch(e => console.log("Error fetching plan:", e));
@@ -3908,13 +3940,16 @@ function trackSearchImpression(shopIdToTrack) {
                 db.collection('shops').doc(shopId).get().then(doc => {
                     if (doc.exists) {
                         const sData = doc.data();
-                        if (sData.storeLogo) {
+                        
+                                                    if (sData.storeLogo) {
                             logoImg.src = sData.storeLogo;
                             logoImg.classList.remove('hidden'); logoIcon.classList.add('hidden');
                         }
-                        const plan = sData.plan || 'basic';
-                        const isVerified = sData.isVerified || plan === 'plus' || plan === 'pro';
+                        const pStatus = checkActivePlan(sData);
+                        const plan = pStatus.plan;
+                        const isVerified = pStatus.isVerified;
                         let badgeHtml = '';
+
                         if (isVerified) {
                             if (plan === 'plus') badgeHtml = `<span class="inline-block ml-1 align-middle"><svg class="w-[15px] h-[15px]" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#A855F7"></circle><path d="M6.5 16h11v1.5h-11v-1.5zM18 8l-3 3.5-3-5-3 5-3-3.5 1.5 6.5h10l1.5-6.5z" fill="#FFFFFF"></path></svg></span>`;
                             else if (plan === 'pro') badgeHtml = `<span class="inline-block ml-1 align-middle"><svg class="w-[15px] h-[15px]" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#111827"></circle><path d="M6.5 16h11v1.5h-11v-1.5zM18 8l-3 3.5-3-5-3 5-3-3.5 1.5 6.5h10l1.5-6.5z" fill="#FFD700"></path></svg></span>`;

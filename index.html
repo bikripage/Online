@@ -686,7 +686,8 @@
     <script>
                 // GPS se distance nikalne ka formula
         function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-            if (!lat1 || !lon1 || !lat2 || !lon2) return null;
+            if (![lat1, lon1, lat2, lon2].every(v => v !== null && v !== undefined && v !== '' && Number.isFinite(Number(v)))) return null;
+            lat1 = Number(lat1); lon1 = Number(lon1); lat2 = Number(lat2); lon2 = Number(lon2);
             var R = 6371; // Radius of the earth in km
             var dLat = (lat2 - lat1) * (Math.PI/180);  
             var dLon = (lon2 - lon1) * (Math.PI/180); 
@@ -701,18 +702,7 @@
 
     
 
-                window.addEventListener('DOMContentLoaded', async () => {
-            // 1. Sabse pehle database se banners fetch karo taaki refresh ki zarurat na pade
-            await loadHomeBanners();
-            
-            // 2. Fir UI aur Login status check karo
-            const isLoggedIn = updateUIBasedOnLogin();
-            updateCartBadge();
-            
-            if (!isLoggedIn) {
-                setTimeout(openAuthModal, 500); 
-            }
-        });
+                // Startup is handled once by the final DOMContentLoaded initializer.
 
 
 
@@ -721,6 +711,10 @@
 
         // 🌟 SCROLL REVEAL ANIMATION 🌟
         function initScrollAnimations() {
+            if (!('IntersectionObserver' in window)) {
+                document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
+                return;
+            }
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -2341,13 +2335,23 @@ function getVIPBadge(isVerified, plan) {
            // ✨ IN-APP PLACE ORDER (FIXED FOR MY ORDERS) ✨
         async function submitOrder(e) {
             e.preventDefault();
-            const qty = document.getElementById('order-qty').value;
+            if (!currentOrder || currentOrder.itemPrice === undefined || currentOrder.itemPrice === null) {
+                alert('Please select a product again before placing the order.');
+                return;
+            }
+            const qty = Number.parseInt(document.getElementById('order-qty').value, 10);
             const custName = document.getElementById('order-cust-name').value.trim();
             const custWhatsApp = document.getElementById('order-cust-phone').value.trim(); // फॉर्म वाला नंबर
             const address = document.getElementById('order-address').value.trim();
-            
-            const total = parseInt(currentOrder.itemPrice) * parseInt(qty);
-            const phone = currentOrder.shopPhone || '9876543210';
+            const unitPrice = Number.parseFloat(String(currentOrder.itemPrice).replace(/[^0-9.]/g, ''));
+            if (!Number.isInteger(qty) || qty < 1) { alert('Please enter a valid quantity.'); return; }
+            if (!custName || !/^[0-9]{10}$/.test(custWhatsApp) || !address) {
+                alert('Please enter your name, a valid 10-digit WhatsApp number, and delivery address.');
+                return;
+            }
+            if (!Number.isFinite(unitPrice) || unitPrice < 0) { alert('This product has an invalid price. Please refresh and try again.'); return; }
+            const total = unitPrice * qty;
+            const phone = currentOrder.shopPhone || '';
             
             // ✨ ASLI ACCOUNT ID YAHAN SE NIKALO ✨
             const accountId = localStorage.getItem('BikriPage_customer_phone');
@@ -2368,7 +2372,7 @@ function getVIPBadge(isVerified, plan) {
                     lng: document.getElementById('order-lng').value || null,
                     shopPhone: phone,
                     shopName: currentOrder.shopName || 'Local Store',
-                    items: [{ name: currentOrder.itemName, qty: parseInt(qty), price: parseInt(currentOrder.itemPrice) }],
+                    items: [{ name: currentOrder.itemName, qty: qty, price: unitPrice }],
                     totalAmount: total,
                     status: 'pending',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -2394,7 +2398,8 @@ function getVIPBadge(isVerified, plan) {
             const address = document.getElementById('order-address').value.trim() || 'N/A';
             
             const total = parseInt(currentOrder.itemPrice) * parseInt(qty);
-            const phone = currentOrder.shopPhone || '9876543210';
+            const phone = String(currentOrder.shopPhone || '').replace(/\D/g, '');
+            if (!phone) { alert('Seller WhatsApp number is unavailable. Please use Place Order Now.'); return; }
             
             const waMessage = `🛍️ *NEW ORDER via BikriPage*\n\n*Item:* ${currentOrder.itemName}\n*Quantity:* ${qty}\n*Total Amount:* ₹${total}\n\n*Customer Details:*\nName: ${custName}\nPhone: ${custPhone}\nAddress: ${address}\n\nPlease confirm my order!`;
             window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(waMessage)}`, '_blank');

@@ -1917,15 +1917,16 @@ trackSearchImpression(shopId);
             
             <p class="text-[8.5px] text-gray-500 truncate mb-2.5 mt-auto pt-1 flex items-center gap-1">By ${shopName} ${verifiedTick}</p>
 
-            <!-- 👆 Action Buttons -->
+                     <!-- 👆 Action Buttons -->
             <div class="flex gap-1.5 mt-auto">
-                <button onclick="event.stopPropagation(); addToCart(event, '${name}', '${price}', '${shopName}', '${shopPhone}')" class="flex-1 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 font-bold py-1.5 rounded-[6px] text-[9.5px] transition-colors flex justify-center items-center gap-1 shadow-sm">
+                <button onclick="event.stopPropagation(); addToCart(event, '${name}', '${price}', '${shopName}', '${shopPhone}', '${shopId}')" class="flex-1 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 font-bold py-1.5 rounded-[6px] text-[9.5px] transition-colors flex justify-center items-center gap-1 shadow-sm">
                     <i class="fas fa-shopping-cart text-[9px]"></i> Add
                 </button>
-                <button onclick="event.stopPropagation(); openOrderModal('${name}', '${price}', '${shopName}', '${shopPhone}')" class="flex-1 bg-[#8B5CF6] hover:bg-purple-600 text-white font-bold py-1.5 rounded-[6px] text-[9.5px] transition-colors flex justify-center items-center shadow-sm">
+                <button onclick="event.stopPropagation(); openOrderModal('${name}', '${price}', '${shopName}', '${shopPhone}', '${shopId}')" class="flex-1 bg-[#8B5CF6] hover:bg-purple-600 text-white font-bold py-1.5 rounded-[6px] text-[9.5px] transition-colors flex justify-center items-center shadow-sm">
                     ${buttonText}
                 </button>
             </div>
+
         </div>
     </div>`;
 }
@@ -2016,14 +2017,14 @@ function getVIPBadge(isVerified, plan) {
 }
 
 
-                        function addToCart(event, name, price, shopName, shopPhone) {
+                        function addToCart(event, name, price, shopName, shopPhone, shopId) {
             event.stopPropagation(); 
             let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
-            const existingItem = cart.find(item => item.name === name && item.shopPhone === shopPhone);
+            const existingItem = cart.find(item => item.name === name && item.shopId === shopId);
             if (existingItem) {
                 existingItem.qty += 1; 
             } else {
-                cart.push({ name, price: parseInt(price), shopName, shopPhone, qty: 1 });
+                cart.push({ name, price: parseInt(price), shopName, shopPhone, shopId: shopId, qty: 1 });
             }
             localStorage.setItem(getCartKey(), JSON.stringify(cart));
             if (typeof updateCartBadge === 'function') updateCartBadge();
@@ -2155,18 +2156,17 @@ function getVIPBadge(isVerified, plan) {
             }
         }
 
-             function addToCart(event, name, price, shopName, shopPhone) {
+             function addToCart(event, name, price, shopName, shopPhone, shopId) {
             event.stopPropagation(); 
             let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
-            const existingItem = cart.find(item => item.name === name && item.shopPhone === shopPhone);
+            const existingItem = cart.find(item => item.name === name && item.shopId === shopId);
             if (existingItem) {
                 existingItem.qty += 1; 
             } else {
-                cart.push({ name, price: parseInt(price), shopName, shopPhone, qty: 1 });
+                cart.push({ name, price: parseInt(price), shopName, shopPhone, shopId: shopId, qty: 1 });
             }
             localStorage.setItem(getCartKey(), JSON.stringify(cart));
             if (typeof updateCartBadge === 'function') updateCartBadge();
-            
             let btn = event.currentTarget;
             if (btn.id === 'detail-cart-btn') return;
             if (btn.dataset.adding === "true") return;
@@ -2283,7 +2283,9 @@ function getVIPBadge(isVerified, plan) {
                         lat: document.getElementById('cart-lat').value || null,
                         lng: document.getElementById('cart-lng').value || null,
                         shopPhone: phone,
-                        shopName: orderData.shopName,
+shopId: orderData.items[0].shopId || '', // ✨ YE NAYI LINE YAHAN ADD KARO ✨
+shopName: orderData.shopName,
+
                         items: orderData.items,
                         totalAmount: orderData.total,
                         status: 'pending',
@@ -2340,9 +2342,9 @@ function getVIPBadge(isVerified, plan) {
         // --- ORDER CHECKOUT MODAL LOGIC ---
         let currentOrder = null;
 
-                      function openOrderModal(itemName, itemPrice, shopName, shopPhone) {
-    currentOrder = { itemName, itemPrice, shopName, shopPhone };
-    document.getElementById('order-item-name').innerText = itemName;
+                      function openOrderModal(itemName, itemPrice, shopName, shopPhone, shopId) {
+            currentOrder = { itemName, itemPrice, shopName, shopPhone, shopId }; // ✨ NAYA: shopId save kiya
+            document.getElementById('order-item-name').innerText = itemName;
     document.getElementById('order-item-price').innerText = `₹${itemPrice}`;
     document.getElementById('order-shop-name').innerText = shopName || 'Local Store';
     
@@ -2451,21 +2453,22 @@ function getVIPBadge(isVerified, plan) {
             btn.disabled = true;
 
             try {
-                                await db.collection('orders').add({
+                                                await db.collection('orders').add({
                     customerId: accountId, 
                     customerName: custName,
                     customerPhone: custWhatsApp, 
                     customerAddress: address,
-                    // ✨ NAYA LOGIC: GPS Coordinates ✨
                     lat: document.getElementById('order-lat').value || null,
                     lng: document.getElementById('order-lng').value || null,
                     shopPhone: phone,
+                    shopId: currentOrder.shopId || '', // ✨ YAHI MISSING THA ✨
                     shopName: currentOrder.shopName || 'Local Store',
                     items: [{ name: currentOrder.itemName, qty: qty, price: unitPrice }],
                     totalAmount: total,
                     status: 'pending',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
+
 
 
                 closeOrderModal();
@@ -3960,20 +3963,18 @@ function trackSearchImpression(shopIdToTrack) {
                 }).catch(e => console.log("Shop data fetch err:", e));
             }
 
-                        document.getElementById('detail-cart-btn').onclick = function(e) {
+                                    document.getElementById('detail-cart-btn').onclick = function(e) {
                 // Pehle cart mein item add karo
-                addToCart(e, name, price, shopName, shopPhone);
+                addToCart(e, name, price, shopName, shopPhone, shopId); // ✨ NAYA: shopId Add kiya
                 
                 // ✨ MAST ANIMATION LOGIC ✨
                 let btn = this;
-                let origHtml = `<i class="fas fa-cart-plus"></i> Add to Cart`; // Asli text fix kar diya
+                let origHtml = `<i class="fas fa-cart-plus"></i> Add to Cart`;
                 
-                // Button ko Purple aur "Added" banao
                 btn.innerHTML = '<i class="fas fa-check"></i> Added';
                 btn.classList.remove('text-gray-900', 'border-gray-300', 'bg-white');
                 btn.classList.add('text-purple-600', 'border-purple-400', 'bg-purple-50');
 
-                // 1.2 second baad button ko wapas normal (Add to Cart) kar do
                 setTimeout(() => {
                     btn.innerHTML = origHtml;
                     btn.classList.remove('text-purple-600', 'border-purple-400', 'bg-purple-50');
@@ -3981,9 +3982,8 @@ function trackSearchImpression(shopIdToTrack) {
                 }, 1200);
             };
 
-            
             document.getElementById('detail-order-btn').innerHTML = isService ? `Book Now <i class="fas fa-bolt text-yellow-300"></i>` : `Order Now <i class="fas fa-bolt text-yellow-300"></i>`;
-            document.getElementById('detail-order-btn').onclick = () => { openOrderModal(name, price, shopName, shopPhone); };
+            document.getElementById('detail-order-btn').onclick = () => { openOrderModal(name, price, shopName, shopPhone, shopId); }; // ✨ NAYA: shopId Add kiya
 
             if(typeof loadStoreSimilarProducts === 'function') loadStoreSimilarProducts(shopId, encodeURIComponent(shopName), shopPhone, isService);
             if(typeof fetchProductReviews === 'function') fetchProductReviews(name, shopPhone);

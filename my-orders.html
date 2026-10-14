@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Orders | BikriPage</title>
+    
+    <!-- Tailwind CSS & FontAwesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- ✨ NAYA: Bill Image Banane ke liye Library ✨ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyAdJsThwv9E7zp6Mff4XUCm6hVNQCYCLyo",
+          authDomain: "BikriPage-ee9f5.firebaseapp.com",
+          projectId: "BikriPage-ee9f5",
+          storageBucket: "BikriPage-ee9f5.firebasestorage.app",
+          messagingSenderId: "727128884439",
+          appId: "1:727128884439:web:8a521d0308347ddcccdc92",
+          measurementId: "G-QTBJS03LTF"
+        };
+
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
+    </script>
+
+    <style>
+        :root { --ios-spring: cubic-bezier(0.25, 1, 0.5, 1); }
+        /* Apple's standard system background gray */
+        body { background-color: #F2F2F7; -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { display: none; }
+        
+        .glass-nav { 
+            background: rgba(242, 242, 247, 0.8); 
+            backdrop-filter: saturate(180%) blur(20px); 
+            -webkit-backdrop-filter: saturate(180%) blur(20px); 
+        }
+        
+        .ios-card { 
+            background: #FFFFFF; 
+            border-radius: 20px; 
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02), 0 10px 30px rgba(0, 0, 0, 0.04); 
+        }
+
+        /* 3D Entry Animation */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .animate-slide-up { animation: slideUp 0.6s var(--ios-spring) forwards; }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.9) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-pop-in { animation: popIn 0.4s var(--ios-spring) forwards; }
+    </style>
+</head>
+<body class="font-sans text-[#111827] pb-10">
+
+    <!-- ✨ HEADER (iOS Glassmorphism & Center Title) ✨ -->
+    <header class="glass-nav sticky top-0 z-50 px-4 h-14 flex items-center justify-between border-b border-black/5">
+        <button onclick="window.location.href='index.html'" class="w-10 h-10 flex items-center justify-start text-blue-500 text-[22px] active:opacity-50 transition-opacity z-10">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <!-- Title is strictly centered -->
+        <h1 class="absolute inset-0 flex items-center justify-center text-[17px] font-semibold text-black tracking-tight pointer-events-none">My Orders</h1>
+        <div class="w-10 h-10 z-10"></div> <!-- Balance ke liye spacer -->
+    </header>
+
+    <!-- ✨ MAIN CONTAINER ✨ -->
+    <main class="max-w-md mx-auto w-full px-4 pt-6 flex flex-col gap-4" id="orders-container">
+        <!-- Loading State -->
+        <div id="loading-state" class="text-center py-20 flex flex-col items-center justify-center animate-slide-up">
+            <i class="fas fa-circle-notch fa-spin text-3xl text-gray-400 mb-4"></i>
+            <h3 class="font-semibold text-gray-900 text-[17px]">Loading Orders...</h3>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const custPhone = localStorage.getItem('BikriPage_customer_phone');
+            const container = document.getElementById('orders-container');
+
+            // Clear instructions for Shop Owners vs Customers
+            if (!custPhone) {
+                container.innerHTML = `
+                    <div class="text-center py-16 px-6 animate-slide-up mt-10">
+                        <div class="w-24 h-24 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl"><i class="fas fa-user-lock"></i></div>
+                        <h3 class="font-bold text-gray-900 text-[22px] tracking-tight mb-2">Customer Login Required</h3>
+                        <p class="text-gray-500 text-[15px] mb-8 leading-relaxed">You need to log in <b>as a Customer</b> to view your purchases.<br><span class="text-xs text-gray-400 mt-2 block">(Note: Shop Owners must go to their Dashboard to see store orders)</span></p>
+                        <a href="index.html" class="inline-block w-full bg-blue-500 hover:bg-blue-600 text-white py-3.5 rounded-2xl font-semibold text-[17px] active:scale-95 transition-transform shadow-sm">Go to Home</a>
+                    </div>`;
+                return;
+            }
+
+            fetchMyOrders(custPhone);
+        });
+
+        async function fetchMyOrders(phone) {
+            const container = document.getElementById('orders-container');
+            
+            try {
+                // Fetch orders for this customer
+                const snapshot = await db.collection('orders').where('customerId', '==', phone).get();
+
+                if (snapshot.empty) {
+                    container.innerHTML = `
+                        <div class="text-center py-16 px-6 animate-slide-up mt-10">
+                            <div class="w-24 h-24 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl"><i class="fas fa-box-open"></i></div>
+                            <h3 class="font-bold text-gray-900 text-[22px] tracking-tight mb-2">No Orders Yet</h3>
+                            <p class="text-gray-500 text-[15px] mt-1 leading-relaxed mb-8">You haven't made any purchases on BikriPage yet.</p>
+                            <a href="index.html" class="inline-block w-full bg-white text-blue-500 border border-gray-200 shadow-sm py-3.5 rounded-2xl font-semibold text-[17px] active:scale-95 transition-transform">Start Shopping</a>
+                        </div>`;
+                    return;
+                }
+
+                let ordersList = [];
+                snapshot.forEach(doc => { 
+                    ordersList.push({ id: doc.id, ...doc.data() }); 
+                });
+
+                         // Sort by Latest First
+                ordersList.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+                
+                // ✨ Taki function me details mil sake
+                window.customerOrders = ordersList;
+
+                // ✨ NAYA LOGIC: Check for unreviewed delivered orders ✨
+                checkForUnreviewedOrder(ordersList);
+
+                let html = '';
+
+                ordersList.forEach((order, index) => {
+                    let delay = index * 0.1; 
+
+                    let dateStr = "Just now";
+                    if(order.createdAt) {
+                        const d = order.createdAt.toDate();
+                        dateStr = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) + " at " + d.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit'});
+                    }
+
+                    // iOS Style Pill Badges
+                    let statusBg = "bg-orange-100 text-orange-700";
+                    let statusIcon = "fa-clock";
+                    let statusText = "Pending";
+                    
+                    if(order.status === 'accepted') { statusBg = "bg-blue-100 text-blue-700"; statusIcon = "fa-box"; statusText = "Accepted"; }
+                    if(order.status === 'delivered') { statusBg = "bg-green-100 text-green-700"; statusIcon = "fa-check-circle"; statusText = "Delivered"; }
+                    if(order.status === 'cancelled') { statusBg = "bg-red-100 text-red-700"; statusIcon = "fa-times-circle"; statusText = "Cancelled"; }
+
+                    let itemsHtml = order.items ? order.items.map(i => `<span class="font-semibold text-gray-900">${i.qty}x</span> ${i.name}`).join(', ') : "Items not found";
+
+                    // ✨ EDITABLE REVIEW & BILL BUTTONS
+                    let actionBtnHtml = "";
+                    if(order.status === 'pending') {
+                        actionBtnHtml = `<button onclick="openCancelModal('${order.id}', this)" class="bg-gray-100 hover:bg-gray-200 text-red-500 font-semibold text-[13px] px-4 py-2 rounded-full transition-all active:scale-95 shrink-0">Cancel</button>`;
+
+                    } else if(order.status === 'delivered') {
+                        // Bill Download Button
+                        let billBtn = `<button onclick="downloadCustomerBill('${order.id}', event)" class="bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold text-[12px] px-3 py-2 rounded-full transition-all active:scale-95 shrink-0 flex items-center gap-1.5 shadow-sm border border-blue-100"><i class="fas fa-file-invoice"></i> Bill</button>`;
+                        
+                        let reviewBtn = "";
+                        if (order.review) {
+                            // Agar review hai -> "Edit" mode me button dikhao
+                            reviewBtn = `<button onclick="openReviewModal('${order.id}')" class="bg-yellow-50 hover:bg-yellow-100 text-yellow-600 font-bold text-[12px] px-3 py-2 rounded-full transition-all active:scale-95 shrink-0 flex items-center gap-1 shadow-sm border border-yellow-200 cursor-pointer"><i class="fas fa-star"></i> ${order.review.rating} <span class="text-[10px] text-yellow-500 ml-1 border-l border-yellow-200 pl-1.5 opacity-90">Edit</span></button>`;
+                        } else {
+                            // First time Review
+                            reviewBtn = `<button onclick="openReviewModal('${order.id}')" class="bg-gray-50 text-gray-700 hover:bg-gray-100 font-bold text-[12px] px-3 py-2 rounded-full transition-all active:scale-95 shrink-0 flex items-center gap-1.5 shadow-sm border border-gray-200"><i class="fas fa-star text-gray-400"></i> Review</button>`;
+                        }
+                        
+                        actionBtnHtml = `<div class="flex items-center gap-2">${reviewBtn}${billBtn}</div>`;
+                    }
+
+                    html += `
+                    <div class="ios-card p-4 sm:p-5 animate-slide-up mb-2" style="animation-delay: ${delay}s">
+                        
+                        <!-- Top Row: Store & Status -->
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100 shrink-0">
+                                    <i class="fas fa-store text-gray-400 text-sm"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900 text-[15px] tracking-tight leading-none">${order.shopName || 'BikriPage Store'}</h4>
+                                    <p class="text-[12px] text-gray-400 mt-1">#${order.id.slice(0, 6).toUpperCase()}</p>
+                                </div>
+                            </div>
+                            <span class="${statusBg} px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 shrink-0">
+                                <i class="fas ${statusIcon}"></i> ${statusText}
+                            </span>
+                        </div>
+                        
+                        <!-- Inner Gray Box for Items (iOS Grouped Style) -->
+                        <div class="bg-gray-50/80 rounded-[14px] p-3 mb-3 border border-gray-100/50">
+                            <p class="text-[13px] text-gray-600 leading-relaxed">${itemsHtml}</p>
+                            <p class="text-[11px] text-gray-400 font-medium mt-1.5">${dateStr}</p>
+                        </div>
+
+                        <!-- Bottom Row: Price & Action -->
+                        <div class="flex justify-between items-center">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] font-medium text-gray-400 uppercase tracking-widest">Total</span>
+                                <span class="font-bold text-gray-900 text-lg tracking-tight">₹${order.totalAmount || 0}</span>
+                            </div>
+                            ${actionBtnHtml}
+                        </div>
+                    </div>`;
+                });
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="text-center py-10 px-6 mt-10">
+                        <i class="fas fa-exclamation-triangle text-gray-400 text-3xl mb-3"></i>
+                        <p class="text-gray-900 font-semibold text-[17px]">Could not load orders</p>
+                        <p class="text-[13px] text-gray-500 mt-1">${error.message}</p>
+                    </div>`;
+            }
+        }
+
+             let pendingCancelOrderId = null;
+        let pendingCancelBtnElement = null;
+
+        // Modal kholne ka function
+        function openCancelModal(orderId, btnElement) {
+            pendingCancelOrderId = orderId;
+            pendingCancelBtnElement = btnElement;
+            const modal = document.getElementById('ios-cancel-modal');
+            const card = document.getElementById('ios-cancel-card');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+            }, 10);
+        }
+
+        // Modal band karne ka function
+        function closeCancelModal() {
+            const modal = document.getElementById('ios-cancel-modal');
+            const card = document.getElementById('ios-cancel-card');
+            
+            modal.classList.add('opacity-0');
+            card.classList.add('scale-95');
+            
+            setTimeout(() => { 
+                modal.classList.add('hidden'); 
+            }, 300);
+        }
+
+        // Asli Cancel ka action (Jab user "Yes" dabaye)
+        async function confirmCancelAction() {
+            closeCancelModal(); // Pehle modal band karo
+            
+            if (!pendingCancelOrderId || !pendingCancelBtnElement) return;
+
+            const orderId = pendingCancelOrderId;
+            const btnElement = pendingCancelBtnElement;
+
+            try {
+                const origHtml = btnElement.innerHTML;
+                btnElement.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i>`;
+                btnElement.disabled = true;
+                
+                await db.collection('orders').doc(orderId).update({
+                    status: 'cancelled',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Status refresh karne ke liye
+                fetchMyOrders(localStorage.getItem('BikriPage_customer_phone'));
+            } catch (error) {
+                alert("Could not cancel order: " + error.message);
+                btnElement.innerHTML = "Cancel";
+                btnElement.disabled = false;
+            }
+        }
+
+                // ==========================================
+        // ✨ AUTO REVIEW PROMPT LOGIC ✨
+        // ==========================================
+        function checkForUnreviewedOrder(orders) {
+            // Find the most recent delivered order that DOES NOT have a review yet
+            const unreviewedOrder = orders.find(o => o.status === 'delivered' && !o.review);
+
+            if (unreviewedOrder) {
+                // Check in localStorage if we already prompted the user for THIS specific order
+                const hasPrompted = localStorage.getItem('BikriPage_prompted_review_' + unreviewedOrder.id);
+
+                if (!hasPrompted) {
+                    // Update Modal Text
+                    document.getElementById('auto-review-shop').innerText = unreviewedOrder.shopName || 'Store';
+                    
+                    // Attach the specific Order ID to the button
+                    const btn = document.getElementById('auto-review-btn');
+                    btn.onclick = () => {
+                        closeAutoReviewPrompt();
+                        openReviewModal(unreviewedOrder.id); // Seedha review wala modal khol dega
+                    };
+
+                    // Show the Prompt Modal with a slight delay so it looks natural
+                    setTimeout(() => {
+                        const modal = document.getElementById('auto-review-prompt');
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
+                        document.body.style.overflow = 'hidden';
+                    }, 800);
+
+                    // Mark as prompted so they don't get annoyed every time they open the app
+                    localStorage.setItem('BikriPage_prompted_review_' + unreviewedOrder.id, 'true');
+                }
+            }
+        }
+
+        function closeAutoReviewPrompt() {
+            const modal = document.getElementById('auto-review-prompt');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = '';
+        }
+
+    </script>
+
+     <!-- ✨ PREMIUM BILL CONTAINER ✨ -->
+    <div id="receipt-container" style="width: 800px !important; height: 1131px !important; min-width: 800px !important; display: block !important;" class="fixed -left-[9999px] top-0 bg-white text-[#1d1d1f] font-sans overflow-hidden shadow-2xl pb-0 z-[-50]">
+        <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap'); .font-inter { font-family: 'Inter', sans-serif; }</style>
+        
+        <div class="font-inter flex flex-col h-[1131px] w-full">
+            
+            <!-- PREMIUM HEADER -->
+            <div class="px-14 pt-16 pb-8 flex justify-between items-start shrink-0">
+                <div class="flex items-center gap-5">
+                    <div class="relative w-20 h-20 rounded-[20px] bg-gray-50 border border-gray-200 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+                        <div id="default-invoice-watermark" class="absolute inset-0 flex items-center justify-center">
+                            <span id="watermark-initials" class="text-gray-400 text-2xl font-black uppercase tracking-widest">ST</span>
+                        </div>
+                        <img id="bill-store-logo" src="" crossorigin="anonymous" class="absolute inset-0 w-full h-full object-cover hidden z-10">
+                    </div>
+                    <div class="pt-1">
+                        <h1 id="print-store-name" class="text-3xl font-black tracking-tight text-gray-900 leading-none uppercase">STORE NAME</h1>
+                        <p id="print-store-address" class="text-sm text-gray-600 mt-2 max-w-[280px] font-semibold leading-relaxed">Local Digital Store</p>
+                        <p class="text-sm text-gray-600 mt-1 font-semibold flex items-center gap-1.5"><i class="fas fa-phone-alt text-[11px] text-gray-500"></i> <span id="print-store-phone">Phone</span></p>
+                    </div>
+                </div>
+                
+                <div class="text-right pt-1">
+                    <h2 class="text-5xl font-black tracking-tighter text-gray-900 uppercase leading-none mb-3">Receipt</h2>
+                    <p class="text-sm text-gray-600 font-black tracking-widest uppercase" id="receipt-id">#ORD-0000</p>
+                </div>
+            </div>
+
+            <!-- PREMIUM SUB-HEADER CARD -->
+            <div class="mx-14 mb-8 bg-[#fafafa] rounded-[24px] p-8 flex justify-between items-center border border-gray-200 shadow-sm shrink-0">
+                <div>
+                    <p class="text-[11px] text-gray-500 uppercase font-black tracking-widest mb-2">Billed To</p>
+                    <p class="text-xl font-black text-gray-900 tracking-tight" id="receipt-name">Customer Name</p>
+                    <p class="text-sm text-gray-600 mt-1.5 max-w-[300px] leading-relaxed font-semibold" id="receipt-address">Customer Address</p>
+                </div>
+                <div class="text-right flex flex-col items-end gap-5">
+                    <div>
+                        <p class="text-[11px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Invoice Date</p>
+                        <p class="text-base font-bold text-gray-900" id="receipt-date">-</p>
+                    </div>
+                    <div>
+                        <p class="text-[11px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Contact</p>
+                        <p class="text-base font-bold text-gray-900">+91 <span id="receipt-phone">0000000000</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ENHANCED ITEMS TABLE -->
+            <div class="px-14 flex-1">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b-2 border-gray-200 text-gray-500 text-[11px] uppercase tracking-widest font-black">
+                            <th class="py-4 pr-4 w-12">No.</th>
+                            <th class="py-4 px-4">Description</th>
+                            <th class="py-4 px-4 text-center w-20">Qty</th>
+                            <th class="py-4 px-4 text-right w-28">Rate</th>
+                            <th class="py-4 pl-4 text-right w-36">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="receipt-items" class="text-base font-semibold text-gray-900">
+                        <!-- JS Injected Items -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- BOTTOM SECTION -->
+            <div class="shrink-0 mt-auto w-full flex flex-col">
+                <!-- PREMIUM TOTALS & STATUS SECTION -->
+                <div class="mx-14 pt-8 pb-4 flex justify-between items-end border-t border-gray-200 gap-8 relative z-10">
+                    
+                    <div class="pb-3 shrink-0">
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-1">Payment Status</p>
+                        <div class="inline-flex items-center justify-center h-10 px-6 rounded-full bg-gradient-to-r from-[#ECFDF5] to-[#D1FAE5] text-[#065F46] border border-[#A7F3D0] text-sm font-black tracking-widest leading-none shadow-sm">
+                            <i class="fas fa-check-circle mr-2 opacity-80 text-[12px]"></i> PAID
+                        </div>
+                    </div>
+
+                    <div class="min-w-[340px] max-w-[75%] bg-[#FCFCFD] rounded-[24px] p-7 border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.03)] ml-auto">
+                        <div id="receipt-breakdown" class="hidden flex-col space-y-3 border-b border-gray-200/60 pb-4 mb-4 text-sm font-bold text-gray-500">
+                            <div class="flex justify-between items-center gap-8">
+                                <span>Subtotal</span>
+                                <span id="receipt-subtotal" class="text-gray-900 text-right">₹0.00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-end gap-6">
+                            <span class="text-[11px] text-gray-400 font-black uppercase tracking-[0.2em] shrink-0 mb-1.5">Grand Total</span>
+                            <span class="text-[42px] font-black text-gray-900 tracking-tighter leading-none text-right break-words drop-shadow-sm" id="receipt-total">₹0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ULTRA SLIM PREMIUM FOOTER -->
+                <div class="mt-6 bg-gray-900 px-14 py-5 flex justify-between items-center rounded-t-[20px] relative overflow-hidden w-full">
+                    <div class="absolute inset-0 bg-gradient-to-r from-gray-800 to-gray-900 opacity-50"></div>
+                    
+                    <div class="relative z-10 text-left">
+                        <p class="text-white font-bold tracking-wide text-sm">Built on trust. Delivered with care.</p>
+                        <p class="text-[10px] text-gray-400 font-medium mt-1">ISSUED BY: <span id="print-store-name-footer" class="font-bold text-white uppercase tracking-wider">STORE NAME</span></p>
+                    </div>
+                    
+                    <div class="relative z-10 text-right">
+                        <p class="text-[11px] text-gray-500 font-bold tracking-widest uppercase relative z-10 flex items-center justify-center gap-2">
+                            POWERED BY <span class="text-white font-black">BikriPage</span> 
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ✨ JAVASCRIPT TO DOWNLOAD THE VIP BILL ✨ -->
+    <script>
+        async function downloadCustomerBill(orderId, event) {
+            const btn = event.currentTarget;
+            const origHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Downloading...`;
+            btn.disabled = true;
+
+            try {
+                const order = window.customerOrders.find(o => o.id === orderId);
+                if(!order) throw new Error("Order not found");
+
+                // 1. Basic Order Details Bharo
+                document.getElementById('receipt-id').innerText = `#ORD-${order.id.substring(0,6).toUpperCase()}`;
+                const sName = order.shopName || "Local Store";
+                document.getElementById('print-store-name').innerText = sName;
+                document.getElementById('print-store-name-footer').innerText = sName;
+                document.getElementById('receipt-name').innerText = order.customerName || "Customer";
+                document.getElementById('receipt-address').innerText = order.customerAddress || "Delhi, India";
+                document.getElementById('receipt-phone').innerText = order.customerPhone || "N/A";
+                
+                const d = order.createdAt ? order.createdAt.toDate() : new Date();
+                document.getElementById('receipt-date').innerText = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+                
+                // 2. Fetch Store Details from Firebase (Logo & Address)
+                document.getElementById('print-store-phone').innerText = order.shopPhone || "";
+                document.getElementById('watermark-initials').innerText = sName.substring(0, 2).toUpperCase();
+                
+                const billLogo = document.getElementById('bill-store-logo');
+                const watermark = document.getElementById('default-invoice-watermark');
+                billLogo.classList.add('hidden');
+                watermark.style.display = 'flex';
+
+                if (order.shopPhone) {
+                    const shopSnap = await db.collection('shops').where('phone', '==', order.shopPhone).get();
+                    if (!shopSnap.empty) {
+                        const sData = shopSnap.docs[0].data();
+                        if (sData.address) document.getElementById('print-store-address').innerText = sData.address;
+                        if (sData.storeLogo) {
+                            billLogo.src = sData.storeLogo;
+                            billLogo.classList.remove('hidden');
+                            watermark.style.display = 'none';
+                        }
+                    }
+                }
+                
+                // 3. Items Bharo
+                let itemsHtml = ''; let tA = 0;
+                if(order.items) {
+                    order.items.forEach((i, idx) => {
+                        let t = i.price * i.qty; tA += t;
+                        itemsHtml += `<tr class="border-b border-gray-100 last:border-0"><td class="py-5 pr-4 font-bold text-gray-400">${String(idx+1).padStart(2,'0')}</td><td class="py-5 px-4 font-black text-gray-900">${i.name}</td><td class="py-5 px-4 text-center font-bold">${i.qty}</td><td class="py-5 px-4 text-right font-semibold text-gray-600">₹${parseFloat(i.price).toFixed(2)}</td><td class="py-5 pl-4 text-right font-black text-gray-900">₹${parseFloat(t).toFixed(2)}</td></tr>`;
+                    });
+                }
+                document.getElementById('receipt-items').innerHTML = itemsHtml;
+                document.getElementById('receipt-total').innerText = `₹${tA.toFixed(2)}`;
+
+                // 4. Generate Photo
+                setTimeout(() => {
+                    const c = document.getElementById('receipt-container');
+                    html2canvas(c, { scale: 2, backgroundColor: "#ffffff", useCORS: true, windowWidth: 800, width: 800, windowHeight: 1131, height: 1131, logging: false }).then(cv => {
+                        let link = document.createElement('a'); 
+                        link.download = `BikriPage_Bill_${order.id.substring(0,6)}.png`; 
+                        link.href = cv.toDataURL("image/png", 1.0); 
+                        link.click();
+                        btn.innerHTML = origHtml; btn.disabled = false;
+                    }).catch(e => { alert("Failed to download bill."); btn.innerHTML = origHtml; btn.disabled = false; });
+                }, 800);
+
+            } catch(e) {
+                alert("Error downloading bill!");
+                btn.innerHTML = origHtml; btn.disabled = false;
+            }
+        }
+    </script>
+
+    <!-- ✨ EDITABLE REVIEW MODAL ✨ -->
+    <div id="review-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeReviewModal()"></div>
+        <div class="ios-card w-full max-w-sm p-6 relative z-10 animate-slide-up bg-white">
+            <h3 class="text-center font-bold text-gray-900 text-lg mb-1" id="review-shop-name">Store Name</h3>
+            <p class="text-center text-gray-500 text-[13px] mb-5">How was the product & delivery?</p>
+
+            <div class="flex justify-center gap-2 mb-6" id="star-container">
+                <i class="fas fa-star text-3xl text-gray-200 cursor-pointer transition-colors" onclick="setRating(1)"></i>
+                <i class="fas fa-star text-3xl text-gray-200 cursor-pointer transition-colors" onclick="setRating(2)"></i>
+                <i class="fas fa-star text-3xl text-gray-200 cursor-pointer transition-colors" onclick="setRating(3)"></i>
+                <i class="fas fa-star text-3xl text-gray-200 cursor-pointer transition-colors" onclick="setRating(4)"></i>
+                <i class="fas fa-star text-3xl text-gray-200 cursor-pointer transition-colors" onclick="setRating(5)"></i>
+            </div>
+
+            <textarea id="review-text" rows="3" placeholder="Write your experience (optional)..." class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-[14px] text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-4 resize-none transition-all"></textarea>
+
+            <div class="flex gap-3">
+                <button onclick="closeReviewModal()" class="flex-1 bg-gray-100 text-gray-700 font-semibold py-3 rounded-xl text-[15px] active:scale-95 transition-transform">Cancel</button>
+                <button onclick="submitReview()" id="submit-review-btn" class="flex-1 bg-blue-500 text-white font-semibold py-3 rounded-xl text-[15px] active:scale-95 transition-transform disabled:opacity-50">Post Review</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✨ AMAZON/FLIPKART STYLE E-COMMERCE SUCCESS MODAL ✨ -->
+    <div id="ecommerce-success-modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4">
+        <!-- Semi-transparent Backdrop -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeSuccessModal()"></div>
+        
+        <!-- Premium White Card -->
+        <div class="bg-white rounded-[24px] w-full max-w-[320px] p-8 relative z-10 flex flex-col items-center text-center shadow-2xl animate-pop-in">
+            
+            <!-- E-commerce Style Graphic (Green tick with pulse effect) -->
+            <div class="relative w-20 h-20 mb-5 flex items-center justify-center">
+                <div class="absolute inset-0 bg-green-100 rounded-full animate-ping opacity-75"></div>
+                <div class="relative bg-green-500 w-16 h-16 rounded-full flex items-center justify-center shadow-[0_4px_14px_rgba(34,197,94,0.4)]">
+                    <i class="fas fa-check text-3xl text-white"></i>
+                </div>
+            </div>
+            
+            <h3 class="font-black text-gray-900 text-2xl tracking-tight mb-2">Thank You!</h3>
+            <p class="text-gray-500 text-[14px] leading-relaxed mb-6 font-medium">Your review has been submitted successfully. This helps other shoppers make better decisions.</p>
+            
+            <button onclick="closeSuccessModal()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3.5 rounded-xl text-[15px] active:scale-95 transition-transform shadow-sm">
+                Done
+            </button>
+        </div>
+    </div>
+        <!-- ✨ iOS STYLE CANCEL CONFIRMATION MODAL ✨ -->
+    <div id="ios-cancel-modal" class="fixed inset-0 z-[300] hidden flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div id="ios-cancel-card" class="bg-white/90 backdrop-blur-xl w-[270px] rounded-[14px] shadow-2xl transform scale-95 transition-transform duration-300 text-center overflow-hidden flex flex-col">
+            <div class="p-4 pt-5 pb-4">
+                <h3 class="text-[17px] font-semibold text-black leading-tight mb-1">Cancel Order</h3>
+                <p class="text-[13px] text-black/70 leading-snug">Are you sure you want to cancel this order? </p>
+            </div>
+            <div class="flex border-t border-black/10">
+                <button onclick="closeCancelModal()" class="flex-1 py-3 text-[17px] text-[#007AFF] font-normal border-r border-black/10 hover:bg-black/5 active:bg-black/10 transition-colors">No</button>
+                <button onclick="confirmCancelAction()" class="flex-1 py-3 text-[17px] text-[#FF3B30] font-semibold hover:bg-black/5 active:bg-black/10 transition-colors">Yes, Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✨ AUTO REVIEW PROMPT MODAL ✨ -->
+    <div id="auto-review-prompt" class="fixed inset-0 z-[250] hidden items-end sm:items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeAutoReviewPrompt()"></div>
+        
+        <!-- Modal Card -->
+        <div class="bg-white rounded-[24px] w-full max-w-[340px] p-6 relative z-10 animate-slide-up shadow-2xl flex flex-col items-center text-center">
+            <button onclick="closeAutoReviewPrompt()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-50 w-8 h-8 rounded-full flex items-center justify-center transition active:scale-95"><i class="fas fa-times"></i></button>
+
+            <div class="w-16 h-16 bg-yellow-50 text-yellow-500 rounded-full flex items-center justify-center text-3xl mb-4 shadow-sm border border-yellow-100">
+                <i class="fas fa-star"></i>
+            </div>
+            
+            <h3 class="font-black text-gray-900 text-xl tracking-tight mb-2">How was your order?</h3>
+            <p class="text-[14px] text-gray-500 leading-relaxed mb-6 font-medium">Your recent order from <strong id="auto-review-shop" class="text-gray-800">Store</strong> has been delivered. Please share your experience!</p>
+
+            <button id="auto-review-btn" onclick="" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3.5 rounded-xl text-[15px] active:scale-95 transition-transform shadow-md">
+                Review Now
+            </button>
+        </div>
+    </div>
+
+    <!-- ✨ Review System Logic ✨ -->
+    <script>
+        let currentReviewOrderId = null;
+        let currentRating = 0;
+
+        function openReviewModal(orderId) {
+            const order = window.customerOrders.find(o => o.id === orderId);
+            if (!order) return;
+
+            currentReviewOrderId = orderId;
+            document.getElementById('review-shop-name').innerText = order.shopName || 'Store';
+            
+            // Check if review already exists (EDIT MODE)
+            if (order.review) {
+                currentRating = order.review.rating || 0;
+                document.getElementById('review-text').value = order.review.text || "";
+                document.getElementById('submit-review-btn').innerText = "Update";
+            } else {
+                currentRating = 0;
+                document.getElementById('review-text').value = "";
+                document.getElementById('submit-review-btn').innerText = "Post";
+            }
+
+            updateStarUI(currentRating);
+            
+            const modal = document.getElementById('review-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function closeReviewModal() {
+            const modal = document.getElementById('review-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = '';
+        }
+
+        function setRating(rating) {
+            currentRating = rating;
+            updateStarUI(rating);
+        }
+
+        function updateStarUI(rating) {
+            const stars = document.getElementById('star-container').children;
+            for (let i = 0; i < stars.length; i++) {
+                if (i < rating) {
+                    stars[i].classList.remove('text-gray-200');
+                    stars[i].classList.add('text-yellow-400');
+                } else {
+                    stars[i].classList.remove('text-yellow-400');
+                    stars[i].classList.add('text-gray-200');
+                }
+            }
+        }
+
+        async function submitReview() {
+            if (currentRating === 0) {
+                alert("Please select a star rating first!");
+                return;
+            }
+
+            const btn = document.getElementById('submit-review-btn');
+            const origHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+            btn.disabled = true;
+
+            const reviewText = document.getElementById('review-text').value.trim();
+
+            try {
+                // Update Order Document in Firebase
+                await db.collection('orders').doc(currentReviewOrderId).update({
+                    review: {
+                        rating: currentRating,
+                        text: reviewText,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }
+                });
+
+                closeReviewModal();
+                btn.innerHTML = origHtml;
+                btn.disabled = false;
+
+                // ✨ Show Amazon/Flipkart Style Modal
+                showSuccessModal();
+
+                // Refresh orders
+                fetchMyOrders(localStorage.getItem('BikriPage_customer_phone'));
+            } catch (error) {
+                alert("Could not post review: " + error.message);
+                btn.innerHTML = origHtml;
+                btn.disabled = false;
+            }
+        }
+
+        // Functions for the new E-commerce Style Success Modal
+        function showSuccessModal() {
+            const modal = document.getElementById('ecommerce-success-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden'; // Stop background scrolling
+        }
+
+        function closeSuccessModal() {
+            const modal = document.getElementById('ecommerce-success-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+    </script>
+</body>
+</html>

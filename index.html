@@ -1693,14 +1693,13 @@ loadHomeBanners();
                     const cardsHtmlArray = snapshot.docs.map((doc) => {
                         const shop = doc.data();
                         const shopId = doc.id;
-                      let badgeOrRatingHtml = '';
+                  let badgeOrRatingHtml = '';
 if (shop.rating && parseFloat(shop.rating) > 0) {
     let exactRating = parseFloat(shop.rating).toFixed(1);
-    badgeOrRatingHtml = `<div class="absolute top-3 right-3 bg-green-50 text-green-700 border border-green-200 px-1.5 py-0.5 rounded-md font-bold text-[10px] shadow-sm z-20 flex items-center gap-1"><i class="fas fa-star text-[8px] mb-[1px]"></i> ${exactRating}</div>`;
+    badgeOrRatingHtml = `<div class="absolute top-4 left-4 bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-md font-bold text-[10px] shadow-sm z-20 flex items-center gap-1"><i class="fas fa-star text-[8px] mb-[1px]"></i> ${exactRating}</div>`;
 } else {
-    badgeOrRatingHtml = `<div class="absolute top-3 right-3 bg-blue-50 text-blue-600 border border-blue-200 px-1.5 py-0.5 rounded-md font-bold text-[9px] uppercase tracking-wider shadow-sm z-20">New</div>`;
+    badgeOrRatingHtml = `<div class="absolute top-4 left-4 bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded-md font-bold text-[9px] uppercase tracking-wider shadow-sm z-20">New</div>`;
 }
-
 
 trackSearchImpression(shopId);
                                             let distanceHtml = "";
@@ -1745,11 +1744,13 @@ trackSearchImpression(shopId);
                             : '';
 
                         return `
-<div class="glass-card hover:bg-white rounded-[1.5rem] p-4 sm:p-6 hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 flex flex-col group relative overflow-hidden cursor-pointer active:scale-95 reveal border border-gray-100">
+div class="glass-card hover:bg-white rounded-[1.5rem] p-4 sm:p-6 hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 flex flex-col group relative overflow-hidden cursor-pointer active:scale-95 reveal border border-gray-100">
     
+    ${badgeOrRatingHtml} <!-- ✨ YE LAGA EKDUM TOP-LEFT PAR ✨ -->
+
     <!-- Image & Text Wrapper -->
     <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-3 sm:gap-4 mb-4 relative z-10 w-full">
-                ${badgeOrRatingHtml} <!-- ✨ YE TOP RIGHT PAR BADGE/RATING LAGAYEGA ✨ -->
+        
         <!-- Logo Section -->
         <div class="relative shrink-0 group-hover:scale-105 transition-transform duration-500 mx-auto sm:mx-0">
             <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gray-50 text-blue-500 rounded-full flex items-center justify-center relative z-10 ring-2 ${ringColor} ring-offset-[2px] ring-offset-white shadow-sm overflow-hidden">

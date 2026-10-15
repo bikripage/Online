@@ -805,18 +805,33 @@ function loginWithGoogle(event) {
         }
 
         
-        const custSnap = await db.collection('customers').doc(email).get();
+            const custSnap = await db.collection('customers').doc(email).get();
         if (custSnap.exists) {
             const custData = custSnap.data();
             localStorage.setItem('BikriPage_customer_name', custData.name);
             localStorage.setItem('BikriPage_customer_phone', email); 
             if (custData.profileImage) localStorage.setItem('BikriPage_profile_img', custData.profileImage);
             
+            // ✨ NAYA LOGIC: Login hote hi turant saari delivery details fetch karke save kar do ✨
+            if (custData.savedAddress) {
+                localStorage.setItem('BikriPage_saved_name', custData.savedName || custData.name);
+                localStorage.setItem('BikriPage_saved_phone', custData.savedPhone || '');
+                localStorage.setItem('BikriPage_saved_landmark', custData.savedLandmark || '');
+                localStorage.setItem('BikriPage_saved_address', custData.savedAddress || '');
+                if (custData.savedLat) localStorage.setItem('BikriPage_saved_lat', custData.savedLat);
+                if (custData.savedLng) localStorage.setItem('BikriPage_saved_lng', custData.savedLng);
+            }
+            
             closeAuthModal();
             updateUIBasedOnLogin();
             updateCartBadge();
+            
+            // Background prefetch ko bhi ek baar safety ke liye call kar do
+            if(typeof prefetchCustomerDetails === 'function') prefetchCustomerDetails();
+            
             return;
         }
+
         
         const shopSnap = await db.collection('shops').where('email', '==', email).get();
         if (!shopSnap.empty) {

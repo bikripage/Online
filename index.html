@@ -1689,19 +1689,41 @@ loadHomeBanners();
                         
                     if (snapshot.empty) { grid.innerHTML = `<p class="col-span-full text-center text-gray-500 py-8">No shops registered yet.</p>`; return; }
 
-                    
-                    const cardsHtmlArray = snapshot.docs.map((doc) => {
+                                        const cardsHtmlArray = await Promise.all(snapshot.docs.map(async (doc) => {
                         const shop = doc.data();
                         const shopId = doc.id;
-                  let badgeOrRatingHtml = '';
-if (shop.rating && parseFloat(shop.rating) > 0) {
-    let exactRating = parseFloat(shop.rating).toFixed(1);
-    badgeOrRatingHtml = `<div class="absolute top-4 left-4 bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-md font-bold text-[10px] shadow-sm z-20 flex items-center gap-1"><i class="fas fa-star text-[8px] mb-[1px]"></i> ${exactRating}</div>`;
-} else {
-    badgeOrRatingHtml = `<div class="absolute top-4 left-4 bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded-md font-bold text-[9px] uppercase tracking-wider shadow-sm z-20">New</div>`;
-}
 
-trackSearchImpression(shopId);
+                        // ✨ FETCH REAL RATING DYNAMICALLY ✨
+                        let realRating = 0;
+                        if (shop.phone) {
+                            try {
+                                const revSnap = await db.collection('orders').where('shopPhone', '==', shop.phone).where('status', '==', 'delivered').get();
+                                let totalR = 0, count = 0;
+                                let seenC = new Set();
+                                revSnap.forEach(rDoc => {
+                                    let ord = rDoc.data();
+                                    if(ord.review && ord.review.rating) {
+                                        if(!seenC.has(ord.customerId)) {
+                                            seenC.add(ord.customerId);
+                                            totalR += ord.review.rating;
+                                            count++;
+                                        }
+                                    }
+                                });
+                                if (count > 0) realRating = totalR / count;
+                            } catch(e) {}
+                        }
+
+                        let badgeOrRatingHtml = '';
+                        if (realRating > 0 || (shop.rating && parseFloat(shop.rating) > 0)) {
+                            let exactRating = realRating > 0 ? realRating.toFixed(1) : parseFloat(shop.rating).toFixed(1);
+                            badgeOrRatingHtml = `<div class="absolute top-4 left-4 bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-md font-bold text-[10px] shadow-sm z-20 flex items-center gap-1"><i class="fas fa-star text-[8px] mb-[1px]"></i> ${exactRating}</div>`;
+                        } else {
+                            badgeOrRatingHtml = `<div class="absolute top-4 left-4 bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded-md font-bold text-[9px] uppercase tracking-wider shadow-sm z-20">New</div>`;
+                        }
+
+                        trackSearchImpression(shopId);
+
                                             let distanceHtml = "";
                         if (typeof getDistanceFromLatLonInKm === "function" && custLat && custLng && shop.latitude && shop.longitude) {
                             let dist = getDistanceFromLatLonInKm(custLat, custLng, shop.latitude, shop.longitude);
@@ -1778,15 +1800,14 @@ trackSearchImpression(shopId);
     
          <!-- Button -->
     <a href="store.html?shop=${shopId}" class="mt-auto w-full bg-blue-50/50 hover:bg-blue-50 text-blue-600 font-bold py-2.5 sm:py-3.5 rounded-[12px] sm:rounded-2xl text-center text-[11px] sm:text-sm flex justify-center items-center gap-1.5 transition-colors duration-300">
-        Visit Store <i class="fas fa-arrow-right text-[10px]"></i>
+              Visit Store <i class="fas fa-arrow-right text-[10px]"></i>
     </a>
 </div>`;
 
-
-
-                    });
+                    })); // ✨ Yahan Promise close ho raha hai ✨
                     
                     grid.innerHTML = cardsHtmlArray.join('');
+
                     if(typeof initScrollAnimations === 'function') initScrollAnimations();
                 } catch (error) { 
                     console.error("Load Error:", error);

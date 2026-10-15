@@ -4749,17 +4749,53 @@ function trackSearchImpression(shopIdToTrack) {
             startAutoSlide();
         }
 
-             window.addEventListener('DOMContentLoaded', () => {
+                     // ✨ NAYA: Background Fetch Saved Details ✨
+        async function prefetchCustomerDetails() {
+            const customerPhone = localStorage.getItem('BikriPage_customer_phone');
+            const activeShop = localStorage.getItem('BikriPage_active_shop');
+            
+            // Sirf customer ke liye fetch karna hai (Dukaandar nahi)
+            if (customerPhone && !activeShop && customerPhone !== 'N/A') {
+                try {
+                    const doc = await db.collection('customers').doc(customerPhone).get();
+                    if (doc.exists && doc.data().savedAddress) {
+                        const d = doc.data();
+                        
+                        // Firebase se nikal kar sidha LocalStorage mein daal do
+                        localStorage.setItem('BikriPage_saved_name', d.savedName || '');
+                        localStorage.setItem('BikriPage_saved_phone', d.savedPhone || '');
+                        localStorage.setItem('BikriPage_saved_landmark', d.savedLandmark || '');
+                        localStorage.setItem('BikriPage_saved_address', d.savedAddress || '');
+                        
+                        if(d.savedLat && d.savedLng) {
+                            localStorage.setItem('BikriPage_saved_lat', d.savedLat);
+                            localStorage.setItem('BikriPage_saved_lng', d.savedLng);
+                        }
+                    }
+                } catch (e) {
+                    console.log("Prefetch error: ", e);
+                }
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            // 1. Sabse pehle database se banners fetch karo taaki refresh ki zarurat na pade
+            await loadHomeBanners();
+            
+            // 2. Fir UI aur Login status check karo
             const isLoggedIn = updateUIBasedOnLogin();
             updateCartBadge();
             
-            // 🚀 FIREBASE SE DYNAMIC BANNERS LOAD KAREGA AUR SLIDER CHALAYEGA
-            loadHomeBanners();
-
+            // ✨ NAYA: Background mein customer ki saved details mangwa lo ✨
+            if(isLoggedIn) {
+                prefetchCustomerDetails();
+            }
+            
             if (!isLoggedIn) {
                 setTimeout(openAuthModal, 500); 
             }
         });
+
 
         // 🌟 DYNAMIC BANNERS FETCHER FUNCTION FOR HOME PAGE 🌟
         async function loadHomeBanners() {

@@ -2038,7 +2038,17 @@
                         if (unitWrapper) { unitWrapper.classList.add('w-1/2'); unitWrapper.classList.remove('w-full'); }
                     }
 
-                    fetchFirebaseData(); 
+                                        fetchFirebaseData(); 
+                    
+                    // ✨ NAYA: Welcome Offer Modal सिर्फ तब आएगा जब Setup पूरा हो गया हो ✨
+                    const hasSeenOffer = localStorage.getItem('BikriPage_welcome_shown_' + currentShopId);
+                    if (!hasSeenOffer && isSetupDone) {
+                        setTimeout(() => {
+                            showWelcomeOfferModal();
+                            localStorage.setItem('BikriPage_welcome_shown_' + currentShopId, 'true');
+                        }, 1500); 
+                    }
+                    
                 } else { 
                     alert("Store not found! Please register again."); 
                     logout(); 
@@ -9991,18 +10001,7 @@ function trackEvent(eventType) {
             }, 350); 
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const activeShopId = localStorage.getItem('BikriPage_active_shop');
-            if (activeShopId) {
-                const hasSeenOffer = localStorage.getItem('BikriPage_welcome_shown_' + activeShopId);
-                if (!hasSeenOffer) {
-                    setTimeout(() => {
-                        showWelcomeOfferModal();
-                        localStorage.setItem('BikriPage_welcome_shown_' + activeShopId, 'true');
-                    }, 1500); 
-                }
-            }
-        });
+        
 
                      // ==========================================
         // ✨ PREMIUM ANALYTICS ENGINE (100% FIXED & COMPLETE) ✨

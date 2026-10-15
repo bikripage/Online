@@ -1693,9 +1693,14 @@ loadHomeBanners();
                     const cardsHtmlArray = snapshot.docs.map((doc) => {
                         const shop = doc.data();
                         const shopId = doc.id;
-                        let ratingHtml = shop.rating && shop.rating > 0 
-    ? `<span class="flex items-center justify-center gap-1 bg-green-50 text-green-700 border border-green-200 px-1.5 py-0.5 rounded-md font-bold text-[10px] shadow-sm"><i class="fas fa-star text-[8px] mb-[1px]"></i> ${shop.rating}</span>` 
-    : `<span class="flex items-center justify-center gap-1 bg-blue-50 text-blue-600 border border-blue-200 px-1.5 py-0.5 rounded-md font-bold text-[9px] uppercase tracking-wider shadow-sm">New</span>`;
+                      let badgeOrRatingHtml = '';
+if (shop.rating && parseFloat(shop.rating) > 0) {
+    let exactRating = parseFloat(shop.rating).toFixed(1);
+    badgeOrRatingHtml = `<div class="absolute top-3 right-3 bg-green-50 text-green-700 border border-green-200 px-1.5 py-0.5 rounded-md font-bold text-[10px] shadow-sm z-20 flex items-center gap-1"><i class="fas fa-star text-[8px] mb-[1px]"></i> ${exactRating}</div>`;
+} else {
+    badgeOrRatingHtml = `<div class="absolute top-3 right-3 bg-blue-50 text-blue-600 border border-blue-200 px-1.5 py-0.5 rounded-md font-bold text-[9px] uppercase tracking-wider shadow-sm z-20">New</div>`;
+}
+
 
 trackSearchImpression(shopId);
                                             let distanceHtml = "";
@@ -1744,7 +1749,7 @@ trackSearchImpression(shopId);
     
     <!-- Image & Text Wrapper -->
     <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-3 sm:gap-4 mb-4 relative z-10 w-full">
-        
+                ${badgeOrRatingHtml} <!-- ✨ YE TOP RIGHT PAR BADGE/RATING LAGAYEGA ✨ -->
         <!-- Logo Section -->
         <div class="relative shrink-0 group-hover:scale-105 transition-transform duration-500 mx-auto sm:mx-0">
             <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gray-50 text-blue-500 rounded-full flex items-center justify-center relative z-10 ring-2 ${ringColor} ring-offset-[2px] ring-offset-white shadow-sm overflow-hidden">
@@ -1760,10 +1765,11 @@ trackSearchImpression(shopId);
                 ${verifiedTick}
             </h4>
 
-                        <!-- ✨ ALIGNMENT FIXED ✨ -->
+                                 <!-- ✨ ALIGNMENT FIXED ✨ -->
             <div class="flex items-center justify-center sm:justify-start gap-2 mt-2.5 text-[10px] sm:text-xs text-gray-500 flex-wrap">
-                ${ratingHtml}${distanceHtml}
+                ${distanceHtml}
             </div>
+
             ${shop.landmark ? `<p class="text-[10px] sm:text-[11px] text-gray-500 mt-1.5 font-medium truncate flex items-center justify-center sm:justify-start gap-1"><i class="fas fa-location-dot text-purple-500 text-[10px]"></i> ${shop.landmark}</p>` : ''}
 
         </div>

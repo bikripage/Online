@@ -61,6 +61,9 @@
         ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
+                    /* ✨ NAYA: 100% Smooth Momentum Scrolling ✨ */
+        .custom-scrollbar { -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+        
             /* ✨ iOS Style Step Slider Animations (FIXED) ✨ */
         .step-wrapper {
             position: relative;
@@ -2074,13 +2077,28 @@
                     let live = [];
                     let pendingCount = 0; 
                     
-                    snapshot.forEach(doc => {
+                                      snapshot.forEach(doc => {
                         let data = doc.data();
                         if(data.status === 'pending') pendingCount++; 
                         live.push({id: doc.id, ...data});
                     });
                     
-                    live.sort((a,b) => (b.createdAt?.toMillis()||0) - (a.createdAt?.toMillis()||0));
+                    // ✨ NAYA LOGIC: Smart Priority Sorting ✨
+                    // (Pending aur Accepted hamesha upar rahenge, Delivered aur Cancelled neechay)
+                    const statusWeight = { 'pending': 1, 'accepted': 2, 'delivered': 3, 'cancelled': 4 };
+                    
+                    live.sort((a, b) => {
+                        let weightA = statusWeight[a.status] || 5;
+                        let weightB = statusWeight[b.status] || 5;
+                        
+                        // Pehle Status ki priority check karo
+                        if (weightA !== weightB) {
+                            return weightA - weightB; 
+                        }
+                        
+                        // Agar status same hai, tab nayi date wala upar rakho
+                        return (b.createdAt?.toMillis()||0) - (a.createdAt?.toMillis()||0); 
+                    });
                     
                     window.globalLiveOrders = live;
                     window.filterLiveOrders();
@@ -2316,8 +2334,8 @@
         }
 
 
-        // ✨ NAYA LOGIC: Order Delivered hote hi Bill banega aur Sales me judega ✨
-          async function updateLiveOrderStatus(orderId, newStatus, custPhone, custName) {
+              // ✨ NAYA LOGIC: Order Delivered hote hi Bill banega, aur Professional WhatsApp message jayega ✨
+        async function updateLiveOrderStatus(orderId, newStatus, custPhone, custName) {
             // ✨ NAYA: Premium iOS Confirm Popup ✨
             let actionColor = (newStatus === 'cancelled') ? 'text-[#FF3B30]' : 'text-[#007AFF]';
             let actionText = newStatus.charAt(0).toUpperCase() + newStatus.slice(1); // "accepted" ko "Accepted" banane ke liye
@@ -2334,35 +2352,40 @@
             try {
                 let billIdToSave = null;
 
-                if (newStatus === 'delivered') {
-                    const orderDoc = await db.collection('orders').doc(orderId).get();
-                    const oData = orderDoc.data();
-                    const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+                // ✨ NAYA: Pehle order details nikal lo taaki items ka pata chal sake
+                const orderDoc = await db.collection('orders').doc(orderId).get();
+                if (!orderDoc.exists) return;
+                const oData = orderDoc.data();
 
-                    // 🚀 BUG FIX: Amount ko Number banaya taaki Sales me jud sake!
+                // ✨ NAYA: Items ki ek clean list banana (Jaise: ▪ 1x INDIAN BROOM)
+                let itemsList = "";
+                if (oData.items && oData.items.length > 0) {
+                    itemsList = oData.items.map(i => `▪ ${i.qty}x ${i.name}`).join('\n');
+                }
+
+                if (newStatus === 'delivered') {
+                    const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
                     let grandTot = Number(oData.totalAmount) || 0;
 
                     let newBill = { 
-    date: dateStr, 
-    customerName: oData.customerName || "Customer", 
-    customerPhone: oData.customerPhone || "N/A", 
-    address: oData.customerAddress || "",
-    items: oData.items || [], 
-    discount: 0, 
-    delivery: 0, 
-    grandTotal: grandTot, 
-    payStatus: 'Unpaid',     // ✨ Ab ye Unpaid aayega
-    payMode: 'None',         // ✨ Jab tak dukaandar khud change na kare
-    deliveryStatus: 'Delivered', 
-    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    appOrderId: orderId
-};
-
+                        date: dateStr, 
+                        customerName: oData.customerName || "Customer", 
+                        customerPhone: oData.customerPhone || "N/A", 
+                        address: oData.customerAddress || "",
+                        items: oData.items || [], 
+                        discount: 0, 
+                        delivery: 0, 
+                        grandTotal: grandTot, 
+                        payStatus: 'Unpaid',
+                        payMode: 'None',
+                        deliveryStatus: 'Delivered', 
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        appOrderId: orderId
+                    };
 
                     const addedBill = await db.collection('shops').doc(currentShopId).collection('bills').add(newBill);
                     billIdToSave = addedBill.id;
                     
-                    // 🚀 Database ko force refresh karo taaki Sales, Customers aur Bills sab update ho jayein
                     setTimeout(() => { fetchFirebaseData(); }, 1500); 
                 }
 
@@ -2374,11 +2397,29 @@
 
                 await db.collection('orders').doc(orderId).update(orderUpdateData);
 
+                // ✨ NAYA: Ultra-Professional WhatsApp Message (With My Orders Link) ✨
                 if(custPhone && custPhone !== 'undefined' && custPhone !== 'N/A') {
                     let msg = "";
-                    if(newStatus === 'accepted') msg = `🎉 *Order Accepted!*\n\nHi ${custName},\nYour order (#${orderId.substring(0,6).toUpperCase()}) has been accepted by ${globalShopData.shopName}. We are preparing it for delivery!\n\nThank you!`;
-                    else if(newStatus === 'delivered') msg = `✅ *Order Delivered!*\n\nHi ${custName},\nYour order (#${orderId.substring(0,6).toUpperCase()}) has been delivered by ${globalShopData.shopName}.\n\nThanks for shopping locally!`;
-                    else if(newStatus === 'cancelled') msg = `❌ *Order Cancelled*\n\nHi ${custName},\nUnfortunately, ${globalShopData.shopName} had to cancel your order (#${orderId.substring(0,6).toUpperCase()}). Please contact the shop for details.`;
+                    const shopName = globalShopData.shopName;
+                    
+                    // ✨ NAYA: Dynamically generate 'My Orders' link
+                    let baseUrl = window.location.href.split('?')[0];
+                    let myOrdersLink = baseUrl.replace(/dashboard\.html/i, 'my-orders.html');
+                    
+                    // (Local testing fallback)
+                    if (myOrdersLink.startsWith("file://")) {
+                        myOrdersLink = "https://bikripage.github.io/Online/my-orders.html"; 
+                    }
+
+                    if(newStatus === 'accepted') {
+                        msg = `🎉 *Order Confirmed!*\n\nDear ${custName},\n\nGreat news! Your order from *${shopName}* has been accepted and is currently being prepared.\n\n*Order Details:*\n${itemsList}\n\n📦 *Track your order here:*\nYou can check the live status of your order in the 'My Orders' section:\n${myOrdersLink}\n\nThank you for choosing us!`;
+                    } 
+                    else if(newStatus === 'delivered') {
+                        msg = `✅ *Order Delivered!*\n\nDear ${custName},\n\nYour order from *${shopName}* has been successfully delivered.\n\n*Order Details:*\n${itemsList}\n\n🧾 *Download Your Official Bill:*\nYou can view your complete order summary and download your invoice from the 'My Orders' section here:\n${myOrdersLink}\n\nWe hope you enjoy your purchase. Thanks for shopping locally!`;
+                    } 
+                    else if(newStatus === 'cancelled') {
+                        msg = `❌ *Order Cancelled*\n\nDear ${custName},\n\nWe regret to inform you that your order from *${shopName}* could not be fulfilled at this time and has been cancelled.\n\n*Order Details:*\n${itemsList}\n\nCheck your order history here:\n${myOrdersLink}\n\nWe sincerely apologize for the inconvenience. Please contact us for further details.`;
+                    }
                     
                     if(msg) window.open(`https://wa.me/91${custPhone}?text=${encodeURIComponent(msg)}`, '_blank');
                 }
@@ -10205,7 +10246,7 @@ function trackEvent(eventType) {
                         <span class="text-xs text-gray-500 font-bold mt-2">/month</span>
                     </div>
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Free Basic Features Included</p>
-                </div>
+     ter        </div>
                 
                 <!-- Primary Action -->
                 <button onclick="closeWelcomeOffer()" class="w-full bg-gray-900 hover:bg-black text-white font-black text-[15px] py-4 rounded-2xl shadow-xl transition-all active:scale-95 tracking-wide mb-4">

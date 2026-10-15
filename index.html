@@ -948,18 +948,16 @@ async function handleShopSubmit(e) {
     btn.disabled = true;
 
     const shopSlug = shopName.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(1000 + Math.random() * 9000);
-    
-        const newShopData = { 
+      const newShopData = { 
         shopId: shopSlug, 
         shopName: shopName, 
         ownerName: authTemp.name, 
-        email: "bikripage@gmail.com", // Aapka custom Gmail yahan add hua
+        email: authTemp.email, // <-- Wapas shopkeeper ka original email set kar diya
         phone: authTemp.email, 
         storeLogo: authTemp.photoURL,
         uid: authTemp.uid,
         status: "active", 
         plan: "starter",
-        instagram: "@bikripage", // Aapka custom Insta handle yahan add hua
         createdAt: firebase.firestore.FieldValue.serverTimestamp() 
     };
 

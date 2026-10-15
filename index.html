@@ -1695,14 +1695,13 @@ loadHomeBanners();
                         const shopId = doc.id;
                         let avgRating = shop.rating ? shop.rating : "5.0"; 
 trackSearchImpression(shopId);
-                        let distanceHtml = "";
+                                            let distanceHtml = "";
                         if (typeof getDistanceFromLatLonInKm === "function" && custLat && custLng && shop.latitude && shop.longitude) {
                             let dist = getDistanceFromLatLonInKm(custLat, custLng, shop.latitude, shop.longitude);
-                            distanceHtml = `<span class="flex items-center gap-1 truncate"><i class="fas fa-map-marker-alt text-gray-400 opacity-70 text-[10px]"></i> ${dist} km away</span>`;
-                        } else {
-                            distanceHtml = `<span class="flex items-center gap-1 truncate"><i class="fas fa-location-arrow text-gray-400 opacity-70 text-[10px]"></i> Turn on GPS</span>`;
+                            // Yahan bullet (•) ko distance ke andar hi daal diya hai
+                            distanceHtml = `<span class="text-gray-300 hidden sm:inline">•</span> <span class="flex items-center gap-1 truncate"><i class="fas fa-map-marker-alt text-gray-400 opacity-70 text-[10px]"></i> ${dist} km away</span>`;
                         }
-                        
+
                                              // ✨ DYNAMIC VIP CHECK (Plan ke hisaab se) ✨
                         const pStatus = checkActivePlan(shop);
                         const verifiedTick = getVIPBadge(pStatus.isVerified, pStatus.plan);

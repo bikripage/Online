@@ -1225,8 +1225,8 @@ async function handleShopSubmit(e) {
                 Everything you need to manage your store, orders, billing, and insights—beautifully integrated in one place.
             </p>
 
-            <!-- 🔘 Apple Style Buttons -->
-            <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                        <!-- 🔘 Apple Style Buttons -->
+            <div class="flex flex-wrap flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
                 <a href="dashboard.html?shop=${activeShop}" class="w-full sm:w-auto px-8 h-[54px] rounded-2xl bg-[#1D1D1F] hover:bg-black text-white flex items-center justify-center text-[16px] font-semibold active:scale-95 transition-all shadow-[0_8px_20px_rgba(0,0,0,0.15)] gap-2">
                     Open Dashboard
                 </a>
@@ -1234,7 +1234,13 @@ async function handleShopSubmit(e) {
                 <a href="store.html?shop=${activeShop}" class="w-full sm:w-auto px-7 h-[54px] rounded-2xl bg-white/80 backdrop-blur-md border border-gray-200/80 text-[#1D1D1F] flex items-center justify-center text-[16px] font-semibold hover:bg-white active:scale-95 transition-all shadow-sm gap-2">
                     Visit My Store <i class="fas fa-arrow-right text-[12px] opacity-60"></i>
                 </a>
+                
+                <!-- ✨ NEW VIDEO BUTTON ✨ -->
+                <button onclick="openVideoModal()" class="w-full sm:w-auto px-7 h-[54px] rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 text-blue-600 flex items-center justify-center text-[16px] font-bold hover:shadow-md active:scale-95 transition-all gap-2">
+                    <i class="fas fa-play-circle text-xl"></i> What Is BikriPage?
+                </button>
             </div>
+
         </div>
 
         <!-- 🖼️ RIGHT: Floating iOS Bento Layout -->
@@ -4636,7 +4642,7 @@ function trackSearchImpression(shopIdToTrack) {
             const profileModal = document.getElementById('ios-profile-modal');
             const authModal = document.getElementById('auth-modal');
             const mapModal = document.getElementById('map-picker-modal');
-
+const videoModal = document.getElementById('video-tutorial-modal');
             // Agar Product Details khula hai, toh pehle use band karo
             if (productModal && !productModal.classList.contains('hidden') && !productModal.classList.contains('translate-x-full')) {
                 closeProductDetails();
@@ -4672,7 +4678,12 @@ function trackSearchImpression(shopIdToTrack) {
                 closeMapPicker();
                 return;
             }
+            if (videoModal && !videoModal.classList.contains('hidden') && !videoModal.classList.contains('opacity-0')) {
+                closeVideoModal();
+                return;
+            }
         });
+        
 
         // 3. Modals ke khulne par history state push karne ke liye automatic triggers
         document.addEventListener('DOMContentLoaded', () => {
@@ -4913,9 +4924,111 @@ function trackSearchImpression(shopIdToTrack) {
                 console.log("Banner load error:", e); 
             }
         }
+        // ===============================================
+        // ✨ VIDEO MODAL LOGIC ✨
+        // ===============================================
+        function openVideoModal() {
+            const modal = document.getElementById('video-tutorial-modal');
+            const content = document.getElementById('video-modal-content');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+            
+            // Back button manager me push karein taaki back dabane par modal band ho
+            if(typeof pushModalState === 'function') pushModalState('video');
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('video-tutorial-modal');
+            const content = document.getElementById('video-modal-content');
+            
+            // Animation hide
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            
+            // Jab modal band ho toh video rok dein taaki background me aawaz na aaye
+            document.getElementById('video-hindi').pause();
+            document.getElementById('video-english').pause();
+
+            setTimeout(() => { 
+                modal.classList.add('hidden'); 
+                document.body.style.overflow = 'auto'; 
+            }, 300);
+        }
+
+        function switchVideoLang(lang) {
+            const btnHi = document.getElementById('lang-hindi-btn');
+            const btnEn = document.getElementById('lang-eng-btn');
+            const vidHi = document.getElementById('video-hindi');
+            const vidEn = document.getElementById('video-english');
+
+            // Pehle dono video pause karo
+            vidHi.pause();
+            vidEn.pause();
+
+            if (lang === 'hindi') {
+                btnHi.className = 'px-4 py-1.5 rounded-lg bg-white shadow-sm text-blue-600 transition-all';
+                btnEn.className = 'px-4 py-1.5 rounded-lg text-gray-500 hover:text-gray-800 transition-all bg-transparent';
+                vidHi.classList.remove('hidden');
+                vidEn.classList.add('hidden');
+            } else {
+                btnEn.className = 'px-4 py-1.5 rounded-lg bg-white shadow-sm text-blue-600 transition-all';
+                btnHi.className = 'px-4 py-1.5 rounded-lg text-gray-500 hover:text-gray-800 transition-all bg-transparent';
+                vidEn.classList.remove('hidden');
+                vidHi.classList.add('hidden');
+            }
+        }
 
     </script>
 
-   
+       <!-- ✨ PREMIUM VIDEO TUTORIAL MODAL ✨ -->
+    <div id="video-tutorial-modal" class="fixed inset-0 bg-[#111827]/80 backdrop-blur-md z-[200] hidden flex items-center justify-center p-4 transition-all duration-300 opacity-0">
+        <div id="video-modal-content" class="bg-white rounded-[2rem] shadow-2xl w-full max-w-3xl overflow-hidden transform scale-95 transition-all duration-300 relative flex flex-col">
+            
+            <!-- Modal Header with Language Switcher -->
+            <div class="flex items-center justify-between p-4 sm:p-5 border-b border-gray-100 bg-gray-50">
+                <h3 class="font-black text-gray-900 text-lg flex items-center gap-2">
+                    <i class="fas fa-play-circle text-blue-600"></i> BikriPage Guide
+                </h3>
+                
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <!-- Language Toggle (Apple Style) -->
+                    <div class="bg-gray-200/60 p-1 rounded-xl flex font-bold text-[12px]">
+                        <button id="lang-hindi-btn" onclick="switchVideoLang('hindi')" class="px-4 py-1.5 rounded-lg bg-white shadow-sm text-blue-600 transition-all">Hindi</button>
+                        <button id="lang-eng-btn" onclick="switchVideoLang('english')" class="px-4 py-1.5 rounded-lg text-gray-500 hover:text-gray-800 transition-all bg-transparent">English</button>
+                    </div>
+                    
+                    <!-- Close Button -->
+                    <button onclick="closeVideoModal()" class="w-8 h-8 bg-white hover:bg-gray-100 border border-gray-200 rounded-full flex items-center justify-center text-gray-600 transition-colors active:scale-90 shadow-sm">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Video Player Area -->
+            <div class="relative w-full aspect-video bg-black">
+                <!-- Hindi Video (Default) -->
+                <video id="video-hindi" class="w-full h-full object-cover" controls preload="none">
+                    <!-- YAHAN APNI HINDI VIDEO KA LINK DAALEIN -->
+                    <source src="https://github.com/bikripage/Online/releases/download/Video/hindi.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                
+                <!-- English Video -->
+                <video id="video-english" class="w-full h-full object-cover hidden" controls preload="none">
+                    <!-- YAHAN APNI ENGLISH VIDEO KA LINK DAALEIN -->
+                    <source src="https://github.com/bikripage/Online/releases/download/Video/english.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html> 

@@ -2373,7 +2373,7 @@
                     itemsList = oData.items.map(i => `▪ ${i.qty}x ${i.name}`).join('\n');
                 }
 
-                if (newStatus === 'delivered') {
+                                if (newStatus === 'delivered') {
                     const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
                     let grandTot = Number(oData.totalAmount) || 0;
 
@@ -2386,8 +2386,8 @@
                         discount: 0, 
                         delivery: 0, 
                         grandTotal: grandTot, 
-                        payStatus: 'Unpaid',
-                        payMode: 'None',
+                        payStatus: 'Paid',                  // 👈 YAHAN 'Unpaid' ki jagah 'Paid' kar dijiye!
+                        payMode: 'UPI (Online)',            // 👈 Agar chahein toh by default payment mode bhi set kar sakte hain
                         deliveryStatus: 'Delivered', 
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         appOrderId: orderId

@@ -4924,13 +4924,20 @@ const videoModal = document.getElementById('video-tutorial-modal');
                 console.log("Banner load error:", e); 
             }
         }
-        // ===============================================
-        // ✨ VIDEO MODAL LOGIC ✨
-        // ===============================================
-        function openVideoModal() {
+               function openVideoModal() {
             const modal = document.getElementById('video-tutorial-modal');
             const content = document.getElementById('video-modal-content');
             
+            // Modal khulte hi default Hindi video load kardo
+            document.getElementById('video-hindi').src = "https://www.youtube.com/embed/mjln-Z9dRzw?autoplay=1";
+            document.getElementById('video-english').src = ""; // English blank rakho
+
+            // Button reset to Hindi
+            document.getElementById('lang-hindi-btn').className = 'px-4 py-1.5 rounded-lg bg-white shadow-sm text-blue-600 transition-all';
+            document.getElementById('lang-eng-btn').className = 'px-4 py-1.5 rounded-lg text-gray-500 hover:text-gray-800 transition-all bg-transparent';
+            document.getElementById('video-hindi').classList.remove('hidden');
+            document.getElementById('video-english').classList.add('hidden');
+
             modal.classList.remove('hidden');
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
@@ -4939,7 +4946,6 @@ const videoModal = document.getElementById('video-tutorial-modal');
             }, 10);
             document.body.style.overflow = 'hidden';
             
-            // Back button manager me push karein taaki back dabane par modal band ho
             if(typeof pushModalState === 'function') pushModalState('video');
         }
 
@@ -4947,14 +4953,13 @@ const videoModal = document.getElementById('video-tutorial-modal');
             const modal = document.getElementById('video-tutorial-modal');
             const content = document.getElementById('video-modal-content');
             
-            // Animation hide
             modal.classList.add('opacity-0');
             content.classList.remove('scale-100');
             content.classList.add('scale-95');
             
-            // Jab modal band ho toh video rok dein taaki background me aawaz na aaye
-            document.getElementById('video-hindi').pause();
-            document.getElementById('video-english').pause();
+            // ✨ MAIN FIX: Iframe ka src khali karne se background audio aur freeze problem khatam ho jayegi!
+            document.getElementById('video-hindi').src = "";
+            document.getElementById('video-english').src = "";
 
             setTimeout(() => { 
                 modal.classList.add('hidden'); 
@@ -4968,18 +4973,22 @@ const videoModal = document.getElementById('video-tutorial-modal');
             const vidHi = document.getElementById('video-hindi');
             const vidEn = document.getElementById('video-english');
 
-            // Pehle dono video pause karo
-            vidHi.pause();
-            vidEn.pause();
-
             if (lang === 'hindi') {
                 btnHi.className = 'px-4 py-1.5 rounded-lg bg-white shadow-sm text-blue-600 transition-all';
                 btnEn.className = 'px-4 py-1.5 rounded-lg text-gray-500 hover:text-gray-800 transition-all bg-transparent';
+                
+                vidEn.src = ""; // English band karo
+                vidHi.src = "https://www.youtube.com/embed/mjln-Z9dRzw?autoplay=1"; // Hindi chalao
+                
                 vidHi.classList.remove('hidden');
                 vidEn.classList.add('hidden');
             } else {
                 btnEn.className = 'px-4 py-1.5 rounded-lg bg-white shadow-sm text-blue-600 transition-all';
                 btnHi.className = 'px-4 py-1.5 rounded-lg text-gray-500 hover:text-gray-800 transition-all bg-transparent';
+                
+                vidHi.src = ""; // Hindi band karo
+                vidEn.src = "https://www.youtube.com/embed/igKhf_KLftI?autoplay=1"; // English chalao
+                
                 vidEn.classList.remove('hidden');
                 vidHi.classList.add('hidden');
             }
@@ -5011,13 +5020,13 @@ const videoModal = document.getElementById('video-tutorial-modal');
                 </div>
             </div>
 
-                     <!-- Video Player Area -->
+                           <!-- Video Player Area -->
             <div class="relative w-full aspect-video bg-black">
                 <!-- Hindi Video (Default) -->
-                <iframe id="video-hindi" class="w-full h-full object-cover" src="https://www.youtube.com/embed/mjln-Z9dRzw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe id="video-hindi" class="w-full h-full object-cover" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 
                 <!-- English Video -->
-                <iframe id="video-english" class="w-full h-full object-cover hidden" src="https://www.youtube.com/embed/igKhf_KLftI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe id="video-english" class="w-full h-full object-cover hidden" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
 
 

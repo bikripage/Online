@@ -2353,7 +2353,7 @@ function getVIPBadge(isVerified, plan) {
             }
         }
 
-        async function checkoutCartInApp() {
+           async function checkoutCartInApp() {
             let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
             if(cart.length === 0) { alert("Cart is empty!"); return; }
             
@@ -2384,14 +2384,6 @@ function getVIPBadge(isVerified, plan) {
                     const phone = shopPhones[i];
                     const orderData = ordersByShop[phone];
                     
-                                    // ✨ NAYA: 4-Digit Random OTP Generate karein
-                const deliveryOtpCode = Math.floor(1000 + Math.random() * 9000).toString();
-
-                const shopPhones = Object.keys(ordersByShop);
-                for (let i = 0; i < shopPhones.length; i++) {
-                    const phone = shopPhones[i];
-                    const orderData = ordersByShop[phone];
-                    
                     await db.collection('orders').add({
                         customerId: accountId, 
                         customerName: custName,
@@ -2405,7 +2397,7 @@ function getVIPBadge(isVerified, plan) {
                         items: orderData.items,
                         totalAmount: orderData.total,
                         status: 'pending',
-                        deliveryOtp: deliveryOtpCode, // ✨ NAYA: OTP database mein save hoga
+                        deliveryOtp: Math.floor(1000 + Math.random() * 9000).toString(), // ✨ YAHAN OTP ADD HUA
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 }
@@ -2541,36 +2533,22 @@ function getVIPBadge(isVerified, plan) {
 
                      // ✨ IN-APP PLACE ORDER (No WhatsApp Redirect) ✨
            // ✨ IN-APP PLACE ORDER (FIXED FOR MY ORDERS) ✨
-        async function submitOrder(e) {
+                async function submitOrder(e) {
             e.preventDefault();
-            if (!currentOrder || currentOrder.itemPrice === undefined || currentOrder.itemPrice === null) {
-                alert('Please select a product again before placing the order.');
-                return;
-            }
-            const qty = Number.parseInt(document.getElementById('order-qty').value, 10);
+            const qty = document.getElementById('order-qty').value;
             const custName = document.getElementById('order-cust-name').value.trim();
-            const custWhatsApp = document.getElementById('order-cust-phone').value.trim(); // फॉर्म वाला नंबर
+            const custWhatsApp = document.getElementById('order-cust-phone').value.trim(); 
             const address = document.getElementById('order-address').value.trim();
-            const unitPrice = Number.parseFloat(String(currentOrder.itemPrice).replace(/[^0-9.]/g, ''));
-            if (!Number.isInteger(qty) || qty < 1) { alert('Please enter a valid quantity.'); return; }
-            if (!custName || !/^[0-9]{10}$/.test(custWhatsApp) || !address) {
-                alert('Please enter your name, a valid 10-digit WhatsApp number, and delivery address.');
-                return;
-            }
-            if (!Number.isFinite(unitPrice) || unitPrice < 0) { alert('This product has an invalid price. Please refresh and try again.'); return; }
-            const total = unitPrice * qty;
-            const phone = currentOrder.shopPhone || '';
             
-            // ✨ ASLI ACCOUNT ID YAHAN SE NIKALO ✨
+            const total = parseInt(currentOrder.itemPrice) * parseInt(qty);
+            const phone = currentOrder.shopPhone || '9876543210';
+            
             const accountId = localStorage.getItem('BikriPage_customer_phone');
 
             const btn = document.getElementById('main-order-btn');
             const origHtml = btn.innerHTML;
             btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Placing...`;
             btn.disabled = true;
-
-                        // ✨ NAYA: 4-Digit Random OTP Generate karein
-            const deliveryOtpCode = Math.floor(1000 + Math.random() * 9000).toString();
 
             try {
                 await db.collection('orders').add({
@@ -2581,16 +2559,14 @@ function getVIPBadge(isVerified, plan) {
                     lat: document.getElementById('order-lat').value || null,
                     lng: document.getElementById('order-lng').value || null,
                     shopPhone: phone,
-                    shopId: currentShopId, 
+                    shopId: currentShopId || '', 
                     shopName: currentOrder.shopName || 'Local Store',
                     items: [{ name: currentOrder.itemName, qty: parseInt(qty), price: parseInt(currentOrder.itemPrice) }],
                     totalAmount: total,
                     status: 'pending',
-                    deliveryOtp: deliveryOtpCode, // ✨ NAYA: OTP database mein save hoga
+                    deliveryOtp: Math.floor(1000 + Math.random() * 9000).toString(), // ✨ YAHAN OTP ADD HUA
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-
-
 
                 closeOrderModal();
                 showOrderSuccessModal(); 

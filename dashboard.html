@@ -2245,10 +2245,21 @@
                 if (o.status === 'pending') {
                     sBg = "bg-blue-50 text-blue-600"; statusText = "New Order"; statusDot = "bg-blue-500";
                     cardBorder = "border-[2px] border-blue-400 shadow-[0_8px_20px_rgba(59,130,246,0.15)]"; // Blue Outline
-                } else if (o.status === 'accepted') {
-                    sBg = "bg-purple-50 text-purple-600"; statusText = "Preparing"; statusDot = "bg-purple-500";
-                    cardBorder = "border-[2px] border-purple-400 shadow-[0_8px_20px_rgba(168,85,247,0.15)]"; // Purple Outline
-                } else if (o.status === 'delivered') {
+                               } else if(o.status === 'accepted') {
+                    // ✨ NAYA UPDATE: Accept hone ke baad sirf 2 buttons (Label aur Delivered) aayenge
+                    btns = `
+                        <!-- 📄 Print Label / QR Button -->
+                        <button onclick="printShippingLabel('${o.id}')" class="flex-1 bg-blue-50 text-blue-600 font-bold h-12 rounded-[16px] text-[13px] active:scale-95 transition shadow-sm flex items-center justify-center gap-1.5 border border-blue-100">
+                            <i class="fas fa-qrcode text-lg"></i> Label
+                        </button>
+                        
+                        <!-- ✅ Mark Delivered Button -->
+                        <button onclick="updateLiveOrderStatus('${o.id}', 'delivered', '${o.customerPhone}', '${o.customerName}')" class="flex-[1.2] bg-[#16A34A] text-white font-bold h-12 rounded-[16px] text-[13px] active:scale-95 transition shadow-[0_4px_14px_rgba(22,163,74,0.3)] flex items-center justify-center gap-1.5">
+                            <i class="fas fa-check-circle"></i> Delivered
+                        </button>
+                    `;
+                } else if(o.status === 'delivered') {
+
                     sBg = "bg-green-50 text-green-600"; statusText = "Delivered"; statusDot = "bg-green-500";
                     cardBorder = "border-[2px] border-green-400 shadow-[0_8px_20px_rgba(34,197,94,0.15)]"; // Green Outline
                 } else if (o.status === 'cancelled') {
@@ -2258,21 +2269,34 @@
                     cardBorder = "border border-gray-200/60 shadow-sm";
                 }
 
-                // ✨ Refined Action Buttons
+                               // ✨ Refined Action Buttons (Ab Delete hamesha rahega)
                 let btns = '';
+                
+                // Common Delete Button (Ye har status me dikhega)
+                const deleteBtnHtml = `<button onclick="deleteLiveOrder('${o.id}')" class="w-12 h-12 bg-red-50 text-red-500 rounded-[16px] flex items-center justify-center text-lg active:scale-95 transition shrink-0 border border-red-100 shadow-sm" title="Delete Order"><i class="fas fa-trash-alt"></i></button>`;
+
                 if(o.status === 'pending') {
                     btns = `
-                        <button onclick="updateLiveOrderStatus('${o.id}', 'cancelled', '${o.customerPhone}', '${o.customerName}')" class="w-12 h-12 bg-red-50 text-red-500 rounded-[16px] flex items-center justify-center text-lg active:scale-95 transition shrink-0"><i class="fas fa-times"></i></button>
+                        ${deleteBtnHtml}
                         <button onclick="updateLiveOrderStatus('${o.id}', 'accepted', '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-[#111827] text-white font-bold h-12 rounded-[16px] text-[14px] hover:bg-black active:scale-95 transition shadow-[0_4px_14px_rgba(0,0,0,0.15)] flex items-center justify-center gap-2">Accept Order</button>
                     `;
                 } else if(o.status === 'accepted') {
-                    btns = `<button onclick="updateLiveOrderStatus('${o.id}', 'delivered', '${o.customerPhone}', '${o.customerName}')" class="w-full bg-[#16A34A] text-white font-bold h-12 rounded-[16px] text-[14px] active:scale-95 transition shadow-[0_4px_14px_rgba(22,163,74,0.3)] flex items-center justify-center gap-2"><i class="fas fa-check-circle"></i> Mark Delivered</button>`;
+                    btns = `
+                        ${deleteBtnHtml}
+                        <button onclick="printShippingLabel('${o.id}')" class="flex-1 bg-blue-50 text-blue-600 font-bold h-12 rounded-[16px] text-[13px] active:scale-95 transition shadow-sm flex items-center justify-center gap-1.5 border border-blue-100"><i class="fas fa-qrcode text-lg"></i> Label</button>
+                        <button onclick="updateLiveOrderStatus('${o.id}', 'delivered', '${o.customerPhone}', '${o.customerName}')" class="flex-[1.2] bg-[#16A34A] text-white font-bold h-12 rounded-[16px] text-[13px] active:scale-95 transition shadow-[0_4px_14px_rgba(22,163,74,0.3)] flex items-center justify-center gap-1.5"><i class="fas fa-check-circle"></i> Delivered</button>
+                    `;
                 } else if(o.status === 'delivered') {
                     btns = `
-                        <button disabled class="flex-[1.5] bg-gray-50 text-[#16A34A] font-bold h-12 rounded-[16px] text-[13px] border border-gray-200 opacity-60">Delivered</button>
-                        <button onclick="downloadBillImage('${o.billId || o.id}')" class="flex-1 bg-blue-50 text-blue-600 font-bold h-12 rounded-[16px] text-[13px] active:scale-95 transition flex items-center justify-center gap-1.5"><i class="fas fa-download"></i> Bill</button>`;
+                        ${deleteBtnHtml}
+                        <button disabled class="flex-[1.2] bg-gray-50 text-[#16A34A] font-bold h-12 rounded-[16px] text-[13px] border border-gray-200 opacity-60">Delivered</button>
+                        <button onclick="downloadBillImage('${o.billId || o.id}')" class="flex-1 bg-blue-50 text-blue-600 font-bold h-12 rounded-[16px] text-[13px] active:scale-95 transition flex items-center justify-center gap-1.5 border border-blue-100"><i class="fas fa-download"></i> Bill</button>
+                    `;
                 } else {
-                    btns = `<div class="w-full text-center py-3.5 bg-gray-50 rounded-[16px] text-gray-500 text-[12px] font-bold uppercase tracking-widest">Order ${o.status}</div>`;
+                    btns = `
+                        ${deleteBtnHtml}
+                        <div class="flex-1 flex items-center justify-center h-12 bg-gray-50 rounded-[16px] text-gray-500 text-[12px] font-bold uppercase tracking-widest border border-gray-200">Order ${o.status}</div>
+                    `;
                 }
 
                 let ini = (o.customerName || 'C').charAt(0).toUpperCase();
@@ -10209,6 +10233,117 @@ function trackEvent(eventType) {
             window.updateGrowthChart(metricSelect ? metricSelect.value : 'orders');
         };
 
+        // ==========================================
+        // ✨ NAYA: DELETE LIVE ORDER FUNCTION ✨
+        // ==========================================
+        async function deleteLiveOrder(orderId) {
+            const isConfirmed = await iosConfirm(
+                "Delete Order", 
+                "Are you sure you want to permanently delete this order?", 
+                "Delete", 
+                "text-[#FF3B30]"
+            );
+            
+            if(!isConfirmed) return; 
+            
+            try {
+                // Firebase se delete kar dega
+                await db.collection('orders').doc(orderId).delete();
+                iosAlert("Deleted", "Order has been deleted successfully.");
+            } catch(e) {
+                iosAlert("Error", e.message);
+            }
+        }
+
+        // ==========================================
+        // ✨ NAYA: PRINT SHIPPING LABEL & QR CODE ✨
+        // ==========================================
+        function printShippingLabel(orderId) {
+            // Backend se order data nikalna
+            const order = window.globalLiveOrders.find(o => o.id === orderId);
+            if(!order) return iosAlert("Error", "Order not found");
+            
+            const shopName = typeof globalShopData !== 'undefined' ? globalShopData.shopName : "Store Name";
+            const shopPhone = typeof globalShopData !== 'undefined' ? globalShopData.phone : "";
+            const customerAddress = order.customerAddress || 'Address not provided';
+            
+            // Google Maps URL (Taaki delivery wala scan karte hi location pe nikal jaye)
+            const mapUrl = (order.lat && order.lng) 
+                ? `https://www.google.com/maps/dir/?api=1&destination=${order.lat},${order.lng}` 
+                : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(customerAddress)}`;
+
+            // Nayi Window me Print Label Layout kholna
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Print Label - ${orderId}</title>
+                    <script src="https://cdn.tailwindcss.com"><\/script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+                    <style>
+                        @media print { body { -webkit-print-color-adjust: exact; } }
+                        body { background: #f3f4f6; display: flex; justify-content: center; padding: 20px; font-family: sans-serif; }
+                        .label-card { width: 100%; max-width: 400px; background: white; border: 2px solid #000; border-radius: 12px; padding: 20px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="label-card">
+                        <!-- HEADER -->
+                        <div class="text-center border-b-2 border-black pb-3 mb-4">
+                            <h2 class="text-2xl font-black uppercase tracking-tight">${shopName}</h2>
+                            <p class="text-sm font-bold mt-1">Ph: ${shopPhone}</p>
+                        </div>
+                        
+                        <!-- TO (CUSTOMER) -->
+                        <div class="border-b border-gray-300 pb-4 mb-4">
+                            <p class="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1">Deliver To:</p>
+                            <h3 class="text-xl font-bold text-black">${order.customerName}</h3>
+                            <p class="text-sm font-medium mt-1 leading-snug">${customerAddress}</p>
+                            <p class="text-sm font-bold mt-2">Ph: +91 ${order.customerPhone}</p>
+                        </div>
+                        
+                        <!-- ORDER DETAILS & AMOUNT -->
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1">Order ID</p>
+                                <p class="text-sm font-bold font-mono">#${order.id.substring(0,8).toUpperCase()}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1">Amount to Collect</p>
+                                <p class="text-2xl font-black text-black">₹${order.totalAmount}</p>
+                            </div>
+                        </div>
+
+                        <!-- QR CODE SECTION -->
+                        <div class="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl border border-dashed border-gray-400 mb-4">
+                            <div id="qrcode"></div>
+                            <p class="text-xs font-bold text-gray-500 mt-3 text-center uppercase tracking-wider">Scan to open Google Maps <br>& Navigate</p>
+                        </div>
+                        
+                        <div class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                            Powered by BikriPage
+                        </div>
+                    </div>
+
+                    <script>
+                        // Thoda delay taaki script load ho jaye, phir QR banaye aur print khol de
+                        setTimeout(() => {
+                            new QRCode(document.getElementById("qrcode"), {
+                                text: "${mapUrl}",
+                                width: 140,
+                                height: 140,
+                                colorDark : "#000000",
+                                colorLight : "#ffffff",
+                                correctLevel : QRCode.CorrectLevel.M
+                            });
+                            setTimeout(() => { window.print(); }, 800);
+                        }, 200);
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
 
     </script>
 

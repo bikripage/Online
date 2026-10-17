@@ -2962,32 +2962,31 @@ function getVIPBadge(isVerified, plan) {
 
 
     </script>
-        <!-- ✨ iOS STYLE CUSTOMER PROFILE MODAL (FULL SAFE CODE) ✨ -->
+            <!-- ✨ COMPACT iOS STYLE CUSTOMER PROFILE MODAL (NO SCROLL) ✨ -->
     <div id="ios-profile-modal" class="fixed inset-0 z-[150] hidden transition-all duration-300 opacity-0">
         <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onclick="toggleProfileModal()"></div>
         
-        <div class="absolute top-16 left-0 right-0 w-full max-w-md mx-auto px-4">
-            <div id="ios-profile-content" class="bg-white rounded-[2rem] shadow-2xl w-full max-h-[75vh] flex flex-col transform scale-90 transition-all duration-300 relative">
+        <div class="absolute top-12 left-0 right-0 w-full max-w-md mx-auto px-4">
+            <div id="ios-profile-content" class="bg-white rounded-[1.5rem] shadow-2xl w-full flex flex-col transform scale-90 transition-all duration-300 relative">
                 
                 <!-- Header -->
-                <div class="flex items-center justify-between p-5 border-b border-gray-100 shrink-0">
-                    <h3 class="font-black text-gray-900 text-xl">My Account</h3>
-                    <button onclick="toggleProfileModal()" class="text-gray-400 hover:text-gray-800 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center transition active:scale-90"><i class="fas fa-times"></i></button>
+                <div class="flex items-center justify-between p-4 border-b border-gray-100 shrink-0">
+                    <h3 class="font-black text-gray-900 text-lg">My Account</h3>
+                    <button onclick="toggleProfileModal()" class="text-gray-400 hover:text-gray-800 w-7 h-7 rounded-full bg-gray-50 flex items-center justify-center transition active:scale-90"><i class="fas fa-times text-sm"></i></button>
                 </div>
 
-                <!-- Scrollable Content Area -->
-                <div class="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-6">
+                <!-- Main Content Area (Compact Spacing) -->
+                <div class="flex-1 p-4 space-y-3">
                     
                     <!-- ✨ iOS PREMIUM PROFILE CARD ✨ -->
-                    <div class="bg-gray-50 rounded-2xl p-4 flex flex-col gap-4 border border-gray-100 shadow-sm">
-                        
+                    <div class="bg-gray-50 rounded-xl p-3 flex flex-col gap-2 border border-gray-100 shadow-sm">
                         <!-- Top Row: Photo & Details -->
-                        <div class="flex items-center gap-4">
-                            <label class="relative w-14 h-14 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl font-bold cursor-pointer overflow-hidden group shrink-0 border border-indigo-200 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <label class="relative w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-lg font-bold cursor-pointer overflow-hidden group shrink-0 border border-indigo-200 shadow-sm">
                                 <span id="prof-initial">U</span>
                                 <img id="prof-img-preview" src="" class="absolute inset-0 w-full h-full object-cover hidden z-10">
                                 <div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center z-20 transition-all">
-                                    <i class="fas fa-camera text-white text-[14px]"></i>
+                                    <i class="fas fa-camera text-white text-[12px]"></i>
                                 </div>
                                 <input type="file" accept="image/*" class="hidden" onchange="uploadProfileImage(event)">
                             </label>
@@ -2995,78 +2994,77 @@ function getVIPBadge(isVerified, plan) {
                             <div class="flex-1 min-w-0">
                                 <!-- View Mode -->
                                 <div id="prof-view-mode" class="flex-1 w-full">
-                                    <div class="flex justify-between items-start mb-0.5">
-                                        <h4 class="font-bold text-gray-900 text-[16px] tracking-tight truncate" id="prof-name">Customer Name</h4>
-                                        <button onclick="toggleProfEdit()" class="text-blue-500 font-semibold text-[13px] active:opacity-50 transition shrink-0">Edit</button>
+                                    <div class="flex justify-between items-start">
+                                        <h4 class="font-bold text-gray-900 text-[15px] tracking-tight truncate" id="prof-name">Customer Name</h4>
+                                        <button onclick="toggleProfEdit()" class="text-blue-500 font-semibold text-[12px] active:opacity-50 transition shrink-0">Edit</button>
                                     </div>
-                                    <p class="text-[13px] text-gray-500 font-medium" id="prof-phone">+91 xxxxxxxxxx</p>
+                                    <p class="text-[12px] text-gray-500 font-medium mt-0.5" id="prof-phone">+91 xxxxxxxxxx</p>
                                 </div>
 
                                 <!-- Edit Mode -->
-                                <div id="prof-edit-mode" class="hidden flex-col gap-2 mt-1">
-                                    <input type="text" id="edit-prof-name" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-blue-500" placeholder="Full Name">
-                                    <div class="flex gap-2 mt-1">
-                                        <button onclick="saveProfChanges(event)" class="flex-1 bg-gray-900 text-white rounded-lg py-2 text-xs font-bold active:scale-95 transition">Save</button>
-                                        <button onclick="toggleProfEdit()" class="flex-1 bg-gray-200 text-gray-700 rounded-lg py-2 text-xs font-bold active:scale-95 transition">Cancel</button>
+                                <div id="prof-edit-mode" class="hidden flex-col gap-1 mt-1">
+                                    <input type="text" id="edit-prof-name" class="w-full bg-white border border-gray-200 rounded-md px-2 py-1.5 text-xs font-bold text-gray-900 outline-none focus:border-blue-500" placeholder="Full Name">
+                                    <div class="flex gap-2">
+                                        <button onclick="saveProfChanges(event)" class="flex-1 bg-gray-900 text-white rounded-md py-1.5 text-[10px] font-bold active:scale-95 transition">Save</button>
+                                        <button onclick="toggleProfEdit()" class="flex-1 bg-gray-200 text-gray-700 rounded-md py-1.5 text-[10px] font-bold active:scale-95 transition">Cancel</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- ✨ iOS Style Plan & Validity List ✨ -->
-                        <div id="prof-plan-container" class="hidden w-full bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-                            <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100">
-                                <span class="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Plan</span>
-                                <div id="prof-active-plan" class="flex items-center gap-1.5 text-sm font-bold text-gray-900"></div>
+                        <div id="prof-plan-container" class="hidden w-full bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm mt-1">
+                            <div class="flex justify-between items-center px-3 py-2 border-b border-gray-100">
+                                <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Plan</span>
+                                <div id="prof-active-plan" class="flex items-center gap-1.5 text-xs font-bold text-gray-900"></div>
                             </div>
-                            <div class="flex justify-between items-center px-4 py-3">
-                                <span class="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Validity</span>
-                                <div id="prof-plan-validity" class="flex items-center gap-1.5 text-sm font-bold"></div>
+                            <div class="flex justify-between items-center px-3 py-2">
+                                <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Validity</span>
+                                <div id="prof-plan-validity" class="flex items-center gap-1.5 text-xs font-bold"></div>
                             </div>
                         </div>
-                        
                     </div>
 
                     <!-- Merchant Dashboard Button -->
-                    <button id="prof-merchant-btn" onclick="window.location.href='dashboard.html'" class="hidden w-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition text-sm mb-4 border border-indigo-100">
+                    <button id="prof-merchant-btn" onclick="window.location.href='dashboard.html'" class="hidden w-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition text-xs mb-2 border border-indigo-100">
                         <i class="fas fa-store"></i> Merchant Dashboard
                     </button>
 
                     <!-- Saved Details Section -->
                     <div id="delivery-section-wrapper">
-                        <h4 class="font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-map-marker-alt text-gray-400"></i> Saved Delivery Details</h4>
-                        <div class="space-y-3">
-                            <div class="grid grid-cols-2 gap-3">
+                        <h4 class="font-bold text-gray-900 mb-2 text-[13px] flex items-center gap-1.5"><i class="fas fa-map-marker-alt text-gray-400"></i> Delivery Details</h4>
+                        <div class="space-y-2">
+                            <div class="grid grid-cols-2 gap-2">
                                 <div>
-                                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Full Name</label>
-                                    <input type="text" id="saved-name" class="w-full px-3 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none bg-white text-sm font-semibold transition">
+                                    <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Full Name</label>
+                                    <input type="text" id="saved-name" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:border-indigo-500 outline-none bg-gray-50 focus:bg-white text-xs font-semibold transition">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Phone</label>
-                                    <input type="tel" id="saved-phone" class="w-full px-3 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none bg-white text-sm font-semibold transition">
+                                    <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Phone</label>
+                                    <input type="tel" id="saved-phone" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:border-indigo-500 outline-none bg-gray-50 focus:bg-white text-xs font-semibold transition">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Landmark (Optional)</label>
-                                <input type="text" id="saved-landmark" placeholder="e.g. Near City Hospital" class="w-full px-3 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none bg-white text-sm font-semibold transition">
+                                <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Landmark (Optional)</label>
+                                <input type="text" id="saved-landmark" placeholder="e.g. Near City Hospital" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:border-indigo-500 outline-none bg-gray-50 focus:bg-white text-xs font-semibold transition">
                             </div>
                             <div>
                                 <div class="flex justify-between items-center mb-1">
-                                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Full Address</label>
-                                    <div class="flex items-center gap-1.5">
-                                        <button type="button" onclick="openMapPicker('saved-address', 'saved-lat', 'saved-lng')" class="text-[10px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-purple-100 shadow-sm">
+                                    <label class="block text-[9px] font-bold text-gray-500 uppercase tracking-widest">Full Address</label>
+                                    <div class="flex items-center gap-1">
+                                        <button type="button" onclick="openMapPicker('saved-address', 'saved-lat', 'saved-lng')" class="text-[9px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 px-1.5 py-0.5 rounded flex items-center gap-1 active:scale-95 transition border border-purple-100 shadow-sm">
                                             <i class="fas fa-map-marked-alt"></i> Map
                                         </button>
-                                        <button type="button" onclick="fetchProfileGPS()" id="prof-gps-btn" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-blue-100 shadow-sm">
+                                        <button type="button" onclick="fetchProfileGPS()" id="prof-gps-btn" class="text-[9px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-1.5 py-0.5 rounded flex items-center gap-1 active:scale-95 transition border border-blue-100 shadow-sm">
                                             <i class="fas fa-location-crosshairs"></i> Auto
                                         </button>
                                     </div>
                                 </div>
-                                <textarea id="saved-address" placeholder="House No, Street, City..." rows="2" class="w-full px-3 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none bg-white text-sm font-semibold transition resize-none"></textarea>
+                                <textarea id="saved-address" placeholder="House No, Street, City..." rows="1" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:border-indigo-500 outline-none bg-gray-50 focus:bg-white text-xs font-semibold transition resize-none"></textarea>
                                 <input type="hidden" id="saved-lat">
                                 <input type="hidden" id="saved-lng">
                             </div>
-                            <button onclick="saveCustomerAddress()" id="save-addr-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-3.5 rounded-xl active:scale-95 transition text-sm shadow-md mt-2">
+                            <button onclick="saveCustomerAddress()" id="save-addr-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-2.5 rounded-lg active:scale-95 transition text-xs shadow-md mt-1">
                                 Save Details
                             </button>
                         </div>
@@ -3074,8 +3072,8 @@ function getVIPBadge(isVerified, plan) {
                 </div>
 
                 <!-- Footer (Logout) -->
-                <div class="p-5 border-t border-gray-100 shrink-0">
-                    <button onclick="showLogoutModal()" class="w-full bg-red-50 text-red-600 hover:bg-red-100 font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition text-sm border border-red-100">
+                <div class="p-3 border-t border-gray-100 shrink-0 bg-gray-50 rounded-b-[1.5rem]">
+                    <button onclick="showLogoutModal()" class="w-full bg-red-50 text-red-600 hover:bg-red-100 font-bold py-2.5 rounded-lg flex items-center justify-center gap-1.5 active:scale-95 transition text-xs border border-red-100">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </button>
                 </div>
@@ -3083,6 +3081,7 @@ function getVIPBadge(isVerified, plan) {
             </div>
         </div>
     </div>
+
 
 
 

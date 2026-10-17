@@ -2258,53 +2258,83 @@
                     cardBorder = "border border-gray-200/60 shadow-sm";
                 }
 
-                // ✨ Refined Action Buttons
+                             // ✨ Refined Action Buttons & Premium Layout
                 let btns = '';
                 if(o.status === 'pending') {
                     btns = `
-                        <button onclick="updateLiveOrderStatus('${o.id}', 'cancelled', '${o.customerPhone}', '${o.customerName}')" class="w-12 h-12 bg-red-50 text-red-500 rounded-[16px] flex items-center justify-center text-lg active:scale-95 transition shrink-0"><i class="fas fa-times"></i></button>
-                        <button onclick="updateLiveOrderStatus('${o.id}', 'accepted', '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-[#111827] text-white font-bold h-12 rounded-[16px] text-[14px] hover:bg-black active:scale-95 transition shadow-[0_4px_14px_rgba(0,0,0,0.15)] flex items-center justify-center gap-2">Accept Order</button>
+                        <div class="flex items-center gap-2 w-full">
+                            <!-- Call Button -->
+                            <a href="tel:${o.customerPhone}" class="w-12 h-12 bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 rounded-[16px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
+                                <i class="fas fa-phone-alt text-[14px]"></i>
+                            </a>
+                            <!-- Reject Button -->
+                            <button onclick="updateLiveOrderStatus('${o.id}', 'cancelled', '${o.customerPhone}', '${o.customerName}')" class="w-12 h-12 bg-red-50 border border-red-100 text-red-500 rounded-[16px] flex items-center justify-center text-lg active:scale-95 transition shrink-0 shadow-sm">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <!-- Accept Order Button (Sahi size aur styling ke sath) -->
+                            <button onclick="updateLiveOrderStatus('${o.id}', 'accepted', '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-[#111827] text-white font-bold h-12 rounded-[16px] text-[14px] hover:bg-black active:scale-95 transition shadow-[0_4px_14px_rgba(0,0,0,0.15)] flex items-center justify-center gap-2">
+                                Accept Order
+                            </button>
+                            <!-- Delete Button -->
+                            <button onclick="deleteLiveOrder('${o.id}')" class="w-12 h-12 bg-[#FEF2F2] border border-[#FECACA] text-[#DC2626] hover:bg-[#FEE2E2] rounded-[16px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
+                                <i class="fas fa-trash-alt text-[14px]"></i>
+                            </button>
+                        </div>
                     `;
-                               } else if(o.status === 'accepted') {
-                    // ✨ NAYA OTP LOGIC START
+                } else if(o.status === 'accepted') {
+                    // ✨ NAYA PREMIUM 4-DIGIT LOCKED OTP DESIGN
                     let otpCheckHtml = '';
-                    let btnDisabledState = '';
-                    let btnOpacity = '';
+                    let btnDisabledState = 'disabled';
+                    let btnOpacity = 'opacity-40 cursor-not-allowed';
                     
-                    // Agar order mein deliveryOtp mojood hai, toh OTP box dikhao aur button lock rakho
                     if (o.deliveryOtp) {
-                        btnDisabledState = 'disabled';
-                        btnOpacity = 'opacity-50 cursor-not-allowed';
-                        
                         otpCheckHtml = `
-                            <div class="flex items-center gap-2 mb-2 w-full bg-gray-50 px-3 py-2 rounded-[12px] border border-gray-200 transition-colors">
-                                <i class="fas fa-key text-gray-400 text-xs"></i>
-                                <input type="number" id="otp-input-${o.id}" placeholder="Enter 4-Digit OTP" 
+                            <div class="flex items-center gap-2 mb-3 w-full bg-gray-50/80 px-4 py-3 rounded-[16px] border border-gray-200/80 focus-within:border-blue-500 focus-within:bg-white transition-all shadow-inner">
+                                <i class="fas fa-key text-blue-500 text-sm"></i>
+                                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="otp-input-${o.id}" placeholder="Enter 4-Digit PIN" 
                                        oninput="window.checkDeliveryOtp(this, '${o.id}', '${o.deliveryOtp}')" 
-                                       class="w-full bg-transparent outline-none text-sm font-bold text-gray-900 tracking-[0.2em]">
+                                       class="w-full bg-transparent outline-none text-[16px] font-black text-gray-900 tracking-[0.3em] placeholder:tracking-normal placeholder:font-semibold placeholder:text-gray-400">
                             </div>
                         `;
                     }
 
                     btns = `
-                        <div class="flex flex-col w-full">
+                        <div class="flex flex-col w-full gap-2">
                             ${otpCheckHtml}
-                            <button id="deliver-btn-${o.id}" ${btnDisabledState} 
-                                    onclick="updateLiveOrderStatus('${o.id}', 'delivered', '${o.customerPhone}', '${o.customerName}')" 
-                                    class="w-full bg-[#16A34A] text-white font-bold h-12 rounded-[16px] text-[14px] active:scale-95 transition shadow-[0_4px_14px_rgba(22,163,74,0.3)] flex items-center justify-center gap-2 ${btnOpacity}">
-                                <i class="fas fa-check-circle"></i> Mark Delivered
+                            <div class="flex items-center gap-2 w-full">
+                                <a href="tel:${o.customerPhone}" class="w-12 h-12 bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 rounded-[16px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
+                                    <i class="fas fa-phone-alt text-[14px]"></i>
+                                </a>
+                                <button id="deliver-btn-${o.id}" ${btnDisabledState} 
+                                        onclick="updateLiveOrderStatus('${o.id}', 'delivered', '${o.customerPhone}', '${o.customerName}')" 
+                                        class="flex-1 bg-[#16A34A] text-white font-bold h-12 rounded-[16px] text-[14px] active:scale-95 transition shadow-[0_4px_14px_rgba(22,163,74,0.3)] flex items-center justify-center gap-2 ${btnOpacity}">
+                                    <i class="fas fa-check-circle"></i> Mark Delivered
+                                </button>
+                                <button onclick="deleteLiveOrder('${o.id}')" class="w-12 h-12 bg-[#FEF2F2] border border-[#FECACA] text-[#DC2626] hover:bg-[#FEE2E2] rounded-[16px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
+                                    <i class="fas fa-trash-alt text-[14px]"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else if(o.status === 'delivered') {
+                    btns = `
+                        <div class="flex items-center gap-2 w-full">
+                            <a href="tel:${o.customerPhone}" class="w-12 h-12 bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 rounded-[16px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
+                                <i class="fas fa-phone-alt text-[14px]"></i>
+                            </a>
+                            <button disabled class="flex-1 bg-gray-50 text-[#16A34A] font-bold h-12 rounded-[16px] text-[13px] border border-gray-200 opacity-70">Delivered Successfully</button>
+                            <button onclick="downloadBillImage('${o.billId || o.id}')" class="w-12 h-12 bg-blue-50 border border-blue-100 text-blue-600 font-bold rounded-[16px] text-[13px] active:scale-95 transition flex items-center justify-center shadow-sm">
+                                <i class="fas fa-download text-[14px]"></i>
+                            </button>
+                            <button onclick="deleteLiveOrder('${o.id}')" class="w-12 h-12 bg-[#FEF2F2] border border-[#FECACA] text-[#DC2626] hover:bg-[#FEE2E2] rounded-[16px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
+                                <i class="fas fa-trash-alt text-[14px]"></i>
                             </button>
                         </div>
                     `;
-                    // ✨ NAYA OTP LOGIC END
-
-                } else if(o.status === 'delivered') {
-                    btns = `
-                        <button disabled class="flex-[1.5] bg-gray-50 text-[#16A34A] font-bold h-12 rounded-[16px] text-[13px] border border-gray-200 opacity-60">Delivered</button>
-                        <button onclick="downloadBillImage('${o.billId || o.id}')" class="flex-1 bg-blue-50 text-blue-600 font-bold h-12 rounded-[16px] text-[13px] active:scale-95 transition flex items-center justify-center gap-1.5"><i class="fas fa-download"></i> Bill</button>`;
                 } else {
                     btns = `<div class="w-full text-center py-3.5 bg-gray-50 rounded-[16px] text-gray-500 text-[12px] font-bold uppercase tracking-widest">Order ${o.status}</div>`;
                 }
+
 
                 let ini = (o.customerName || 'C').charAt(0).toUpperCase();
                 let mapUrl = (o.lat && o.lng) ? `https://www.google.com/maps/dir/?api=1&destination=${o.lat},${o.lng}` : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(o.customerAddress || '')}`;
@@ -10273,25 +10303,31 @@ async function deleteLiveOrder(orderId) {
         iosAlert("Error", "Order delete karne mein problem aayi: " + e.message);
     }
 }
-        // ✨ NAYA: OTP Verify karne ka function
+                // ✨ NAYA: Strict 4-Digit PIN Validator
         window.checkDeliveryOtp = function(input, orderId, correctOtp) {
+            // Agar user ne 4 se zyada digit likh diye hain, toh automatically cut karke sirf pehle 4 rakho
+            if (input.value.length > 4) {
+                input.value = input.value.slice(0, 4);
+            }
+
             const btn = document.getElementById(`deliver-btn-${orderId}`);
             if (!btn) return;
             
             if (input.value.trim() === String(correctOtp)) {
-                // OTP Sahi Hai -> Button Active karo aur Green color dikhao
+                // Sahi PIN hone par button khulega
                 btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                input.parentElement.classList.replace('border-gray-200', 'border-[#16A34A]');
-                input.parentElement.classList.replace('bg-gray-50', 'bg-[#DCFCE7]');
+                btn.classList.remove('opacity-40', 'cursor-not-allowed');
+                input.parentElement.classList.replace('border-gray-200/80', 'border-[#16A34A]');
+                input.parentElement.classList.replace('bg-gray-50/80', 'bg-[#DCFCE7]');
             } else {
-                // OTP Galat Hai -> Button Lock rakho
+                // Galat ya incomplete hone par button lock rahega
                 btn.disabled = true;
-                btn.classList.add('opacity-50', 'cursor-not-allowed');
-                input.parentElement.classList.replace('border-[#16A34A]', 'border-gray-200');
-                input.parentElement.classList.replace('bg-[#DCFCE7]', 'bg-gray-50');
+                btn.classList.add('opacity-40', 'cursor-not-allowed');
+                input.parentElement.classList.replace('border-[#16A34A]', 'border-gray-200/80');
+                input.parentElement.classList.replace('bg-[#DCFCE7]', 'bg-gray-50/80');
             }
         };
+
 
     </script>
 

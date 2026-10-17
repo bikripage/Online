@@ -2330,13 +2330,22 @@
                         </div>
                         
                         <div class="flex items-center gap-3 w-full">
-                            <a href="tel:${o.customerPhone}" class="w-12 h-12 bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 rounded-[16px] flex items-center justify-center transition active:scale-95 shrink-0">
-                                <i class="fas fa-phone-alt"></i>
-                            </a>
-                            <div class="flex-1 flex gap-3">
-                                ${btns}
-                            </div>
-                        </div>
+    <!-- Call Button -->
+    <a href="tel:${o.customerPhone}" class="w-12 h-12 bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 rounded-[16px] flex items-center justify-center transition active:scale-95 shrink-0">
+        <i class="fas fa-phone-alt"></i>
+    </a>
+    
+    <!-- Status Action Buttons (Accept, Delivered etc.) -->
+    <div class="flex-1 flex gap-3">
+        ${btns}
+    </div>
+
+    <!-- ✨ NAYA DELETE BUTTON (Ye hamesha dikhega) -->
+    <button onclick="deleteLiveOrder('${o.id}')" class="w-12 h-12 bg-[#FEF2F2] border border-[#FECACA] text-[#DC2626] hover:bg-[#FEE2E2] rounded-[16px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
+        <i class="fas fa-trash-alt"></i>
+    </button>
+</div>
+
                     </div>
                 </div>`;
             });
@@ -10209,6 +10218,30 @@ function trackEvent(eventType) {
             window.updateGrowthChart(metricSelect ? metricSelect.value : 'orders');
         };
 
+// ✨ NAYA: Order ko delete karne ka function
+async function deleteLiveOrder(orderId) {
+    // Pehle user se confirm karwayenge (Aapke premium iOS popup ka use karke)
+    const isConfirmed = await iosConfirm(
+        "Delete Order", 
+        "Kya aap sach mein is order ko permanently delete karna chahte hain?", 
+        "Delete", 
+        "text-[#FF3B30]"
+    );
+    
+    if(!isConfirmed) return; // Agar cancel kiya toh wahi ruk jao
+
+    try {
+        // Firebase se order ko delete karna
+        await db.collection('orders').doc(orderId).delete();
+        
+        // Success message dikhana
+        iosAlert("Deleted!", "Aapka order successfully delete ho gaya hai.");
+        
+        // Note: Aapke code mein pehle se 'onSnapshot' laga hai, toh order delete hote hi list apne aap update (refresh) ho jayegi.
+    } catch(e) {
+        iosAlert("Error", "Order delete karne mein problem aayi: " + e.message);
+    }
+}
 
     </script>
 

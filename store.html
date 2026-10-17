@@ -1463,7 +1463,7 @@ function checkCustomerAuth() {
                         <div class="w-12 h-12 bg-white text-[#9CA3AF] rounded-full flex items-center justify-center text-xl mb-3 shadow-sm border border-[#E5E7EB]">
                             <i class="fas fa-lock"></i>
                         </div>
-                        <p class="text-sm font-bold text-[#6B7280] mb-4">Login first for shop & post reviews</p>
+                        <p class="text-sm font-bold text-[#6B7280] mb-4">Log in to explore shops and share your experience. </p>
 <button onclick="openAuthModal()" class="mx-auto bg-[#111827] text-white font-bold py-3 px-8 rounded-xl text-sm active:scale-95 transition shadow-md">
     Login / Sign Up
 </button>
@@ -2517,6 +2517,12 @@ function closeIOSAlert() {
     setTimeout(() => {
         modal.classList.add('hidden');
     }, 300);
+}
+function goToCustomerLogin() {
+    // Current store ka URL save kar lo taaki login ke baad user wapas yahin aaye
+    localStorage.setItem('BikriPage_return_url', window.location.href);
+    // User ko index page ke login wale hisse par bhej do
+    window.location.href = "index.html?action=login";
 }
 
     </script>

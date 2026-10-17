@@ -10242,11 +10242,10 @@ function trackEvent(eventType) {
             }
         }
 
-        // ==========================================
-        // ✨ NAYA: PRINT SHIPPING LABEL & QR CODE ✨
+              // ==========================================
+        // ✨ NAYA: PRINT COMPACT LANDSCAPE SHIPPING LABEL & QR CODE ✨
         // ==========================================
         function printShippingLabel(orderId) {
-            // Backend se order data nikalna
             const order = window.globalLiveOrders.find(o => o.id === orderId);
             if(!order) return iosAlert("Error", "Order not found");
             
@@ -10254,12 +10253,10 @@ function trackEvent(eventType) {
             const shopPhone = typeof globalShopData !== 'undefined' ? globalShopData.phone : "";
             const customerAddress = order.customerAddress || 'Address not provided';
             
-            // Google Maps URL (Taaki delivery wala scan karte hi location pe nikal jaye)
             const mapUrl = (order.lat && order.lng) 
                 ? `https://www.google.com/maps/dir/?api=1&destination=${order.lat},${order.lng}` 
                 : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(customerAddress)}`;
 
-            // Nayi Window me Print Label Layout kholna
             const printWindow = window.open('', '_blank');
             printWindow.document.write(`
                 <html>
@@ -10268,61 +10265,87 @@ function trackEvent(eventType) {
                     <script src="https://cdn.tailwindcss.com"><\/script>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
                     <style>
-                        @media print { body { -webkit-print-color-adjust: exact; } }
-                        body { background: #f3f4f6; display: flex; justify-content: center; padding: 20px; font-family: sans-serif; }
-                        .label-card { width: 100%; max-width: 400px; background: white; border: 2px solid #000; border-radius: 12px; padding: 20px; }
+                        /* ✨ Print Settings (Landscape & Small Size) ✨ */
+                        @media print { 
+                            @page { 
+                                size: A6 landscape; /* A6 Size (A4 ka chauthai) aur Landscape layout */
+                                margin: 5mm; /* Extra space hata diya */
+                            }
+                            body { 
+                                background: white !important; 
+                                padding: 0 !important;
+                                -webkit-print-color-adjust: exact; 
+                            }
+                            .label-card {
+                                border: none !important; /* Print me outer border htayenge */
+                                width: 100% !important;
+                                max-width: 100% !important;
+                                height: 100% !important;
+                                box-shadow: none !important;
+                            }
+                        }
+                        
+                        /* Screen Style */
+                        body { background: #f3f4f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; font-family: sans-serif; margin: 0; }
+                        
+                        /* Landscape Flex Design */
+                        .label-card { width: 100%; max-width: 15cm; background: white; border: 2px solid #000; border-radius: 12px; padding: 15px 20px; display: flex; gap: 20px; align-items: center; }
+                        .left-section { flex: 1; }
+                        .right-section { width: 130px; text-align: center; flex-shrink: 0; border-left: 2px dashed #cbd5e1; padding-left: 20px; }
                     </style>
                 </head>
                 <body>
                     <div class="label-card">
-                        <!-- HEADER -->
-                        <div class="text-center border-b-2 border-black pb-3 mb-4">
-                            <h2 class="text-2xl font-black uppercase tracking-tight">${shopName}</h2>
-                            <p class="text-sm font-bold mt-1">Ph: ${shopPhone}</p>
-                        </div>
                         
-                        <!-- TO (CUSTOMER) -->
-                        <div class="border-b border-gray-300 pb-4 mb-4">
-                            <p class="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1">Deliver To:</p>
-                            <h3 class="text-xl font-bold text-black">${order.customerName}</h3>
-                            <p class="text-sm font-medium mt-1 leading-snug">${customerAddress}</p>
-                            <p class="text-sm font-bold mt-2">Ph: +91 ${order.customerPhone}</p>
-                        </div>
-                        
-                        <!-- ORDER DETAILS & AMOUNT -->
-                        <div class="flex justify-between items-center mb-6">
-                            <div>
-                                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1">Order ID</p>
-                                <p class="text-sm font-bold font-mono">#${order.id.substring(0,8).toUpperCase()}</p>
+                        <!-- LEFT SIDE: Details -->
+                        <div class="left-section">
+                            <!-- HEADER -->
+                            <div class="border-b-2 border-black pb-2 mb-3">
+                                <h2 class="text-xl font-black uppercase tracking-tight leading-none">${shopName}</h2>
+                                <p class="text-[11px] font-bold mt-1">Ph: ${shopPhone}</p>
                             </div>
-                            <div class="text-right">
-                                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1">Amount to Collect</p>
-                                <p class="text-2xl font-black text-black">₹${order.totalAmount}</p>
+                            
+                            <!-- TO (CUSTOMER) -->
+                            <div class="mb-3">
+                                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Deliver To:</p>
+                                <h3 class="text-lg font-bold text-black leading-tight">${order.customerName}</h3>
+                                <p class="text-xs font-medium mt-1 leading-snug line-clamp-3">${customerAddress}</p>
+                                <p class="text-xs font-bold mt-1.5">Ph: +91 ${order.customerPhone}</p>
+                            </div>
+                            
+                            <!-- ORDER ID -->
+                            <div class="bg-gray-100 p-2 rounded-lg border border-gray-300 inline-block pr-6">
+                                <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Order ID</p>
+                                <p class="text-sm font-bold font-mono text-black">#${order.id.substring(0,8).toUpperCase()}</p>
                             </div>
                         </div>
 
-                        <!-- QR CODE SECTION -->
-                        <div class="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl border border-dashed border-gray-400 mb-4">
-                            <div id="qrcode"></div>
-                            <p class="text-xs font-bold text-gray-500 mt-3 text-center uppercase tracking-wider">Scan to open Google Maps <br>& Navigate</p>
+                        <!-- RIGHT SIDE: Amount & QR -->
+                        <div class="right-section">
+                            <div class="mb-3">
+                                <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Collect Amount</p>
+                                <p class="text-2xl font-black text-black">₹${order.totalAmount}</p>
+                            </div>
+
+                            <div class="flex flex-col items-center">
+                                <div id="qrcode" class="p-1.5 bg-white border border-gray-400 rounded-lg inline-block"></div>
+                                <p class="text-[8px] font-bold text-gray-500 mt-2 text-center uppercase tracking-wider leading-tight">Scan For Map</p>
+                            </div>
                         </div>
-                        
-                        <div class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                            Powered by BikriPage
-                        </div>
+
                     </div>
 
                     <script>
-                        // Thoda delay taaki script load ho jaye, phir QR banaye aur print khol de
                         setTimeout(() => {
                             new QRCode(document.getElementById("qrcode"), {
                                 text: "${mapUrl}",
-                                width: 140,
-                                height: 140,
+                                width: 90,  // QR code thoda chota kiya landscape me fit karne ke liye
+                                height: 90,
                                 colorDark : "#000000",
                                 colorLight : "#ffffff",
                                 correctLevel : QRCode.CorrectLevel.M
                             });
+                            // Print popup thoda delay ke baad
                             setTimeout(() => { window.print(); }, 800);
                         }, 200);
                     <\/script>

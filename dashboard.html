@@ -2211,7 +2211,7 @@
             renderAdminBills(); 
             renderInsights(); 
         }
-                          // ==========================================
+                   // ==========================================
         // ✨ ULTRA-PREMIUM iOS STYLE LIVE ORDERS (WITH COLORED BORDERS) ✨
         // ==========================================
         function renderLiveOrders(orders) {
@@ -2240,56 +2240,45 @@
                     </div>
                 `).join('') : '<p class="text-[13px] text-gray-500">Items not found</p>';
 
-                // ✨ CORRECTED: Status Badges & Colored Borders ✨
+                // ✨ Status Badges & DYNAMIC COLORED BORDERS
                 let sBg, statusText, statusDot, cardBorder;
                 if (o.status === 'pending') {
                     sBg = "bg-blue-50 text-blue-600"; statusText = "New Order"; statusDot = "bg-blue-500";
-                    cardBorder = "border-[2px] border-blue-400 shadow-[0_8px_20px_rgba(59,130,246,0.15)]"; 
-                } else if(o.status === 'accepted') {
-                    sBg = "bg-orange-50 text-orange-600"; statusText = "Accepted"; statusDot = "bg-orange-500";
-                    cardBorder = "border-[2px] border-orange-400 shadow-[0_8px_20px_rgba(249,115,22,0.15)]"; 
-                } else if(o.status === 'delivered') {
+                    cardBorder = "border-[2px] border-blue-400 shadow-[0_8px_20px_rgba(59,130,246,0.15)]"; // Blue Outline
+                } else if (o.status === 'accepted') {
+                    sBg = "bg-purple-50 text-purple-600"; statusText = "Preparing"; statusDot = "bg-purple-500";
+                    cardBorder = "border-[2px] border-purple-400 shadow-[0_8px_20px_rgba(168,85,247,0.15)]"; // Purple Outline
+                } else if (o.status === 'delivered') {
                     sBg = "bg-green-50 text-green-600"; statusText = "Delivered"; statusDot = "bg-green-500";
-                    cardBorder = "border-[2px] border-green-400 shadow-[0_8px_20px_rgba(34,197,94,0.15)]"; 
+                    cardBorder = "border-[2px] border-green-400 shadow-[0_8px_20px_rgba(34,197,94,0.15)]"; // Green Outline
                 } else if (o.status === 'cancelled') {
                     sBg = "bg-red-50 text-red-600"; statusText = "Cancelled"; statusDot = "bg-red-500";
-                    cardBorder = "border-[2px] border-red-400 shadow-[0_8px_20px_rgba(239,68,68,0.15)]"; 
+                    cardBorder = "border-[2px] border-red-400 shadow-[0_8px_20px_rgba(239,68,68,0.15)]"; // Red Outline
                 } else {
-                    sBg = "bg-gray-50 text-gray-600"; statusText = o.status; statusDot = "bg-gray-500";
                     cardBorder = "border border-gray-200/60 shadow-sm";
                 }
 
-                // ✨ CORRECTED: Action Buttons Logic ✨
+                // ✨ Refined Action Buttons
                 let btns = '';
-                const deleteBtnHtml = `<button onclick="deleteLiveOrder('${o.id}')" class="w-12 h-12 bg-red-50 text-red-500 rounded-[16px] flex items-center justify-center text-lg active:scale-95 transition shrink-0 border border-red-100 shadow-sm" title="Delete Order"><i class="fas fa-trash-alt"></i></button>`;
-
                 if(o.status === 'pending') {
                     btns = `
-                        ${deleteBtnHtml}
-                        <button onclick="updateLiveOrderStatus('${o.id}', 'accepted')" class="flex-1 bg-[#111827] text-white font-bold h-12 rounded-[16px] text-[14px] hover:bg-black active:scale-95 transition shadow-[0_4px_14px_rgba(0,0,0,0.15)] flex items-center justify-center gap-2">Accept Order</button>
+                        <button onclick="updateLiveOrderStatus('${o.id}', 'cancelled', '${o.customerPhone}', '${o.customerName}')" class="w-12 h-12 bg-red-50 text-red-500 rounded-[16px] flex items-center justify-center text-lg active:scale-95 transition shrink-0"><i class="fas fa-times"></i></button>
+                        <button onclick="updateLiveOrderStatus('${o.id}', 'accepted', '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-[#111827] text-white font-bold h-12 rounded-[16px] text-[14px] hover:bg-black active:scale-95 transition shadow-[0_4px_14px_rgba(0,0,0,0.15)] flex items-center justify-center gap-2">Accept Order</button>
                     `;
                 } else if(o.status === 'accepted') {
-                    btns = `
-                        ${deleteBtnHtml}
-                        <button onclick="printShippingLabel('${o.id}')" class="flex-1 bg-blue-50 text-blue-600 font-bold h-12 rounded-[16px] text-[13px] active:scale-95 transition shadow-sm flex items-center justify-center gap-1.5 border border-blue-100"><i class="fas fa-qrcode text-lg"></i> Label</button>
-                        <button onclick="updateLiveOrderStatus('${o.id}', 'delivered')" class="flex-[1.2] bg-[#16A34A] text-white font-bold h-12 rounded-[16px] text-[13px] active:scale-95 transition shadow-[0_4px_14px_rgba(22,163,74,0.3)] flex items-center justify-center gap-1.5"><i class="fas fa-check-circle"></i> Delivered</button>
-                    `;
+                    btns = `<button onclick="updateLiveOrderStatus('${o.id}', 'delivered', '${o.customerPhone}', '${o.customerName}')" class="w-full bg-[#16A34A] text-white font-bold h-12 rounded-[16px] text-[14px] active:scale-95 transition shadow-[0_4px_14px_rgba(22,163,74,0.3)] flex items-center justify-center gap-2"><i class="fas fa-check-circle"></i> Mark Delivered</button>`;
                 } else if(o.status === 'delivered') {
                     btns = `
-                        ${deleteBtnHtml}
-                        <button disabled class="flex-[1.2] bg-gray-50 text-[#16A34A] font-bold h-12 rounded-[16px] text-[13px] border border-gray-200 opacity-60">Delivered</button>
-                        <button onclick="downloadBillImage('${o.billId || o.id}')" class="flex-1 bg-blue-50 text-blue-600 font-bold h-12 rounded-[16px] text-[13px] active:scale-95 transition flex items-center justify-center gap-1.5 border border-blue-100"><i class="fas fa-download"></i> Bill</button>
-                    `;
+                        <button disabled class="flex-[1.5] bg-gray-50 text-[#16A34A] font-bold h-12 rounded-[16px] text-[13px] border border-gray-200 opacity-60">Delivered</button>
+                        <button onclick="downloadBillImage('${o.billId || o.id}')" class="flex-1 bg-blue-50 text-blue-600 font-bold h-12 rounded-[16px] text-[13px] active:scale-95 transition flex items-center justify-center gap-1.5"><i class="fas fa-download"></i> Bill</button>`;
                 } else {
-                    btns = `
-                        ${deleteBtnHtml}
-                        <div class="flex-1 flex items-center justify-center h-12 bg-gray-50 rounded-[16px] text-gray-500 text-[12px] font-bold uppercase tracking-widest border border-gray-200">Order ${o.status}</div>
-                    `;
+                    btns = `<div class="w-full text-center py-3.5 bg-gray-50 rounded-[16px] text-gray-500 text-[12px] font-bold uppercase tracking-widest">Order ${o.status}</div>`;
                 }
 
                 let ini = (o.customerName || 'C').charAt(0).toUpperCase();
                 let mapUrl = (o.lat && o.lng) ? `https://www.google.com/maps/dir/?api=1&destination=${o.lat},${o.lng}` : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(o.customerAddress || '')}`;
 
+                // Yahan Card Border aur Animation apply ho rahi hai
                 html += `
                 <div class="bg-white rounded-[24px] mb-5 overflow-hidden shrink-0 flex flex-col animate-slide-up transition-all duration-300 ${cardBorder}" style="animation-delay: ${delay}s">
                     
@@ -2304,6 +2293,7 @@
                                 <p class="text-[11px] text-gray-500 font-medium">#${o.id.substring(0,8).toUpperCase()} • ${d}</p>
                             </div>
                         </div>
+                        <!-- Modern Minimal Badge -->
                         <span class="${sBg} px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide flex items-center gap-1.5 shrink-0 ml-3">
                             <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span> ${statusText}
                         </span>
@@ -2311,6 +2301,8 @@
 
                     <!-- iOS Grouped Content Box (Address & Items) -->
                     <div class="p-4 sm:p-5 bg-[#F9FAFB] flex flex-col gap-4 border-b border-gray-100">
+                        
+                        <!-- Address Block -->
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-start gap-2.5 min-w-0">
                                 <i class="fas fa-map-marker-alt text-gray-400 mt-1 text-[14px]"></i>
@@ -2321,8 +2313,10 @@
                             </a>
                         </div>
 
+                        <!-- Minimal Divider -->
                         <div class="h-px w-full bg-gray-200/60"></div>
 
+                        <!-- Items List -->
                         <div class="flex flex-col">
                             ${itemsHtml}
                         </div>
@@ -2350,104 +2344,99 @@
         }
 
 
-              // सिर्फ orderId और newStatus पास करें
-async function updateLiveOrderStatus(orderId, newStatus) {
-    let actionText = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-    let actionColor = (newStatus === 'cancelled') ? 'text-[#FF3B30]' : 'text-[#007AFF]';
+              // ✨ NAYA LOGIC: Order Delivered hote hi Bill banega, aur Professional WhatsApp message jayega ✨
+        async function updateLiveOrderStatus(orderId, newStatus, custPhone, custName) {
+            // ✨ NAYA: Premium iOS Confirm Popup ✨
+            let actionColor = (newStatus === 'cancelled') ? 'text-[#FF3B30]' : 'text-[#007AFF]';
+            let actionText = newStatus.charAt(0).toUpperCase() + newStatus.slice(1); // "accepted" ko "Accepted" banane ke liye
 
-    const isConfirmed = await iosConfirm(
-        "Update Order", 
-        `Are you sure you want to mark this order as ${newStatus}?`, 
-        "Mark " + actionText, 
-        actionColor
-    );
-    
-    if(!isConfirmed) return; 
-
-    try {
-        let billIdToSave = null;
-
-        // Firebase से आर्डर का डेटा निकालें
-        const orderDoc = await db.collection('orders').doc(orderId).get();
-        if (!orderDoc.exists) return;
-        const oData = orderDoc.data();
-        
-        // ✨ कस्टमर का नाम और नंबर डेटाबेस से सीधा लें
-        const custName = oData.customerName || 'Customer';
-        let custPhone = oData.customerPhone || '';
-
-        let itemsList = "";
-        if (oData.items && oData.items.length > 0) {
-            itemsList = oData.items.map(i => `▪ ${i.qty}x ${i.name}`).join('\n');
-        }
-
-        if (newStatus === 'delivered') {
-            const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-            let grandTot = Number(oData.totalAmount) || 0;
-
-            let newBill = { 
-                date: dateStr, 
-                customerName: custName, 
-                customerPhone: custPhone || "N/A", 
-                address: oData.customerAddress || "",
-                items: oData.items || [], 
-                discount: 0, 
-                delivery: 0, 
-                grandTotal: grandTot, 
-                payStatus: 'Paid',                  
-                payMode: 'UPI (Online)',            
-                deliveryStatus: 'Delivered', 
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                appOrderId: orderId
-            };
-
-            const addedBill = await db.collection('shops').doc(currentShopId).collection('bills').add(newBill);
-            billIdToSave = addedBill.id;
+            const isConfirmed = await iosConfirm(
+                "Update Order", 
+                `Are you sure you want to mark this order as ${newStatus}?`, 
+                "Mark " + actionText, 
+                actionColor
+            );
             
-            setTimeout(() => { fetchFirebaseData(); }, 1500); 
+            if(!isConfirmed) return; // Agar user cancel dabaye toh wahi ruk jao
+
+            try {
+                let billIdToSave = null;
+
+                // ✨ NAYA: Pehle order details nikal lo taaki items ka pata chal sake
+                const orderDoc = await db.collection('orders').doc(orderId).get();
+                if (!orderDoc.exists) return;
+                const oData = orderDoc.data();
+
+                // ✨ NAYA: Items ki ek clean list banana (Jaise: ▪ 1x INDIAN BROOM)
+                let itemsList = "";
+                if (oData.items && oData.items.length > 0) {
+                    itemsList = oData.items.map(i => `▪ ${i.qty}x ${i.name}`).join('\n');
+                }
+
+                                if (newStatus === 'delivered') {
+                    const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+                    let grandTot = Number(oData.totalAmount) || 0;
+
+                    let newBill = { 
+                        date: dateStr, 
+                        customerName: oData.customerName || "Customer", 
+                        customerPhone: oData.customerPhone || "N/A", 
+                        address: oData.customerAddress || "",
+                        items: oData.items || [], 
+                        discount: 0, 
+                        delivery: 0, 
+                        grandTotal: grandTot, 
+                        payStatus: 'Paid',                  // 👈 YAHAN 'Unpaid' ki jagah 'Paid' kar dijiye!
+                        payMode: 'UPI (Online)',            // 👈 Agar chahein toh by default payment mode bhi set kar sakte hain
+                        deliveryStatus: 'Delivered', 
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        appOrderId: orderId
+                    };
+
+                    const addedBill = await db.collection('shops').doc(currentShopId).collection('bills').add(newBill);
+                    billIdToSave = addedBill.id;
+                    
+                    setTimeout(() => { fetchFirebaseData(); }, 1500); 
+                }
+
+                let orderUpdateData = {
+                    status: newStatus,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                if (billIdToSave) orderUpdateData.billId = billIdToSave;
+
+                await db.collection('orders').doc(orderId).update(orderUpdateData);
+
+                // ✨ NAYA: Ultra-Professional WhatsApp Message (With My Orders Link) ✨
+                if(custPhone && custPhone !== 'undefined' && custPhone !== 'N/A') {
+                    let msg = "";
+                    const shopName = globalShopData.shopName;
+                    
+                    // ✨ NAYA: Dynamically generate 'My Orders' link
+                    let baseUrl = window.location.href.split('?')[0];
+                    let myOrdersLink = baseUrl.replace(/dashboard\.html/i, 'my-orders.html');
+                    
+                    // (Local testing fallback)
+                    if (myOrdersLink.startsWith("file://")) {
+                        myOrdersLink = "https://bikripage.github.io/Online/my-orders.html"; 
+                    }
+
+                    if(newStatus === 'accepted') {
+                        msg = `🎉 *Order Confirmed!*\n\nDear ${custName},\n\nGreat news! Your order from *${shopName}* has been accepted and is currently being prepared.\n\n*Order Details:*\n${itemsList}\n\n📦 *Track your order here:*\nYou can check the live status of your order in the 'My Orders' section:\n${myOrdersLink}\n\nThank you for choosing us!`;
+                    } 
+                    else if(newStatus === 'delivered') {
+                        msg = `✅ *Order Delivered!*\n\nDear ${custName},\n\nYour order from *${shopName}* has been successfully delivered.\n\n*Order Details:*\n${itemsList}\n\n🧾 *Download Your Official Bill:*\nYou can view your complete order summary and download your invoice from the 'My Orders' section here:\n${myOrdersLink}\n\nWe hope you enjoy your purchase. Thanks for shopping locally!`;
+                    } 
+                    else if(newStatus === 'cancelled') {
+                        msg = `❌ *Order Cancelled*\n\nDear ${custName},\n\nWe regret to inform you that your order from *${shopName}* could not be fulfilled at this time and has been cancelled.\n\n*Order Details:*\n${itemsList}\n\nCheck your order history here:\n${myOrdersLink}\n\nWe sincerely apologize for the inconvenience. Please contact us for further details.`;
+                    }
+                    
+                    if(msg) window.open(`https://wa.me/91${custPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+                }
+            } catch(e) {
+                alert("Error updating order: " + e.message);
+            }
         }
-
-        let orderUpdateData = {
-            status: newStatus,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        if (billIdToSave) orderUpdateData.billId = billIdToSave;
-
-        // डेटाबेस अपडेट
-        await db.collection('orders').doc(orderId).update(orderUpdateData);
-
-        // WhatsApp Message Logic
-        if(custPhone && custPhone !== 'undefined' && custPhone !== 'N/A') {
-            let msg = "";
-            const shopName = globalShopData.shopName;
-            
-            let baseUrl = window.location.href.split('?')[0];
-            let myOrdersLink = baseUrl.replace(/dashboard\.html/i, 'my-orders.html');
-            if (myOrdersLink.startsWith("file://")) {
-                myOrdersLink = "https://bikripage.github.io/Online/my-orders.html"; 
-            }
-
-            if(newStatus === 'accepted') {
-                msg = `🎉 *Order Confirmed!*\n\nDear ${custName},\n\nGreat news! Your order from *${shopName}* has been accepted.\n\n*Order Details:*\n${itemsList}\n\n📦 *Track your order here:*\n${myOrdersLink}\n\nThank you!`;
-            } else if(newStatus === 'delivered') {
-                msg = `✅ *Order Delivered!*\n\nDear ${custName},\n\nYour order from *${shopName}* has been delivered.\n\n*Order Details:*\n${itemsList}\n\n🧾 *Download Your Invoice:*\n${myOrdersLink}`;
-            } else if(newStatus === 'cancelled') {
-                msg = `❌ *Order Cancelled*\n\nDear ${custName},\n\nWe regret to inform you that your order from *${shopName}* has been cancelled.\n\n*Order Details:*\n${itemsList}\n\nCheck history: ${myOrdersLink}`;
-            }
-            
-            if(msg) {
-                // Phone number format fix (ताकि 9191... ना हो जाए)
-                let cleanPhone = custPhone.startsWith('91') ? custPhone : '91' + custPhone;
-                let waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
-                
-                // Popup blocker से बचने के लिए window.location.href का इस्तेमाल करें
-                window.location.href = waLink;
-            }
-        }
-    } catch(e) {
-        alert("Error updating order: " + e.message);
-    }
-}
 
 
 
@@ -10219,148 +10208,6 @@ function trackEvent(eventType) {
             let metricSelect = document.getElementById('growth-metric');
             window.updateGrowthChart(metricSelect ? metricSelect.value : 'orders');
         };
-
-        // ==========================================
-        // ✨ NAYA: DELETE LIVE ORDER FUNCTION ✨
-        // ==========================================
-        async function deleteLiveOrder(orderId) {
-            const isConfirmed = await iosConfirm(
-                "Delete Order", 
-                "Are you sure you want to permanently delete this order?", 
-                "Delete", 
-                "text-[#FF3B30]"
-            );
-            
-            if(!isConfirmed) return; 
-            
-            try {
-                // Firebase se delete kar dega
-                await db.collection('orders').doc(orderId).delete();
-                iosAlert("Deleted", "Order has been deleted successfully.");
-            } catch(e) {
-                iosAlert("Error", e.message);
-            }
-        }
-        // ==========================================
-        // ✨ FIXED: PRINT COMPACT 1-PAGE SHIPPING LABEL ✨
-        // ==========================================
-        function printShippingLabel(orderId) {
-            const order = window.globalLiveOrders.find(o => o.id === orderId);
-            if(!order) return iosAlert("Error", "Order not found");
-            
-            const shopName = typeof globalShopData !== 'undefined' ? globalShopData.shopName : "Store Name";
-            const shopPhone = typeof globalShopData !== 'undefined' ? globalShopData.phone : "";
-            const customerAddress = order.customerAddress || 'Address not provided';
-            
-            const mapUrl = (order.lat && order.lng) 
-                ? `https://www.google.com/maps/dir/?api=1&destination=${order.lat},${order.lng}` 
-                : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(customerAddress)}`;
-
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>Print Label - ${orderId}</title>
-                    <script src="https://cdn.tailwindcss.com"><\/script>
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
-                    <style>
-                        /* ✨ STRICT 1-PAGE PRINT SETTINGS ✨ */
-                        @media print { 
-                            @page { 
-                                margin: 0mm; /* दूसरा खाली पेज बनने से रोकेगा */
-                                size: auto; 
-                            }
-                            body, html { 
-                                margin: 0; padding: 0; background: white !important; 
-                                width: 100%; height: auto !important;
-                                -webkit-print-color-adjust: exact; 
-                            }
-                            .print-wrapper {
-                                padding: 10mm; /* पेज के अंदर का सेफ स्पेस */
-                                page-break-after: avoid;
-                            }
-                            .label-card {
-                                border: 2px solid #000 !important; /* कार्ड की आउटलाइन दिखेगी */
-                                width: 15cm !important; /* परफेक्ट चौड़ाई */
-                                max-width: 100% !important;
-                                box-shadow: none !important;
-                                margin: 0 !important;
-                                page-break-inside: avoid;
-                            }
-                        }
-                        
-                        /* Screen Style (Mobile view ke liye) */
-                        body { background: #f3f4f6; display: flex; justify-content: center; align-items: flex-start; padding: 20px; font-family: sans-serif; margin: 0; }
-                        
-                        /* Landscape Card Layout */
-                        .label-card { width: 100%; max-width: 15cm; background: white; border: 2px solid #000; border-radius: 12px; padding: 15px; display: flex; gap: 15px; align-items: center; }
-                        .left-section { flex: 1; min-width: 0; }
-                        .right-section { width: 120px; text-align: center; flex-shrink: 0; border-left: 2px dashed #cbd5e1; padding-left: 15px; }
-                    </style>
-                </head>
-                <body>
-                    <div class="print-wrapper">
-                        <div class="label-card">
-                            
-                            <!-- LEFT SIDE: Details -->
-                            <div class="left-section">
-                                <!-- HEADER -->
-                                <div class="border-b-2 border-black pb-2 mb-2">
-                                    <h2 class="text-xl font-black uppercase tracking-tight leading-none truncate">${shopName}</h2>
-                                    <p class="text-[10px] font-bold mt-1">Ph: ${shopPhone}</p>
-                                </div>
-                                
-                                <!-- TO (CUSTOMER) -->
-                                <div class="mb-2">
-                                    <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Deliver To:</p>
-                                    <h3 class="text-base font-bold text-black leading-tight">${order.customerName}</h3>
-                                    <p class="text-[11px] font-medium mt-1 leading-snug line-clamp-3">${customerAddress}</p>
-                                    <p class="text-[11px] font-bold mt-1">Ph: +91 ${order.customerPhone}</p>
-                                </div>
-                                
-                                <!-- ORDER ID -->
-                                <div class="bg-gray-100 p-1.5 rounded border border-gray-300 inline-block pr-4">
-                                    <p class="text-[8px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Order ID</p>
-                                    <p class="text-xs font-bold font-mono text-black">#${order.id.substring(0,8).toUpperCase()}</p>
-                                </div>
-                            </div>
-
-                            <!-- RIGHT SIDE: Amount & QR -->
-                            <div class="right-section">
-                                <div class="mb-2">
-                                    <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Collect Amt</p>
-                                    <p class="text-xl font-black text-black">₹${order.totalAmount}</p>
-                                </div>
-
-                                <div class="flex flex-col items-center">
-                                    <div id="qrcode" class="p-1 bg-white border border-gray-400 rounded inline-block"></div>
-                                    <p class="text-[7px] font-bold text-gray-500 mt-1.5 text-center uppercase tracking-wider leading-tight">Scan for Map</p>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <script>
-                        setTimeout(() => {
-                            new QRCode(document.getElementById("qrcode"), {
-                                text: "${mapUrl}",
-                                width: 85,  /* QR code ko aur chota aur fit kiya */
-                                height: 85,
-                                colorDark : "#000000",
-                                colorLight : "#ffffff",
-                                correctLevel : QRCode.CorrectLevel.L
-                            });
-                            
-                            // Print popup
-                            setTimeout(() => { window.print(); }, 800);
-                        }, 200);
-                    <\/script>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
-        }
 
 
     </script>

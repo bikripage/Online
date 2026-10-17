@@ -909,7 +909,7 @@ function checkCustomerAuth() {
  class="flex-1 bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100 font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 active:scale-95">
     <i class="fas fa-cart-plus text-sm"></i> Cart
 </button>
-<button onclick="event.stopPropagation(); if(checkCustomerAuth()){ addToCart(event, '${product.name}', '${product.price}', globalShopName, globalShopPhone, currentShopId); }"
+<button onclick="event.stopPropagation(); if(checkCustomerAuth()){ openOrderModal('${product.name}', '${product.price}', globalShopName, globalShopPhone); }"
  class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95">
     ${buttonText}
 </button>

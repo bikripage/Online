@@ -2253,7 +2253,7 @@
                     cardBorder = "border border-gray-200/60 shadow-sm";
                 }
 
-                // ✨ CLEAN & UNIFIED ACTION BUTTONS ✨
+                              // ✨ CLEAN & UNIFIED ACTION BUTTONS ✨
                 let btns = '';
                 if(o.status === 'pending') {
                     btns = `
@@ -2323,9 +2323,24 @@
                             </button>
                         </div>
                     `;
+                } else if(o.status === 'cancelled') {
+                    btns = `
+                        <div class="flex items-center gap-2 w-full mt-2">
+                            <a href="tel:${o.customerPhone}" class="w-11 h-11 bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 rounded-[14px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
+                                <i class="fas fa-phone-alt text-[13px]"></i>
+                            </a>
+                            <button disabled class="flex-1 bg-red-50 text-red-600 font-bold h-11 rounded-[14px] text-[12px] border border-red-100 opacity-80 flex items-center justify-center gap-1">
+                                <i class="fas fa-ban"></i> Order Cancelled
+                            </button>
+                            <button onclick="deleteLiveOrder('${o.id}')" class="w-11 h-11 bg-red-50 border border-red-100 text-red-600 hover:bg-red-100 rounded-[14px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
+                                <i class="fas fa-trash-alt text-[13px]"></i>
+                            </button>
+                        </div>
+                    `;
                 } else {
                     btns = `<div class="w-full text-center py-3 bg-gray-50 rounded-[14px] text-gray-500 text-[11px] font-bold uppercase tracking-widest mt-2">Order ${o.status}</div>`;
                 }
+
 
                 let ini = (o.customerName || 'C').charAt(0).toUpperCase();
                 let mapUrl = (o.lat && o.lng) ? `https://www.google.com/maps/dir/?api=1&destination=${o.lat},${o.lng}` : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(o.customerAddress || '')}`;

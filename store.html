@@ -348,7 +348,8 @@
                             </button>
                         </div>
                     </div>
-                    <textarea id="cart-address" placeholder="House No, Street, City..." rows="2" class="w-full px-4 py-3 mb-3 rounded-xl border border-gray-200 focus:border-purple-500 outline-none bg-white text-sm font-semibold transition resize-none shadow-sm"></textarea>
+                  <textarea id="cart-address" readonly placeholder="Use Map or Auto button to fetch address..." rows="2" class="w-full px-4 py-3 mb-3 rounded-xl border border-gray-300 outline-none bg-gray-200 text-gray-600 text-sm font-semibold transition resize-none shadow-sm cursor-not-allowed"></textarea>
+
                     <input type="hidden" id="cart-lat">
                     <input type="hidden" id="cart-lng">
                 </div>
@@ -412,7 +413,8 @@
                             </button>
                         </div>
                     </div>
-                    <textarea id="order-address" placeholder="House No, Street, Landmark..." required rows="2" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 outline-none bg-[#F7F7F9] focus:bg-white text-sm font-semibold transition resize-none"></textarea>
+                 <textarea id="order-address" readonly placeholder="Use Map or Auto button to fetch address..." required rows="2" class="w-full px-4 py-3 rounded-xl border border-gray-300 outline-none bg-gray-200 text-gray-600 text-sm font-semibold transition resize-none cursor-not-allowed"></textarea>
+
                     <input type="hidden" id="order-lat">
                     <input type="hidden" id="order-lng">
                 </div>

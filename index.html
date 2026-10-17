@@ -2559,12 +2559,12 @@ function getVIPBadge(isVerified, plan) {
                     lat: document.getElementById('order-lat').value || null,
                     lng: document.getElementById('order-lng').value || null,
                     shopPhone: phone,
-                    shopId: currentShopId || '', 
+                    shopId: currentOrder.shopId || '', // 👈 Yahan 'currentShopId' ki jagah 'currentOrder.shopId' kar dein
                     shopName: currentOrder.shopName || 'Local Store',
                     items: [{ name: currentOrder.itemName, qty: parseInt(qty), price: parseInt(currentOrder.itemPrice) }],
                     totalAmount: total,
                     status: 'pending',
-                    deliveryOtp: Math.floor(1000 + Math.random() * 9000).toString(), // ✨ YAHAN OTP ADD HUA
+                    deliveryOtp: Math.floor(1000 + Math.random() * 9000).toString(),
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
@@ -2578,7 +2578,6 @@ function getVIPBadge(isVerified, plan) {
                 btn.disabled = false;
             }
         }
-
         // ✨ MANUAL WHATSAPP ORDER LOGIC ✨
         function orderViaWhatsApp() {
             const qty = document.getElementById('order-qty').value;

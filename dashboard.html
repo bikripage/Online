@@ -2278,13 +2278,15 @@
                 if(o.status === 'pending') {
                     btns = `
                         ${deleteBtnHtml}
-                        <button onclick="updateLiveOrderStatus('${o.id}', 'accepted', '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-[#111827] text-white font-bold h-12 rounded-[16px] text-[14px] hover:bg-black active:scale-95 transition shadow-[0_4px_14px_rgba(0,0,0,0.15)] flex items-center justify-center gap-2">Accept Order</button>
+                     <button onclick="updateLiveOrderStatus('${o.id}', 'accepted')" class="flex-1 bg-[#111827] text-white font-bold h-12 rounded-[16px] text-[14px] hover:bg-black active:scale-95 transition shadow-[0_4px_14px_rgba(0,0,0,0.15)] flex items-center justify-center gap-2">Accept Order</button>
+
                     `;
                 } else if(o.status === 'accepted') {
                     btns = `
                         ${deleteBtnHtml}
                         <button onclick="printShippingLabel('${o.id}')" class="flex-1 bg-blue-50 text-blue-600 font-bold h-12 rounded-[16px] text-[13px] active:scale-95 transition shadow-sm flex items-center justify-center gap-1.5 border border-blue-100"><i class="fas fa-qrcode text-lg"></i> Label</button>
-                        <button onclick="updateLiveOrderStatus('${o.id}', 'delivered', '${o.customerPhone}', '${o.customerName}')" class="flex-[1.2] bg-[#16A34A] text-white font-bold h-12 rounded-[16px] text-[13px] active:scale-95 transition shadow-[0_4px_14px_rgba(22,163,74,0.3)] flex items-center justify-center gap-1.5"><i class="fas fa-check-circle"></i> Delivered</button>
+                        <button onclick="updateLiveOrderStatus('${o.id}', 'delivered')" class="flex-[1.2] bg-[#16A34A] text-white font-bold h-12 rounded-[16px] text-[13px] active:scale-95 transition shadow-[0_4px_14px_rgba(22,163,74,0.3)] flex items-center justify-center gap-1.5"><i class="fas fa-check-circle"></i> Delivered</button>
+
                     `;
                 } else if(o.status === 'delivered') {
                     btns = `
@@ -2368,99 +2370,104 @@
         }
 
 
-              // ✨ NAYA LOGIC: Order Delivered hote hi Bill banega, aur Professional WhatsApp message jayega ✨
-        async function updateLiveOrderStatus(orderId, newStatus, custPhone, custName) {
-            // ✨ NAYA: Premium iOS Confirm Popup ✨
-            let actionColor = (newStatus === 'cancelled') ? 'text-[#FF3B30]' : 'text-[#007AFF]';
-            let actionText = newStatus.charAt(0).toUpperCase() + newStatus.slice(1); // "accepted" ko "Accepted" banane ke liye
+              // सिर्फ orderId और newStatus पास करें
+async function updateLiveOrderStatus(orderId, newStatus) {
+    let actionText = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+    let actionColor = (newStatus === 'cancelled') ? 'text-[#FF3B30]' : 'text-[#007AFF]';
 
-            const isConfirmed = await iosConfirm(
-                "Update Order", 
-                `Are you sure you want to mark this order as ${newStatus}?`, 
-                "Mark " + actionText, 
-                actionColor
-            );
+    const isConfirmed = await iosConfirm(
+        "Update Order", 
+        `Are you sure you want to mark this order as ${newStatus}?`, 
+        "Mark " + actionText, 
+        actionColor
+    );
+    
+    if(!isConfirmed) return; 
+
+    try {
+        let billIdToSave = null;
+
+        // Firebase से आर्डर का डेटा निकालें
+        const orderDoc = await db.collection('orders').doc(orderId).get();
+        if (!orderDoc.exists) return;
+        const oData = orderDoc.data();
+        
+        // ✨ कस्टमर का नाम और नंबर डेटाबेस से सीधा लें
+        const custName = oData.customerName || 'Customer';
+        let custPhone = oData.customerPhone || '';
+
+        let itemsList = "";
+        if (oData.items && oData.items.length > 0) {
+            itemsList = oData.items.map(i => `▪ ${i.qty}x ${i.name}`).join('\n');
+        }
+
+        if (newStatus === 'delivered') {
+            const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+            let grandTot = Number(oData.totalAmount) || 0;
+
+            let newBill = { 
+                date: dateStr, 
+                customerName: custName, 
+                customerPhone: custPhone || "N/A", 
+                address: oData.customerAddress || "",
+                items: oData.items || [], 
+                discount: 0, 
+                delivery: 0, 
+                grandTotal: grandTot, 
+                payStatus: 'Paid',                  
+                payMode: 'UPI (Online)',            
+                deliveryStatus: 'Delivered', 
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                appOrderId: orderId
+            };
+
+            const addedBill = await db.collection('shops').doc(currentShopId).collection('bills').add(newBill);
+            billIdToSave = addedBill.id;
             
-            if(!isConfirmed) return; // Agar user cancel dabaye toh wahi ruk jao
+            setTimeout(() => { fetchFirebaseData(); }, 1500); 
+        }
 
-            try {
-                let billIdToSave = null;
+        let orderUpdateData = {
+            status: newStatus,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        if (billIdToSave) orderUpdateData.billId = billIdToSave;
 
-                // ✨ NAYA: Pehle order details nikal lo taaki items ka pata chal sake
-                const orderDoc = await db.collection('orders').doc(orderId).get();
-                if (!orderDoc.exists) return;
-                const oData = orderDoc.data();
+        // डेटाबेस अपडेट
+        await db.collection('orders').doc(orderId).update(orderUpdateData);
 
-                // ✨ NAYA: Items ki ek clean list banana (Jaise: ▪ 1x INDIAN BROOM)
-                let itemsList = "";
-                if (oData.items && oData.items.length > 0) {
-                    itemsList = oData.items.map(i => `▪ ${i.qty}x ${i.name}`).join('\n');
-                }
+        // WhatsApp Message Logic
+        if(custPhone && custPhone !== 'undefined' && custPhone !== 'N/A') {
+            let msg = "";
+            const shopName = globalShopData.shopName;
+            
+            let baseUrl = window.location.href.split('?')[0];
+            let myOrdersLink = baseUrl.replace(/dashboard\.html/i, 'my-orders.html');
+            if (myOrdersLink.startsWith("file://")) {
+                myOrdersLink = "https://bikripage.github.io/Online/my-orders.html"; 
+            }
 
-                                if (newStatus === 'delivered') {
-                    const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-                    let grandTot = Number(oData.totalAmount) || 0;
-
-                    let newBill = { 
-                        date: dateStr, 
-                        customerName: oData.customerName || "Customer", 
-                        customerPhone: oData.customerPhone || "N/A", 
-                        address: oData.customerAddress || "",
-                        items: oData.items || [], 
-                        discount: 0, 
-                        delivery: 0, 
-                        grandTotal: grandTot, 
-                        payStatus: 'Paid',                  // 👈 YAHAN 'Unpaid' ki jagah 'Paid' kar dijiye!
-                        payMode: 'UPI (Online)',            // 👈 Agar chahein toh by default payment mode bhi set kar sakte hain
-                        deliveryStatus: 'Delivered', 
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                        appOrderId: orderId
-                    };
-
-                    const addedBill = await db.collection('shops').doc(currentShopId).collection('bills').add(newBill);
-                    billIdToSave = addedBill.id;
-                    
-                    setTimeout(() => { fetchFirebaseData(); }, 1500); 
-                }
-
-                let orderUpdateData = {
-                    status: newStatus,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                if (billIdToSave) orderUpdateData.billId = billIdToSave;
-
-                await db.collection('orders').doc(orderId).update(orderUpdateData);
-
-                // ✨ NAYA: Ultra-Professional WhatsApp Message (With My Orders Link) ✨
-                if(custPhone && custPhone !== 'undefined' && custPhone !== 'N/A') {
-                    let msg = "";
-                    const shopName = globalShopData.shopName;
-                    
-                    // ✨ NAYA: Dynamically generate 'My Orders' link
-                    let baseUrl = window.location.href.split('?')[0];
-                    let myOrdersLink = baseUrl.replace(/dashboard\.html/i, 'my-orders.html');
-                    
-                    // (Local testing fallback)
-                    if (myOrdersLink.startsWith("file://")) {
-                        myOrdersLink = "https://bikripage.github.io/Online/my-orders.html"; 
-                    }
-
-                    if(newStatus === 'accepted') {
-                        msg = `🎉 *Order Confirmed!*\n\nDear ${custName},\n\nGreat news! Your order from *${shopName}* has been accepted and is currently being prepared.\n\n*Order Details:*\n${itemsList}\n\n📦 *Track your order here:*\nYou can check the live status of your order in the 'My Orders' section:\n${myOrdersLink}\n\nThank you for choosing us!`;
-                    } 
-                    else if(newStatus === 'delivered') {
-                        msg = `✅ *Order Delivered!*\n\nDear ${custName},\n\nYour order from *${shopName}* has been successfully delivered.\n\n*Order Details:*\n${itemsList}\n\n🧾 *Download Your Official Bill:*\nYou can view your complete order summary and download your invoice from the 'My Orders' section here:\n${myOrdersLink}\n\nWe hope you enjoy your purchase. Thanks for shopping locally!`;
-                    } 
-                    else if(newStatus === 'cancelled') {
-                        msg = `❌ *Order Cancelled*\n\nDear ${custName},\n\nWe regret to inform you that your order from *${shopName}* could not be fulfilled at this time and has been cancelled.\n\n*Order Details:*\n${itemsList}\n\nCheck your order history here:\n${myOrdersLink}\n\nWe sincerely apologize for the inconvenience. Please contact us for further details.`;
-                    }
-                    
-                    if(msg) window.open(`https://wa.me/91${custPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-                }
-            } catch(e) {
-                alert("Error updating order: " + e.message);
+            if(newStatus === 'accepted') {
+                msg = `🎉 *Order Confirmed!*\n\nDear ${custName},\n\nGreat news! Your order from *${shopName}* has been accepted.\n\n*Order Details:*\n${itemsList}\n\n📦 *Track your order here:*\n${myOrdersLink}\n\nThank you!`;
+            } else if(newStatus === 'delivered') {
+                msg = `✅ *Order Delivered!*\n\nDear ${custName},\n\nYour order from *${shopName}* has been delivered.\n\n*Order Details:*\n${itemsList}\n\n🧾 *Download Your Invoice:*\n${myOrdersLink}`;
+            } else if(newStatus === 'cancelled') {
+                msg = `❌ *Order Cancelled*\n\nDear ${custName},\n\nWe regret to inform you that your order from *${shopName}* has been cancelled.\n\n*Order Details:*\n${itemsList}\n\nCheck history: ${myOrdersLink}`;
+            }
+            
+            if(msg) {
+                // Phone number format fix (ताकि 9191... ना हो जाए)
+                let cleanPhone = custPhone.startsWith('91') ? custPhone : '91' + custPhone;
+                let waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+                
+                // Popup blocker से बचने के लिए window.location.href का इस्तेमाल करें
+                window.location.href = waLink;
             }
         }
+    } catch(e) {
+        alert("Error updating order: " + e.message);
+    }
+}
 
 
 

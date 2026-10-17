@@ -1464,9 +1464,10 @@ function checkCustomerAuth() {
                             <i class="fas fa-lock"></i>
                         </div>
                         <p class="text-sm font-bold text-[#6B7280] mb-4">Log in to explore shops and share your experience. </p>
-<button onclick="openAuthModal()" class="mx-auto bg-[#111827] text-white font-bold py-3 px-8 rounded-xl text-sm active:scale-95 transition shadow-md">
+<button onclick="goToCustomerLogin()" class="mx-auto bg-[#111827] text-white font-bold py-3 px-8 rounded-xl text-sm active:scale-95 transition shadow-md">
     Login / Sign Up
 </button>
+
 
                     </div>
                 `;
@@ -1650,20 +1651,14 @@ function checkCustomerAuth() {
                     savedPhone = ''; 
                 }
                 
-                if(!document.getElementById('cart-cust-name').value) {
-                    document.getElementById('cart-cust-name').value = savedName;
-                }
-                if(!document.getElementById('cart-cust-phone').value) {
-                    document.getElementById('cart-cust-phone').value = savedPhone;
-                }
-                if(!document.getElementById('cart-address').value && savedAddress) {
-                    document.getElementById('cart-address').value = savedAddress;
-                    
-                    if(savedLat && savedLng) {
-                        if(document.getElementById('cart-lat')) document.getElementById('cart-lat').value = savedLat;
-                        if(document.getElementById('cart-lng')) document.getElementById('cart-lng').value = savedLng;
-                    }
-                }
+                                // Hamesha cart khulte waqt value aur GPS fill karo
+                if(document.getElementById('cart-cust-name')) document.getElementById('cart-cust-name').value = savedName;
+                if(document.getElementById('cart-cust-phone')) document.getElementById('cart-cust-phone').value = savedPhone;
+                if(document.getElementById('cart-address')) document.getElementById('cart-address').value = savedAddress;
+                
+                if(document.getElementById('cart-lat')) document.getElementById('cart-lat').value = savedLat;
+                if(document.getElementById('cart-lng')) document.getElementById('cart-lng').value = savedLng;
+
 
                 modal.classList.remove('hidden');
                 setTimeout(() => {
@@ -1877,15 +1872,24 @@ function checkCustomerAuth() {
                     : `<i class="fab fa-whatsapp text-lg"></i> Order via WhatsApp`;
             }
             
-            const savedName = localStorage.getItem('BikriPage_saved_name') || localStorage.getItem('BikriPage_customer_name') || '';
+                        const savedName = localStorage.getItem('BikriPage_saved_name') || localStorage.getItem('BikriPage_customer_name') || '';
             let savedPhone = localStorage.getItem('BikriPage_saved_phone') || localStorage.getItem('BikriPage_customer_phone') || '';
             const savedAddress = localStorage.getItem('BikriPage_saved_address') || '';
+            
+            // ✨ YAHAN GPS COORDINATES FETCH KAR RAHE HAIN
+            const savedLat = localStorage.getItem('BikriPage_saved_lat') || '';
+            const savedLng = localStorage.getItem('BikriPage_saved_lng') || '';
 
             if (savedPhone.includes('@')) savedPhone = '';
 
             document.getElementById('order-cust-name').value = savedName;
             document.getElementById('order-cust-phone').value = savedPhone;
             document.getElementById('order-address').value = savedAddress;
+            
+            // ✨ YAHAN HIDDEN INPUTS MEIN GPS DAAL RAHE HAIN
+            if (document.getElementById('order-lat')) document.getElementById('order-lat').value = savedLat;
+            if (document.getElementById('order-lng')) document.getElementById('order-lng').value = savedLng;
+
             
             if (document.getElementById('order-shop-phone')) {
                 document.getElementById('order-shop-phone').value = shopPhone || '';

@@ -905,10 +905,12 @@ function checkCustomerAuth() {
                         </div>
                         <div class="flex flex-col gap-2 w-full mt-3">
                             <div class="flex gap-2 w-full">
-                                <button onclick="event.stopPropagation(); if(checkCustomerAuth()){ addToCart(event, '${product.name}', '${product.price}', globalShopName, globalShopPhone); }" class="flex-1 bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100 font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 active:scale-95">
+                                <button onclick="event.stopPropagation(); if(checkCustomerAuth()){ addToCart(event, '${product.name}', '${product.price}', globalShopName, globalShopPhone, currentShopId); }"
+ class="flex-1 bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100 font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 active:scale-95">
     <i class="fas fa-cart-plus text-sm"></i> Cart
 </button>
-<button onclick="event.stopPropagation(); if(checkCustomerAuth()){ openOrderModal('${product.name}', '${product.price}', globalShopName, globalShopPhone); }" class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95">
+<button onclick="event.stopPropagation(); if(checkCustomerAuth()){ addToCart(event, '${product.name}', '${product.price}', globalShopName, globalShopPhone, currentShopId); }"
+ class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95">
     ${buttonText}
 </button>
 
@@ -994,7 +996,8 @@ function checkCustomerAuth() {
                         </div>
                         <div class="flex flex-col gap-2 w-full mt-3">
                             <div class="flex gap-2 w-full">
-                                <button onclick="event.stopPropagation(); if(checkCustomerAuth()){ addToCart(event, '${product.name}', '${product.price}', globalShopName, globalShopPhone); }" class="flex-1 bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100 font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 active:scale-95">
+                                <button onclick="event.stopPropagation(); if(checkCustomerAuth()){ addToCart(event, '${product.name}', '${product.price}', globalShopName, globalShopPhone, currentShopId); }"
+ class="flex-1 bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100 font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 active:scale-95">
     <i class="fas fa-cart-plus text-sm"></i> Cart
 </button>
 <button onclick="event.stopPropagation(); if(checkCustomerAuth()){ openOrderModal('${product.name}', '${product.price}', globalShopName, globalShopPhone); }" class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95">
@@ -1602,14 +1605,15 @@ function checkCustomerAuth() {
             }
         }
 
-        function addToCart(event, name, price, shopName, shopPhone) {
+              function addToCart(event, name, price, shopName, shopPhone, shopId) {
             event.stopPropagation(); 
             let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
-            const existingItem = cart.find(item => item.name === name && item.shopPhone === shopPhone);
+            // shopId ke through check karega
+            const existingItem = cart.find(item => item.name === name && item.shopId === shopId);
             if (existingItem) {
                 existingItem.qty += 1; 
             } else {
-                cart.push({ name, price: parseInt(price), shopName, shopPhone, qty: 1 });
+                cart.push({ name, price: parseInt(price), shopName, shopPhone, shopId: shopId, qty: 1 });
             }
             localStorage.setItem(getCartKey(), JSON.stringify(cart));
             if (typeof updateCartBadge === 'function') updateCartBadge();
@@ -1632,6 +1636,7 @@ function checkCustomerAuth() {
                 btn.dataset.adding = "false"; 
             }, 1200);
         }
+
 
         function toggleCartModal() {
             const modal = document.getElementById('cart-modal');
@@ -1747,7 +1752,7 @@ function checkCustomerAuth() {
             }
         }
 
-        async function checkoutCartInApp() {
+                async function checkoutCartInApp() {
             let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
             if(cart.length === 0) { alert("Cart is empty!"); return; }
             
@@ -1767,18 +1772,20 @@ function checkCustomerAuth() {
             
             const ordersByShop = {};
             cart.forEach(item => {
-                if(!ordersByShop[item.shopPhone]) { ordersByShop[item.shopPhone] = { items: [], total: 0, shopName: item.shopName }; }
+                // ✨ YAHAN shopId SAVE KAR RAHE HAIN
+                if(!ordersByShop[item.shopPhone]) { 
+                    ordersByShop[item.shopPhone] = { items: [], total: 0, shopName: item.shopName, shopId: item.shopId }; 
+                }
                 ordersByShop[item.shopPhone].items.push(item);
                 ordersByShop[item.shopPhone].total += (item.price * item.qty);
             });
 
-                        try {
+            try {
                 const shopPhones = Object.keys(ordersByShop);
                 for (let i = 0; i < shopPhones.length; i++) {
                     const phone = shopPhones[i];
                     const orderData = ordersByShop[phone];
                     
-                    // ✨ NAYA: Cart ke liye bhi 4-Digit Random OTP
                     const cartOtpCode = Math.floor(1000 + Math.random() * 9000).toString();
 
                     await db.collection('orders').add({
@@ -1789,11 +1796,12 @@ function checkCustomerAuth() {
                         lat: document.getElementById('cart-lat').value || null,
                         lng: document.getElementById('cart-lng').value || null,
                         shopPhone: phone,
+                        shopId: orderData.shopId || currentShopId, // ✨ EXACT SHOP ID DATABASE MEIN JAYEGA
                         shopName: orderData.shopName,
                         items: orderData.items,
                         totalAmount: orderData.total,
                         status: 'pending',
-                        deliveryOtp: cartOtpCode, // ✨ YAHAN CART OTP ADD HUA
+                        deliveryOtp: cartOtpCode, 
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 }
@@ -1810,6 +1818,7 @@ function checkCustomerAuth() {
                 btn.disabled = false; 
             }
         }
+
 
         function checkoutCartWhatsApp() {
             let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];

@@ -2211,10 +2211,7 @@
             renderAdminBills(); 
             renderInsights(); 
         }
-                   // ==========================================
-        // ✨ ULTRA-PREMIUM iOS STYLE LIVE ORDERS (WITH COLORED BORDERS) ✨
-        // ==========================================
-        function renderLiveOrders(orders) {
+                        function renderLiveOrders(orders) {
             const list = document.getElementById('merchant-orders-list');
             if(!list) return;
             if(orders.length === 0) {
@@ -2224,7 +2221,7 @@
 
             let html = '';
             orders.forEach((o, index) => {
-                let delay = index * 0.05; // Smooth entry animation
+                let delay = index * 0.05;
 
                 let d = "Just now";
                 if(o.createdAt && o.createdAt.toDate) {
@@ -2232,7 +2229,6 @@
                     d = dt.toLocaleDateString('en-IN', {day:'2-digit', month:'short'}) + " at " + dt.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
                 }
 
-                // ✨ Enhanced Items List (Clean Apple Style)
                 let itemsHtml = o.items ? o.items.map(i => `
                     <div class="flex justify-between items-start text-[13px] mb-2.5 last:mb-0">
                         <span class="font-medium text-gray-700 pr-4 leading-snug"><strong class="text-black">${i.qty}x</strong> ${i.name}</span>
@@ -2240,25 +2236,24 @@
                     </div>
                 `).join('') : '<p class="text-[13px] text-gray-500">Items not found</p>';
 
-                // ✨ Status Badges & DYNAMIC COLORED BORDERS
                 let sBg, statusText, statusDot, cardBorder;
                 if (o.status === 'pending') {
                     sBg = "bg-blue-50 text-blue-600"; statusText = "New Order"; statusDot = "bg-blue-500";
-                    cardBorder = "border-[2px] border-blue-400 shadow-[0_8px_20px_rgba(59,130,246,0.15)]"; // Blue Outline
+                    cardBorder = "border-[2px] border-blue-400 shadow-[0_8px_20px_rgba(59,130,246,0.15)]";
                 } else if (o.status === 'accepted') {
                     sBg = "bg-purple-50 text-purple-600"; statusText = "Preparing"; statusDot = "bg-purple-500";
-                    cardBorder = "border-[2px] border-purple-400 shadow-[0_8px_20px_rgba(168,85,247,0.15)]"; // Purple Outline
+                    cardBorder = "border-[2px] border-purple-400 shadow-[0_8px_20px_rgba(168,85,247,0.15)]";
                 } else if (o.status === 'delivered') {
                     sBg = "bg-green-50 text-green-600"; statusText = "Delivered"; statusDot = "bg-green-500";
-                    cardBorder = "border-[2px] border-green-400 shadow-[0_8px_20px_rgba(34,197,94,0.15)]"; // Green Outline
+                    cardBorder = "border-[2px] border-green-400 shadow-[0_8px_20px_rgba(34,197,94,0.15)]";
                 } else if (o.status === 'cancelled') {
                     sBg = "bg-red-50 text-red-600"; statusText = "Cancelled"; statusDot = "bg-red-500";
-                    cardBorder = "border-[2px] border-red-400 shadow-[0_8px_20px_rgba(239,68,68,0.15)]"; // Red Outline
+                    cardBorder = "border-[2px] border-red-400 shadow-[0_8px_20px_rgba(239,68,68,0.15)]";
                 } else {
                     cardBorder = "border border-gray-200/60 shadow-sm";
                 }
 
-                                          // ✨ Clean & Non-Overlapping Action Buttons Layout
+                // ✨ CLEAN & UNIFIED ACTION BUTTONS ✨
                 let btns = '';
                 if(o.status === 'pending') {
                     btns = `
@@ -2332,84 +2327,45 @@
                     btns = `<div class="w-full text-center py-3 bg-gray-50 rounded-[14px] text-gray-500 text-[11px] font-bold uppercase tracking-widest mt-2">Order ${o.status}</div>`;
                 }
 
-
                 let ini = (o.customerName || 'C').charAt(0).toUpperCase();
                 let mapUrl = (o.lat && o.lng) ? `https://www.google.com/maps/dir/?api=1&destination=${o.lat},${o.lng}` : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(o.customerAddress || '')}`;
 
-                // Yahan Card Border aur Animation apply ho rahi hai
                 html += `
                 <div class="bg-white rounded-[24px] mb-5 overflow-hidden shrink-0 flex flex-col animate-slide-up transition-all duration-300 ${cardBorder}" style="animation-delay: ${delay}s">
-                    
-                    <!-- iOS Style Header -->
                     <div class="p-4 sm:p-5 border-b border-gray-100 flex justify-between items-start bg-white">
                         <div class="flex items-center gap-3 min-w-0">
-                            <div class="w-11 h-11 bg-gray-100 rounded-full flex items-center justify-center text-gray-800 font-black text-lg shrink-0 border border-gray-200/50">
-                                ${ini}
-                            </div>
+                            <div class="w-11 h-11 bg-gray-100 rounded-full flex items-center justify-center text-gray-800 font-black text-lg shrink-0 border border-gray-200/50">${ini}</div>
                             <div class="min-w-0">
                                 <h4 class="font-bold text-gray-900 text-[16px] tracking-tight leading-none mb-1 truncate">${o.customerName || 'Customer'}</h4>
                                 <p class="text-[11px] text-gray-500 font-medium">#${o.id.substring(0,8).toUpperCase()} • ${d}</p>
                             </div>
                         </div>
-                        <!-- Modern Minimal Badge -->
-                        <span class="${sBg} px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide flex items-center gap-1.5 shrink-0 ml-3">
-                            <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span> ${statusText}
-                        </span>
+                        <span class="${sBg} px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide flex items-center gap-1.5 shrink-0 ml-3"><span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span> ${statusText}</span>
                     </div>
 
-                    <!-- iOS Grouped Content Box (Address & Items) -->
                     <div class="p-4 sm:p-5 bg-[#F9FAFB] flex flex-col gap-4 border-b border-gray-100">
-                        
-                        <!-- Address Block -->
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-start gap-2.5 min-w-0">
                                 <i class="fas fa-map-marker-alt text-gray-400 mt-1 text-[14px]"></i>
                                 <p class="text-[13px] text-gray-700 font-medium leading-relaxed line-clamp-2">${o.customerAddress || 'No address provided'}</p>
                             </div>
-                            <a href="${mapUrl}" target="_blank" class="w-9 h-9 bg-white border border-gray-200 rounded-full flex items-center justify-center text-blue-500 shadow-sm active:scale-95 transition shrink-0">
-                                <i class="fas fa-location-arrow text-[13px]"></i>
-                            </a>
+                            <a href="${mapUrl}" target="_blank" class="w-9 h-9 bg-white border border-gray-200 rounded-full flex items-center justify-center text-blue-500 shadow-sm active:scale-95 transition shrink-0"><i class="fas fa-location-arrow text-[13px]"></i></a>
                         </div>
-
-                        <!-- Minimal Divider -->
                         <div class="h-px w-full bg-gray-200/60"></div>
-
-                        <!-- Items List -->
-                        <div class="flex flex-col">
-                            ${itemsHtml}
-                        </div>
+                        <div class="flex flex-col">${itemsHtml}</div>
                     </div>
 
-                    <!-- Footer (Total & Actions) -->
-                    <div class="p-4 sm:p-5 bg-white flex flex-col gap-5">
+                    <div class="p-4 sm:p-5 bg-white flex flex-col gap-3">
                         <div class="flex justify-between items-center px-1">
                             <span class="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Grand Total</span>
                             <span class="font-black text-gray-900 text-[24px] tracking-tight">₹${o.totalAmount}</span>
                         </div>
-                        
-                        <div class="flex items-center gap-3 w-full">
-    <!-- Call Button -->
-    <a href="tel:${o.customerPhone}" class="w-12 h-12 bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 rounded-[16px] flex items-center justify-center transition active:scale-95 shrink-0">
-        <i class="fas fa-phone-alt"></i>
-    </a>
-    
-    <!-- Status Action Buttons (Accept, Delivered etc.) -->
-    <div class="flex-1 flex gap-3">
-        ${btns}
-    </div>
-
-    <!-- ✨ NAYA DELETE BUTTON (Ye hamesha dikhega) -->
-    <button onclick="deleteLiveOrder('${o.id}')" class="w-12 h-12 bg-[#FEF2F2] border border-[#FECACA] text-[#DC2626] hover:bg-[#FEE2E2] rounded-[16px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
-        <i class="fas fa-trash-alt"></i>
-    </button>
-</div>
-
+                        ${btns}
                     </div>
                 </div>`;
             });
             list.innerHTML = html;
         }
-
 
               // ✨ NAYA LOGIC: Order Delivered hote hi Bill banega, aur Professional WhatsApp message jayega ✨
         async function updateLiveOrderStatus(orderId, newStatus, custPhone, custName) {

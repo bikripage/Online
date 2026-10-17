@@ -476,24 +476,22 @@
     <!-- ✨ JAVASCRIPT LOGIC ✨ -->
     <!-- ============================================== -->
     <script>
-        // Check if customer is logged in
+        // Purana code delete karke ye dalo:
 function checkCustomerAuth() {
     const customerPhone = localStorage.getItem('BikriPage_customer_phone');
     const activeShop = localStorage.getItem('BikriPage_active_shop');
     
-    // Agar customer login nahi hai (ya dukandar khud apni shop dekh raha hai toh usko rokna nahi hai)
     if (!customerPhone && !activeShop) {
-        alert("🔒 Please login first to continue!");
-        // Login modal kholne wala function (Jo tumhare code mein ho)
-        if (typeof openAuthModal === 'function') {
-            openAuthModal();
-        } else if (typeof checkAuthAndOpenModal === 'function') {
-            checkAuthAndOpenModal();
-        }
-        return false; // Rok do aage ka kaam
+        // Default alert ki jagah naya premium alert
+        showIOSAlert("Login Required", "Please log in as a customer first to continue shopping.", "Log In", function() {
+            localStorage.setItem('BikriPage_return_url', window.location.href);
+            window.location.href = "index.html?action=login";
+        });
+        return false; 
     }
-    return true; // Pass karne do
+    return true; 
 }
+
 
         let globalShopPhone = "";
         let globalShopName = "";
@@ -1335,13 +1333,19 @@ function checkCustomerAuth() {
         // 🚀 TOGGLE FOLLOW BUTTON LOGIC (AUTH AWARE)
         // ==========================================
         async function toggleFollow() {
-            const custPhone = localStorage.getItem('BikriPage_customer_phone');
-            const custName = localStorage.getItem('BikriPage_customer_name') || "Customer";
-                
-            if (!custPhone) { 
-                alert("Please log in as a customer to follow stores!"); 
-                return; 
-            }
+    const custPhone = localStorage.getItem('BikriPage_customer_phone');
+    const custName = localStorage.getItem('BikriPage_customer_name') || "Customer";
+        
+    if (!custPhone) { 
+        // Default alert ki jagah naya premium alert
+        showIOSAlert("Login Required", "Please log in as a customer to follow stores!", "Log In", function() {
+            localStorage.setItem('BikriPage_return_url', window.location.href);
+            window.location.href = "index.html?action=login";
+        });
+        return; 
+    }
+    
+
 
             // ✨ Check karo ki Firebase Auth load ho chuka hai ya nahi
             if (typeof auth !== 'undefined' && !auth.currentUser) {
@@ -1459,10 +1463,11 @@ function checkCustomerAuth() {
                         <div class="w-12 h-12 bg-white text-[#9CA3AF] rounded-full flex items-center justify-center text-xl mb-3 shadow-sm border border-[#E5E7EB]">
                             <i class="fas fa-lock"></i>
                         </div>
-                        <p class="text-sm font-bold text-[#6B7280] mb-4">Log in as a customer to shop & post reviews</p>
-                        <button onclick="goToCustomerLogin()" class="mx-auto bg-[#111827] text-white font-bold py-3 px-8 rounded-xl text-sm active:scale-95 transition shadow-md">
-                            Login / Sign Up
-                        </button>
+                        <p class="text-sm font-bold text-[#6B7280] mb-4">Login first for shop & post reviews</p>
+<button onclick="openAuthModal()" class="mx-auto bg-[#111827] text-white font-bold py-3 px-8 rounded-xl text-sm active:scale-95 transition shadow-md">
+    Login / Sign Up
+</button>
+
                     </div>
                 `;
                 formContainer.classList.remove('hidden'); 
@@ -2482,8 +2487,56 @@ function checkCustomerAuth() {
 
             } catch(e) { console.log("Review fetch error: ", e); }
         }
+// iOS Alert Show Function
+function showIOSAlert(title, message, actionText, actionCallback) {
+    document.getElementById('ios-alert-title').innerText = title;
+    document.getElementById('ios-alert-message').innerText = message;
+    
+    const actionBtn = document.getElementById('ios-alert-action-btn');
+    actionBtn.innerText = actionText;
+    actionBtn.onclick = function() {
+        closeIOSAlert();
+        if(actionCallback) actionCallback();
+    };
+
+    const modal = document.getElementById('ios-alert-modal');
+    const card = document.getElementById('ios-alert-card');
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        card.classList.remove('scale-95');
+    }, 10);
+}
+
+// iOS Alert Close Function
+function closeIOSAlert() {
+    const modal = document.getElementById('ios-alert-modal');
+    const card = document.getElementById('ios-alert-card');
+    modal.classList.add('opacity-0');
+    card.classList.add('scale-95');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
+}
 
     </script>
+    <!-- ✨ iOS STYLE PREMIUM ALERT MODAL ✨ -->
+<div id="ios-alert-modal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+    <div id="ios-alert-card" class="bg-white/90 backdrop-blur-xl w-[270px] rounded-[14px] shadow-2xl transform scale-95 transition-transform duration-300 text-center overflow-hidden flex flex-col">
+        <div class="p-4 pt-5 pb-4">
+            <div class="w-10 h-10 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center text-lg mx-auto mb-3 shadow-sm border border-blue-100">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h3 id="ios-alert-title" class="text-[17px] font-semibold text-black leading-tight mb-1">Notice</h3>
+            <p id="ios-alert-message" class="text-[13px] text-black/70 leading-snug">Message goes here.</p>
+        </div>
+        <div class="flex border-t border-black/10">
+            <button onclick="closeIOSAlert()" class="flex-1 py-3 text-[17px] text-gray-500 font-normal border-r border-black/10 hover:bg-black/5 active:bg-black/10 transition-colors">Cancel</button>
+            <button id="ios-alert-action-btn" class="flex-1 py-3 text-[17px] text-[#007AFF] font-semibold hover:bg-black/5 active:bg-black/10 transition-colors">Log In</button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
 

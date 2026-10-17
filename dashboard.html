@@ -2265,8 +2265,39 @@
                         <button onclick="updateLiveOrderStatus('${o.id}', 'cancelled', '${o.customerPhone}', '${o.customerName}')" class="w-12 h-12 bg-red-50 text-red-500 rounded-[16px] flex items-center justify-center text-lg active:scale-95 transition shrink-0"><i class="fas fa-times"></i></button>
                         <button onclick="updateLiveOrderStatus('${o.id}', 'accepted', '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-[#111827] text-white font-bold h-12 rounded-[16px] text-[14px] hover:bg-black active:scale-95 transition shadow-[0_4px_14px_rgba(0,0,0,0.15)] flex items-center justify-center gap-2">Accept Order</button>
                     `;
-                } else if(o.status === 'accepted') {
-                    btns = `<button onclick="updateLiveOrderStatus('${o.id}', 'delivered', '${o.customerPhone}', '${o.customerName}')" class="w-full bg-[#16A34A] text-white font-bold h-12 rounded-[16px] text-[14px] active:scale-95 transition shadow-[0_4px_14px_rgba(22,163,74,0.3)] flex items-center justify-center gap-2"><i class="fas fa-check-circle"></i> Mark Delivered</button>`;
+                               } else if(o.status === 'accepted') {
+                    // ✨ NAYA OTP LOGIC START
+                    let otpCheckHtml = '';
+                    let btnDisabledState = '';
+                    let btnOpacity = '';
+                    
+                    // Agar order mein deliveryOtp mojood hai, toh OTP box dikhao aur button lock rakho
+                    if (o.deliveryOtp) {
+                        btnDisabledState = 'disabled';
+                        btnOpacity = 'opacity-50 cursor-not-allowed';
+                        
+                        otpCheckHtml = `
+                            <div class="flex items-center gap-2 mb-2 w-full bg-gray-50 px-3 py-2 rounded-[12px] border border-gray-200 transition-colors">
+                                <i class="fas fa-key text-gray-400 text-xs"></i>
+                                <input type="number" id="otp-input-${o.id}" placeholder="Enter 4-Digit OTP" 
+                                       oninput="window.checkDeliveryOtp(this, '${o.id}', '${o.deliveryOtp}')" 
+                                       class="w-full bg-transparent outline-none text-sm font-bold text-gray-900 tracking-[0.2em]">
+                            </div>
+                        `;
+                    }
+
+                    btns = `
+                        <div class="flex flex-col w-full">
+                            ${otpCheckHtml}
+                            <button id="deliver-btn-${o.id}" ${btnDisabledState} 
+                                    onclick="updateLiveOrderStatus('${o.id}', 'delivered', '${o.customerPhone}', '${o.customerName}')" 
+                                    class="w-full bg-[#16A34A] text-white font-bold h-12 rounded-[16px] text-[14px] active:scale-95 transition shadow-[0_4px_14px_rgba(22,163,74,0.3)] flex items-center justify-center gap-2 ${btnOpacity}">
+                                <i class="fas fa-check-circle"></i> Mark Delivered
+                            </button>
+                        </div>
+                    `;
+                    // ✨ NAYA OTP LOGIC END
+
                 } else if(o.status === 'delivered') {
                     btns = `
                         <button disabled class="flex-[1.5] bg-gray-50 text-[#16A34A] font-bold h-12 rounded-[16px] text-[13px] border border-gray-200 opacity-60">Delivered</button>
@@ -10242,6 +10273,25 @@ async function deleteLiveOrder(orderId) {
         iosAlert("Error", "Order delete karne mein problem aayi: " + e.message);
     }
 }
+        // ✨ NAYA: OTP Verify karne ka function
+        window.checkDeliveryOtp = function(input, orderId, correctOtp) {
+            const btn = document.getElementById(`deliver-btn-${orderId}`);
+            if (!btn) return;
+            
+            if (input.value.trim() === String(correctOtp)) {
+                // OTP Sahi Hai -> Button Active karo aur Green color dikhao
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                input.parentElement.classList.replace('border-gray-200', 'border-[#16A34A]');
+                input.parentElement.classList.replace('bg-gray-50', 'bg-[#DCFCE7]');
+            } else {
+                // OTP Galat Hai -> Button Lock rakho
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                input.parentElement.classList.replace('border-[#16A34A]', 'border-gray-200');
+                input.parentElement.classList.replace('bg-[#DCFCE7]', 'bg-gray-50');
+            }
+        };
 
     </script>
 

@@ -577,6 +577,11 @@
                                         <div class="w-10 h-10 bg-[#FEF3C7] text-[#D97706] rounded-[12px] flex items-center justify-center"><i class="fas fa-bell"></i></div>
                                         Live Orders
                                     </h3>
+                                    
+    <!-- ✨ NAYA BUTTON: Batch Print Accepted Orders ✨ -->
+    <button onclick="printAllAcceptedSlips()" class="w-full sm:w-auto bg-[#111827] hover:bg-black text-white text-sm font-bold px-4 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm active:scale-95">
+        <i class="fas fa-print"></i> Print Accepted Orders
+    </button>
                                 </div>
                                 
                                                                <!-- ✨ NAYA: SEARCH & FILTER OPTIONS ✨ -->
@@ -10439,6 +10444,140 @@ function generateShippingSlip(orderId) {
     doc.close();
 }
 
+// =======================================================
+// ✨ NAYA: BATCH PRINT ALL ACCEPTED ORDERS ✨
+// =======================================================
+function printAllAcceptedSlips() {
+    // Sirf 'accepted' status wale orders filter karein
+    let acceptedOrders = window.globalLiveOrders.filter(o => o.status === 'accepted');
+
+    if (acceptedOrders.length === 0) {
+        iosAlert("No Accepted Orders", "Abhi koi bhi order 'Accepted' status mein nahi hai print karne ke liye.");
+        return;
+    }
+
+    let shopName = globalShopData.shopName || "Store Name";
+    let shopPhone = globalShopData.phone || "";
+
+    // Hidden iframe create karna
+    let iframe = document.getElementById('print-iframe');
+    if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'print-iframe';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+    }
+
+    // Saare slips ka HTML ek sath generate karna
+    let allSlipsHtml = acceptedOrders.map((order, index) => {
+        let mapUrl = (order.lat && order.lng) 
+            ? `https://www.google.com/maps/dir/?api=1&destination=${order.lat},${order.lng}` 
+            : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.customerAddress || '')}`;
+        
+        // Har slip ke baad page break lagega, taaki naye page par print ho (Aakhiri wale ko chhodkar)
+        let pageBreak = (index < acceptedOrders.length - 1) ? 'page-break-after: always;' : '';
+
+        return `
+            <div class="label-box" style="${pageBreak}">
+                <div class="header">SHIPPING LABEL</div>
+                <div class="row">
+                    <div class="col-left">
+                        <div class="sec-title">Deliver To:</div>
+                        <p class="cust-name">${order.customerName}</p>
+                        <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
+                        <p class="cust-text" style="font-weight: 900; font-size: 18px; margin-top: 12px;">📞 Ph: ${order.customerPhone}</p>
+                    </div>
+                    <div class="col-right">
+                        <div class="qr-box">
+                            <div id="qrcode-${order.id}" class="qr-placeholder" data-url="${mapUrl}"></div>
+                            <div class="qr-text">Scan for Direction</div>
+                        </div>
+                        <div class="seller-sec">
+                            <div class="sec-title" style="margin-bottom: 4px;">Sold By:</div>
+                            <p class="cust-text" style="font-weight: bold; font-size: 14px;">${shopName}</p>
+                            <p class="cust-text" style="font-size: 13px;">Ph: ${shopPhone}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="amount-box">
+                    <div class="amount-title">Collect Amount</div>
+                    <p class="amount-value">₹${order.totalAmount}</p>
+                    <div class="cod-text">(CASH ON DELIVERY)</div>
+                </div>
+                <div class="footer">
+                    Order ID: #${order.id.substring(0,8).toUpperCase()} &nbsp;&nbsp;|&nbsp;&nbsp; Date: ${new Date().toLocaleDateString('en-IN')}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    let htmlContent = `
+        <html>
+        <head>
+            <title>Batch Print - Accepted Orders</title>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+            <style>
+                body { font-family: 'Arial', sans-serif; margin: 0; padding: 15px; color: #000; background: #fff; }
+                @page { size: auto; margin: 5mm; }
+                .label-box { width: 100%; max-height: 140mm; border: 3px solid #000; border-radius: 12px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; margin-bottom: 20px;}
+                .header { text-align: center; border-bottom: 3px solid #000; padding-bottom: 12px; margin-bottom: 20px; font-weight: 900; font-size: 26px; letter-spacing: 3px; }
+                .row { display: flex; justify-content: space-between; margin-bottom: 20px; flex: 1; }
+                .col-left { flex: 1.5; padding-right: 20px; border-right: 2px dashed #ccc; }
+                .sec-title { font-size: 14px; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 8px; letter-spacing: 1px; }
+                .cust-name { font-size: 24px; font-weight: 900; margin: 0 0 8px 0; text-transform: uppercase; }
+                .cust-text { font-size: 16px; margin: 0 0 6px 0; line-height: 1.5; }
+                .col-right { flex: 1; padding-left: 20px; display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; }
+                .qr-box { text-align: right; }
+                .qr-placeholder { display: inline-block; width: 110px; height: 110px; }
+                .qr-text { font-size: 11px; font-weight: bold; margin-top: 5px; text-transform: uppercase; text-align: center; }
+                .seller-sec { margin-top: 15px; text-align: right; }
+                .amount-box { border: 3px solid #000; border-radius: 12px; text-align: center; padding: 15px; background: #f9f9f9; margin-top: 10px; }
+                .amount-title { font-size: 15px; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+                .amount-value { font-size: 40px; font-weight: 900; margin: 0; }
+                .cod-text { font-size: 18px; font-weight: 900; letter-spacing: 2px; margin-top: 5px; }
+                .footer { text-align: center; font-size: 13px; color: #444; font-weight: bold; margin-top: 20px; border-top: 2px solid #000; padding-top: 15px; }
+                
+                /* Print karte waqt extra gap hatane ke liye */
+                @media print {
+                    body { padding: 0; }
+                    .label-box { margin-bottom: 0; }
+                }
+            </style>
+        </head>
+        <body>
+            ${allSlipsHtml}
+
+            <script>
+                window.onload = function() {
+                    // Loop lagakar sabhi QR codes ek sath render karna
+                    let qrElements = document.querySelectorAll('.qr-placeholder');
+                    qrElements.forEach(el => {
+                        let url = el.getAttribute('data-url');
+                        new QRCode(el, {
+                            text: url,
+                            width: 110,
+                            height: 110,
+                            colorDark : "#000000",
+                            colorLight : "#ffffff",
+                            correctLevel : QRCode.CorrectLevel.L
+                        });
+                    });
+                    
+                    // QR render hone ke liye wait (thoda extra time diya hai batch ke liye)
+                    setTimeout(() => {
+                        window.print();
+                    }, 800);
+                };
+            <\/script>
+        </body>
+        </html>
+    `;
+
+    let doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(htmlContent);
+    doc.close();
+}
 
     </script>
 

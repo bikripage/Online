@@ -10301,9 +10301,8 @@ async function deleteLiveOrder(orderId) {
                 input.parentElement.classList.replace('bg-[#DCFCE7]', 'bg-gray-50/80');
             }
         };
-
 // =======================================================
-// ✨ NAYA: PROFESSIONAL SHIPPING SLIP GENERATOR ✨
+// ✨ NAYA: PROFESSIONAL SHIPPING SLIP GENERATOR (LANDSCAPE HALF-PAGE) ✨
 // =======================================================
 function generateShippingSlip(orderId) {
     // 1. Order aur Store ka data nikalein
@@ -10311,7 +10310,6 @@ function generateShippingSlip(orderId) {
     if(!order) return alert("Order details not found!");
 
     let shopName = globalShopData.shopName || "Store Name";
-    let shopAddress = globalShopData.address || "Store Address";
     let shopPhone = globalShopData.phone || "";
 
     // 2. Map ka Link banayein QR code ke liye
@@ -10319,19 +10317,10 @@ function generateShippingSlip(orderId) {
         ? `https://www.google.com/maps/dir/?api=1&destination=${order.lat},${order.lng}` 
         : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.customerAddress || '')}`;
 
-    // 3. Items ki HTML table list banayein
-    let itemsHtml = order.items ? order.items.map(i => `
-        <tr style="border-bottom: 1px dashed #ccc;">
-            <td style="padding: 8px 0; font-size: 13px;">${i.name}</td>
-            <td style="text-align: center; font-size: 13px;">${i.qty}</td>
-            <td style="text-align: right; font-size: 13px; font-weight: bold;">₹${i.price * i.qty}</td>
-        </tr>
-    `).join('') : '<tr><td colspan="3">Items not found</td></tr>';
-
-    // 4. Print karne ke liye ek nayi window/tab kholiye
+    // 3. Print karne ke liye ek nayi window/tab kholiye
     let printWin = window.open('', '_blank');
     
-    // 5. Amazon/Flipkart style ka Professional HTML Format (Landscape / Half-Page Print Setup)
+    // 4. Naya Landscape (Top-Half) HTML Design bina Product List ke
     printWin.document.write(`
         <html>
         <head>
@@ -10341,107 +10330,89 @@ function generateShippingSlip(orderId) {
                 body { 
                     font-family: 'Arial', sans-serif; 
                     margin: 0; 
-                    padding: 0; 
-                    color: #000; 
-                    background: #fff;
-                }
-                
-                /* ✨ PRINT SETTINGS: Landscape aur top-half align karne ke liye ✨ */
-                @page { 
-                    size: landscape; 
-                    margin: 0; 
-                }
-
-                .print-container {
-                    /* Paper ki aadhe hisse jitni width rakhkar usko center karenge landscape mode me, 
-                       yaa landscape page par top-left align karke aadhe size me layenge */
-                    width: 148mm;  /* A5/Half Page width roughly */
-                    height: 210mm; /* A5 Height */
-                    padding: 10mm;
-                    box-sizing: border-box;
-                    margin: 0 auto;
-                }
-
-                .label-box { 
-                    width: 100%; 
-                    border: 2px solid #000; 
-                    border-radius: 8px; 
                     padding: 15px; 
-                    box-sizing: border-box; 
+                    color: #000; 
+                    background: #fff; 
                 }
                 
-                .header { text-align: center; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 15px; font-weight: 900; font-size: 22px; letter-spacing: 2px; }
+                /* Ye ensure karega ki margin kam rahe print me */
+                @page { size: auto; margin: 5mm; }
                 
-                .flex-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 2px solid #000; padding-bottom: 15px; }
-                .address-sec { flex: 1; padding-right: 15px; }
-                .sec-title { font-size: 11px; color: #444; text-transform: uppercase; font-weight: bold; margin-bottom: 4px; letter-spacing: 1px; }
-                .cust-name { font-size: 18px; font-weight: bold; margin: 0 0 4px 0; text-transform: uppercase; }
-                .cust-text { font-size: 13px; margin: 0 0 4px 0; line-height: 1.4; }
+                .label-box { 
+                    width: 100%; /* Pura width lega landscape look ke liye */
+                    max-height: 140mm; /* Page ka theek aadha hissa (A5 size height) */
+                    border: 3px solid #000; 
+                    border-radius: 12px; 
+                    padding: 20px; 
+                    box-sizing: border-box; 
+                    display: flex;
+                    flex-direction: column;
+                }
                 
-                .qr-box { text-align: center; border: 1px solid #ccc; padding: 5px; border-radius: 6px; }
-                .qr-placeholder { width: 90px; height: 90px; margin: 0 auto; }
-                .qr-text { font-size: 9px; font-weight: bold; margin-top: 5px; text-transform: uppercase; }
+                .header { text-align: center; border-bottom: 3px solid #000; padding-bottom: 12px; margin-bottom: 20px; font-weight: 900; font-size: 26px; letter-spacing: 3px; }
                 
-                .seller-sec { border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 15px; }
+                .row { display: flex; justify-content: space-between; margin-bottom: 20px; flex: 1; }
                 
-                table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-                th { text-align: left; border-bottom: 2px solid #000; padding-bottom: 5px; font-size: 12px; text-transform: uppercase; }
+                /* Left Side - Delivery Address */
+                .col-left { flex: 1.5; padding-right: 20px; border-right: 2px dashed #ccc; }
+                .sec-title { font-size: 14px; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 8px; letter-spacing: 1px; }
+                .cust-name { font-size: 24px; font-weight: 900; margin: 0 0 8px 0; text-transform: uppercase; }
+                .cust-text { font-size: 16px; margin: 0 0 6px 0; line-height: 1.5; }
                 
-                .amount-box { border: 2px solid #000; border-radius: 8px; text-align: center; padding: 15px; margin-bottom: 15px; background: #f9f9f9; }
-                .amount-title { font-size: 14px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
-                .amount-value { font-size: 32px; font-weight: 900; margin: 0; }
-                .cod-text { font-size: 16px; font-weight: bold; letter-spacing: 1px; margin-top: 5px; }
+                /* Right Side - QR Code aur Seller Info */
+                .col-right { flex: 1; padding-left: 20px; display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; }
+                .qr-box { text-align: right; }
+                .qr-placeholder { display: inline-block; width: 110px; height: 110px; }
+                .qr-text { font-size: 11px; font-weight: bold; margin-top: 5px; text-transform: uppercase; text-align: center; }
                 
-                .footer { text-align: center; font-size: 11px; color: #555; }
+                .seller-sec { margin-top: 15px; text-align: right; }
+                
+                /* Collect Amount Section */
+                .amount-box { border: 3px solid #000; border-radius: 12px; text-align: center; padding: 15px; background: #f9f9f9; margin-top: 10px; }
+                .amount-title { font-size: 15px; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+                .amount-value { font-size: 40px; font-weight: 900; margin: 0; }
+                .cod-text { font-size: 18px; font-weight: 900; letter-spacing: 2px; margin-top: 5px; }
+                
+                .footer { text-align: center; font-size: 13px; color: #444; font-weight: bold; margin-top: 20px; border-top: 2px solid #000; padding-top: 15px; }
             </style>
         </head>
         <body>
-            <div class="print-container">
-                <div class="label-box">
-                    <div class="header">SHIPPING LABEL</div>
+            <div class="label-box">
+                <div class="header">SHIPPING LABEL</div>
+                
+                <div class="row">
+                    <!-- Left: Customer Data -->
+                    <div class="col-left">
+                        <div class="sec-title">Deliver To:</div>
+                        <p class="cust-name">${order.customerName}</p>
+                        <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
+                        <p class="cust-text" style="font-weight: 900; font-size: 18px; margin-top: 12px;">📞 Ph: ${order.customerPhone}</p>
+                    </div>
                     
-                    <div class="flex-row">
-                        <div class="address-sec">
-                            <div class="sec-title">Deliver To:</div>
-                            <p class="cust-name">${order.customerName}</p>
-                            <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
-                            <p class="cust-text" style="font-weight: bold; margin-top: 8px;">Ph: ${order.customerPhone}</p>
-                        </div>
+                    <!-- Right: QR Code & Seller -->
+                    <div class="col-right">
                         <div class="qr-box">
                             <div id="qrcode" class="qr-placeholder"></div>
                             <div class="qr-text">Scan for Direction</div>
                         </div>
+                        <div class="seller-sec">
+                            <div class="sec-title" style="margin-bottom: 4px;">Sold By:</div>
+                            <p class="cust-text" style="font-weight: bold; font-size: 14px;">${shopName}</p>
+                            <p class="cust-text" style="font-size: 13px;">Ph: ${shopPhone}</p>
+                        </div>
                     </div>
+                </div>
 
-                    <div class="seller-sec">
-                        <div class="sec-title">Sold By:</div>
-                        <p class="cust-text" style="font-weight: bold;">${shopName}</p>
-                        <p class="cust-text">${shopAddress}</p>
-                        <p class="cust-text">Ph: ${shopPhone}</p>
-                    </div>
+                <!-- Total COD Amount -->
+                <div class="amount-box">
+                    <div class="amount-title">Collect Amount</div>
+                    <p class="amount-value">₹${order.totalAmount}</p>
+                    <div class="cod-text">(CASH ON DELIVERY)</div>
+                </div>
 
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Item Details</th>
-                                <th style="text-align: center; width: 40px;">Qty</th>
-                                <th style="text-align: right; width: 60px;">Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${itemsHtml}
-                        </tbody>
-                    </table>
-
-                    <div class="amount-box">
-                        <div class="amount-title">Collect Amount</div>
-                        <p class="amount-value">₹${order.totalAmount}</p>
-                        <div class="cod-text">(CASH ON DELIVERY)</div>
-                    </div>
-
-                    <div class="footer">
-                        Order ID: #${order.id.substring(0,8).toUpperCase()} • Date: ${new Date().toLocaleDateString('en-IN')}
-                    </div>
+                <!-- Footer Details -->
+                <div class="footer">
+                    Order ID: #${order.id.substring(0,8).toUpperCase()} &nbsp;&nbsp;|&nbsp;&nbsp; Date: ${new Date().toLocaleDateString('en-IN')}
                 </div>
             </div>
 
@@ -10449,8 +10420,8 @@ function generateShippingSlip(orderId) {
                 // Generate QR Code dynamically
                 new QRCode(document.getElementById("qrcode"), {
                     text: "${mapUrl}",
-                    width: 90,
-                    height: 90,
+                    width: 110,
+                    height: 110,
                     colorDark : "#000000",
                     colorLight : "#ffffff",
                     correctLevel : QRCode.CorrectLevel.L
@@ -10466,6 +10437,7 @@ function generateShippingSlip(orderId) {
     `);
     printWin.document.close();
 }
+
 
     </script>
 

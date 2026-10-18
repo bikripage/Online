@@ -10302,7 +10302,7 @@ async function deleteLiveOrder(orderId) {
             }
         };
 // =======================================================
-// ✨ NAYA: PROFESSIONAL SHIPPING SLIP GENERATOR (LANDSCAPE HALF-PAGE) ✨
+// ✨ NAYA: PROFESSIONAL SHIPPING SLIP GENERATOR (SINGLE ALL-IN-ONE QR) ✨
 // =======================================================
 function generateShippingSlip(orderId) {
     // 1. Order aur Store ka data nikalein
@@ -10312,15 +10312,21 @@ function generateShippingSlip(orderId) {
     let shopName = globalShopData.shopName || "Store Name";
     let shopPhone = globalShopData.phone || "";
 
-    // 2. Map ka Link banayein QR code ke liye
+    // 2. Map ka Link banayein
     let mapUrl = (order.lat && order.lng) 
         ? `https://www.google.com/maps/dir/?api=1&destination=${order.lat},${order.lng}` 
         : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.customerAddress || '')}`;
 
+    // ✨ NAYA: Ek hi QR code mein Saari Details aur Map link jodein ✨
+    let itemsListText = order.items ? order.items.map(i => i.qty + 'x ' + i.name).join(', ') : 'N/A';
+    
+    // Yahan humne saari information ek saath merge kardi hai (\\n ka matlab nayi line hota hai)
+    let orderDataString = "Deliver To: " + order.customerName + "\\nPh: " + order.customerPhone + "\\nAddress: " + (order.customerAddress || 'N/A') + "\\nItems: " + itemsListText + "\\nTotal: Rs " + order.totalAmount + "\\n\\nGo for delivery:\\n" + mapUrl;
+
     // 3. Print karne ke liye ek nayi window/tab kholiye
     let printWin = window.open('', '_blank');
     
-    // 4. Naya Landscape (Top-Half) HTML Design bina Product List ke
+    // 4. Landscape HTML Design with Single All-in-One QR Code
     printWin.document.write(`
         <html>
         <head>
@@ -10335,12 +10341,11 @@ function generateShippingSlip(orderId) {
                     background: #fff; 
                 }
                 
-                /* Ye ensure karega ki margin kam rahe print me */
                 @page { size: auto; margin: 5mm; }
                 
                 .label-box { 
-                    width: 100%; /* Pura width lega landscape look ke liye */
-                    max-height: 140mm; /* Page ka theek aadha hissa (A5 size height) */
+                    width: 100%; 
+                    max-height: 140mm; 
                     border: 3px solid #000; 
                     border-radius: 12px; 
                     padding: 20px; 
@@ -10351,21 +10356,21 @@ function generateShippingSlip(orderId) {
                 
                 .header { text-align: center; border-bottom: 3px solid #000; padding-bottom: 12px; margin-bottom: 20px; font-weight: 900; font-size: 26px; letter-spacing: 3px; }
                 
-                .row { display: flex; justify-content: space-between; margin-bottom: 20px; flex: 1; }
+                .row { display: flex; justify-content: space-between; margin-bottom: 10px; flex: 1; }
                 
                 /* Left Side - Delivery Address */
-                .col-left { flex: 1.5; padding-right: 20px; border-right: 2px dashed #ccc; }
+                .col-left { flex: 1.5; padding-right: 20px; border-right: 2px dashed #ccc; display: flex; flex-direction: column; }
                 .sec-title { font-size: 14px; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 8px; letter-spacing: 1px; }
                 .cust-name { font-size: 24px; font-weight: 900; margin: 0 0 8px 0; text-transform: uppercase; }
                 .cust-text { font-size: 16px; margin: 0 0 6px 0; line-height: 1.5; }
                 
-                /* Right Side - QR Code aur Seller Info */
+                /* Right Side - QR Code & Seller */
                 .col-right { flex: 1; padding-left: 20px; display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; }
                 .qr-box { text-align: right; }
                 .qr-placeholder { display: inline-block; width: 110px; height: 110px; }
                 .qr-text { font-size: 11px; font-weight: bold; margin-top: 5px; text-transform: uppercase; text-align: center; }
                 
-                .seller-sec { margin-top: 15px; text-align: right; }
+                .seller-sec { margin-top: auto; text-align: right; }
                 
                 /* Collect Amount Section */
                 .amount-box { border: 3px solid #000; border-radius: 12px; text-align: center; padding: 15px; background: #f9f9f9; margin-top: 10px; }
@@ -10386,14 +10391,14 @@ function generateShippingSlip(orderId) {
                         <div class="sec-title">Deliver To:</div>
                         <p class="cust-name">${order.customerName}</p>
                         <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
-                        <p class="cust-text" style="font-weight: 900; font-size: 18px; margin-top: 12px;">📞 Ph: ${order.customerPhone}</p>
+                        <p class="cust-text" style="font-weight: 900; font-size: 18px; margin-top: 8px;">📞 Ph: ${order.customerPhone}</p>
                     </div>
                     
-                    <!-- Right: QR Code & Seller -->
+                    <!-- Right: Main QR & Seller Info -->
                     <div class="col-right">
                         <div class="qr-box">
-                            <div id="qrcode" class="qr-placeholder"></div>
-                            <div class="qr-text">Scan for Direction</div>
+                            <div id="main-qrcode" class="qr-placeholder"></div>
+                            <div class="qr-text">Scan for Details<br>& Direction</div>
                         </div>
                         <div class="seller-sec">
                             <div class="sec-title" style="margin-bottom: 4px;">Sold By:</div>
@@ -10417,9 +10422,9 @@ function generateShippingSlip(orderId) {
             </div>
 
             <script>
-                // Generate QR Code dynamically
-                new QRCode(document.getElementById("qrcode"), {
-                    text: "${mapUrl}",
+                // Ek hi QR mein pura data daal diya
+                new QRCode(document.getElementById("main-qrcode"), {
+                    text: "${orderDataString}",
                     width: 110,
                     height: 110,
                     colorDark : "#000000",
@@ -10437,7 +10442,6 @@ function generateShippingSlip(orderId) {
     `);
     printWin.document.close();
 }
-
 
     </script>
 

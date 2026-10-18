@@ -10445,7 +10445,7 @@ function generateShippingSlip(orderId) {
 }
 
 // =======================================================
-// ✨ NAYA: BATCH PRINT ALL ACCEPTED ORDERS (WITH RETURN ADDRESS) ✨
+// ✨ NAYA: BATCH PRINT ALL ACCEPTED ORDERS (PERFECT E-COMMERCE LAYOUT) ✨
 // =======================================================
 function printAllAcceptedSlips() {
     // Sirf 'accepted' status wale orders filter karein
@@ -10457,8 +10457,8 @@ function printAllAcceptedSlips() {
     }
 
     let shopName = globalShopData.shopName || "Store Name";
+    let ownerName = globalShopData.ownerName || "Shopkeeper";
     let shopPhone = globalShopData.phone || "";
-    // ✨ NAYA: Firebase se dukaan ka address fetch kar liya ✨
     let shopAddress = globalShopData.address || "Return address not provided";
 
     // Hidden iframe create karna
@@ -10486,27 +10486,39 @@ function printAllAcceptedSlips() {
                 <div class="header">SHIPPING LABEL</div>
                 
                 <div class="main-content">
-                    <!-- Left Side: Address & Return Info -->
+                    <!-- Left Side: Address & Sold By -->
                     <div class="col-left">
                         <div class="sec-title">Deliver To:</div>
                         <p class="cust-name">${order.customerName}</p>
                         <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
                         <p class="cust-text" style="font-weight: 900; font-size: 14px; margin-top: 6px;">📞 Ph: ${order.customerPhone}</p>
                         
-                        <!-- ✨ NAYA: Return Address Section ✨ -->
+                        <!-- ✨ NAYA: Sirf Sold By, Owner Name aur Shop Name ✨ -->
                         <div class="seller-sec">
-                            <div style="font-size: 9px; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 2px;">If Undelivered, Return To:</div>
-                            <div style="font-size: 11px;"><b>${shopName}</b> (Ph: ${shopPhone})</div>
-                            <div style="font-size: 10px; color: #333; margin-top: 1px; line-height: 1.2;">${shopAddress}</div>
+                            <span style="font-size: 9px; color: #555; text-transform: uppercase; font-weight: 900;">Sold By:</span> 
+                            <span style="font-size: 13px; font-weight: 900; margin-left: 2px;">${ownerName}</span>
+                            <span style="font-size: 11px; color: #444; font-weight: bold; margin-left: 2px;">(${shopName})</span>
                         </div>
                     </div>
                     
-                    <!-- Right Side: QR & Amount -->
+                    <!-- Right Side: Return Address, QR & Amount -->
                     <div class="col-right">
-                        <div class="qr-box">
-                            <div id="qrcode-${order.id}" class="qr-placeholder" data-url="${mapUrl}"></div>
-                            <div class="qr-text">Scan for Direction</div>
+                        
+                        <!-- ✨ NAYA: Khali jagah par Return Address aur QR Code ✨ -->
+                        <div style="display: flex; gap: 8px; margin-bottom: 8px; width: 100%;">
+                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                                <div style="font-size: 8px; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 2px;">If Undelivered, Return To:</div>
+                                <div style="font-size: 11px; font-weight: 900; margin-bottom: 2px;">${shopName}</div>
+                                <div style="font-size: 9px; color: #333; line-height: 1.2;">${shopAddress}</div>
+                                <div style="font-size: 10px; font-weight: 900; margin-top: 3px;">Ph: ${shopPhone}</div>
+                            </div>
+                            
+                            <div class="qr-box" style="width: 65px; flex-shrink: 0; text-align: center;">
+                                <div id="qrcode-${order.id}" class="qr-placeholder" data-url="${mapUrl}"></div>
+                                <div class="qr-text">Scan for Direction</div>
+                            </div>
                         </div>
+
                         <div class="amount-box-compact">
                             <div class="amount-lbl">COLLECT AMOUNT</div>
                             <div class="amount-val">₹${order.totalAmount}</div>
@@ -10554,18 +10566,20 @@ function printAllAcceptedSlips() {
                 
                 .main-content { display: flex; justify-content: space-between; margin-bottom: 8px; flex: 1; }
                 
-                .col-left { flex: 1; padding-right: 12px; border-right: 2px dashed #ccc; display: flex; flex-direction: column; }
+                /* ✨ Column sizes adjust kiye hain ✨ */
+                .col-left { width: 52%; padding-right: 12px; border-right: 2px dashed #ccc; display: flex; flex-direction: column; }
                 .sec-title { font-size: 11px; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 4px; letter-spacing: 1px; }
                 .cust-name { font-size: 18px; font-weight: 900; margin: 0 0 4px 0; text-transform: uppercase; }
                 .cust-text { font-size: 13px; margin: 0 0 3px 0; line-height: 1.3; }
                 
-                /* ✨ Yahan Seller Section ko upar se halka line dekar alag kiya gaya hai ✨ */
+                /* Sold By section ko theek se align kiya */
                 .seller-sec { margin-top: auto; padding-top: 6px; border-top: 1px dashed #eee; }
                 
-                .col-right { width: 120px; padding-left: 12px; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
-                .qr-box { text-align: center; margin-bottom: 8px; }
+                /* ✨ Right Column ko chauda (wide) kiya hai taaki Return Address aa sake ✨ */
+                .col-right { width: 48%; padding-left: 12px; display: flex; flex-direction: column; flex-shrink: 0; }
+                
                 .qr-placeholder { display: inline-block; width: 65px; height: 65px; }
-                .qr-text { font-size: 9px; font-weight: bold; margin-top: 3px; text-transform: uppercase; text-align: center; }
+                .qr-text { font-size: 8px; font-weight: bold; margin-top: 3px; text-transform: uppercase; text-align: center; }
                 
                 .amount-box-compact { border: 2px solid #000; border-radius: 6px; text-align: center; padding: 5px 6px; background: #f9f9f9; width: 100%; box-sizing: border-box; margin-top: auto;}
                 .amount-lbl { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }

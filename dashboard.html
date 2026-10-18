@@ -2240,38 +2240,47 @@
                 if (o.status === 'pending') {
                     sBg = "bg-blue-50 text-blue-600"; statusText = "New Order"; statusDot = "bg-blue-500";
                     cardBorder = "border-[2px] border-blue-400 shadow-[0_8px_20px_rgba(59,130,246,0.15)]";
-                } else if (o.status === 'accepted') {
-                    sBg = "bg-purple-50 text-purple-600"; statusText = "Preparing"; statusDot = "bg-purple-500";
-                    cardBorder = "border-[2px] border-purple-400 shadow-[0_8px_20px_rgba(168,85,247,0.15)]";
-                } else if (o.status === 'delivered') {
-                    sBg = "bg-green-50 text-green-600"; statusText = "Delivered"; statusDot = "bg-green-500";
-                    cardBorder = "border-[2px] border-green-400 shadow-[0_8px_20px_rgba(34,197,94,0.15)]";
-                } else if (o.status === 'cancelled') {
-                    sBg = "bg-red-50 text-red-600"; statusText = "Cancelled"; statusDot = "bg-red-500";
-                    cardBorder = "border-[2px] border-red-400 shadow-[0_8px_20px_rgba(239,68,68,0.15)]";
-                } else {
-                    cardBorder = "border border-gray-200/60 shadow-sm";
-                }
+                               } else if(o.status === 'accepted') {
+                    let otpCheckHtml = '';
+                    let btnDisabledState = 'disabled';
+                    let btnOpacity = 'opacity-40 cursor-not-allowed';
+                    
+                    if (o.deliveryOtp) {
+                        otpCheckHtml = `
+                            <div class="flex items-center gap-2 mb-2.5 w-full bg-gray-50 px-3.5 py-2.5 rounded-[14px] border border-gray-200 focus-within:border-blue-500 focus-within:bg-white transition-all shadow-inner">
+                                <i class="fas fa-key text-blue-500 text-xs"></i>
+                                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="otp-input-${o.id}" placeholder="Enter 4-Digit PIN" 
+                                       oninput="window.checkDeliveryOtp(this, '${o.id}', '${o.deliveryOtp}')" 
+                                       class="w-full bg-transparent outline-none text-[15px] font-black text-gray-900 tracking-[0.25em] placeholder:tracking-normal placeholder:font-semibold placeholder:text-gray-400">
+                            </div>
+                        `;
+                    }
 
-                              // ✨ CLEAN & UNIFIED ACTION BUTTONS ✨
-                let btns = '';
-                if(o.status === 'pending') {
                     btns = `
-                        <div class="flex items-center gap-2 w-full mt-2">
-                            <a href="tel:${o.customerPhone}" class="w-11 h-11 bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 rounded-[14px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
-                                <i class="fas fa-phone-alt text-[13px]"></i>
-                            </a>
-                            <button onclick="updateLiveOrderStatus('${o.id}', 'cancelled', '${o.customerPhone}', '${o.customerName}')" class="w-11 h-11 bg-red-50 border border-red-100 text-red-500 rounded-[14px] flex items-center justify-center text-base active:scale-95 transition shrink-0 shadow-sm">
-                                <i class="fas fa-times"></i>
+                        <div class="flex flex-col w-full mt-2">
+                            ${otpCheckHtml}
+                            
+                            <!-- ✨ NAYA: GENERATE SLIP BUTTON ✨ -->
+                            <button onclick="generateShippingSlip('${o.id}')" class="mb-3 w-full bg-gray-900 hover:bg-black text-white font-bold h-11 rounded-[14px] text-[13px] active:scale-95 transition shadow-sm flex items-center justify-center gap-2">
+                                <i class="fas fa-print"></i> Print Shipping Slip
                             </button>
-                            <button onclick="updateLiveOrderStatus('${o.id}', 'accepted', '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-[#111827] text-white font-bold h-11 rounded-[14px] text-[13px] hover:bg-black active:scale-95 transition shadow-sm flex items-center justify-center gap-1.5">
-                                Accept Order
-                            </button>
-                            <button onclick="deleteLiveOrder('${o.id}')" class="w-11 h-11 bg-red-50 border border-red-100 text-red-600 hover:bg-red-100 rounded-[14px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
-                                <i class="fas fa-trash-alt text-[13px]"></i>
-                            </button>
+
+                            <div class="flex items-center gap-2 w-full">
+                                <a href="tel:${o.customerPhone}" class="w-11 h-11 bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 rounded-[14px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
+                                    <i class="fas fa-phone-alt text-[13px]"></i>
+                                </a>
+                                <button id="deliver-btn-${o.id}" ${btnDisabledState} 
+                                        onclick="updateLiveOrderStatus('${o.id}', 'delivered', '${o.customerPhone}', '${o.customerName}')" 
+                                        class="flex-1 bg-[#16A34A] text-white font-bold h-11 rounded-[14px] text-[13px] active:scale-95 transition shadow-sm flex items-center justify-center gap-1.5 ${btnOpacity}">
+                                    <i class="fas fa-check-circle"></i> Mark Delivered
+                                </button>
+                                <button onclick="deleteLiveOrder('${o.id}')" class="w-11 h-11 bg-red-50 border border-red-100 text-red-600 hover:bg-red-100 rounded-[14px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
+                                    <i class="fas fa-trash-alt text-[13px]"></i>
+                                </button>
+                            </div>
                         </div>
                     `;
+
                 } else if(o.status === 'accepted') {
                     let otpCheckHtml = '';
                     let btnDisabledState = 'disabled';
@@ -10296,6 +10305,139 @@ async function deleteLiveOrder(orderId) {
             }
         };
 
+// =======================================================
+// ✨ NAYA: PROFESSIONAL SHIPPING SLIP GENERATOR ✨
+// =======================================================
+function generateShippingSlip(orderId) {
+    // 1. Order aur Store ka data nikalein
+    let order = window.globalLiveOrders.find(o => o.id === orderId);
+    if(!order) return alert("Order details not found!");
+
+    let shopName = globalShopData.shopName || "Store Name";
+    let shopAddress = globalShopData.address || "Store Address";
+    let shopPhone = globalShopData.phone || "";
+
+    // 2. Map ka Link banayein QR code ke liye
+    let mapUrl = (order.lat && order.lng) 
+        ? `https://www.google.com/maps/dir/?api=1&destination=${order.lat},${order.lng}` 
+        : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.customerAddress || '')}`;
+
+    // 3. Items ki HTML table list banayein
+    let itemsHtml = order.items ? order.items.map(i => `
+        <tr style="border-bottom: 1px dashed #ccc;">
+            <td style="padding: 8px 0; font-size: 13px;">${i.name}</td>
+            <td style="text-align: center; font-size: 13px;">${i.qty}</td>
+            <td style="text-align: right; font-size: 13px; font-weight: bold;">₹${i.price * i.qty}</td>
+        </tr>
+    `).join('') : '<tr><td colspan="3">Items not found</td></tr>';
+
+    // 4. Print karne ke liye ek nayi window/tab kholiye
+    let printWin = window.open('', '_blank');
+    
+    // 5. Amazon/Flipkart style ka Professional HTML Format
+    printWin.document.write(`
+        <html>
+        <head>
+            <title>Shipping Label - #${order.id.substring(0,8).toUpperCase()}</title>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+            <style>
+                body { font-family: 'Arial', sans-serif; margin: 0; padding: 20px; color: #000; }
+                .label-box { width: 100%; max-width: 420px; margin: 0 auto; border: 2px solid #000; border-radius: 8px; padding: 15px; box-sizing: border-box; }
+                .header { text-align: center; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 15px; font-weight: 900; font-size: 22px; letter-spacing: 2px; }
+                
+                .flex-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 2px solid #000; padding-bottom: 15px; }
+                .address-sec { flex: 1; padding-right: 15px; }
+                .sec-title { font-size: 11px; color: #444; text-transform: uppercase; font-weight: bold; margin-bottom: 4px; letter-spacing: 1px; }
+                .cust-name { font-size: 18px; font-weight: bold; margin: 0 0 4px 0; text-transform: uppercase; }
+                .cust-text { font-size: 13px; margin: 0 0 4px 0; line-height: 1.4; }
+                
+                .qr-box { text-align: center; border: 1px solid #ccc; padding: 5px; border-radius: 6px; }
+                .qr-placeholder { width: 90px; height: 90px; margin: 0 auto; }
+                .qr-text { font-size: 9px; font-weight: bold; margin-top: 5px; text-transform: uppercase; }
+                
+                .seller-sec { border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 15px; }
+                
+                table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+                th { text-align: left; border-bottom: 2px solid #000; padding-bottom: 5px; font-size: 12px; text-transform: uppercase; }
+                
+                .amount-box { border: 2px solid #000; border-radius: 8px; text-align: center; padding: 15px; margin-bottom: 15px; background: #f9f9f9; }
+                .amount-title { font-size: 14px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
+                .amount-value { font-size: 32px; font-weight: 900; margin: 0; }
+                .cod-text { font-size: 16px; font-weight: bold; letter-spacing: 1px; margin-top: 5px; }
+                
+                .footer { text-align: center; font-size: 11px; color: #555; }
+                @media print { body { padding: 0; } }
+            </style>
+        </head>
+        <body>
+            <div class="label-box">
+                <div class="header">SHIPPING LABEL</div>
+                
+                <div class="flex-row">
+                    <div class="address-sec">
+                        <div class="sec-title">Deliver To:</div>
+                        <p class="cust-name">${order.customerName}</p>
+                        <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
+                        <p class="cust-text" style="font-weight: bold; margin-top: 8px;">Ph: ${order.customerPhone}</p>
+                    </div>
+                    <div class="qr-box">
+                        <div id="qrcode" class="qr-placeholder"></div>
+                        <div class="qr-text">Scan for Direction</div>
+                    </div>
+                </div>
+
+                <div class="seller-sec">
+                    <div class="sec-title">Sold By:</div>
+                    <p class="cust-text" style="font-weight: bold;">${shopName}</p>
+                    <p class="cust-text">${shopAddress}</p>
+                    <p class="cust-text">Ph: ${shopPhone}</p>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item Details</th>
+                            <th style="text-align: center; width: 40px;">Qty</th>
+                            <th style="text-align: right; width: 60px;">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml}
+                    </tbody>
+                </table>
+
+                <div class="amount-box">
+                    <div class="amount-title">Collect Amount</div>
+                    <p class="amount-value">₹${order.totalAmount}</p>
+                    <div class="cod-text">(CASH ON DELIVERY)</div>
+                </div>
+
+                <div class="footer">
+                    Order ID: #${order.id.substring(0,8).toUpperCase()} • Date: ${new Date().toLocaleDateString('en-IN')}
+                </div>
+            </div>
+
+            <script>
+                // Generate QR Code dynamically
+                new QRCode(document.getElementById("qrcode"), {
+                    text: "${mapUrl}",
+                    width: 90,
+                    height: 90,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.L
+                });
+                
+                // Automatically open print dialog after 1 second
+                setTimeout(() => {
+                    window.print();
+                }, 1000);
+            <\/script>
+        </body>
+        </html>
+    `);
+    printWin.document.close();
+}
 
     </script>
 

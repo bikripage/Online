@@ -10445,7 +10445,7 @@ function generateShippingSlip(orderId) {
 }
 
 // =======================================================
-// ✨ NAYA: BATCH PRINT ALL ACCEPTED ORDERS (3 SLIPS PER PAGE) ✨
+// ✨ NAYA: BATCH PRINT ALL ACCEPTED ORDERS (PERFECT ALIGNMENT) ✨
 // =======================================================
 function printAllAcceptedSlips() {
     // Sirf 'accepted' status wale orders filter karein
@@ -10469,7 +10469,7 @@ function printAllAcceptedSlips() {
     }
 
     // Saare slips ka HTML ek sath generate karna
-    let allSlipsHtml = acceptedOrders.map((order, index) => {
+    let allSlipsHtml = acceptedOrders.map((order) => {
         let mapUrl = (order.lat && order.lng) 
             ? `https://www.google.com/maps/dir/?api=1&destination=${order.lat},${order.lng}` 
             : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.customerAddress || '')}`;
@@ -10482,7 +10482,7 @@ function printAllAcceptedSlips() {
                         <div class="sec-title">Deliver To:</div>
                         <p class="cust-name">${order.customerName}</p>
                         <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
-                        <p class="cust-text" style="font-weight: 900; font-size: 13px; margin-top: 6px;">📞 Ph: ${order.customerPhone}</p>
+                        <p class="cust-text" style="font-weight: 900; font-size: 15px; margin-top: 8px;">📞 Ph: ${order.customerPhone}</p>
                     </div>
                     <div class="col-right">
                         <div class="qr-box">
@@ -10491,8 +10491,8 @@ function printAllAcceptedSlips() {
                         </div>
                         <div class="seller-sec">
                             <div class="sec-title" style="margin-bottom: 2px;">Sold By:</div>
-                            <p class="cust-text" style="font-weight: bold; font-size: 11px;">${shopName}</p>
-                            <p class="cust-text" style="font-size: 10px;">Ph: ${shopPhone}</p>
+                            <p class="cust-text" style="font-weight: bold; font-size: 12px;">${shopName}</p>
+                            <p class="cust-text" style="font-size: 11px;">Ph: ${shopPhone}</p>
                         </div>
                     </div>
                 </div>
@@ -10515,38 +10515,44 @@ function printAllAcceptedSlips() {
             <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
             <style>
                 body { font-family: 'Arial', sans-serif; margin: 0; padding: 5px; color: #000; background: #fff; }
-                @page { size: auto; margin: 3mm; } /* Margin aur kam kar diya */
+                @page { size: auto; margin: 3mm; }
                 
-                /* ✨ MAIN FIX: Height 88mm kardi hai taaki 1 page pe exactly 3 label fit ho jayein ✨ */
+                /* Height 89mm rakhi hai 3 slips perfectly fit karne ke liye */
                 .label-box { 
                     width: 100%; 
-                    height: 88mm; 
+                    height: 89mm; 
                     border: 2px solid #000; 
                     border-radius: 8px; 
-                    padding: 10px 15px; 
+                    padding: 12px 15px; 
                     box-sizing: border-box; 
                     display: flex; 
                     flex-direction: column; 
-                    margin-bottom: 5mm; 
+                    margin-bottom: 4mm; 
                     page-break-inside: avoid; 
                 }
                 
-                .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 8px; font-weight: 900; font-size: 18px; letter-spacing: 2px; }
-                .row { display: flex; justify-content: space-between; margin-bottom: 8px; flex: 1; }
-                .col-left { flex: 1.5; padding-right: 10px; border-right: 2px dashed #ccc; }
-                .sec-title { font-size: 10px; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 4px; letter-spacing: 1px; }
-                .cust-name { font-size: 16px; font-weight: 900; margin: 0 0 4px 0; text-transform: uppercase; }
-                .cust-text { font-size: 12px; margin: 0 0 3px 0; line-height: 1.3; }
-                .col-right { flex: 1; padding-left: 10px; display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; }
-                .qr-box { text-align: right; }
-                .qr-placeholder { display: inline-block; width: 65px; height: 65px; } /* QR Chhota kiya */
-                .qr-text { font-size: 8px; font-weight: bold; margin-top: 3px; text-transform: uppercase; text-align: center; }
-                .seller-sec { margin-top: 5px; text-align: right; }
-                .amount-box { border: 2px solid #000; border-radius: 8px; text-align: center; padding: 6px; background: #f9f9f9; margin-top: auto; }
-                .amount-title { font-size: 11px; font-weight: 900; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 1px; }
-                .amount-value { font-size: 24px; font-weight: 900; margin: 0; }
-                .cod-text { font-size: 11px; font-weight: 900; letter-spacing: 1px; margin-top: 2px; }
-                .footer { text-align: center; font-size: 10px; color: #444; font-weight: bold; margin-top: 8px; border-top: 2px solid #000; padding-top: 6px; }
+                .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px; font-weight: 900; font-size: 20px; letter-spacing: 3px; }
+                
+                /* Flex ko better align kiya hai space bharne ke liye */
+                .row { display: flex; justify-content: space-between; flex: 1; align-items: center; margin-bottom: 10px; }
+                
+                .col-left { width: 60%; padding-right: 15px; border-right: 2px dashed #ccc; display: flex; flex-direction: column; justify-content: center; }
+                .sec-title { font-size: 11px; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 4px; letter-spacing: 1px; }
+                .cust-name { font-size: 18px; font-weight: 900; margin: 0 0 5px 0; text-transform: uppercase; }
+                .cust-text { font-size: 13px; margin: 0 0 3px 0; line-height: 1.4; }
+                
+                .col-right { width: 40%; padding-left: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+                .qr-box { text-align: center; }
+                .qr-placeholder { display: inline-block; width: 75px; height: 75px; } /* QR bada kiya taaki jagah bhare */
+                .qr-text { font-size: 9px; font-weight: bold; margin-top: 4px; text-transform: uppercase; text-align: center; }
+                .seller-sec { margin-top: 8px; text-align: center; width: 100%; }
+                
+                .amount-box { border: 2px solid #000; border-radius: 8px; text-align: center; padding: 8px; background: #f9f9f9; margin-top: auto; }
+                .amount-title { font-size: 12px; font-weight: 900; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 1px; }
+                .amount-value { font-size: 28px; font-weight: 900; margin: 0; }
+                .cod-text { font-size: 12px; font-weight: 900; letter-spacing: 1px; margin-top: 2px; }
+                
+                .footer { text-align: center; font-size: 10px; color: #444; font-weight: bold; margin-top: 10px; border-top: 2px solid #000; padding-top: 6px; }
                 
                 @media print {
                     body { padding: 0; }
@@ -10563,8 +10569,8 @@ function printAllAcceptedSlips() {
                         let url = el.getAttribute('data-url');
                         new QRCode(el, {
                             text: url,
-                            width: 65, // Naye CSS ke hisaab se QR ka size set kiya
-                            height: 65,
+                            width: 75,
+                            height: 75,
                             colorDark : "#000000",
                             colorLight : "#ffffff",
                             correctLevel : QRCode.CorrectLevel.L

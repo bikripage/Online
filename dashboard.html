@@ -3061,6 +3061,7 @@ window.openDeliverySettings = function() {
                         canvas.getContext('2d').drawImage(img, 0, 0, width, height);
                         resolve(canvas.toDataURL('image/jpeg', 0.7)); 
                     };
+                    img.onerror = function() { resolve(""); }; 
                     img.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
@@ -3152,8 +3153,9 @@ window.openDeliverySettings = function() {
                 return;
             }
 
-            const btn = e.target.querySelector('button'); const orig = btn.innerHTML; 
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+            const btn = e.target.querySelector('button[type="submit"]'); const orig = btn.innerHTML; 
+btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+
 
                     // ✨ NAYA: Teeno Images Process Karo ✨
             const imgBase64_1 = await processImage(document.getElementById('prod-image'));

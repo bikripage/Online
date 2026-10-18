@@ -10445,7 +10445,7 @@ function generateShippingSlip(orderId) {
 }
 
 // =======================================================
-// ✨ NAYA: BATCH PRINT ALL ACCEPTED ORDERS ✨
+// ✨ NAYA: BATCH PRINT ALL ACCEPTED ORDERS (SPACE SAVING) ✨
 // =======================================================
 function printAllAcceptedSlips() {
     // Sirf 'accepted' status wale orders filter karein
@@ -10468,17 +10468,14 @@ function printAllAcceptedSlips() {
         document.body.appendChild(iframe);
     }
 
-    // Saare slips ka HTML ek sath generate karna
+    // Saare slips ka HTML ek sath generate karna bina page break ke
     let allSlipsHtml = acceptedOrders.map((order, index) => {
         let mapUrl = (order.lat && order.lng) 
             ? `https://www.google.com/maps/dir/?api=1&destination=${order.lat},${order.lng}` 
             : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.customerAddress || '')}`;
-        
-        // Har slip ke baad page break lagega, taaki naye page par print ho (Aakhiri wale ko chhodkar)
-        let pageBreak = (index < acceptedOrders.length - 1) ? 'page-break-after: always;' : '';
 
         return `
-            <div class="label-box" style="${pageBreak}">
+            <div class="label-box">
                 <div class="header">SHIPPING LABEL</div>
                 <div class="row">
                     <div class="col-left">
@@ -10519,7 +10516,10 @@ function printAllAcceptedSlips() {
             <style>
                 body { font-family: 'Arial', sans-serif; margin: 0; padding: 15px; color: #000; background: #fff; }
                 @page { size: auto; margin: 5mm; }
-                .label-box { width: 100%; max-height: 140mm; border: 3px solid #000; border-radius: 12px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; margin-bottom: 20px;}
+                
+                /* Yahan 'page-break-inside: avoid;' add kiya hai taaki slip kate nahi */
+                .label-box { width: 100%; max-height: 140mm; border: 3px solid #000; border-radius: 12px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; margin-bottom: 30px; page-break-inside: avoid; }
+                
                 .header { text-align: center; border-bottom: 3px solid #000; padding-bottom: 12px; margin-bottom: 20px; font-weight: 900; font-size: 26px; letter-spacing: 3px; }
                 .row { display: flex; justify-content: space-between; margin-bottom: 20px; flex: 1; }
                 .col-left { flex: 1.5; padding-right: 20px; border-right: 2px dashed #ccc; }
@@ -10537,10 +10537,8 @@ function printAllAcceptedSlips() {
                 .cod-text { font-size: 18px; font-weight: 900; letter-spacing: 2px; margin-top: 5px; }
                 .footer { text-align: center; font-size: 13px; color: #444; font-weight: bold; margin-top: 20px; border-top: 2px solid #000; padding-top: 15px; }
                 
-                /* Print karte waqt extra gap hatane ke liye */
                 @media print {
                     body { padding: 0; }
-                    .label-box { margin-bottom: 0; }
                 }
             </style>
         </head>
@@ -10549,7 +10547,6 @@ function printAllAcceptedSlips() {
 
             <script>
                 window.onload = function() {
-                    // Loop lagakar sabhi QR codes ek sath render karna
                     let qrElements = document.querySelectorAll('.qr-placeholder');
                     qrElements.forEach(el => {
                         let url = el.getAttribute('data-url');
@@ -10563,7 +10560,6 @@ function printAllAcceptedSlips() {
                         });
                     });
                     
-                    // QR render hone ke liye wait (thoda extra time diya hai batch ke liye)
                     setTimeout(() => {
                         window.print();
                     }, 800);

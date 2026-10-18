@@ -3046,27 +3046,28 @@ window.openDeliverySettings = function() {
         // ==========================================
         // 7. PRODUCTS LOGIC
         // ==========================================
-        async function processImage(fileInput) {
-            if (!fileInput.files || fileInput.files.length === 0) return "";
-            const file = fileInput.files[0];
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width, height = img.height;
-                        if (width > 600) { height *= 600 / width; width = 600; }
-                        canvas.width = width; canvas.height = height;
-                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.7)); 
-                    };
-                    img.onerror = function() { resolve(""); }; 
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        }
+     async function processImage(fileInput) {
+    if (!fileInput.files || fileInput.files.length === 0) return "";
+    const file = fileInput.files[0];
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                let width = img.width, height = img.height;
+                if (width > 600) { height *= 600 / width; width = 600; }
+                canvas.width = width; canvas.height = height;
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', 0.7)); 
+            };
+            img.onerror = function() { resolve(""); }; // NAYA: Error aane par atke nahi
+            img.src = e.target.result;
+        };
+        reader.onerror = function() { resolve(""); }; // NAYA: Reader fail hone par atke nahi
+        reader.readAsDataURL(file);
+    });
+}
 
           function renderAdminProducts() {
             const list = document.getElementById('admin-products-list'); const cnt = document.getElementById('inventory-count'); if(!list) return; cnt.innerText = storeProducts.length;
@@ -3149,52 +3150,60 @@ window.openDeliverySettings = function() {
 
             // Selling Price kabhi MRP se zyada nahi ho sakti
             if (p > mrpVal) {
-                showIOSAlert("Invalid Price", "Selling Price cannot be greater than MRP!");
-                return;
-            }
+        showIOSAlert("Invalid Price", "Selling Price cannot be greater than MRP!");
+        return;
+    }
 
-            const btn = e.target.querySelector('button[type="submit"]'); const orig = btn.innerHTML; 
-btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+    // 👇 1. Yahan 'button' ki jagah 'button[type="submit"]' lagana zaruri hai 👇
+    const btn = e.target.querySelector('button[type="submit"]'); 
+    const orig = btn.innerHTML; 
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...'; 
+    btn.disabled = true;
 
+    // 👇 2. 'try' block ko Image process hone se pehle shuru karein 👇
+    try { 
+        // Ab images try block ke andar hain, toh error aane par form atkega nahi
+        const imgBase64_1 = await processImage(document.getElementById('prod-image'));
+        const imgBase64_2 = await processImage(document.getElementById('prod-image2'));
+        const imgBase64_3 = await processImage(document.getElementById('prod-image3'));
 
-                    // ✨ NAYA: Teeno Images Process Karo ✨
-            const imgBase64_1 = await processImage(document.getElementById('prod-image'));
-            const imgBase64_2 = await processImage(document.getElementById('prod-image2'));
-            const imgBase64_3 = await processImage(document.getElementById('prod-image3'));
+        let currentRank = (typeof globalShopData !== 'undefined' && globalShopData.searchRank) ? globalShopData.searchRank : 0;
 
-            try { 
-                let currentRank = (typeof globalShopData !== 'undefined' && globalShopData.searchRank) ? globalShopData.searchRank : 0;
+        let pd = { 
+            name: n, 
+            mrp: mrpVal, 
+            price: p, 
+            qtySize: qtySize, 
+            unit: unit, 
+            description: desc, 
+            image: imgBase64_1,     
+            image2: imgBase64_2,    
+            image3: imgBase64_3,    
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            searchRank: currentRank
+        };
 
-                let pd = { 
-                    name: n, 
-                    mrp: mrpVal, 
-                    price: p, 
-                    qtySize: qtySize, 
-                    unit: unit, 
-                    description: desc, 
-                    image: imgBase64_1,     // Primary Img
-                    image2: imgBase64_2,    // Img 2
-                    image3: imgBase64_3,    // Img 3
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    searchRank: currentRank
-                };
-
-                const doc = await db.collection('shops').doc(currentShopId).collection('products').add(pd); 
-                pd.id = doc.id; storeProducts.unshift(pd); 
-                e.target.reset(); 
-                
-                // Form reset hone ke baad Image Preview bhi hata do
-                if(typeof clearImg === 'function') {
-                    clearImg('prod-image', 'add-prev-1', 'add-def-1', 'add-show-1');
-                    clearImg('prod-image2', 'add-prev-2', 'add-def-2', 'add-show-2');
-                    clearImg('prod-image3', 'add-prev-3', 'add-def-3', 'add-show-3');
-                }
-                
-                renderAdminProducts(); 
-            } catch(err) { alert(err.message); } 
-            
-            btn.innerHTML = orig; btn.disabled = false;
+        const doc = await db.collection('shops').doc(currentShopId).collection('products').add(pd); 
+        pd.id = doc.id; 
+        storeProducts.unshift(pd); 
+        e.target.reset(); 
+        
+        // Form reset hone ke baad Image Preview bhi hata do
+        if(typeof clearImg === 'function') {
+            clearImg('prod-image', 'add-prev-1', 'add-def-1', 'add-show-1');
+            clearImg('prod-image2', 'add-prev-2', 'add-def-2', 'add-show-2');
+            clearImg('prod-image3', 'add-prev-3', 'add-def-3', 'add-show-3');
         }
+        
+        renderAdminProducts(); 
+    } catch(err) { 
+        alert(err.message); 
+    } 
+    
+    // Ye line hamesha run hogi aur button ko theek kar degi
+    btn.innerHTML = orig; 
+    btn.disabled = false;
+}
 
 
                       function openEditProductModal(id) {

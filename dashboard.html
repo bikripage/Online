@@ -578,12 +578,11 @@
                                         Live Orders
                                     </h3>
                                     
-    <!-- ✨ NAYA BUTTON: Batch Print Accepted Orders ✨ -->
-    <button onclick="printAllAcceptedSlips()" class="w-full sm:w-auto bg-[#111827] hover:bg-black text-white text-sm font-bold px-4 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm active:scale-95">
-        <i class="fas fa-print"></i> Print Accepted Orders
-    </button>
-                                </div>
-                                
+<!-- ✨ NAYA BUTTON: Batch Print Accepted Orders ✨ -->
+<div id="top-batch-print-wrapper" class="w-full sm:w-auto">
+    <!-- Button JS se aayega (Blur ya Normal) -->
+</div>
+
                                                                <!-- ✨ NAYA: SEARCH & FILTER OPTIONS ✨ -->
                                 <div class="flex flex-col sm:flex-row gap-3 mb-6">
                                     <div class="relative flex-1">
@@ -2228,6 +2227,36 @@ window.openDeliverySettings = function() {
                              function renderLiveOrders(orders) {
     const list = document.getElementById('merchant-orders-list');
     if(!list) return;
+
+    // --- ✨ NAYA LOGIC: TOP BUTTON KO BHI CHECK KARKE BLUR KARNA ✨ ---
+    const topPrintWrapper = document.getElementById('top-batch-print-wrapper');
+    if(topPrintWrapper) {
+        if (globalShopData && globalShopData.homeDelivery === true) {
+            topPrintWrapper.innerHTML = `
+                <button onclick="printAllAcceptedSlips()" class="w-full sm:w-auto bg-[#111827] hover:bg-black text-white text-sm font-bold px-5 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm active:scale-95">
+                    <i class="fas fa-print"></i> Print Accepted Orders
+                </button>
+            `;
+        } else {
+            topPrintWrapper.innerHTML = `
+                <div class="relative w-full sm:w-auto cursor-pointer group" onclick="openDeliverySettings()">
+                    <!-- Halka Blur Wala Dummy Button -->
+                    <div class="w-full sm:w-auto bg-[#111827] text-white text-sm font-bold px-5 h-10 rounded-[12px] flex justify-center items-center gap-2 filter blur-[2px] opacity-40 pointer-events-none select-none">
+                        <i class="fas fa-print"></i> Print Accepted Orders
+                    </div>
+                    <!-- Clean iOS Pill Overlay -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="bg-white/95 backdrop-blur-md border border-gray-200 shadow-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 group-active:scale-95 transition-transform">
+                            <i class="fas fa-lock text-gray-500 text-[10px]"></i>
+                            <span class="text-[10px] font-black text-gray-800 uppercase tracking-wide">Delivery Off</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+    // -------------------------------------------------------------
+
     if(orders.length === 0) {
         list.innerHTML = `<div class="text-center py-12 bg-white rounded-[24px] border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]"><i class="fas fa-inbox text-5xl text-gray-200 mb-4"></i><p class="text-gray-500 text-[15px] font-medium">No live orders right now.</p></div>`;
         return;
@@ -2285,7 +2314,7 @@ window.openDeliverySettings = function() {
                     </button>
                 </div>
             `;
-                              } else if(o.status === 'accepted') {
+        } else if(o.status === 'accepted') {
             let otpCheckHtml = '';
             let btnDisabledState = 'disabled';
             let btnOpacity = 'opacity-40 cursor-not-allowed';
@@ -2301,13 +2330,12 @@ window.openDeliverySettings = function() {
                 `;
             }
 
-            // JavaScript errors se bachne ke liye text safe kiya gaya hai
             let safeName = (o.customerName || 'Customer').replace(/'/g, "\\'").replace(/"/g, '&quot;');
             let safeAddr = (o.customerAddress || 'Address not provided').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
 
-            // ✨ NAYA LOGIC: Premium iOS Blur Lock Overlay (Print Slip hamesha ke liye hat gaya) ✨
+            // ✨ NAYA LOGIC: Order Card wala Clean Blur & Pill Overlay ✨
             let deliveryActionsHtml = '';
-            let markDeliveredText = 'Mark Picked Up'; // Default Picked Up
+            let markDeliveredText = 'Mark Picked Up';
             
             if (globalShopData && globalShopData.homeDelivery === true) {
                 markDeliveredText = 'Mark Delivered';
@@ -2317,24 +2345,18 @@ window.openDeliverySettings = function() {
                     </button>
                 `;
             } else {
-                // LOCKED & BLURRED UI FOR HOME DELIVERY OFF
                 deliveryActionsHtml = `
-                    <div class="relative mb-3 mt-1 cursor-pointer group" onclick="openDeliverySettings()">
-                        <!-- Blurred Dummy Button -->
-                        <div class="filter blur-[4px] opacity-30 select-none pointer-events-none flex flex-col gap-2">
-                            <div class="w-full bg-blue-50 border border-blue-200 text-blue-600 font-bold h-11 rounded-[14px] text-[13px] flex items-center justify-center gap-2">
-                                <i class="fas fa-motorcycle"></i> Notify: Out for Delivery
-                            </div>
+                    <div class="relative w-full mb-3 cursor-pointer group" onclick="openDeliverySettings()">
+                        <!-- Halka Blur Dummy Button -->
+                        <div class="w-full bg-blue-50 border border-blue-200 text-blue-600 font-bold h-11 rounded-[14px] text-[13px] flex items-center justify-center gap-2 filter blur-[2.5px] opacity-50 select-none pointer-events-none">
+                            <i class="fas fa-motorcycle"></i> Notify: Out for Delivery
                         </div>
                         
-                        <!-- iOS Premium Lock Overlay -->
-                        <div class="absolute inset-0 flex flex-col items-center justify-center transition-transform group-active:scale-95">
-                            <div class="bg-white/80 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)] border border-white rounded-[20px] px-5 py-3 text-center flex flex-col items-center min-w-[240px]">
-                                <div class="w-9 h-9 bg-gradient-to-tr from-gray-100 to-gray-200 text-gray-500 rounded-full flex items-center justify-center text-sm mb-2 shadow-inner border border-gray-300">
-                                    <i class="fas fa-lock"></i>
-                                </div>
-                                <p class="text-[13px] font-black text-gray-900 tracking-tight leading-tight">Delivery is Off</p>
-                                <p class="text-[10px] text-gray-500 font-bold mt-1">Tap to enable Home Delivery = YES</p>
+                        <!-- Clean iOS Pill Overlay -->
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="bg-white/95 backdrop-blur-md border border-gray-200 shadow-sm px-4 py-1.5 rounded-full flex items-center gap-1.5 group-active:scale-95 transition-transform">
+                                <i class="fas fa-lock text-gray-500 text-[11px]"></i>
+                                <span class="text-[11px] font-black text-gray-800 tracking-tight">Delivery Off (Tap to Enable)</span>
                             </div>
                         </div>
                     </div>
@@ -2362,9 +2384,7 @@ window.openDeliverySettings = function() {
                     </div>
                 </div>
             `;
-        }
-
- else if(o.status === 'delivered') {
+        } else if(o.status === 'delivered') {
             btns = `
                 <div class="flex items-center gap-2 w-full mt-2">
                     <a href="tel:${o.customerPhone}" class="w-11 h-11 bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 rounded-[14px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">

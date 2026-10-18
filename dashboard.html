@@ -2285,7 +2285,7 @@ window.openDeliverySettings = function() {
                     </button>
                 </div>
             `;
-                         } else if(o.status === 'accepted') {
+                              } else if(o.status === 'accepted') {
             let otpCheckHtml = '';
             let btnDisabledState = 'disabled';
             let btnOpacity = 'opacity-40 cursor-not-allowed';
@@ -2305,17 +2305,13 @@ window.openDeliverySettings = function() {
             let safeName = (o.customerName || 'Customer').replace(/'/g, "\\'").replace(/"/g, '&quot;');
             let safeAddr = (o.customerAddress || 'Address not provided').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
 
-            // ✨ NAYA LOGIC: Premium iOS Blur Lock Overlay ✨
+            // ✨ NAYA LOGIC: Premium iOS Blur Lock Overlay (Print Slip hamesha ke liye hat gaya) ✨
             let deliveryActionsHtml = '';
             let markDeliveredText = 'Mark Picked Up'; // Default Picked Up
             
             if (globalShopData && globalShopData.homeDelivery === true) {
                 markDeliveredText = 'Mark Delivered';
                 deliveryActionsHtml = `
-                    <button onclick="generateShippingSlip('${o.id}')" class="mb-2 w-full bg-gray-900 hover:bg-black text-white font-bold h-11 rounded-[14px] text-[13px] active:scale-95 transition shadow-sm flex items-center justify-center gap-2">
-                        <i class="fas fa-print"></i> Print Shipping Slip
-                    </button>
-
                     <button onclick="sendOutForDeliveryMsg('${o.customerPhone}', '${safeName}', '${safeAddr}')" class="mb-3 w-full bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-100 font-bold h-11 rounded-[14px] text-[13px] active:scale-95 transition shadow-sm flex items-center justify-center gap-2">
                         <i class="fas fa-motorcycle"></i> Notify: Out for Delivery
                     </button>
@@ -2324,11 +2320,8 @@ window.openDeliverySettings = function() {
                 // LOCKED & BLURRED UI FOR HOME DELIVERY OFF
                 deliveryActionsHtml = `
                     <div class="relative mb-3 mt-1 cursor-pointer group" onclick="openDeliverySettings()">
-                        <!-- Blurred Dummy Buttons -->
+                        <!-- Blurred Dummy Button -->
                         <div class="filter blur-[4px] opacity-30 select-none pointer-events-none flex flex-col gap-2">
-                            <div class="w-full bg-gray-900 text-white font-bold h-11 rounded-[14px] text-[13px] flex items-center justify-center gap-2">
-                                <i class="fas fa-print"></i> Print Shipping Slip
-                            </div>
                             <div class="w-full bg-blue-50 border border-blue-200 text-blue-600 font-bold h-11 rounded-[14px] text-[13px] flex items-center justify-center gap-2">
                                 <i class="fas fa-motorcycle"></i> Notify: Out for Delivery
                             </div>

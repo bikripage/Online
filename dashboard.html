@@ -2276,7 +2276,7 @@
                     </button>
                 </div>
             `;
-        } else if(o.status === 'accepted') {
+            } else if(o.status === 'accepted') {
             let otpCheckHtml = '';
             let btnDisabledState = 'disabled';
             let btnOpacity = 'opacity-40 cursor-not-allowed';
@@ -2296,18 +2296,28 @@
             let safeName = (o.customerName || 'Customer').replace(/'/g, "\\'").replace(/"/g, '&quot;');
             let safeAddr = (o.customerAddress || 'Address not provided').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
 
-            btns = `
-                <div class="flex flex-col w-full mt-2">
-                    ${otpCheckHtml}
-                    
+            // ✨ NAYA LOGIC: Home delivery check karna ✨
+            let deliveryActionsHtml = '';
+            let markDeliveredText = 'Mark Picked Up'; // Default agar home delivery off ho
+            
+            if (globalShopData && globalShopData.homeDelivery === true) {
+                markDeliveredText = 'Mark Delivered';
+                deliveryActionsHtml = `
                     <button onclick="generateShippingSlip('${o.id}')" class="mb-2 w-full bg-gray-900 hover:bg-black text-white font-bold h-11 rounded-[14px] text-[13px] active:scale-95 transition shadow-sm flex items-center justify-center gap-2">
                         <i class="fas fa-print"></i> Print Shipping Slip
                     </button>
 
-                    <!-- ✨ NAYA: OUT FOR DELIVERY BUTTON ✨ -->
                     <button onclick="sendOutForDeliveryMsg('${o.customerPhone}', '${safeName}', '${safeAddr}')" class="mb-3 w-full bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-100 font-bold h-11 rounded-[14px] text-[13px] active:scale-95 transition shadow-sm flex items-center justify-center gap-2">
                         <i class="fas fa-motorcycle"></i> Notify: Out for Delivery
                     </button>
+                `;
+            }
+
+            btns = `
+                <div class="flex flex-col w-full mt-2">
+                    ${otpCheckHtml}
+                    
+                    ${deliveryActionsHtml}
 
                     <div class="flex items-center gap-2 w-full">
                         <a href="tel:${o.customerPhone}" class="w-11 h-11 bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 rounded-[14px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
@@ -2316,7 +2326,7 @@
                         <button id="deliver-btn-${o.id}" ${btnDisabledState} 
                                 onclick="updateLiveOrderStatus('${o.id}', 'delivered', '${o.customerPhone}', '${o.customerName}')" 
                                 class="flex-1 bg-[#16A34A] text-white font-bold h-11 rounded-[14px] text-[13px] active:scale-95 transition shadow-sm flex items-center justify-center gap-1.5 ${btnOpacity}">
-                            <i class="fas fa-check-circle"></i> Mark Delivered
+                            <i class="fas fa-check-circle"></i> ${markDeliveredText}
                         </button>
                         <button onclick="deleteLiveOrder('${o.id}')" class="w-11 h-11 bg-red-50 border border-red-100 text-red-600 hover:bg-red-100 rounded-[14px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
                             <i class="fas fa-trash-alt text-[13px]"></i>
@@ -2324,6 +2334,8 @@
                     </div>
                 </div>
             `;
+        
+
         } else if(o.status === 'delivered') {
             btns = `
                 <div class="flex items-center gap-2 w-full mt-2">

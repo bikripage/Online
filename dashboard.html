@@ -10331,15 +10331,45 @@ function generateShippingSlip(orderId) {
     // 4. Print karne ke liye ek nayi window/tab kholiye
     let printWin = window.open('', '_blank');
     
-    // 5. Amazon/Flipkart style ka Professional HTML Format
+    // 5. Amazon/Flipkart style ka Professional HTML Format (Landscape / Half-Page Print Setup)
     printWin.document.write(`
         <html>
         <head>
             <title>Shipping Label - #${order.id.substring(0,8).toUpperCase()}</title>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
             <style>
-                body { font-family: 'Arial', sans-serif; margin: 0; padding: 20px; color: #000; }
-                .label-box { width: 100%; max-width: 420px; margin: 0 auto; border: 2px solid #000; border-radius: 8px; padding: 15px; box-sizing: border-box; }
+                body { 
+                    font-family: 'Arial', sans-serif; 
+                    margin: 0; 
+                    padding: 0; 
+                    color: #000; 
+                    background: #fff;
+                }
+                
+                /* ✨ PRINT SETTINGS: Landscape aur top-half align karne ke liye ✨ */
+                @page { 
+                    size: landscape; 
+                    margin: 0; 
+                }
+
+                .print-container {
+                    /* Paper ki aadhe hisse jitni width rakhkar usko center karenge landscape mode me, 
+                       yaa landscape page par top-left align karke aadhe size me layenge */
+                    width: 148mm;  /* A5/Half Page width roughly */
+                    height: 210mm; /* A5 Height */
+                    padding: 10mm;
+                    box-sizing: border-box;
+                    margin: 0 auto;
+                }
+
+                .label-box { 
+                    width: 100%; 
+                    border: 2px solid #000; 
+                    border-radius: 8px; 
+                    padding: 15px; 
+                    box-sizing: border-box; 
+                }
+                
                 .header { text-align: center; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 15px; font-weight: 900; font-size: 22px; letter-spacing: 2px; }
                 
                 .flex-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 2px solid #000; padding-bottom: 15px; }
@@ -10363,54 +10393,55 @@ function generateShippingSlip(orderId) {
                 .cod-text { font-size: 16px; font-weight: bold; letter-spacing: 1px; margin-top: 5px; }
                 
                 .footer { text-align: center; font-size: 11px; color: #555; }
-                @media print { body { padding: 0; } }
             </style>
         </head>
         <body>
-            <div class="label-box">
-                <div class="header">SHIPPING LABEL</div>
-                
-                <div class="flex-row">
-                    <div class="address-sec">
-                        <div class="sec-title">Deliver To:</div>
-                        <p class="cust-name">${order.customerName}</p>
-                        <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
-                        <p class="cust-text" style="font-weight: bold; margin-top: 8px;">Ph: ${order.customerPhone}</p>
+            <div class="print-container">
+                <div class="label-box">
+                    <div class="header">SHIPPING LABEL</div>
+                    
+                    <div class="flex-row">
+                        <div class="address-sec">
+                            <div class="sec-title">Deliver To:</div>
+                            <p class="cust-name">${order.customerName}</p>
+                            <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
+                            <p class="cust-text" style="font-weight: bold; margin-top: 8px;">Ph: ${order.customerPhone}</p>
+                        </div>
+                        <div class="qr-box">
+                            <div id="qrcode" class="qr-placeholder"></div>
+                            <div class="qr-text">Scan for Direction</div>
+                        </div>
                     </div>
-                    <div class="qr-box">
-                        <div id="qrcode" class="qr-placeholder"></div>
-                        <div class="qr-text">Scan for Direction</div>
+
+                    <div class="seller-sec">
+                        <div class="sec-title">Sold By:</div>
+                        <p class="cust-text" style="font-weight: bold;">${shopName}</p>
+                        <p class="cust-text">${shopAddress}</p>
+                        <p class="cust-text">Ph: ${shopPhone}</p>
                     </div>
-                </div>
 
-                <div class="seller-sec">
-                    <div class="sec-title">Sold By:</div>
-                    <p class="cust-text" style="font-weight: bold;">${shopName}</p>
-                    <p class="cust-text">${shopAddress}</p>
-                    <p class="cust-text">Ph: ${shopPhone}</p>
-                </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item Details</th>
+                                <th style="text-align: center; width: 40px;">Qty</th>
+                                <th style="text-align: right; width: 60px;">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${itemsHtml}
+                        </tbody>
+                    </table>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Item Details</th>
-                            <th style="text-align: center; width: 40px;">Qty</th>
-                            <th style="text-align: right; width: 60px;">Price</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${itemsHtml}
-                    </tbody>
-                </table>
+                    <div class="amount-box">
+                        <div class="amount-title">Collect Amount</div>
+                        <p class="amount-value">₹${order.totalAmount}</p>
+                        <div class="cod-text">(CASH ON DELIVERY)</div>
+                    </div>
 
-                <div class="amount-box">
-                    <div class="amount-title">Collect Amount</div>
-                    <p class="amount-value">₹${order.totalAmount}</p>
-                    <div class="cod-text">(CASH ON DELIVERY)</div>
-                </div>
-
-                <div class="footer">
-                    Order ID: #${order.id.substring(0,8).toUpperCase()} • Date: ${new Date().toLocaleDateString('en-IN')}
+                    <div class="footer">
+                        Order ID: #${order.id.substring(0,8).toUpperCase()} • Date: ${new Date().toLocaleDateString('en-IN')}
+                    </div>
                 </div>
             </div>
 

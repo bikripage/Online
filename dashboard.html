@@ -10305,75 +10305,65 @@ async function deleteLiveOrder(orderId) {
 // ✨ NAYA: PROFESSIONAL SHIPPING SLIP GENERATOR (LANDSCAPE HALF-PAGE) ✨
 // =======================================================
 function generateShippingSlip(orderId) {
-    // 1. Order aur Store ka data nikalein
     let order = window.globalLiveOrders.find(o => o.id === orderId);
     if(!order) return alert("Order details not found!");
 
     let shopName = globalShopData.shopName || "Store Name";
     let shopPhone = globalShopData.phone || "";
 
-    // 2. Map ka Link banayein QR code ke liye
     let mapUrl = (order.lat && order.lng) 
         ? `https://www.google.com/maps/dir/?api=1&destination=${order.lat},${order.lng}` 
         : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.customerAddress || '')}`;
 
-    // 3. Print karne ke liye ek nayi window/tab kholiye
-    let printWin = window.open('', '_blank');
-    
-    // 4. Naya Landscape (Top-Half) HTML Design bina Product List ke
-    printWin.document.write(`
+    // 1. Hidden iframe create karna (Mobile Popup Blocker se bachne ke liye)
+    let iframe = document.getElementById('print-iframe');
+    if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'print-iframe';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+    }
+
+    // 2. HTML aur CSS inject karna (Standard 4x6 Thermal Label Size: 100mm x 150mm)
+    let htmlContent = `
         <html>
         <head>
             <title>Shipping Label - #${order.id.substring(0,8).toUpperCase()}</title>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
             <style>
-                body { 
-                    font-family: 'Arial', sans-serif; 
-                    margin: 0; 
-                    padding: 15px; 
-                    color: #000; 
-                    background: #fff; 
-                }
+                body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; color: #000; background: #fff; }
                 
-                /* Ye ensure karega ki margin kam rahe print me */
-                @page { size: auto; margin: 5mm; }
+                /* Thermal Printer Size Fix */
+                @page { size: 100mm 150mm; margin: 0; }
                 
                 .label-box { 
-                    width: 100%; /* Pura width lega landscape look ke liye */
-                    max-height: 140mm; /* Page ka theek aadha hissa (A5 size height) */
-                    border: 3px solid #000; 
-                    border-radius: 12px; 
-                    padding: 20px; 
+                    width: 100mm; 
+                    height: 150mm; 
+                    padding: 5mm; 
                     box-sizing: border-box; 
                     display: flex;
                     flex-direction: column;
                 }
                 
-                .header { text-align: center; border-bottom: 3px solid #000; padding-bottom: 12px; margin-bottom: 20px; font-weight: 900; font-size: 26px; letter-spacing: 3px; }
+                .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 10px; font-weight: 900; font-size: 20px; letter-spacing: 2px; }
+                .row { display: flex; justify-content: space-between; margin-bottom: 10px; flex: 1; }
                 
-                .row { display: flex; justify-content: space-between; margin-bottom: 20px; flex: 1; }
+                .col-left { flex: 1.5; padding-right: 10px; border-right: 2px dashed #ccc; }
+                .sec-title { font-size: 11px; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 4px; letter-spacing: 1px; }
+                .cust-name { font-size: 18px; font-weight: 900; margin: 0 0 4px 0; text-transform: uppercase; }
+                .cust-text { font-size: 12px; margin: 0 0 4px 0; line-height: 1.3; }
                 
-                /* Left Side - Delivery Address */
-                .col-left { flex: 1.5; padding-right: 20px; border-right: 2px dashed #ccc; }
-                .sec-title { font-size: 14px; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 8px; letter-spacing: 1px; }
-                .cust-name { font-size: 24px; font-weight: 900; margin: 0 0 8px 0; text-transform: uppercase; }
-                .cust-text { font-size: 16px; margin: 0 0 6px 0; line-height: 1.5; }
+                .col-right { flex: 1; padding-left: 10px; text-align: center; display: flex; flex-direction: column; justify-content: space-between;}
+                .qr-placeholder { display: inline-block; width: 80px; height: 80px; margin: 0 auto;}
+                .qr-text { font-size: 9px; font-weight: bold; margin-top: 3px; text-transform: uppercase; }
+                .seller-sec { margin-top: 10px; text-align: right; }
                 
-                /* Right Side - QR Code aur Seller Info */
-                .col-right { flex: 1; padding-left: 20px; display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; }
-                .qr-box { text-align: right; }
-                .qr-placeholder { display: inline-block; width: 110px; height: 110px; }
-                .qr-text { font-size: 11px; font-weight: bold; margin-top: 5px; text-transform: uppercase; text-align: center; }
+                .amount-box { border: 2px solid #000; border-radius: 8px; text-align: center; padding: 10px; background: #f9f9f9; margin-top: auto; }
+                .amount-title { font-size: 12px; font-weight: 900; margin-bottom: 3px; text-transform: uppercase; }
+                .amount-value { font-size: 28px; font-weight: 900; margin: 0; }
+                .cod-text { font-size: 14px; font-weight: 900; letter-spacing: 1px; margin-top: 3px; }
                 
-                .seller-sec { margin-top: 15px; text-align: right; }
-                
-                /* Collect Amount Section */
-                .amount-box { border: 3px solid #000; border-radius: 12px; text-align: center; padding: 15px; background: #f9f9f9; margin-top: 10px; }
-                .amount-title { font-size: 15px; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-                .amount-value { font-size: 40px; font-weight: 900; margin: 0; }
-                .cod-text { font-size: 18px; font-weight: 900; letter-spacing: 2px; margin-top: 5px; }
-                
-                .footer { text-align: center; font-size: 13px; color: #444; font-weight: bold; margin-top: 20px; border-top: 2px solid #000; padding-top: 15px; }
+                .footer { text-align: center; font-size: 10px; color: #444; font-weight: bold; margin-top: 10px; border-top: 2px solid #000; padding-top: 8px; }
             </style>
         </head>
         <body>
@@ -10381,63 +10371,65 @@ function generateShippingSlip(orderId) {
                 <div class="header">SHIPPING LABEL</div>
                 
                 <div class="row">
-                    <!-- Left: Customer Data -->
                     <div class="col-left">
                         <div class="sec-title">Deliver To:</div>
                         <p class="cust-name">${order.customerName}</p>
                         <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
-                        <p class="cust-text" style="font-weight: 900; font-size: 18px; margin-top: 12px;">📞 Ph: ${order.customerPhone}</p>
+                        <p class="cust-text" style="font-weight: 900; font-size: 14px; margin-top: 8px;">📞 Ph: ${order.customerPhone}</p>
                     </div>
                     
-                    <!-- Right: QR Code & Seller -->
                     <div class="col-right">
-                        <div class="qr-box">
+                        <div>
                             <div id="qrcode" class="qr-placeholder"></div>
                             <div class="qr-text">Scan for Direction</div>
                         </div>
                         <div class="seller-sec">
-                            <div class="sec-title" style="margin-bottom: 4px;">Sold By:</div>
-                            <p class="cust-text" style="font-weight: bold; font-size: 14px;">${shopName}</p>
-                            <p class="cust-text" style="font-size: 13px;">Ph: ${shopPhone}</p>
+                            <div class="sec-title" style="margin-bottom: 2px;">Sold By:</div>
+                            <p class="cust-text" style="font-weight: bold; font-size: 11px;">${shopName}</p>
+                            <p class="cust-text" style="font-size: 10px;">Ph: ${shopPhone}</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Total COD Amount -->
                 <div class="amount-box">
                     <div class="amount-title">Collect Amount</div>
                     <p class="amount-value">₹${order.totalAmount}</p>
                     <div class="cod-text">(CASH ON DELIVERY)</div>
                 </div>
 
-                <!-- Footer Details -->
                 <div class="footer">
-                    Order ID: #${order.id.substring(0,8).toUpperCase()} &nbsp;&nbsp;|&nbsp;&nbsp; Date: ${new Date().toLocaleDateString('en-IN')}
+                    Order ID: #${order.id.substring(0,8).toUpperCase()} | Date: ${new Date().toLocaleDateString('en-IN')}
                 </div>
             </div>
 
             <script>
-                // Generate QR Code dynamically
-                new QRCode(document.getElementById("qrcode"), {
-                    text: "${mapUrl}",
-                    width: 110,
-                    height: 110,
-                    colorDark : "#000000",
-                    colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.L
-                });
-                
-                // Automatically open print dialog after 1 second
-                setTimeout(() => {
-                    window.print();
-                }, 1000);
+                // 3. Smart Load Logic: QR code banne ke baad hi print hoga
+                window.onload = function() {
+                    new QRCode(document.getElementById("qrcode"), {
+                        text: "${mapUrl}",
+                        width: 80,
+                        height: 80,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.L
+                    });
+                    
+                    // QR generate hone ke liye thoda sa wait time
+                    setTimeout(() => {
+                        window.print();
+                    }, 400);
+                };
             <\/script>
         </body>
         </html>
-    `);
-    printWin.document.close();
-}
+    `;
 
+    // 4. Iframe mein code daal kar execute karna
+    let doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(htmlContent);
+    doc.close();
+}
 
     </script>
 

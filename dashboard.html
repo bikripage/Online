@@ -569,44 +569,92 @@
 
                                                                 <!-- ✨ TAB 5: LIVE ORDERS (NEW TAB) ✨ -->
 <div id="tab-orders" class="tab-content hidden space-y-8 pb-24">
- <!-- pb-10 for bottom space -->
-                            <!-- ✨ NAYA: w-full max-w-4xl mx-auto se card stretch hoga ✨ -->
-                            <div class="ios-card w-full max-w-4xl mx-auto p-5 sm:p-8 border border-[#E5E7EB] bg-white rounded-[24px]">
-                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                                    <h3 class="text-xl font-bold text-[#111827] flex items-center gap-2">
-                                        <div class="w-10 h-10 bg-[#FEF3C7] text-[#D97706] rounded-[12px] flex items-center justify-center"><i class="fas fa-bell"></i></div>
-                                        Live Orders
-                                    </h3>
-                                    
-<!-- ✨ NAYA BUTTON: Batch Print Accepted Orders ✨ -->
-<div id="top-batch-print-wrapper" class="w-full sm:w-auto">
-    <!-- Button JS se aayega (Blur ya Normal) -->
+    <div class="ios-card w-full max-w-4xl mx-auto p-5 sm:p-8 border border-[#E5E7EB] bg-white rounded-[24px]">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <h3 class="text-xl font-bold text-[#111827] flex items-center gap-2">
+                <div class="w-10 h-10 bg-[#FEF3C7] text-[#D97706] rounded-[12px] flex items-center justify-center"><i class="fas fa-bell"></i></div>
+                Live Orders
+            </h3>
+            
+            <!-- ✨ NAYA BUTTON: Batch Print Accepted Orders ✨ -->
+            <div id="top-batch-print-wrapper" class="w-full sm:w-auto">
+                <!-- Button JS se aayega (Blur ya Normal) -->
+            </div>
+        </div>
+
+        <!-- =========================================================
+             ✨ APP DOWNLOAD & PASSWORD SECTION (BEACH MEIN) ✨
+        ========================================================== -->
+        <div class="bg-[#111827] text-white p-5 rounded-[16px] mb-6 shadow-md border border-gray-800">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h4 class="font-bold text-lg flex items-center gap-2">
+                        <i class="fas fa-mobile-alt text-[#10B981]"></i> Live Order Alert App
+                    </h4>
+                    <p class="text-[12px] text-gray-400 mt-1">Get instant voice alerts for new orders on your phone.</p>
+                </div>
+                
+                <!-- ⬇️ YAHAN APNE APK KA LINK DAALNA HAI ⬇️ -->
+                <a href="APNE_GITHUB_KA_APK_LINK_YAHAN_DALEIN" target="_blank" class="w-full sm:w-auto bg-[#10B981] hover:bg-[#059669] text-white text-sm font-bold px-4 h-10 rounded-[10px] flex justify-center items-center gap-2 transition active:scale-95 shadow-sm">
+                    <i class="fas fa-download"></i> Download App
+                </a>
+            </div>
+
+            <div class="mt-4 bg-[#1F2937] p-4 rounded-[12px] border border-gray-700">
+                <div class="flex justify-between items-center mb-2">
+                    <p class="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Shop ID</p>
+                    <span id="app-shop-id-display" class="font-mono text-sm text-[#60A5FA] font-bold">Loading...</span>
+                </div>
+                
+                <div class="flex justify-between items-center">
+                    <p class="text-[11px] text-gray-400 font-bold uppercase tracking-wider">App Password</p>
+                    <div class="flex items-center gap-3">
+                        <!-- Password Edit karne ke liye Input -->
+                        <input type="text" id="app-password-input" class="bg-transparent border-b border-gray-600 text-white font-mono text-lg tracking-[2px] w-24 outline-none text-right font-bold focus:border-[#60A5FA] transition-colors" readonly>
+                        
+                        <button id="edit-pwd-btn" onclick="toggleEditPassword()" class="text-gray-400 hover:text-white transition p-1">
+                            <i class="fas fa-pen text-[13px]"></i>
+                        </button>
+                        
+                        <button id="save-pwd-btn" onclick="saveNewAppPassword()" class="hidden text-[#10B981] hover:text-white transition p-1">
+                            <i class="fas fa-save text-[15px]"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mt-3 pt-3 border-t border-gray-700">
+                    <p class="text-[10px] text-[#EF4444] font-bold uppercase tracking-wider flex items-start gap-1.5">
+                        <i class="fas fa-exclamation-triangle mt-0.5"></i>
+                        <span>DO NOT SHARE THIS PASSWORD WITH ANYONE. It gives access to your live orders.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- ========================================================= -->
+
+        <!-- ✨ SEARCH & FILTER OPTIONS ✨ -->
+        <div class="flex flex-col sm:flex-row gap-3 mb-6">
+            <div class="relative flex-1">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]"></i>
+                <input type="text" id="live-order-search" oninput="window.filterLiveOrders()" placeholder="Search Name, Phone or ID..." class="w-full bg-[#F7F7F9] focus:bg-white border border-[#E5E7EB] focus:border-[#A855F7] rounded-[14px] h-[46px] pl-11 pr-4 text-sm font-semibold outline-none transition-all shadow-sm">
+            </div>
+            <select id="live-order-filter" onchange="window.filterLiveOrders()" class="w-full sm:w-40 bg-[#F7F7F9] focus:bg-white border border-[#E5E7EB] focus:border-[#A855F7] rounded-[14px] h-[46px] px-4 text-xs font-bold tracking-wide outline-none cursor-pointer transition-all shadow-sm">
+                <option value="All">ALL ORDERS</option>
+                <option value="pending">PENDING</option>
+                <option value="accepted">ACCEPTED</option>
+                <option value="delivered">DELIVERED</option>
+                <option value="cancelled">CANCELLED</option>
+            </select>
+        </div>
+
+        <div id="merchant-orders-list" class="flex flex-col gap-4 max-h-[65vh] overflow-y-auto custom-scrollbar p-1">
+            <div class="text-center py-10">
+                <i class="fas fa-circle-notch fa-spin text-3xl text-[#A855F7] mb-3"></i>
+                <p class="text-[#6B7280] font-bold text-sm">Loading live orders...</p>
+            </div>
+        </div>
+    </div>
 </div>
-
-                         </div>                                            <!-- ✨ NAYA: SEARCH & FILTER OPTIONS ✨ -->
-                                <div class="flex flex-col sm:flex-row gap-3 mb-6">
-                                    <div class="relative flex-1">
-                                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]"></i>
-                                        <input type="text" id="live-order-search" oninput="window.filterLiveOrders()" placeholder="Search Name, Phone or ID..." class="w-full bg-[#F7F7F9] focus:bg-white border border-[#E5E7EB] focus:border-[#A855F7] rounded-[14px] h-[46px] pl-11 pr-4 text-sm font-semibold outline-none transition-all shadow-sm">
-                                    </div>
-                                    <select id="live-order-filter" onchange="window.filterLiveOrders()" class="w-full sm:w-40 bg-[#F7F7F9] focus:bg-white border border-[#E5E7EB] focus:border-[#A855F7] rounded-[14px] h-[46px] px-4 text-xs font-bold tracking-wide outline-none cursor-pointer transition-all shadow-sm">
-                                        <option value="All">ALL ORDERS</option>
-                                        <option value="pending">PENDING</option>
-                                        <option value="accepted">ACCEPTED</option>
-                                        <option value="delivered">DELIVERED</option>
-                                        <option value="cancelled">CANCELLED</option>
-                                    </select>
-                                </div>
-
-
-                                <div id="merchant-orders-list" class="flex flex-col gap-4 max-h-[65vh] overflow-y-auto custom-scrollbar p-1">
-                                    <div class="text-center py-10">
-                                        <i class="fas fa-circle-notch fa-spin text-3xl text-[#A855F7] mb-3"></i>
-                                        <p class="text-[#6B7280] font-bold text-sm">Loading live orders...</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
 
                                       <!-- ✨ TAB 2: INVENTORY ✨ -->
@@ -10729,6 +10777,84 @@ window.sendOutForDeliveryMsg = function(custPhone, custName, custAddress) {
 
     window.open(`https://wa.me/91${custPhone}?text=${encodeURIComponent(msg)}`, '_blank');
 };
+// =======================================================
+// ✨ APP PASSWORD GENERATION & EDITING LOGIC ✨
+// =======================================================
+
+// Ye function dashboard load hone par password check karega
+async function loadAppSecurityDetails() {
+    if (!currentShopId) return;
+    
+    document.getElementById('app-shop-id-display').innerText = currentShopId;
+    
+    try {
+        const shopRef = db.collection('shops').doc(currentShopId);
+        const doc = await shopRef.get();
+        
+        if (doc.exists && doc.data().password) {
+            document.getElementById('app-password-input').value = doc.data().password;
+        } else {
+            // Agar password nahi hai toh auto-generate karo (6 digits)
+            const newPassword = Math.floor(100000 + Math.random() * 900000).toString();
+            await shopRef.set({ password: newPassword }, { merge: true });
+            document.getElementById('app-password-input').value = newPassword;
+        }
+    } catch (e) {
+        console.error("Error loading password", e);
+    }
+}
+
+// Edit button click karne par input editable ho jayega
+function toggleEditPassword() {
+    const input = document.getElementById('app-password-input');
+    const editBtn = document.getElementById('edit-pwd-btn');
+    const saveBtn = document.getElementById('save-pwd-btn');
+    
+    input.removeAttribute('readonly');
+    input.focus();
+    
+    // Style change
+    input.classList.remove('border-gray-600', 'text-white');
+    input.classList.add('border-[#60A5FA]', 'text-[#60A5FA]', 'bg-gray-800', 'px-2');
+    
+    editBtn.classList.add('hidden');
+    saveBtn.classList.remove('hidden');
+}
+
+// Naya password save karne ka function
+async function saveNewAppPassword() {
+    const input = document.getElementById('app-password-input');
+    const newPwd = input.value.trim();
+    
+    if (newPwd.length < 4) {
+        alert("Password kam se kam 4 characters ka hona chahiye!");
+        return;
+    }
+    
+    try {
+        await db.collection('shops').doc(currentShopId).set({
+            password: newPwd,
+            shopName: globalShopData.shopName || "My Shop"
+        }, { merge: true });
+        
+        // Style wapas normal karna
+        input.setAttribute('readonly', 'true');
+        input.classList.add('border-gray-600', 'text-white');
+        input.classList.remove('border-[#60A5FA]', 'text-[#60A5FA]', 'bg-gray-800', 'px-2');
+        
+        document.getElementById('save-pwd-btn').classList.add('hidden');
+        document.getElementById('edit-pwd-btn').classList.remove('hidden');
+        
+        iosAlert("Secured!", "Aapka naya App Password successfully update ho gaya hai.");
+        
+    } catch (e) {
+        iosAlert("Error", "Password update nahi ho paya. Fir se try karein.");
+        console.error(e);
+    }
+}
+
+// Call loadAppSecurityDetails jab page load ho jaye
+setTimeout(loadAppSecurityDetails, 2500);
 
     </script>
 

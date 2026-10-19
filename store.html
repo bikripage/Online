@@ -1751,73 +1751,102 @@ function checkCustomerAuth() {
                 updateCartBadge();
             }
         }
+// ✨ NAYA FUNCTION: Dukandar ko notification bhejne ke liye ✨
+async function sendAlertToShop(shopId, customerName, totalAmount) {
+    try {
+        if (!shopId) return;
+        const shopDoc = await db.collection('shops').doc(shopId).get();
+        if (!shopDoc.exists) return;
+        
+        const pushToken = shopDoc.data().expoPushToken;
+        if (!pushToken) return;
+
+        await fetch('https://exp.host/--/api/v2/push/send', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                to: pushToken,
+                sound: 'default', 
+                title: '🛍️ Naya Order Aaya!',
+                body: `${customerName} ne ₹${totalAmount} ka order diya hai. Check BikriPage app!`,
+                priority: 'high',
+                channelId: 'orders', 
+            }),
+        });
+        console.log("Push notification sent to shop!");
+    } catch (error) {
+        console.error("Notification fail:", error);
+    }
+}
 
                 async function checkoutCartInApp() {
-            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
-            if(cart.length === 0) { alert("Cart is empty!"); return; }
-            
-            let address = document.getElementById('cart-address').value.trim();
-            let custName = document.getElementById('cart-cust-name').value.trim();
-            let custWhatsApp = document.getElementById('cart-cust-phone').value.trim();
-            
-            if(!custName || !custWhatsApp) { alert("Please enter your name and WhatsApp number!"); return; }
-            if(!address) { alert("Please enter delivery address!"); return; }
+    let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
+    if(cart.length === 0) { alert("Cart is empty!"); return; }
+    
+    let address = document.getElementById('cart-address').value.trim();
+    let custName = document.getElementById('cart-cust-name').value.trim();
+    let custWhatsApp = document.getElementById('cart-cust-phone').value.trim();
+    
+    if(!custName || !custWhatsApp) { alert("Please enter your name and WhatsApp number!"); return; }
+    if(!address) { alert("Please enter delivery address!"); return; }
 
-            const accountId = localStorage.getItem('BikriPage_customer_phone');
+    const accountId = localStorage.getItem('BikriPage_customer_phone');
 
-            const btn = document.getElementById('cart-main-btn');
-            const origHTML = btn.innerHTML;
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`; 
-            btn.disabled = true;
+    const btn = document.getElementById('cart-main-btn');
+    const origHTML = btn.innerHTML;
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`; 
+    btn.disabled = true;
+    
+    const ordersByShop = {};
+    cart.forEach(item => {
+        if(!ordersByShop[item.shopPhone]) { ordersByShop[item.shopPhone] = { items: [], total: 0, shopName: item.shopName }; }
+        ordersByShop[item.shopPhone].items.push(item);
+        ordersByShop[item.shopPhone].total += (item.price * item.qty);
+    });
+
+    try {
+        const shopPhones = Object.keys(ordersByShop);
+        for (let i = 0; i < shopPhones.length; i++) {
+            const phone = shopPhones[i];
+            const orderData = ordersByShop[phone];
+            const targetShopId = orderData.items[0].shopId || '';
             
-            const ordersByShop = {};
-            cart.forEach(item => {
-                // ✨ YAHAN shopId SAVE KAR RAHE HAIN
-                if(!ordersByShop[item.shopPhone]) { 
-                    ordersByShop[item.shopPhone] = { items: [], total: 0, shopName: item.shopName, shopId: item.shopId }; 
-                }
-                ordersByShop[item.shopPhone].items.push(item);
-                ordersByShop[item.shopPhone].total += (item.price * item.qty);
+            await db.collection('orders').add({
+                customerId: accountId, 
+                customerName: custName,
+                customerPhone: custWhatsApp, 
+                customerAddress: address,
+                lat: document.getElementById('cart-lat').value || null,
+                lng: document.getElementById('cart-lng').value || null,
+                shopPhone: phone,
+                shopId: targetShopId, 
+                shopName: orderData.shopName,
+                items: orderData.items,
+                totalAmount: orderData.total,
+                status: 'pending',
+                deliveryOtp: Math.floor(1000 + Math.random() * 9000).toString(), 
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            try {
-                const shopPhones = Object.keys(ordersByShop);
-                for (let i = 0; i < shopPhones.length; i++) {
-                    const phone = shopPhones[i];
-                    const orderData = ordersByShop[phone];
-                    
-                    const cartOtpCode = Math.floor(1000 + Math.random() * 9000).toString();
-
-                    await db.collection('orders').add({
-                        customerId: accountId, 
-                        customerName: custName,
-                        customerPhone: custWhatsApp, 
-                        customerAddress: address,
-                        lat: document.getElementById('cart-lat').value || null,
-                        lng: document.getElementById('cart-lng').value || null,
-                        shopPhone: phone,
-                        shopId: orderData.shopId || currentShopId, // ✨ EXACT SHOP ID DATABASE MEIN JAYEGA
-                        shopName: orderData.shopName,
-                        items: orderData.items,
-                        totalAmount: orderData.total,
-                        status: 'pending',
-                        deliveryOtp: cartOtpCode, 
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
-
-                localStorage.setItem(getCartKey(), JSON.stringify([]));
-                updateCartBadge();
-                toggleCartModal();
-                showOrderSuccessModal(); 
-                
-            } catch (error) { 
-                alert("Error placing order: " + error.message); 
-            } finally { 
-                btn.innerHTML = origHTML; 
-                btn.disabled = false; 
-            }
+            // ✨ NAYA LOGIC: Order place hote hi Notification function call hoga ✨
+            sendAlertToShop(targetShopId, custName, orderData.total);
         }
+
+        localStorage.setItem(getCartKey(), JSON.stringify([]));
+        updateCartBadge();
+        toggleCartModal();
+        showOrderSuccessModal(); 
+        
+    } catch (error) { 
+        alert("Error placing order: " + error.message); 
+    } finally { 
+        btn.innerHTML = origHTML; 
+        btn.disabled = false; 
+    }
+}
 
 
         function checkoutCartWhatsApp() {
@@ -1925,54 +1954,54 @@ function checkCustomerAuth() {
             setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 500); 
         }
 
-            async function submitOrder(e) {
-            e.preventDefault();
-            const qty = document.getElementById('order-qty').value;
-            const custName = document.getElementById('order-cust-name').value.trim();
-            const custWhatsApp = document.getElementById('order-cust-phone').value.trim(); 
-            const address = document.getElementById('order-address').value.trim();
-            
-            const total = parseInt(currentOrder.itemPrice) * parseInt(qty);
-            const phone = currentOrder.shopPhone || '9876543210';
-            
-            const accountId = localStorage.getItem('BikriPage_customer_phone');
+         async function submitOrder(e) {
+    e.preventDefault();
+    const qty = document.getElementById('order-qty').value;
+    const custName = document.getElementById('order-cust-name').value.trim();
+    const custWhatsApp = document.getElementById('order-cust-phone').value.trim(); 
+    const address = document.getElementById('order-address').value.trim();
+    
+    const total = parseInt(currentOrder.itemPrice) * parseInt(qty);
+    const phone = currentOrder.shopPhone || '9876543210';
+    
+    const accountId = localStorage.getItem('BikriPage_customer_phone');
 
-            const btn = document.getElementById('main-order-btn');
-            const origHtml = btn.innerHTML;
-            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Placing...`;
-            btn.disabled = true;
+    const btn = document.getElementById('main-order-btn');
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Placing...`;
+    btn.disabled = true;
 
-            // ✨ NAYA: 4-Digit Random OTP Generate karein
-            const deliveryOtpCode = Math.floor(1000 + Math.random() * 9000).toString();
+    try {
+        await db.collection('orders').add({
+            customerId: accountId, 
+            customerName: custName,
+            customerPhone: custWhatsApp, 
+            customerAddress: address,
+            lat: document.getElementById('order-lat').value || null,
+            lng: document.getElementById('order-lng').value || null,
+            shopPhone: phone,
+            shopId: currentOrder.shopId || '', 
+            shopName: currentOrder.shopName || 'Local Store',
+            items: [{ name: currentOrder.itemName, qty: parseInt(qty), price: parseInt(currentOrder.itemPrice) }],
+            totalAmount: total,
+            status: 'pending',
+            deliveryOtp: Math.floor(1000 + Math.random() * 9000).toString(),
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
 
-            try {
-                await db.collection('orders').add({
-                    customerId: accountId, 
-                    customerName: custName,
-                    customerPhone: custWhatsApp, 
-                    customerAddress: address,
-                    lat: document.getElementById('order-lat').value || null,
-                    lng: document.getElementById('order-lng').value || null,
-                    shopPhone: phone,
-                    shopId: currentShopId, 
-                    shopName: currentOrder.shopName || 'Local Store',
-                    items: [{ name: currentOrder.itemName, qty: parseInt(qty), price: parseInt(currentOrder.itemPrice) }],
-                    totalAmount: total,
-                    status: 'pending',
-                    deliveryOtp: deliveryOtpCode, // ✨ YAHAN OTP ADD HUA
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
+        // ✨ NAYA LOGIC: Direct order place hote hi Notification function call hoga ✨
+        sendAlertToShop(currentOrder.shopId, custName, total);
 
-                closeOrderModal();
-                showOrderSuccessModal(); 
-                
-            } catch (error) {
-                alert("Error placing order: " + error.message);
-            } finally {
-                btn.innerHTML = origHtml;
-                btn.disabled = false;
-            }
-        }
+        closeOrderModal();
+        showOrderSuccessModal(); 
+        
+    } catch (error) {
+        alert("Error placing order: " + error.message);
+    } finally {
+        btn.innerHTML = origHtml;
+        btn.disabled = false;
+    }
+}
 
         function orderViaWhatsApp() {
             const qty = document.getElementById('order-qty').value;

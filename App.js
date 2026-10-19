@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, Linking, Alert, TextInput, ActivityIndicator } from 'react-native';
+// 👉 NAYA CHANGE: 'Platform' ko import me add kiya hai
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, Linking, Alert, TextInput, ActivityIndicator, Platform } from 'react-native';
 import * as Speech from 'expo-speech';
 import * as Notifications from 'expo-notifications';
 import { Audio } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 
@@ -29,6 +31,38 @@ Notifications.setNotificationHandler({
   }),
 });
 
+// 👉 NAYA FUNCTION: Expo Push Token generate karne ke liye
+async function registerForPushNotificationsAsync() {
+  let token;
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
+
+  if (existingStatus !== 'granted') {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
+  }
+
+  if (finalStatus !== 'granted') {
+    Alert.alert('Permission Denied', 'Notification permission zaroori hai alert pane ke liye!');
+    return null;
+  }
+
+  token = (await Notifications.getExpoPushTokenAsync()).data;
+
+  // Android lock-screen alert ke liye channel zaroori hai
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('orders', {
+      name: 'Order Alerts',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+      sound: 'default',
+    });
+  }
+
+  return token;
+}
+
 export default function App() {
   const [orders, setOrders] = useState([]);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -38,6 +72,7 @@ export default function App() {
   
   const [shopIdInput, setShopIdInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isCheckingLogin, setIsCheckingLogin] = useState(true);
 
@@ -87,6 +122,15 @@ export default function App() {
       const fetchedShopName = shopData.shopName || shopId;
       await AsyncStorage.setItem('shopId', shopId);
       await AsyncStorage.setItem('shopName', fetchedShopName);
+      
+      // 👉 NAYA CHANGE: Login hote hi Token nikal kar Firebase me save karega
+      const pushToken = await registerForPushNotificationsAsync();
+      if (pushToken) {
+        await db.collection('shops').doc(shopId).set(
+          { expoPushToken: pushToken },
+          { merge: true } // Ye bas token ko add karega baki data safe rahega
+        );
+      }
       
       setCurrentShopId(shopId);
       setCurrentShopName(fetchedShopName);
@@ -222,22 +266,27 @@ export default function App() {
         
         <TextInput
           style={styles.input}
-          placeholder="Shop ID (e.g. netajijhadustore-3581)"
+          placeholder="Shop ID (e.g. Drishtistore-3381)"
           placeholderTextColor="#888888"
           value={shopIdInput}
           onChangeText={setShopIdInput}
           autoCapitalize="none"
         />
         
-        <TextInput
-          style={styles.input}
-          placeholder="App Password"
-          placeholderTextColor="#888888"
-          value={passwordInput}
-          onChangeText={setPasswordInput}
-          secureTextEntry={true} 
-          autoCapitalize="none"
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="App Password"
+            placeholderTextColor="#888888"
+            value={passwordInput}
+            onChangeText={setPasswordInput}
+            secureTextEntry={!showPassword} 
+            autoCapitalize="none"
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+            <Ionicons name={showPassword ? "eye-off" : "eye"} size={24} color="#888888" />
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity 
           style={[styles.loginBtn, isLoggingIn && {backgroundColor: '#60A5FA'}]} 
@@ -288,6 +337,9 @@ const styles = StyleSheet.create({
   loginTitle: { color: 'white', fontSize: 32, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 },
   loginSubtitle: { color: 'gray', fontSize: 16, textAlign: 'center', marginBottom: 40 },
   input: { backgroundColor: 'white', padding: 15, borderRadius: 10, fontSize: 16, marginBottom: 15, color: '#000' },
+  passwordContainer: { flexDirection: 'row', backgroundColor: 'white', borderRadius: 10, marginBottom: 15, alignItems: 'center' },
+  passwordInput: { flex: 1, padding: 15, fontSize: 16, color: '#000' },
+  eyeIcon: { padding: 15 },
   loginBtn: { backgroundColor: '#2563EB', padding: 15, borderRadius: 10, alignItems: 'center', marginTop: 10 },
   loginBtnText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
   header: { backgroundColor: '#111827', padding: 20, paddingTop: 50, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },

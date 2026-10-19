@@ -223,6 +223,7 @@ export default function App() {
         <TextInput
           style={styles.input}
           placeholder="Shop ID (e.g. netajijhadustore-3581)"
+          placeholderTextColor="#888888"
           value={shopIdInput}
           onChangeText={setShopIdInput}
           autoCapitalize="none"
@@ -231,6 +232,7 @@ export default function App() {
         <TextInput
           style={styles.input}
           placeholder="App Password"
+          placeholderTextColor="#888888"
           value={passwordInput}
           onChangeText={setPasswordInput}
           secureTextEntry={true} 
@@ -285,7 +287,7 @@ const styles = StyleSheet.create({
   loginContainer: { flex: 1, backgroundColor: '#111827', justifyContent: 'center', padding: 20 },
   loginTitle: { color: 'white', fontSize: 32, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 },
   loginSubtitle: { color: 'gray', fontSize: 16, textAlign: 'center', marginBottom: 40 },
-  input: { backgroundColor: 'white', padding: 15, borderRadius: 10, fontSize: 16, marginBottom: 15 },
+  input: { backgroundColor: 'white', padding: 15, borderRadius: 10, fontSize: 16, marginBottom: 15, color: '#000' },
   loginBtn: { backgroundColor: '#2563EB', padding: 15, borderRadius: 10, alignItems: 'center', marginTop: 10 },
   loginBtnText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
   header: { backgroundColor: '#111827', padding: 20, paddingTop: 50, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },

@@ -25,6 +25,14 @@
     },
     "web": {
       "favicon": "./favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f04fd7db-de71-48be-b31a-2e244b307168"
+      }
+    },
+    "cli": {
+      "appVersionSource": "remote"
     }
   }
 }

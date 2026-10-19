@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, Linking, Alert, TextInput } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, Linking, Alert, TextInput, ActivityIndicator } from 'react-native';
 import * as Speech from 'expo-speech';
 import * as Notifications from 'expo-notifications';
 import { Audio } from 'expo-av';
@@ -32,57 +32,96 @@ export default function App() {
   const [orders, setOrders] = useState([]);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   
-  // Naye Login States
   const [currentShopId, setCurrentShopId] = useState(null);
+  const [currentShopName, setCurrentShopName] = useState(''); // Shop Name save karne ke liye
+  
   const [shopIdInput, setShopIdInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isCheckingLogin, setIsCheckingLogin] = useState(true);
 
-  // App khulte hi check karega ki koi Shop ID save hai ya nahi
+  // Load Saved Login Data
   useEffect(() => {
-    const checkSavedShopId = async () => {
+    const checkSavedCredentials = async () => {
       try {
         const savedId = await AsyncStorage.getItem('shopId');
+        const savedName = await AsyncStorage.getItem('shopName');
         if (savedId) {
           setCurrentShopId(savedId);
+          setCurrentShopName(savedName || 'My Shop');
         }
       } catch (e) {
-        console.log('Error reading shopId', e);
+        console.log('Error reading credentials', e);
       }
       setIsCheckingLogin(false);
     };
-    checkSavedShopId();
+    checkSavedCredentials();
   }, []);
 
-  // Login Function
+  // ✨ SECURE FIREBASE LOGIN FUNCTION WITH POPUP ✨
   const handleLogin = async () => {
-    if (shopIdInput.trim() === '') {
-      Alert.alert('Error', 'Please enter your Shop ID');
+    const shopId = shopIdInput.trim();
+    const pwd = passwordInput.trim();
+
+    if (shopId === '' || pwd === '') {
+      Alert.alert('Error', 'Shop ID aur Password dono daalna zaroori hai');
       return;
     }
+
+    setIsLoggingIn(true);
     try {
-      await AsyncStorage.setItem('shopId', shopIdInput.trim());
-      setCurrentShopId(shopIdInput.trim());
+      const shopDoc = await db.collection('shops').doc(shopId).get();
+
+      if (!shopDoc.exists) {
+        Alert.alert('Error', 'Ye Shop ID nahi mili!');
+        setIsLoggingIn(false);
+        return;
+      }
+
+      const shopData = shopDoc.data();
+      if (shopData.password !== pwd) {
+        Alert.alert('Error', 'Galat Password!');
+        setIsLoggingIn(false);
+        return;
+      }
+
+      // Password Sahi Hai -> Data Save Karo
+      const fetchedShopName = shopData.shopName || shopId;
+      await AsyncStorage.setItem('shopId', shopId);
+      await AsyncStorage.setItem('shopName', fetchedShopName);
+      
+      setCurrentShopId(shopId);
+      setCurrentShopName(fetchedShopName);
+      
+      // ✨ SUCCESS POPUP WITH SHOP NAME ✨
+      Alert.alert('Login Successful! ✅', `Welcome, ${fetchedShopName}`);
+
     } catch (e) {
-      Alert.alert('Error', 'Failed to save Shop ID');
+      Alert.alert('Error', 'Login fail ho gaya. Internet check karein.');
+      console.log(e);
     }
+    setIsLoggingIn(false);
   };
 
-  // Logout Function
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('shopId');
+      await AsyncStorage.removeItem('shopName');
       setCurrentShopId(null);
+      setCurrentShopName('');
       setShopIdInput('');
+      setPasswordInput('');
       setOrders([]);
     } catch (e) {
       console.log('Logout Error', e);
     }
   };
 
-  // Orders Monitor (Sirf tab chalega jab currentShopId set ho)
+  // Live Order Listener & Audio Setup
   useEffect(() => {
     if (!currentShopId) return;
 
+    // ✨ Force Audio in Silent Mode ✨
     const setupAudio = async () => {
       try {
         await Audio.setAudioModeAsync({
@@ -141,6 +180,7 @@ export default function App() {
 
         snapshot.forEach((doc) => {
           const data = doc.data();
+          // ✨ SMART FILTER: Sirf Pending orders dikhayega
           if (data.status === 'pending') {
             liveOrders.push({ id: doc.id, ...data });
           }
@@ -171,40 +211,64 @@ export default function App() {
     </View>
   );
 
-  // Loading Screen jab tak ID check ho rahi ho
+  // Loading Screen
   if (isCheckingLogin) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Loading BikriPage...</Text>
+        <ActivityIndicator size="large" color="#2563EB" />
+        <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 15 }}>Loading BikriPage...</Text>
       </View>
     );
   }
 
-  // Agar Shop ID nahi hai, toh Login Screen dikhayein
+  // ✨ SECURE LOGIN SCREEN ✨
   if (!currentShopId) {
     return (
       <View style={styles.loginContainer}>
         <Text style={styles.loginTitle}>BikriPage Alert</Text>
-        <Text style={styles.loginSubtitle}>Enter your Shop ID to receive live order alerts</Text>
+        <Text style={styles.loginSubtitle}>Login to receive live order alerts</Text>
+        
         <TextInput
           style={styles.input}
-          placeholder="e.g. netajijhadustore-3581"
+          placeholder="Shop ID (e.g. netajijhadustore-3581)"
           value={shopIdInput}
           onChangeText={setShopIdInput}
           autoCapitalize="none"
         />
-        <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
-          <Text style={styles.loginBtnText}>Start Receiving Orders</Text>
+        
+        <TextInput
+          style={styles.input}
+          placeholder="App Password"
+          value={passwordInput}
+          onChangeText={setPasswordInput}
+          secureTextEntry={true} 
+          autoCapitalize="none"
+        />
+
+        <TouchableOpacity 
+          style={[styles.loginBtn, isLoggingIn && {backgroundColor: '#60A5FA'}]} 
+          onPress={handleLogin}
+          disabled={isLoggingIn}
+        >
+          {isLoggingIn ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.loginBtnText}>Secure Login</Text>
+          )}
         </TouchableOpacity>
       </View>
     );
   }
 
-  // Agar Shop ID hai, toh main Orders Screen dikhayein
+  // ✨ MAIN SCREEN (Header mein Shop Name aur Logout Button) ✨
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>BikriPage Shop Alert</Text>
+        <View>
+          <Text style={styles.headerTitle}>BikriPage Alert</Text>
+          {/* Shop ka Naam yahan aayega */}
+          <Text style={styles.shopNameText}>{currentShopName}</Text> 
+        </View>
         <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
@@ -228,18 +292,20 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F2F2F7' },
-  // Login Screen Styles
+  // Login Styles
   loginContainer: { flex: 1, backgroundColor: '#111827', justifyContent: 'center', padding: 20 },
   loginTitle: { color: 'white', fontSize: 32, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 },
   loginSubtitle: { color: 'gray', fontSize: 16, textAlign: 'center', marginBottom: 40 },
-  input: { backgroundColor: 'white', padding: 15, borderRadius: 10, fontSize: 16, marginBottom: 20 },
-  loginBtn: { backgroundColor: '#2563EB', padding: 15, borderRadius: 10, alignItems: 'center' },
+  input: { backgroundColor: 'white', padding: 15, borderRadius: 10, fontSize: 16, marginBottom: 15 },
+  loginBtn: { backgroundColor: '#2563EB', padding: 15, borderRadius: 10, alignItems: 'center', marginTop: 10 },
   loginBtnText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
-  // Main Screen Styles
+  // Header Styles
   header: { backgroundColor: '#111827', padding: 20, paddingTop: 50, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   headerTitle: { color: 'white', fontSize: 18, fontWeight: 'bold' },
-  logoutBtn: { backgroundColor: '#EF4444', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 5 },
+  shopNameText: { color: '#10B981', fontSize: 14, fontWeight: 'bold', marginTop: 4, textTransform: 'uppercase' },
+  logoutBtn: { backgroundColor: '#EF4444', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 5 },
   logoutText: { color: 'white', fontWeight: 'bold', fontSize: 12 },
+  // Card Styles
   card: { backgroundColor: 'white', padding: 15, borderRadius: 15, marginBottom: 15, shadowColor: '#000', shadowOffset: {width: 0, height: 2}, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3, borderLeftWidth: 5, borderLeftColor: '#2563EB' },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
   customerName: { fontSize: 16, fontWeight: 'bold' },

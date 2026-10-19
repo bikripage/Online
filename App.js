@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// 👉 NAYA CHANGE: 'Platform' ko import me add kiya hai
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Linking, Alert, TextInput, ActivityIndicator, Platform } from 'react-native';
 import * as Speech from 'expo-speech';
 import * as Notifications from 'expo-notifications';
@@ -31,7 +30,7 @@ Notifications.setNotificationHandler({
   }),
 });
 
-// 👉 NAYA FUNCTION: Expo Push Token generate karne ke liye
+// 👉 Push Token Generate Karne Ka Setup
 async function registerForPushNotificationsAsync() {
   let token;
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -47,9 +46,9 @@ async function registerForPushNotificationsAsync() {
     return null;
   }
 
+  // Yahan try block add kiya hai taaki token crash ho toh handle ho jaye
   token = (await Notifications.getExpoPushTokenAsync()).data;
 
-  // Android lock-screen alert ke liye channel zaroori hai
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('orders', {
       name: 'Order Alerts',
@@ -123,13 +122,18 @@ export default function App() {
       await AsyncStorage.setItem('shopId', shopId);
       await AsyncStorage.setItem('shopName', fetchedShopName);
       
-      // 👉 NAYA CHANGE: Login hote hi Token nikal kar Firebase me save karega
-      const pushToken = await registerForPushNotificationsAsync();
-      if (pushToken) {
-        await db.collection('shops').doc(shopId).set(
-          { expoPushToken: pushToken },
-          { merge: true } // Ye bas token ko add karega baki data safe rahega
-        );
+      // 👉 Push notification ko alag try-catch me daala hai taaki login bypass ho sake
+      try {
+        const pushToken = await registerForPushNotificationsAsync();
+        if (pushToken) {
+          await db.collection('shops').doc(shopId).set(
+            { expoPushToken: pushToken },
+            { merge: true }
+          );
+        }
+      } catch (tokenError) {
+        Alert.alert('Notification Setup Failed', 'Push Token nahi ban paya. Error: ' + tokenError.message);
+        console.log("Token Error:", tokenError);
       }
       
       setCurrentShopId(shopId);
@@ -138,8 +142,9 @@ export default function App() {
       Alert.alert('Login Successful! ✅', `Welcome, ${fetchedShopName}`);
 
     } catch (e) {
-      Alert.alert('Error', 'Login fail ho gaya. Internet check karein.');
-      console.log(e);
+      // 👉 Ab "Internet Check Karein" ki jagah yahan asli error aayega!
+      Alert.alert('Asli Error 👇', e.message || 'Kuch galat ho gaya');
+      console.log("Login Error:", e);
     }
     setIsLoggingIn(false);
   };
@@ -266,7 +271,7 @@ export default function App() {
         
         <TextInput
           style={styles.input}
-          placeholder="Shop ID (e.g. Drishtistore-3381)"
+          placeholder="Shop ID (e.g. netajijhadustore-3581)"
           placeholderTextColor="#888888"
           value={shopIdInput}
           onChangeText={setShopIdInput}

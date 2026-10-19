@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "crabby-violet-ice-cream",
-    "slug": "snack-60ac09fe-9f38-49f7-a5f2-b2b6af3f95d1",
+    "name": "BikriPage Shop Alert",
+    "slug": "bikripage-shop-alert",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,13 +17,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.bikripage.shopalert"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./favicon.png"
     }
   }
 }

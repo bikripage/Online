@@ -4,7 +4,8 @@ import * as Speech from 'expo-speech';
 import * as Notifications from 'expo-notifications';
 import { Audio } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import firebase from 'firebase';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCWquftO39vqj83ZtYqtF_sDfkHVNpjd3k",
@@ -33,14 +34,13 @@ export default function App() {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   
   const [currentShopId, setCurrentShopId] = useState(null);
-  const [currentShopName, setCurrentShopName] = useState(''); // Shop Name save karne ke liye
+  const [currentShopName, setCurrentShopName] = useState(''); 
   
   const [shopIdInput, setShopIdInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isCheckingLogin, setIsCheckingLogin] = useState(true);
 
-  // Load Saved Login Data
   useEffect(() => {
     const checkSavedCredentials = async () => {
       try {
@@ -58,7 +58,6 @@ export default function App() {
     checkSavedCredentials();
   }, []);
 
-  // ✨ SECURE FIREBASE LOGIN FUNCTION WITH POPUP ✨
   const handleLogin = async () => {
     const shopId = shopIdInput.trim();
     const pwd = passwordInput.trim();
@@ -85,7 +84,6 @@ export default function App() {
         return;
       }
 
-      // Password Sahi Hai -> Data Save Karo
       const fetchedShopName = shopData.shopName || shopId;
       await AsyncStorage.setItem('shopId', shopId);
       await AsyncStorage.setItem('shopName', fetchedShopName);
@@ -93,7 +91,6 @@ export default function App() {
       setCurrentShopId(shopId);
       setCurrentShopName(fetchedShopName);
       
-      // ✨ SUCCESS POPUP WITH SHOP NAME ✨
       Alert.alert('Login Successful! ✅', `Welcome, ${fetchedShopName}`);
 
     } catch (e) {
@@ -117,11 +114,9 @@ export default function App() {
     }
   };
 
-  // Live Order Listener & Audio Setup
   useEffect(() => {
     if (!currentShopId) return;
 
-    // ✨ Force Audio in Silent Mode ✨
     const setupAudio = async () => {
       try {
         await Audio.setAudioModeAsync({
@@ -180,7 +175,6 @@ export default function App() {
 
         snapshot.forEach((doc) => {
           const data = doc.data();
-          // ✨ SMART FILTER: Sirf Pending orders dikhayega
           if (data.status === 'pending') {
             liveOrders.push({ id: doc.id, ...data });
           }
@@ -211,7 +205,6 @@ export default function App() {
     </View>
   );
 
-  // Loading Screen
   if (isCheckingLogin) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
@@ -221,7 +214,6 @@ export default function App() {
     );
   }
 
-  // ✨ SECURE LOGIN SCREEN ✨
   if (!currentShopId) {
     return (
       <View style={styles.loginContainer}>
@@ -260,13 +252,11 @@ export default function App() {
     );
   }
 
-  // ✨ MAIN SCREEN (Header mein Shop Name aur Logout Button) ✨
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View>
           <Text style={styles.headerTitle}>BikriPage Alert</Text>
-          {/* Shop ka Naam yahan aayega */}
           <Text style={styles.shopNameText}>{currentShopName}</Text> 
         </View>
         <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
@@ -292,20 +282,17 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F2F2F7' },
-  // Login Styles
   loginContainer: { flex: 1, backgroundColor: '#111827', justifyContent: 'center', padding: 20 },
   loginTitle: { color: 'white', fontSize: 32, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 },
   loginSubtitle: { color: 'gray', fontSize: 16, textAlign: 'center', marginBottom: 40 },
   input: { backgroundColor: 'white', padding: 15, borderRadius: 10, fontSize: 16, marginBottom: 15 },
   loginBtn: { backgroundColor: '#2563EB', padding: 15, borderRadius: 10, alignItems: 'center', marginTop: 10 },
   loginBtnText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
-  // Header Styles
   header: { backgroundColor: '#111827', padding: 20, paddingTop: 50, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   headerTitle: { color: 'white', fontSize: 18, fontWeight: 'bold' },
   shopNameText: { color: '#10B981', fontSize: 14, fontWeight: 'bold', marginTop: 4, textTransform: 'uppercase' },
   logoutBtn: { backgroundColor: '#EF4444', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 5 },
   logoutText: { color: 'white', fontWeight: 'bold', fontSize: 12 },
-  // Card Styles
   card: { backgroundColor: 'white', padding: 15, borderRadius: 15, marginBottom: 15, shadowColor: '#000', shadowOffset: {width: 0, height: 2}, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3, borderLeftWidth: 5, borderLeftColor: '#2563EB' },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
   customerName: { fontSize: 16, fontWeight: 'bold' },

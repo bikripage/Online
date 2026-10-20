@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "900882116436",
+    "project_id": "bikripage-3aba6",
+    "storage_bucket": "bikripage-3aba6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:900882116436:android:aaaa9ef35f0a1ad3ae22c1",
+        "android_client_info": {
+          "package_name": "com.bikripage.shopalert"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "900882116436-6uld8jvcktq58plblmr7u0oglqg3cep4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkD79_f1y3b54LPeBE7XJJphY8xoEe6SM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "900882116436-6uld8jvcktq58plblmr7u0oglqg3cep4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

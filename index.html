@@ -2355,18 +2355,27 @@ function getVIPBadge(isVerified, plan) {
                 updateCartBadge();
             }
         }
-// ✨ FINAL FUNCTION: Dukandar ko notification bhejne ke liye ✨
+// ✨ NAYA FUNCTION: Expo ki Delivery Report ke sath ✨
 async function sendAlertToShop(shopId, customerName, totalAmount) {
     try {
-        if (!shopId) return;
+        if (!shopId) {
+            alert("❌ Error: Shop ID website se nahi aayi!");
+            return;
+        }
+        
         const shopDoc = await db.collection('shops').doc(shopId).get();
-        if (!shopDoc.exists) return;
+        if (!shopDoc.exists) {
+            alert("❌ Error: Ye dukaan database me nahi mili!");
+            return;
+        }
         
         const pushToken = shopDoc.data().expoPushToken;
-        if (!pushToken) return;
+        if (!pushToken) {
+            alert("❌ Error: Is Dukaan ka Push Token database me save nahi hai! Dukandar ko App me Logout karke Login karna hoga.");
+            return;
+        }
 
-        // Isme se Unsafe Header hata diya gaya hai
-        await fetch('https://exp.host/--/api/v2/push/send', {
+        const response = await fetch('https://exp.host/--/api/v2/push/send', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -2376,17 +2385,20 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
                 to: pushToken,
                 sound: 'default', 
                 title: '🛍️ Naya Order Aaya!',
-                body: `${customerName} ne ₹${totalAmount} ka order diya hai. Check BikriPage app!`,
+                body: `${customerName} ne ₹${totalAmount} ka order diya hai.`,
                 priority: 'high',
                 channelId: 'orders'
             }),
         });
-        console.log("Push notification sent to shop!");
+
+        // ASLI REPORT YAHAN AAYEGI
+        const data = await response.json();
+        alert("Expo Server ka Jawab:\n" + JSON.stringify(data));
+
     } catch (error) {
-        console.error("Notification fail:", error);
+        alert("❌ Fetch Error: " + error.message);
     }
 }
-
 
            async function checkoutCartInApp() {
     let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];

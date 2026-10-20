@@ -1754,56 +1754,38 @@ function checkCustomerAuth() {
                 updateCartBadge();
             }
         }
-// ✨ NAYA FUNCTION: Push Notification Scanner ke sath ✨
+// ✨ FINAL FUNCTION: Dukandar ko notification bhejne ke liye ✨
 async function sendAlertToShop(shopId, customerName, totalAmount) {
     try {
-        if (!shopId) {
-            alert("⚠️ Error: Code ko Shop ID nahi mili!");
-            return;
-        }
-        
+        if (!shopId) return;
         const shopDoc = await db.collection('shops').doc(shopId).get();
         if (!shopDoc.exists) return;
         
         const pushToken = shopDoc.data().expoPushToken;
-        if (!pushToken) {
-            alert("⚠️ Error: Firebase me Dukandar ka Push Token SAVE nahi hai! App me ek baar Logout karke Login karein.");
-            return;
-        }
+        if (!pushToken) return;
 
-        const response = await fetch('https://exp.host/--/api/v2/push/send', {
+        // Isme se Unsafe Header hata diya gaya hai
+        await fetch('https://exp.host/--/api/v2/push/send', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Accept-encoding': 'gzip, deflate',
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 to: pushToken,
                 sound: 'default', 
                 title: '🛍️ Naya Order Aaya!',
-                body: `${customerName} ne ₹${totalAmount} ka order diya hai.`,
+                body: `${customerName} ne ₹${totalAmount} ka order diya hai. Check BikriPage app!`,
                 priority: 'high',
-                channelId: 'orders', 
+                channelId: 'orders'
             }),
         });
-
-        // 👇 YAHAN SE ASLI BIMARI PAKAD ME AAYEGI
-        const expoResult = await response.json();
-        
-        if (expoResult.data && expoResult.data.status === 'error') {
-            // Agar token invalid/purana hua toh yahan dikhega
-            alert("❌ Expo ne Reject kiya: " + expoResult.data.message);
-        } else if (expoResult.errors) {
-            alert("❌ Expo API Error: " + JSON.stringify(expoResult.errors));
-        } else {
-            console.log("Push sent successfully!");
-        }
-
+        console.log("Push notification sent to shop!");
     } catch (error) {
-        alert("❌ Fetch Error: " + error.message);
+        console.error("Notification fail:", error);
     }
 }
+
 
                 async function checkoutCartInApp() {
     let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];

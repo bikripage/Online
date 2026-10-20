@@ -909,7 +909,8 @@ function checkCustomerAuth() {
  class="flex-1 bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100 font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 active:scale-95">
     <i class="fas fa-cart-plus text-sm"></i> Cart
 </button>
-<button onclick="event.stopPropagation(); if(checkCustomerAuth()){ openOrderModal('${product.name}', '${product.price}', globalShopName, globalShopPhone); }"
+<button onclick="event.stopPropagation(); if(checkCustomerAuth()){ openOrderModal('${product.name}', '${product.price}', globalShopName, globalShopPhone, currentShopId); }"
+
  class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95">
     ${buttonText}
 </button>
@@ -1000,7 +1001,8 @@ function checkCustomerAuth() {
  class="flex-1 bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100 font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 active:scale-95">
     <i class="fas fa-cart-plus text-sm"></i> Cart
 </button>
-<button onclick="event.stopPropagation(); if(checkCustomerAuth()){ openOrderModal('${product.name}', '${product.price}', globalShopName, globalShopPhone); }" class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95">
+<button onclick="event.stopPropagation(); if(checkCustomerAuth()){ openOrderModal('${product.name}', '${product.price}', globalShopName, globalShopPhone, currentShopId); }"
+ class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95">
     ${buttonText}
 </button>
 
@@ -1164,7 +1166,8 @@ function checkCustomerAuth() {
             const orderBtn = document.getElementById('detail-order-btn');
             if(orderBtn) {
                 orderBtn.innerHTML = isService ? `Book Now <i class="fas fa-bolt text-yellow-300"></i>` : `Order Now <i class="fas fa-bolt text-yellow-300"></i>`;
-                orderBtn.onclick = () => { openOrderModal(name, price, shopName, shopPhone); };
+              orderBtn.onclick = () => { openOrderModal(name, price, shopName, shopPhone, shopId); };
+
             }
 
             if(typeof loadStoreSimilarProducts === 'function') loadStoreSimilarProducts(shopId, encodeURIComponent(shopName), shopPhone, isService);
@@ -1885,8 +1888,9 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
 
         let currentOrder = null;
 
-        function openOrderModal(itemName, itemPrice, shopName, shopPhone) {
-            currentOrder = { itemName, itemPrice, shopName, shopPhone };
+        function openOrderModal(itemName, itemPrice, shopName, shopPhone, shopId) {
+    currentOrder = { itemName, itemPrice, shopName, shopPhone, shopId: shopId };
+
             document.getElementById('order-item-name').innerText = itemName;
             document.getElementById('order-item-price').innerText = `₹${itemPrice}`;
             document.getElementById('order-shop-name').innerText = shopName || 'Local Store';

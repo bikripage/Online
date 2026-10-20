@@ -2355,31 +2355,22 @@ function getVIPBadge(isVerified, plan) {
                 updateCartBadge();
             }
         }
-// ✨ NAYA FUNCTION: Dukandar ko notification bhejne ke liye ✨
+// ✨ FINAL FUNCTION: Dukandar ko notification bhejne ke liye ✨
 async function sendAlertToShop(shopId, customerName, totalAmount) {
     try {
-        if (!shopId) {
-            alert("⚠️ Error: Shop ID gayab hai! (Code me shopId nahi aaya)");
-            return;
-        }
-        
+        if (!shopId) return;
         const shopDoc = await db.collection('shops').doc(shopId).get();
         if (!shopDoc.exists) return;
         
         const pushToken = shopDoc.data().expoPushToken;
-        if (!pushToken) {
-            alert("⚠️ Error: Is dukaan ka Push Token database me nahi hai! Kripya App me ek baar Logout karke dubara Login karein.");
-            return;
-        }
+        if (!pushToken) return;
 
-        // Agar sab theek raha toh ye safalta ka message aayega:
-        alert("🚀 Success: Background Signal Expo Server ko bhej diya gaya hai!"); 
-
+        // Isme se Unsafe Header hata diya gaya hai
         await fetch('https://exp.host/--/api/v2/push/send', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 to: pushToken,
@@ -2387,15 +2378,15 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
                 title: '🛍️ Naya Order Aaya!',
                 body: `${customerName} ne ₹${totalAmount} ka order diya hai. Check BikriPage app!`,
                 priority: 'high',
-                channelId: 'orders', 
+                channelId: 'orders'
             }),
         });
         console.log("Push notification sent to shop!");
     } catch (error) {
         console.error("Notification fail:", error);
-        alert("⚠️ Error: Signal bhejne me dikkat aayi! Internet check karein.");
     }
 }
+
 
            async function checkoutCartInApp() {
     let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];

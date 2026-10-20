@@ -21,7 +21,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.bikripage.shopalert"
+      "package": "com.bikripage.shopalert",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./favicon.png"

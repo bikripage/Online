@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Linking, Alert, TextInput, ActivityIndicator, Platform } from 'react-native';
 import * as Speech from 'expo-speech';
 import * as Notifications from 'expo-notifications';
@@ -30,7 +30,7 @@ Notifications.setNotificationHandler({
   }),
 });
 
-// 👉 Push Token Generate Karne Ka Setup
+// 👉 Push Token & Custom Root Sound Setup
 async function registerForPushNotificationsAsync() {
   let token;
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -46,7 +46,6 @@ async function registerForPushNotificationsAsync() {
     return null;
   }
 
-  // 👉 YAHAN CHANGE KIYA HAI: Project ID fix kar diya gaya hai APK ke liye
   try {
     token = (await Notifications.getExpoPushTokenAsync({
       projectId: 'f04fd7db-de71-48be-b31a-2e244b307168'
@@ -61,7 +60,8 @@ async function registerForPushNotificationsAsync() {
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#FF231F7C',
-      sound: 'default',
+      // ✨ YAHAN CUSTOM SOUND SET KI HAI ✨
+      sound: 'voice_alert.wav', 
     });
   }
 
@@ -70,7 +70,6 @@ async function registerForPushNotificationsAsync() {
 
 export default function App() {
   const [orders, setOrders] = useState([]);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
   
   const [currentShopId, setCurrentShopId] = useState(null);
   const [currentShopName, setCurrentShopName] = useState(''); 
@@ -81,14 +80,32 @@ export default function App() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isCheckingLogin, setIsCheckingLogin] = useState(true);
 
+  // ✨ LANGUAGE STATE ✨
+  const [speechLang, setSpeechLang] = useState('hi-IN');
+  const langRef = useRef(speechLang);
+
+  useEffect(() => {
+    langRef.current = speechLang;
+  }, [speechLang]);
+
   useEffect(() => {
     const checkSavedCredentials = async () => {
       try {
         const savedId = await AsyncStorage.getItem('shopId');
         const savedName = await AsyncStorage.getItem('shopName');
+        const savedLang = await AsyncStorage.getItem('speechLang');
+        
+        if (savedLang) setSpeechLang(savedLang);
+        
         if (savedId) {
           setCurrentShopId(savedId);
           setCurrentShopName(savedName || 'My Shop');
+          
+          // Auto-update token on open
+          const pushToken = await registerForPushNotificationsAsync();
+          if (pushToken) {
+            db.collection('shops').doc(savedId).set({ expoPushToken: pushToken }, { merge: true });
+          }
         }
       } catch (e) {
         console.log('Error reading credentials', e);
@@ -137,7 +154,6 @@ export default function App() {
           );
         }
       } catch (tokenError) {
-        Alert.alert('Notification Setup Failed', 'Push Token nahi ban paya. Error: ' + tokenError.message);
         console.log("Token Error:", tokenError);
       }
       
@@ -148,7 +164,6 @@ export default function App() {
 
     } catch (e) {
       Alert.alert('Asli Error 👇', e.message || 'Kuch galat ho gaya');
-      console.log("Login Error:", e);
     }
     setIsLoggingIn(false);
   };
@@ -167,8 +182,19 @@ export default function App() {
     }
   };
 
+  // ✨ LANGUAGE TOGGLE FUNCTION ✨
+  const toggleLanguage = async () => {
+    const newLang = speechLang === 'hi-IN' ? 'en-US' : 'hi-IN';
+    setSpeechLang(newLang);
+    await AsyncStorage.setItem('speechLang', newLang);
+    
+    Speech.speak(newLang === 'hi-IN' ? "हिंदी भाषा सेट हो गई है" : "English language selected", { language: newLang });
+  };
+
   useEffect(() => {
     if (!currentShopId) return;
+
+    let isFirstFetch = true;
 
     const setupAudio = async () => {
       try {
@@ -199,46 +225,55 @@ export default function App() {
       .onSnapshot((snapshot) => {
         let liveOrders = [];
 
-        snapshot.docChanges().forEach((change) => {
-          if (change.type === 'added' && !isInitialLoad) {
-            const newOrder = change.doc.data();
-
-            if (newOrder.status === 'pending') {
-              const customerName = newOrder.customerName || 'Customer';
-              const amount = newOrder.totalAmount || 0;
-              const msg = `${customerName} ne ${amount} rupaye ka naya order bheja hai.`;
-
-              Speech.speak(msg, {
-                language: 'hi-IN',
-                pitch: 1.1,
-                rate: 0.9,
-              });
-
-              Notifications.scheduleNotificationAsync({
-                content: {
-                  title: "New Order Received!",
-                  body: `${customerName} just placed an order. Check the website.`,
-                  sound: 'default',
-                },
-                trigger: null,
-              });
+        if (isFirstFetch) {
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.status === 'pending') {
+              liveOrders.push({ id: doc.id, ...data });
             }
-          }
-        });
+          });
+          setOrders(liveOrders);
+          isFirstFetch = false; 
 
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.status === 'pending') {
-            liveOrders.push({ id: doc.id, ...data });
-          }
-        });
+        } else {
+          snapshot.docChanges().forEach((change) => {
+            if (change.type === 'added') {
+              const newOrder = change.doc.data();
 
-        setOrders(liveOrders);
-        setTimeout(() => setIsInitialLoad(false), 2000);
+              if (newOrder.status === 'pending') {
+                const customerName = newOrder.customerName || 'Customer';
+                const amount = newOrder.totalAmount || 0;
+                
+                let msg = "";
+                if (langRef.current === 'hi-IN') {
+                  msg = `${customerName} ने ${amount} रुपये का नया आर्डर भेजा है।`;
+                } else {
+                  msg = `New order received from ${customerName} for ${amount} rupees.`;
+                }
+
+                Speech.stop(); 
+                Speech.speak(msg, {
+                  language: langRef.current,
+                  pitch: 1.1,
+                  rate: 0.9,
+                });
+              }
+            }
+          });
+
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.status === 'pending') {
+              liveOrders.push({ id: doc.id, ...data });
+            }
+          });
+
+          setOrders(liveOrders);
+        }
       });
 
     return () => unsubscribe();
-  }, [currentShopId, isInitialLoad]);
+  }, [currentShopId]);
 
   const openWebsiteDashboard = () => {
     const url = `https://bikripage.github.io/Online/dashboard.html?shop=${currentShopId}`;
@@ -319,9 +354,15 @@ export default function App() {
           <Text style={styles.headerTitle}>BikriPage Alert</Text>
           <Text style={styles.shopNameText}>{currentShopName}</Text> 
         </View>
-        <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
+        
+        <View style={styles.headerRightControls}>
+          <TouchableOpacity onPress={toggleLanguage} style={styles.langBtn}>
+            <Text style={styles.langText}>{speechLang === 'hi-IN' ? 'A🗣️ Hindi' : 'A🗣️ Eng'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <FlatList
@@ -354,6 +395,9 @@ const styles = StyleSheet.create({
   header: { backgroundColor: '#111827', padding: 20, paddingTop: 50, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   headerTitle: { color: 'white', fontSize: 18, fontWeight: 'bold' },
   shopNameText: { color: '#10B981', fontSize: 14, fontWeight: 'bold', marginTop: 4, textTransform: 'uppercase' },
+  headerRightControls: { flexDirection: 'row', alignItems: 'center' },
+  langBtn: { backgroundColor: '#F59E0B', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 5, marginRight: 10 },
+  langText: { color: 'white', fontWeight: 'bold', fontSize: 12 },
   logoutBtn: { backgroundColor: '#EF4444', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 5 },
   logoutText: { color: 'white', fontWeight: 'bold', fontSize: 12 },
   card: { backgroundColor: 'white', padding: 15, borderRadius: 15, marginBottom: 15, shadowColor: '#000', shadowOffset: {width: 0, height: 2}, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3, borderLeftWidth: 5, borderLeftColor: '#2563EB' },

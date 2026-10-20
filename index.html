@@ -2435,7 +2435,8 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
             });
 
             // ✨ NAYA LOGIC: Order place hote hi Notification function call hoga ✨
-            sendAlertToShop(targetShopId, custName, orderData.total);
+         await sendAlertToShop(targetShopId, custName, orderData.total);
+
         }
 
         localStorage.setItem(getCartKey(), JSON.stringify([]));
@@ -2605,7 +2606,8 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
         });
 
         // ✨ NAYA LOGIC: Direct order place hote hi Notification function call hoga ✨
-        sendAlertToShop(currentOrder.shopId, custName, total);
+      await sendAlertToShop(currentOrder.shopId, custName, total);
+
 
         closeOrderModal();
         showOrderSuccessModal(); 

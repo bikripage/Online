@@ -34,6 +34,14 @@
     },
     "cli": {
       "appVersionSource": "remote"
-    }
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "sounds": ["./voice_alert.wav"]
+        }
+      ]
+    ]
   }
 }

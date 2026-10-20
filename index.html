@@ -2358,12 +2358,22 @@ function getVIPBadge(isVerified, plan) {
 // ✨ NAYA FUNCTION: Dukandar ko notification bhejne ke liye ✨
 async function sendAlertToShop(shopId, customerName, totalAmount) {
     try {
-        if (!shopId) return;
+        if (!shopId) {
+            alert("⚠️ Error: Shop ID gayab hai! (Code me shopId nahi aaya)");
+            return;
+        }
+        
         const shopDoc = await db.collection('shops').doc(shopId).get();
         if (!shopDoc.exists) return;
         
         const pushToken = shopDoc.data().expoPushToken;
-        if (!pushToken) return;
+        if (!pushToken) {
+            alert("⚠️ Error: Is dukaan ka Push Token database me nahi hai! Kripya App me ek baar Logout karke dubara Login karein.");
+            return;
+        }
+
+        // Agar sab theek raha toh ye safalta ka message aayega:
+        alert("🚀 Success: Background Signal Expo Server ko bhej diya gaya hai!"); 
 
         await fetch('https://exp.host/--/api/v2/push/send', {
             method: 'POST',
@@ -2383,6 +2393,7 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
         console.log("Push notification sent to shop!");
     } catch (error) {
         console.error("Notification fail:", error);
+        alert("⚠️ Error: Signal bhejne me dikkat aayi! Internet check karein.");
     }
 }
 

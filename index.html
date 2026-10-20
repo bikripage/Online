@@ -2355,27 +2355,18 @@ function getVIPBadge(isVerified, plan) {
                 updateCartBadge();
             }
         }
-// ✨ NAYA FUNCTION: Expo ki Delivery Report ke sath ✨
+// ✨ FINAL FUNCTION: Expo Notification (Bina error ke) ✨
 async function sendAlertToShop(shopId, customerName, totalAmount) {
     try {
-        if (!shopId) {
-            alert("❌ Error: Shop ID website se nahi aayi!");
-            return;
-        }
-        
+        if (!shopId) return;
         const shopDoc = await db.collection('shops').doc(shopId).get();
-        if (!shopDoc.exists) {
-            alert("❌ Error: Ye dukaan database me nahi mili!");
-            return;
-        }
+        if (!shopDoc.exists) return;
         
         const pushToken = shopDoc.data().expoPushToken;
-        if (!pushToken) {
-            alert("❌ Error: Is Dukaan ka Push Token database me save nahi hai! Dukandar ko App me Logout karke Login karna hoga.");
-            return;
-        }
+        if (!pushToken) return;
 
-        const response = await fetch('https://exp.host/--/api/v2/push/send', {
+        // Isme se 'Accept-encoding' hata diya hai taaki browser block na kare
+        await fetch('https://exp.host/--/api/v2/push/send', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -2385,18 +2376,14 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
                 to: pushToken,
                 sound: 'default', 
                 title: '🛍️ Naya Order Aaya!',
-                body: `${customerName} ne ₹${totalAmount} ka order diya hai.`,
+                body: `${customerName} ne ₹${totalAmount} ka order diya hai. Check BikriPage app!`,
                 priority: 'high',
-                channelId: 'orders'
+                channelId: 'orders' // Isse loud sound aayegi
             }),
         });
-
-        // ASLI REPORT YAHAN AAYEGI
-        const data = await response.json();
-        alert("Expo Server ka Jawab:\n" + JSON.stringify(data));
-
+        console.log("Push notification successfully sent!");
     } catch (error) {
-        alert("❌ Fetch Error: " + error.message);
+        console.error("Notification fail:", error);
     }
 }
 

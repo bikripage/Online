@@ -46,8 +46,14 @@ async function registerForPushNotificationsAsync() {
     return null;
   }
 
-  // Yahan try block add kiya hai taaki token crash ho toh handle ho jaye
-  token = (await Notifications.getExpoPushTokenAsync()).data;
+  // 👉 YAHAN CHANGE KIYA HAI: Project ID fix kar diya gaya hai APK ke liye
+  try {
+    token = (await Notifications.getExpoPushTokenAsync({
+      projectId: 'f04fd7db-de71-48be-b31a-2e244b307168'
+    })).data;
+  } catch (e) {
+    console.log("Push token error:", e);
+  }
 
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('orders', {
@@ -122,7 +128,6 @@ export default function App() {
       await AsyncStorage.setItem('shopId', shopId);
       await AsyncStorage.setItem('shopName', fetchedShopName);
       
-      // 👉 Push notification ko alag try-catch me daala hai taaki login bypass ho sake
       try {
         const pushToken = await registerForPushNotificationsAsync();
         if (pushToken) {
@@ -142,7 +147,6 @@ export default function App() {
       Alert.alert('Login Successful! ✅', `Welcome, ${fetchedShopName}`);
 
     } catch (e) {
-      // 👉 Ab "Internet Check Karein" ki jagah yahan asli error aayega!
       Alert.alert('Asli Error 👇', e.message || 'Kuch galat ho gaya');
       console.log("Login Error:", e);
     }

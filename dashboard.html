@@ -10432,10 +10432,10 @@ async function deleteLiveOrder(orderId) {
             }
         };
 
-/* =====================================================
-   BIKRIPAGE SHIPPING LABEL — A4 / 4 SLIPS PER PAGE
-   Single order + batch printing
-===================================================== */
+/* =========================================================
+   BIKRIPAGE PROFESSIONAL SHIPPING LABEL
+   A4 PORTRAIT | 4 LABELS PER PAGE | CLEAN PACK SECTION
+========================================================= */
 
 const BP_LABEL = {
     margin: 5,
@@ -10445,6 +10445,7 @@ const BP_LABEL = {
     qrMM: 28
 };
 
+// Escape customer/shop data before inserting into HTML
 function bpEscape(value) {
     return String(value ?? "")
         .replace(/&/g, "&amp;")
@@ -10454,14 +10455,18 @@ function bpEscape(value) {
         .replace(/'/g, "&#39;");
 }
 
+// Google Maps destination URL
 function bpMapURL(order) {
     const lat = Number(order.lat);
     const lng = Number(order.lng);
 
     if (
-        order.lat !== "" && order.lat != null &&
-        order.lng !== "" && order.lng != null &&
-        Number.isFinite(lat) && Number.isFinite(lng) &&
+        order.lat !== "" &&
+        order.lat != null &&
+        order.lng !== "" &&
+        order.lng != null &&
+        Number.isFinite(lat) &&
+        Number.isFinite(lng) &&
         lat >= -90 && lat <= 90 &&
         lng >= -180 && lng <= 180
     ) {
@@ -10477,13 +10482,14 @@ function bpMapURL(order) {
         : "";
 }
 
+// Create/reuse hidden print iframe
 function bpGetFrame() {
     let frame = document.getElementById("print-iframe");
 
     if (!frame) {
         frame = document.createElement("iframe");
         frame.id = "print-iframe";
-        frame.title = "Shipping labels";
+        frame.title = "BikriPage Shipping Labels";
 
         Object.assign(frame.style, {
             position: "fixed",
@@ -10500,14 +10506,19 @@ function bpGetFrame() {
     return frame;
 }
 
+// Generate one shipping label
 function bpLabelHTML(order, shopName, shopPhone) {
     const id = String(order.id ?? "");
     const shortId = id.substring(0, 8).toUpperCase();
 
     const amount = Number(order.totalAmount);
     const amountText = Number.isFinite(amount)
-        ? amount.toLocaleString("en-IN", { maximumFractionDigits: 2 })
+        ? amount.toLocaleString("en-IN", {
+            maximumFractionDigits: 2
+        })
         : String(order.totalAmount ?? "0");
+
+    const mapURL = bpMapURL(order);
 
     const items = Array.isArray(order.items) && order.items.length
         ? order.items.map(item => `
@@ -10518,10 +10529,9 @@ function bpLabelHTML(order, shopName, shopPhone) {
         `).join("")
         : '<span class="item">No items found</span>';
 
-    const mapURL = bpMapURL(order);
-
     return `
         <section class="label">
+
             <header class="header">
                 <div class="brand">BIKRIPAGE</div>
                 <div class="heading">SHIPPING LABEL</div>
@@ -10529,37 +10539,59 @@ function bpLabelHTML(order, shopName, shopPhone) {
             </header>
 
             <div class="content">
+
                 <div class="customer">
                     <div class="caption">DELIVER TO</div>
+
                     <div class="name">
                         ${bpEscape(order.customerName || "CUSTOMER")}
                     </div>
+
                     <div class="address">
-                        ${bpEscape(order.customerAddress || "Address not provided")}
+                        ${bpEscape(
+                            order.customerAddress || "Address not provided"
+                        )}
                     </div>
+
                     <div class="phone">
                         <span class="caption">PHONE</span>
-                        ${bpEscape(order.customerPhone || "Not provided")}
+                        <span>${bpEscape(
+                            order.customerPhone || "Not provided"
+                        )}</span>
                     </div>
                 </div>
 
                 <div class="right">
+
                     <div class="qr-panel">
-                        <div class="qr" data-url="${bpEscape(mapURL)}"></div>
+                        <div
+                            class="qr"
+                            data-url="${bpEscape(mapURL)}"
+                        ></div>
+
                         <div class="qr-caption">
-                            ${mapURL ? "SCAN FOR DIRECTIONS" : "ADDRESS UNAVAILABLE"}
+                            ${mapURL
+                                ? "SCAN FOR DIRECTIONS"
+                                : "ADDRESS UNAVAILABLE"}
                         </div>
                     </div>
 
                     <div class="cod">
-                        <div class="cod-title">COLLECT AMOUNT (COD)</div>
-                        <div class="amount">₹${bpEscape(amountText)}</div>
+                        <div class="cod-title">
+                            COLLECT AMOUNT (COD)
+                        </div>
+
+                        <div class="amount">
+                            ₹${bpEscape(amountText)}
+                        </div>
                     </div>
+
                 </div>
             </div>
 
+            <!-- PACK SECTION: no crossing line -->
             <div class="products">
-                <div class="pack-title">PACK</div>
+                <div class="pack-title">PACK:</div>
                 <div class="items">${items}</div>
             </div>
 
@@ -10569,10 +10601,12 @@ function bpLabelHTML(order, shopName, shopPhone) {
                 <span>Phone: ${bpEscape(shopPhone || "—")}</span>
                 <span>Date: ${new Date().toLocaleDateString("en-IN")}</span>
             </footer>
+
         </section>
     `;
 }
 
+// Complete print stylesheet
 function bpPrintCSS() {
     return `
         @page {
@@ -10595,13 +10629,16 @@ function bpPrintCSS() {
             background: #fff;
         }
 
+        /* Four full-width labels on every A4 page */
         .sheet {
             width: 100%;
             height: 287mm;
+
             display: grid;
             grid-template-columns: minmax(0, 1fr);
             grid-template-rows: repeat(4, 70mm);
             gap: 2mm;
+
             overflow: hidden;
             break-after: page;
             page-break-after: always;
@@ -10617,22 +10654,28 @@ function bpPrintCSS() {
             height: 70mm;
             min-width: 0;
             overflow: hidden;
+
             border: 1.2pt solid #111;
             border-radius: 2mm;
             padding: 2.5mm 4mm;
+
             display: flex;
             flex-direction: column;
             background: #fff;
+
             break-inside: avoid;
             page-break-inside: avoid;
         }
 
+        /* Header */
         .header {
             flex: 0 0 7mm;
+
             display: grid;
             grid-template-columns: 1fr 2fr 1fr;
             align-items: center;
             gap: 2mm;
+
             border-bottom: 1pt solid #111;
             padding-bottom: 1.5mm;
         }
@@ -10656,10 +10699,12 @@ function bpPrintCSS() {
             overflow-wrap: anywhere;
         }
 
+        /* Customer and QR layout */
         .content {
             display: grid;
             grid-template-columns: minmax(0, 1fr) 39mm;
             gap: 3mm;
+
             flex: 1;
             min-height: 0;
             padding: 2mm 0;
@@ -10667,9 +10712,11 @@ function bpPrintCSS() {
 
         .customer {
             min-width: 0;
+
             display: flex;
             flex-direction: column;
             justify-content: center;
+
             padding-right: 3mm;
             border-right: 1pt dashed #555;
         }
@@ -10700,6 +10747,7 @@ function bpPrintCSS() {
             align-items: baseline;
             flex-wrap: wrap;
             gap: 2mm;
+
             margin-top: 2mm;
             font-size: 11pt;
             line-height: 1.15;
@@ -10707,8 +10755,10 @@ function bpPrintCSS() {
             overflow-wrap: anywhere;
         }
 
+        /* QR and COD */
         .right {
             min-width: 0;
+
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -10718,11 +10768,13 @@ function bpPrintCSS() {
         .qr-panel {
             height: 36mm;
             flex: 0 0 36mm;
+
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             gap: .5mm;
+
             border: 1pt solid #222;
             border-radius: 1.5mm;
             background: #fff;
@@ -10732,6 +10784,7 @@ function bpPrintCSS() {
             width: 28mm;
             height: 28mm;
             flex: 0 0 28mm;
+
             display: flex;
             align-items: center;
             justify-content: center;
@@ -10757,6 +10810,7 @@ function bpPrintCSS() {
         .cod {
             border: 1.3pt solid #111;
             border-radius: 1.5mm;
+
             text-align: center;
             padding: 1mm;
             background: #f2f2f2;
@@ -10775,16 +10829,20 @@ function bpPrintCSS() {
             overflow-wrap: anywhere;
         }
 
+        /* PACK: no horizontal line through product names */
         .products {
-            flex: 0 0 9mm;
-            min-height: 9mm;
-            max-height: 9mm;
-            overflow: hidden;
+            flex: 0 0 10mm;
+            min-height: 10mm;
+            max-height: 10mm;
+
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 3mm;
-            border-top: 1pt solid #111;
-            padding-top: 1.5mm;
+
+            overflow: hidden;
+            border: none;
+            padding: 1.5mm 0;
+            margin: 0;
         }
 
         .pack-title {
@@ -10796,33 +10854,43 @@ function bpPrintCSS() {
 
         .items {
             min-width: 0;
+            flex: 1;
+
             display: flex;
             flex-wrap: wrap;
+            align-items: center;
             gap: 1mm;
+
             overflow: hidden;
         }
 
         .item {
             display: inline-block;
             max-width: 100%;
+
             padding: .7mm 1.5mm;
             border: .7pt solid #555;
             border-radius: 1mm;
+
             font-size: 8pt;
             line-height: 1.15;
             font-weight: 600;
             overflow-wrap: anywhere;
         }
 
+        /* Footer separator stays below PACK */
         .footer {
             flex: 0 0 auto;
+
             display: flex;
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 1mm 2mm;
+
             border-top: .6pt solid #aaa;
             margin-top: 1mm;
             padding-top: 1mm;
+
             font-size: 6.5pt;
             line-height: 1.1;
             font-weight: 700;
@@ -10834,8 +10902,13 @@ function bpPrintCSS() {
         }
 
         @media screen {
-            body { padding: 0; }
-            .sheet { margin-bottom: 5mm; }
+            body {
+                padding: 0;
+            }
+
+            .sheet {
+                margin-bottom: 5mm;
+            }
         }
 
         @media print {
@@ -10843,13 +10916,18 @@ function bpPrintCSS() {
                 margin: 0 !important;
                 padding: 0 !important;
             }
-            .sheet { margin: 0 !important; }
+
+            .sheet {
+                margin: 0 !important;
+            }
         }
     `;
 }
 
+// Prepare QR codes before opening print dialog
 function bpRunPrint(frame, html) {
     const doc = frame.contentWindow.document;
+
     doc.open();
     doc.write(html);
     doc.close();
@@ -10863,7 +10941,8 @@ function bpRunPrint(frame, html) {
         const win = frame.contentWindow;
         const printDoc = frame.contentDocument;
 
-        if (!win || !printDoc || !printDoc.querySelector(".label")) {
+        if (!win || !printDoc ||
+            !printDoc.querySelector(".label")) {
             return;
         }
 
@@ -10871,7 +10950,9 @@ function bpRunPrint(frame, html) {
             if (++attempts < 40) {
                 setTimeout(prepare, 250);
             } else {
-                alert("QR library load nahi hui. Internet check karke dobara try karo.");
+                alert(
+                    "QR library load nahi hui. Internet check karke dobara try karo."
+                );
             }
             return;
         }
@@ -10881,7 +10962,8 @@ function bpRunPrint(frame, html) {
             el.replaceChildren();
 
             if (!url) {
-                el.innerHTML = '<div class="qr-error">Address unavailable</div>';
+                el.innerHTML =
+                    '<div class="qr-error">Address unavailable</div>';
                 return;
             }
 
@@ -10894,45 +10976,45 @@ function bpRunPrint(frame, html) {
                     colorLight: "#ffffff",
                     correctLevel: win.QRCode.CorrectLevel.H
                 });
-            } catch (e) {
-                el.innerHTML = '<div class="qr-error">QR failed</div>';
+            } catch (error) {
+                el.innerHTML =
+                    '<div class="qr-error">QR failed</div>';
             }
         });
 
         printed = true;
 
-        // Allow the QR canvases and fonts to render before printing.
+        // Let QR canvases render before printing
         setTimeout(() => {
             win.focus();
             win.print();
         }, 700);
     }
 
-    const script = doc.querySelector("#bp-qr-library");
-
-    if (script) {
-        script.addEventListener("error", () => {
-            alert("QR library load nahi hui. Internet check karo.");
-        }, { once: true });
-    }
-
     setTimeout(prepare, 100);
 }
 
+// Print one or multiple orders
 function bpPrintOrders(orders) {
     if (!Array.isArray(orders) || !orders.length) {
         alert("Print karne ke liye koi order nahi mila.");
         return;
     }
 
-    const shopName = globalShopData?.shopName || "BikriPage Store";
-    const shopPhone = globalShopData?.phone || "";
+    const shopName =
+        globalShopData?.shopName || "BikriPage Store";
+
+    const shopPhone =
+        globalShopData?.phone || "";
+
     const sheets = [];
 
-    // Four full-width slips on each A4 page.
     for (let i = 0; i < orders.length; i += 4) {
-        const labels = orders.slice(i, i + 4)
-            .map(order => bpLabelHTML(order, shopName, shopPhone))
+        const labels = orders
+            .slice(i, i + 4)
+            .map(order =>
+                bpLabelHTML(order, shopName, shopPhone)
+            )
             .join("");
 
         sheets.push(`<div class="sheet">${labels}</div>`);
@@ -10943,12 +11025,18 @@ function bpPrintOrders(orders) {
         <html>
         <head>
             <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1"
+            >
+
             <title>BikriPage Shipping Labels</title>
+
             <script
                 id="bp-qr-library"
                 src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
             ><\/script>
+
             <style>${bpPrintCSS()}</style>
         </head>
         <body>${sheets.join("")}</body>
@@ -10958,10 +11046,13 @@ function bpPrintOrders(orders) {
     bpRunPrint(bpGetFrame(), html);
 }
 
-// PRINT ONE ORDER
+// PRINT SINGLE ORDER
 function generateShippingSlip(orderId) {
     const orders = window.globalLiveOrders || [];
-    const order = orders.find(o => String(o.id) === String(orderId));
+
+    const order = orders.find(
+        o => String(o.id) === String(orderId)
+    );
 
     if (!order) {
         alert("Order details not found!");
@@ -10978,15 +11069,20 @@ function printAllAcceptedSlips() {
 
     if (!orders.length) {
         if (typeof iosAlert === "function") {
-            iosAlert("No Accepted Orders", "Koi accepted order nahi mila.");
+            iosAlert(
+                "No Accepted Orders",
+                "Koi accepted order nahi mila."
+            );
         } else {
             alert("Koi accepted order nahi mila.");
         }
+
         return;
     }
 
     bpPrintOrders(orders);
 }
+
 
 // =======================================================
 // ✨ NAYA: OUT FOR DELIVERY WHATSAPP MESSAGE ✨

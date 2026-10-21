@@ -4159,6 +4159,8 @@ function trackSearchImpression(shopIdToTrack) {
 
             document.getElementById('detail-order-btn').innerHTML = isService ? `Book Now <i class="fas fa-bolt text-yellow-300"></i>` : `Order Now <i class="fas fa-bolt text-yellow-300"></i>`;
             
+           
+            document.getElementById('detail-order-btn').onclick = () => openOrderModal(name, price, shopName, shopPhone, shopId);
 
             if(typeof loadStoreSimilarProducts === 'function') loadStoreSimilarProducts(shopId, encodeURIComponent(shopName), shopPhone, isService);
             if(typeof fetchProductReviews === 'function') fetchProductReviews(name, shopPhone);

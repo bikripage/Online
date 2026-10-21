@@ -10432,7 +10432,7 @@ async function deleteLiveOrder(orderId) {
             }
         };
 // =======================================================
-// ✨ NAYA: SINGLE PRINT (ChatGPT ANALYSIS FIXED - OFFSCREEN IFRAME) ✨
+// ✨ 1. SINGLE ORDER SLIP (EXACT A4 PAPER & BIG QR FIX) ✨
 // =======================================================
 function generateShippingSlip(orderId) {
     let order = window.globalLiveOrders.find(o => o.id === orderId);
@@ -10445,19 +10445,17 @@ function generateShippingSlip(orderId) {
         ? `https://www.google.com/maps/dir/?api=1&destination=${order.lat},${order.lng}` 
         : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.customerAddress || '')}`;
 
-    // 🚀 FIX 1: Iframe ab 'display: none' nahi hai. Isko screen ke bahar chupaya hai.
     let iframe = document.getElementById('print-iframe');
     if (!iframe) {
         iframe = document.createElement('iframe');
         iframe.id = 'print-iframe';
         document.body.appendChild(iframe);
     }
-    // Iframe ko measurable dimensions do, par user ko dikhne mat do
-    iframe.style.position = 'absolute';
-    iframe.style.top = '-10000px';
-    iframe.style.left = '-10000px';
-    iframe.style.width = '100vw';
-    iframe.style.height = '100vh';
+    iframe.style.position = 'fixed';
+    iframe.style.top = '-9999px';
+    iframe.style.left = '-9999px';
+    iframe.style.width = '210mm'; // Exact A4 Width
+    iframe.style.height = '297mm'; // Exact A4 Height
     iframe.style.border = 'none';
 
     let htmlContent = `
@@ -10468,93 +10466,82 @@ function generateShippingSlip(orderId) {
             <meta charset="UTF-8">
             <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
             <style>
-                /* 🚀 FIX 2: CSS ko scaling aur paper-agnostic (A4/Letter dono ke liye) banaya */
                 * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; color: #000; background: #fff; width: 100%; }
                 
-                @page { size: auto; margin: 5mm; }
+                /* 🔥 STRICT A4 PAGE SETUP 🔥 */
+                @page { size: A4 portrait; margin: 8mm; }
+                body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; color: #000; background: #fff; width: 194mm; }
                 
-                .label-box { width: 100%; border: 3pt solid #000; border-radius: 12pt; padding: 20pt; display: flex; flex-direction: column; margin-bottom: 20pt; page-break-inside: avoid; }
-                .header { text-align: center; border-bottom: 3pt solid #000; padding-bottom: 10pt; margin-bottom: 20pt; font-weight: 900; font-size: 24pt; letter-spacing: 2pt; text-transform: uppercase; }
+                .label-box { width: 100%; border: 4px solid #000; border-radius: 14px; padding: 22px; display: flex; flex-direction: column; page-break-inside: avoid; }
+                .header { text-align: center; border-bottom: 4px solid #000; padding-bottom: 12px; margin-bottom: 20px; font-weight: 900; font-size: 30px; letter-spacing: 2px; text-transform: uppercase; }
                 
-                .row { display: flex; justify-content: space-between; margin-bottom: 20pt; width: 100%; }
+                .main-content { display: flex; justify-content: space-between; margin-bottom: 20px; width: 100%; }
                 
-                .col-left { width: 60%; padding-right: 20pt; border-right: 2pt dashed #ccc; display: flex; flex-direction: column; }
-                .sec-title { font-size: 12pt; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 8pt; }
-                .cust-name { font-size: 26pt; font-weight: 900; margin: 0 0 6pt 0; text-transform: uppercase; line-height: 1.1; }
-                .cust-text { font-size: 14pt; font-weight: bold; margin: 0 0 6pt 0; line-height: 1.4; }
+                .col-left { width: 58%; padding-right: 20px; border-right: 3px dashed #000; display: flex; flex-direction: column; }
+                .sec-title { font-size: 16px; color: #333; text-transform: uppercase; font-weight: 900; margin-bottom: 8px; }
+                .cust-name { font-size: 36px; font-weight: 900; margin: 0 0 10px 0; text-transform: uppercase; line-height: 1.1; }
+                .cust-text { font-size: 20px; font-weight: bold; margin: 0 0 8px 0; line-height: 1.4; }
                 
-                .col-right { width: 40%; padding-left: 20pt; display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; }
-                .qr-box { text-align: center; background: #fafafa; border: 1pt solid #ddd; padding: 5pt; border-radius: 8pt; }
-                .qr-placeholder { display: inline-block; width: 110pt; height: 110pt; }
-                .qr-text { font-size: 10pt; font-weight: 900; margin-top: 5pt; text-transform: uppercase; text-align: center; }
+                .col-right { width: 42%; padding-left: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
                 
-                .seller-sec { margin-top: 15pt; text-align: right; width: 100%; }
+                /* 🔥 QR CODE SCALING FIX 🔥 */
+                .qr-box { text-align: center; background: #fff; border: 2px solid #000; padding: 10px; border-radius: 10px; margin-bottom: 12px; width: 100%; display: flex; flex-direction: column; align-items: center; }
+                .qr-placeholder { width: 155px; height: 155px; display: flex; align-items: center; justify-content: center; }
+                .qr-placeholder img, .qr-placeholder canvas { width: 155px !important; height: 155px !important; display: block !important; }
+                .qr-text { font-size: 13px; font-weight: 900; margin-top: 6px; text-transform: uppercase; text-align: center; }
                 
-                .amount-box { border: 2pt solid #000; border-radius: 12pt; text-align: center; padding: 15pt; background: #f9f9f9; margin-top: 15pt; width: 100%; }
-                .amount-title { font-size: 14pt; font-weight: 900; margin-bottom: 5pt; text-transform: uppercase; letter-spacing: 1pt; }
-                .amount-value { font-size: 40pt; font-weight: 900; margin: 0; line-height: 1; }
-                .cod-text { font-size: 14pt; font-weight: 900; letter-spacing: 2pt; margin-top: 5pt; }
+                .amount-box { border: 4px solid #000; border-radius: 12px; text-align: center; padding: 14px; background: #f2f2f2; width: 100%; margin-top: 10px; }
+                .amount-title { font-size: 15px; font-weight: 900; text-transform: uppercase; }
+                .amount-value { font-size: 46px; font-weight: 900; margin: 4px 0; line-height: 1; }
                 
-                .items-sec { border-top: 2pt solid #f0f0f0; padding-top: 15pt; margin-top: 15pt; }
-                .items-list { font-size: 16pt; font-weight: bold; line-height: 1.6; display: flex; flex-wrap: wrap; gap: 8pt; }
-                .item-tag { background: #f0f0f0; padding: 6pt 10pt; border-radius: 6pt; border: 1pt solid #ccc; display: inline-block; }
+                .items-sec { border-top: 3px solid #000; padding-top: 15px; margin-top: 10px; }
+                .items-list { font-size: 22px; font-weight: 900; display: flex; flex-wrap: wrap; gap: 10px; }
+                .item-tag { background: #eee; padding: 8px 14px; border-radius: 8px; border: 2px solid #000; display: inline-block; }
                 
-                .footer { text-align: center; font-size: 12pt; color: #444; font-weight: bold; margin-top: 20pt; border-top: 2pt solid #000; padding-top: 15pt; }
+                .footer { text-align: center; font-size: 16px; color: #000; font-weight: 900; margin-top: 20px; border-top: 3px solid #000; padding-top: 12px; }
             </style>
         </head>
         <body>
             <div class="label-box">
                 <div class="header">SHIPPING LABEL</div>
-                <div class="row">
+                <div class="main-content">
                     <div class="col-left">
                         <div class="sec-title">Deliver To:</div>
                         <p class="cust-name">${order.customerName}</p>
                         <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
-                        <p class="cust-text" style="font-weight: 900; font-size: 18pt; margin-top: 15pt;">📞 Ph: ${order.customerPhone}</p>
+                        <p class="cust-text" style="font-weight: 900; font-size: 24px; margin-top: 12px;">📞 Ph: ${order.customerPhone}</p>
                     </div>
                     <div class="col-right">
                         <div class="qr-box">
                             <div id="qrcode" class="qr-placeholder"></div>
                             <div class="qr-text">Scan for Direction</div>
                         </div>
-                        <div class="seller-sec">
-                            <div class="sec-title" style="margin-bottom: 4pt;">Sold By:</div>
-                            <p class="cust-text" style="font-weight: 900; font-size: 16pt;">${shopName}</p>
-                            <p class="cust-text" style="font-size: 14pt;">Ph: ${shopPhone}</p>
+                        <div class="amount-box">
+                            <div class="amount-title">Collect Amount (COD)</div>
+                            <p class="amount-value">₹${order.totalAmount}</p>
                         </div>
                     </div>
                 </div>
-                <div class="amount-box">
-                    <div class="amount-title">Collect Amount</div>
-                    <p class="amount-value">₹${order.totalAmount}</p>
-                    <div class="cod-text">(CASH ON DELIVERY)</div>
-                </div>
                 <div class="items-sec">
-                    <div class="sec-title" style="margin-bottom: 10pt;">Products to Pack:</div>
+                    <div class="sec-title">Products to Pack:</div>
                     <div class="items-list">
-                        ${order.items.map(i => `<span class="item-tag"><b>${i.qty}x</b>${i.name}</span>`).join(' ')}
+                        ${order.items.map(i => `<span class="item-tag">${i.qty}x${i.name}</span>`).join(' ')}
                     </div>
                 </div>
-                <div class="footer">Order ID: #${order.id.substring(0,8).toUpperCase()} &nbsp;&nbsp;|&nbsp;&nbsp; Date: ${new Date().toLocaleDateString('en-IN')}</div>
+                <div class="footer">Order ID: #${order.id.substring(0,8).toUpperCase()} &nbsp;|&nbsp; Sold By: ${shopName} (${shopPhone}) &nbsp;|&nbsp; Date: ${new Date().toLocaleDateString('en-IN')}</div>
             </div>
 
             <script>
                 window.onload = function() {
                     new QRCode(document.getElementById("qrcode"), {
                         text: "${mapUrl}",
-                        width: 256, 
-                        height: 256,
+                        width: 155,
+                        height: 155,
                         colorDark : "#000000",
                         colorLight : "#ffffff",
                         correctLevel : QRCode.CorrectLevel.L
                     });
-                    
-                    // 🚀 FIX 3: 1 Full Second ka delay taaki QR HD mein render ho jaye
-                    setTimeout(() => {
-                        window.focus();
-                        window.print();
-                    }, 1000);
+                    setTimeout(() => { window.focus(); window.print(); }, 1000);
                 };
             <\/script>
         </body>
@@ -10562,13 +10549,11 @@ function generateShippingSlip(orderId) {
     `;
 
     let doc = iframe.contentWindow.document;
-    doc.open();
-    doc.write(htmlContent);
-    doc.close();
+    doc.open(); doc.write(htmlContent); doc.close();
 }
 
 // =======================================================
-// ✨ NAYA: BATCH PRINT (ChatGPT ANALYSIS FIXED - OFFSCREEN IFRAME) ✨
+// ✨ 2. BATCH PRINT ALL ACCEPTED ORDERS (EXACT A4 PAPER FIX) ✨
 // =======================================================
 function printAllAcceptedSlips() {
     let acceptedOrders = window.globalLiveOrders.filter(o => o.status === 'accepted');
@@ -10583,18 +10568,17 @@ function printAllAcceptedSlips() {
     let shopPhone = globalShopData.phone || "";
     let shopAddress = globalShopData.address || "Return address not provided";
 
-    // 🚀 FIX 1: Off-screen Iframe
     let iframe = document.getElementById('print-iframe');
     if (!iframe) {
         iframe = document.createElement('iframe');
         iframe.id = 'print-iframe';
         document.body.appendChild(iframe);
     }
-    iframe.style.position = 'absolute';
-    iframe.style.top = '-10000px';
-    iframe.style.left = '-10000px';
-    iframe.style.width = '100vw';
-    iframe.style.height = '100vh';
+    iframe.style.position = 'fixed';
+    iframe.style.top = '-9999px';
+    iframe.style.left = '-9999px';
+    iframe.style.width = '210mm'; // Exact A4 Width
+    iframe.style.height = '297mm'; // Exact A4 Height
     iframe.style.border = 'none';
 
     let allSlipsHtml = acceptedOrders.map((order) => {
@@ -10611,348 +10595,32 @@ function printAllAcceptedSlips() {
                 <div class="header">SHIPPING LABEL</div>
                 
                 <div class="main-content">
+                    <!-- LEFT SIDE: CUSTOMER & RETURN ADDRESS -->
                     <div class="col-left">
                         <div class="sec-title">Deliver To:</div>
                         <p class="cust-name">${order.customerName}</p>
                         <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
-                        <p class="cust-text" style="font-weight: 900; font-size: 18pt; margin-top: 10pt;">📞 Ph: ${order.customerPhone}</p>
+                        <p class="cust-phone">📞 Ph: ${order.customerPhone}</p>
                         
-                        <div class="seller-sec">
-                            <span style="font-size: 12pt; color: #555; text-transform: uppercase; font-weight: 900;">Sold By:</span> 
-                            <span style="font-size: 16pt; font-weight: 900; margin-left: 4pt;">${ownerName}</span>
-                            <span style="font-size: 12pt; color: #444; font-weight: bold; margin-left: 4pt;">(${shopName})</span>
+                        <div class="return-sec">
+                            <div style="font-size: 13px; color: #444; text-transform: uppercase; font-weight: 900; margin-bottom: 3px;">If Undelivered, Return To:</div>
+                            <div style="font-size: 18px; font-weight: 900;">${shopName} (${ownerName})</div>
+                            <div style="font-size: 15px; color: #222; font-weight: bold; line-height: 1.3;">${shopAddress}</div>
+                            <div style="font-size: 16px; font-weight: 900; margin-top: 3px;">Ph: ${shopPhone}</div>
                         </div>
                     </div>
                     
+                    <!-- RIGHT SIDE: BIG QR & BIG COD BOX (STACKED VERTICALLY) -->
                     <div class="col-right">
-                        <div style="display: flex; gap: 10pt; margin-bottom: 10pt; width: 100%;">
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="font-size: 10pt; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 4pt;">If Undelivered, Return To:</div>
-                                <div style="font-size: 14pt; font-weight: 900; margin-bottom: 4pt;">${shopName}</div>
-                                <div style="font-size: 11pt; color: #333; line-height: 1.3; font-weight: bold;">${shopAddress}</div>
-                                <div style="font-size: 12pt; font-weight: 900; margin-top: 6pt;">Ph: ${shopPhone}</div>
-                            </div>
-                            
-                            <div class="qr-box">
-                                <div id="qrcode-${order.id}" class="qr-placeholder" data-url="${mapUrl}"></div>
-                                <div class="qr-text">Scan for Direction</div>
-                            </div>
+                        <div class="qr-box">
+                            <div id="qrcode-${order.id}" class="qr-placeholder" data-url="${mapUrl}"></div>
+                            <div class="qr-text">SCAN FOR DIRECTION</div>
                         </div>
 
                         <div class="amount-box-compact">
                             <div class="amount-lbl">COLLECT AMOUNT</div>
                             <div class="amount-val">₹${order.totalAmount}</div>
-                            <div class="amount-lbl">(COD)</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="items-sec">
-                    <div class="sec-title" style="margin-bottom: 10pt;">Products to Pack:</div>
-                    <div class="items-list">${itemsList}</div>
-                </div>
-
-                <div class="footer">
-                    Order ID: #${order.id.substring(0,8).toUpperCase()} &nbsp;&nbsp;|&nbsp;&nbsp; Date: ${new Date().toLocaleDateString('en-IN')}
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    let htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Batch Print - Accepted Orders</title>
-            <meta charset="UTF-8">
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
-            <style>
-                * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; color: #000; background: #fff; width: 100%; }
-                
-                @page { size: auto; margin: 5mm; }
-                
-                .label-box { width: 100%; border: 3pt solid #000; border-radius: 12pt; padding: 15pt; display: flex; flex-direction: column; margin-bottom: 20pt; page-break-inside: avoid; }
-                .header { text-align: center; border-bottom: 3pt solid #000; padding-bottom: 10pt; margin-bottom: 15pt; font-weight: 900; font-size: 22pt; letter-spacing: 2pt; text-transform: uppercase; }
-                
-                .main-content { display: flex; justify-content: space-between; margin-bottom: 15pt; flex: 1; width: 100%; }
-                .col-left { width: 55%; padding-right: 15pt; border-right: 2pt dashed #ccc; display: flex; flex-direction: column; }
-                .sec-title { font-size: 11pt; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 6pt; }
-                .cust-name { font-size: 24pt; font-weight: 900; margin: 0 0 6pt 0; text-transform: uppercase; line-height: 1.1; }
-                .cust-text { font-size: 13pt; font-weight: bold; margin: 0 0 6pt 0; line-height: 1.4; }
-                .seller-sec { margin-top: auto; padding-top: 15pt; border-top: 2pt dashed #eee; }
-                
-                .col-right { width: 45%; padding-left: 15pt; display: flex; flex-direction: column; flex-shrink: 0; }
-                
-                .qr-box { text-align: center; width: 100pt; flex-shrink: 0; }
-                .qr-placeholder { display: inline-block; width: 100pt; height: 100pt; background: #fafafa; border: 1pt solid #ddd; padding: 4pt; border-radius: 6pt; }
-                .qr-text { font-size: 9pt; font-weight: 900; margin-top: 4pt; text-transform: uppercase; text-align: center; }
-                
-                .amount-box-compact { border: 2pt solid #000; border-radius: 10pt; text-align: center; padding: 10pt; background: #f9f9f9; width: 100%; margin-top: auto;}
-                .amount-lbl { font-size: 12pt; font-weight: 900; text-transform: uppercase; letter-spacing: 1pt; }
-                .amount-val { font-size: 36pt; font-weight: 900; margin: 4pt 0; line-height: 1; }
-                
-                .items-sec { border-top: 2pt solid #f0f0f0; padding-top: 15pt; margin-bottom: 10pt; }
-                .items-list { font-size: 14pt; font-weight: bold; line-height: 1.6; display: flex; flex-wrap: wrap; gap: 6pt; }
-                .item-tag { background: #f0f0f0; padding: 6pt 10pt; border-radius: 6pt; border: 1pt solid #ccc; display: inline-block; }
-                
-                .footer { text-align: center; font-size: 11pt; color: #444; font-weight: bold; margin-top: 15pt; border-top: 2pt solid #000; padding-top: 10pt; }
-            </style>
-        </head>
-        <body>
-            ${allSlipsHtml}
-            <script>
-                window.onload = function() {
-                    let qrElements = document.querySelectorAll('.qr-placeholder');
-                    qrElements.forEach(el => {
-                        let url = el.getAttribute('data-url');
-                        new QRCode(el, {
-                            text: url,
-                            width: 256, 
-                            height: 256,
-                            colorDark : "#000000",
-                            colorLight : "#ffffff",
-                            correctLevel : QRCode.CorrectLevel.L
-                        });
-                    });
-                    
-                    // 🚀 FIX 3: Wait for all canvases to draw before printing
-                    setTimeout(() => {
-                        window.focus();
-                        window.print();
-                    }, 1200);
-                };
-            <\/script>
-        </body>
-        </html>
-    `;
-
-    let doc = iframe.contentWindow.document;
-    doc.open(); doc.write(htmlContent); doc.close();
-}
-
-// =======================================================
-// ✨ NAYA: BATCH PRINT ALL ACCEPTED ORDERS (FIXED PAPER SIZE) ✨
-// =======================================================
-function printAllAcceptedSlips() {
-    let acceptedOrders = window.globalLiveOrders.filter(o => o.status === 'accepted');
-
-    if (acceptedOrders.length === 0) {
-        iosAlert("No Accepted Orders", "Abhi koi bhi order 'Accepted' status mein nahi hai print karne ke liye.");
-        return;
-    }
-
-    let shopName = globalShopData.shopName || "Store Name";
-    let ownerName = globalShopData.ownerName || "Shopkeeper";
-    let shopPhone = globalShopData.phone || "";
-    let shopAddress = globalShopData.address || "Return address not provided";
-
-    let iframe = document.getElementById('print-iframe');
-    if (!iframe) {
-        iframe = document.createElement('iframe');
-        iframe.id = 'print-iframe';
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-    }
-
-    let allSlipsHtml = acceptedOrders.map((order) => {
-        let mapUrl = (order.lat && order.lng) 
-            ? `https://www.google.com/maps/dir/?api=1&destination=${order.lat},${order.lng}` 
-            : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.customerAddress || '')}`;
-
-        let itemsList = (order.items && order.items.length > 0) 
-            ? order.items.map(i => `<span class="item-tag"><b>${i.qty}x</b> ${i.name}</span>`).join(' ') 
-            : '<span class="item-tag">No items found</span>';
-
-        return `
-            <div class="label-box">
-                <div class="header">SHIPPING LABEL</div>
-                
-                <div class="main-content">
-                    <div class="col-left">
-                        <div class="sec-title">Deliver To:</div>
-                        <p class="cust-name">${order.customerName}</p>
-                        <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
-                        <p class="cust-text" style="font-weight: 900; font-size: 20pt; margin-top: 3mm;">📞 Ph: ${order.customerPhone}</p>
-                        
-                        <div class="seller-sec">
-                            <span style="font-size: 12pt; color: #555; text-transform: uppercase; font-weight: 900;">Sold By:</span> 
-                            <span style="font-size: 16pt; font-weight: 900; margin-left: 1mm;">${ownerName}</span>
-                            <span style="font-size: 12pt; color: #444; font-weight: bold; margin-left: 1mm;">(${shopName})</span>
-                        </div>
-                    </div>
-                    
-                    <div class="col-right">
-                        <div style="display: flex; gap: 3mm; margin-bottom: 3mm; width: 100%;">
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="font-size: 10pt; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 1mm;">If Undelivered, Return To:</div>
-                                <div style="font-size: 14pt; font-weight: 900; margin-bottom: 1mm;">${shopName}</div>
-                                <div style="font-size: 11pt; color: #333; line-height: 1.3; font-weight: bold;">${shopAddress}</div>
-                                <div style="font-size: 12pt; font-weight: 900; margin-top: 2mm;">Ph: ${shopPhone}</div>
-                            </div>
-                            
-                            <div class="qr-box">
-                                <div id="qrcode-${order.id}" class="qr-placeholder" data-url="${mapUrl}"></div>
-                                <div class="qr-text">Scan for Direction</div>
-                            </div>
-                        </div>
-
-                        <div class="amount-box-compact">
-                            <div class="amount-lbl">COLLECT AMOUNT</div>
-                            <div class="amount-val">₹${order.totalAmount}</div>
-                            <div class="amount-lbl">(COD)</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="items-sec">
-                    <div class="sec-title" style="margin-bottom: 2mm;">Products to Pack:</div>
-                    <div class="items-list">${itemsList}</div>
-                </div>
-
-                <div class="footer">
-                    Order ID: #${order.id.substring(0,8).toUpperCase()} &nbsp;&nbsp;|&nbsp;&nbsp; Date: ${new Date().toLocaleDateString('en-IN')}
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    let htmlContent = `
-        <html>
-        <head>
-            <title>Batch Print - Accepted Orders</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
-            <style>
-                body { font-family: 'Arial', sans-serif; margin: 0; padding: 5mm; color: #000; background: #fff; width: 190mm; /* A4 width */ }
-                @page { size: portrait; margin: 5mm; }
-                
-                .label-box { width: 100%; border: 1mm solid #000; border-radius: 4mm; padding: 6mm; box-sizing: border-box; display: flex; flex-direction: column; margin-bottom: 10mm; page-break-inside: avoid; }
-                .header { text-align: center; border-bottom: 1mm solid #000; padding-bottom: 2mm; margin-bottom: 4mm; font-weight: 900; font-size: 22pt; letter-spacing: 2px; }
-                
-                .main-content { display: flex; justify-content: space-between; margin-bottom: 4mm; flex: 1; }
-                .col-left { width: 55%; padding-right: 4mm; border-right: 1mm dashed #ccc; display: flex; flex-direction: column; }
-                .sec-title { font-size: 12pt; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 2mm; }
-                .cust-name { font-size: 28pt; font-weight: 900; margin: 0 0 2mm 0; text-transform: uppercase; line-height: 1.1; }
-                .cust-text { font-size: 14pt; font-weight: bold; margin: 0 0 2mm 0; line-height: 1.4; }
-                .seller-sec { margin-top: auto; padding-top: 4mm; border-top: 0.5mm dashed #eee; }
-                
-                .col-right { width: 45%; padding-left: 4mm; display: flex; flex-direction: column; flex-shrink: 0; }
-                
-                .qr-box { text-align: center; width: 35mm; flex-shrink: 0; }
-                .qr-placeholder { display: inline-block; width: 35mm; height: 35mm; background: #fafafa; border: 0.5mm solid #ddd; padding: 1mm; border-radius: 2mm; }
-                .qr-text { font-size: 10pt; font-weight: 900; margin-top: 1mm; text-transform: uppercase; text-align: center; }
-                
-                .amount-box-compact { border: 1mm solid #000; border-radius: 3mm; text-align: center; padding: 4mm; background: #f9f9f9; width: 100%; box-sizing: border-box; margin-top: auto;}
-                .amount-lbl { font-size: 12pt; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
-                .amount-val { font-size: 38pt; font-weight: 900; margin: 1mm 0; line-height: 1; }
-                
-                .items-sec { border-top: 1mm solid #f0f0f0; padding-top: 4mm; margin-bottom: 2mm; }
-                .items-list { font-size: 16pt; font-weight: bold; line-height: 1.6; display: flex; flex-wrap: wrap; gap: 2mm; }
-                .item-tag { background: #f0f0f0; padding: 2mm 3mm; border-radius: 2mm; border: 0.5mm solid #ccc; display: inline-block; }
-                
-                .footer { text-align: center; font-size: 11pt; color: #444; font-weight: bold; margin-top: 4mm; border-top: 1mm solid #000; padding-top: 3mm; }
-                
-                @media print { body { padding: 0; } }
-            </style>
-        </head>
-        <body>
-            ${allSlipsHtml}
-            <script>
-                window.onload = function() {
-                    let qrElements = document.querySelectorAll('.qr-placeholder');
-                    qrElements.forEach(el => {
-                        let url = el.getAttribute('data-url');
-                        new QRCode(el, {
-                            text: url,
-                            width: 256, 
-                            height: 256,
-                            colorDark : "#000000",
-                            colorLight : "#ffffff",
-                            correctLevel : QRCode.CorrectLevel.L
-                        });
-                    });
-                    setTimeout(() => { window.print(); }, 800);
-                };
-            <\/script>
-        </body>
-        </html>
-    `;
-
-    let doc = iframe.contentWindow.document;
-    doc.open(); doc.write(htmlContent); doc.close();
-}
-
-// =======================================================
-// ✨ NAYA: BATCH PRINT ALL ACCEPTED ORDERS (BIG FONTS) ✨
-// =======================================================
-function printAllAcceptedSlips() {
-    let acceptedOrders = window.globalLiveOrders.filter(o => o.status === 'accepted');
-
-    if (acceptedOrders.length === 0) {
-        iosAlert("No Accepted Orders", "Abhi koi bhi order 'Accepted' status mein nahi hai print karne ke liye.");
-        return;
-    }
-
-    let shopName = globalShopData.shopName || "Store Name";
-    let ownerName = globalShopData.ownerName || "Shopkeeper";
-    let shopPhone = globalShopData.phone || "";
-    let shopAddress = globalShopData.address || "Return address not provided";
-
-    let iframe = document.getElementById('print-iframe');
-    if (!iframe) {
-        iframe = document.createElement('iframe');
-        iframe.id = 'print-iframe';
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-    }
-
-    let allSlipsHtml = acceptedOrders.map((order) => {
-        let mapUrl = (order.lat && order.lng) 
-            ? `https://www.google.com/maps/dir/?api=1&destination=${order.lat},${order.lng}` 
-            : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.customerAddress || '')}`;
-
-        let itemsList = (order.items && order.items.length > 0) 
-            ? order.items.map(i => `<span class="item-tag"><b>${i.qty}x</b> ${i.name}</span>`).join(' ') 
-            : '<span class="item-tag">No items found</span>';
-
-        return `
-            <div class="label-box">
-                <div class="header">SHIPPING LABEL</div>
-                
-                <div class="main-content">
-                    <div class="col-left">
-                        <div class="sec-title">Deliver To:</div>
-                        <p class="cust-name">${order.customerName}</p>
-                        <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
-                        <p class="cust-text" style="font-weight: 900; font-size: 24px; margin-top: 12px;">📞 Ph: ${order.customerPhone}</p>
-                        
-                        <div class="seller-sec">
-                            <span style="font-size: 16px; color: #555; text-transform: uppercase; font-weight: 900;">Sold By:</span> 
-                            <span style="font-size: 22px; font-weight: 900; margin-left: 4px;">${ownerName}</span>
-                            <span style="font-size: 18px; color: #444; font-weight: bold; margin-left: 4px;">(${shopName})</span>
-                        </div>
-                    </div>
-                    
-                    <div class="col-right">
-                        <div style="display: flex; gap: 15px; margin-bottom: 12px; width: 100%;">
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="font-size: 14px; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 4px;">If Undelivered, Return To:</div>
-                                <div style="font-size: 18px; font-weight: 900; margin-bottom: 4px;">${shopName}</div>
-                                <div style="font-size: 14px; color: #333; line-height: 1.4; font-weight: bold;">${shopAddress}</div>
-                                <div style="font-size: 16px; font-weight: 900; margin-top: 6px;">Ph: ${shopPhone}</div>
-                            </div>
-                            
-                            <div class="qr-box" style="width: 150px; flex-shrink: 0; text-align: center;">
-                                <div id="qrcode-${order.id}" class="qr-placeholder" data-url="${mapUrl}"></div>
-                                <div class="qr-text">Scan for Direction</div>
-                            </div>
-                        </div>
-
-                        <div class="amount-box-compact">
-                            <div class="amount-lbl">COLLECT AMOUNT</div>
-                            <div class="amount-val">₹${order.totalAmount}</div>
-                            <div class="amount-lbl">(COD)</div>
+                            <div class="amount-lbl">(CASH ON DELIVERY)</div>
                         </div>
                     </div>
                 </div>
@@ -10970,62 +10638,53 @@ function printAllAcceptedSlips() {
     }).join('');
 
     let htmlContent = `
+        <!DOCTYPE html>
         <html>
         <head>
             <title>Batch Print - Accepted Orders</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta charset="UTF-8">
             <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
             <style>
-                body { font-family: 'Arial', sans-serif; margin: 0; padding: 10px; color: #000; background: #fff; }
-                @page { size: auto; margin: 5mm; }
+                * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
                 
-                .label-box { 
-                    width: 100%; 
-                    min-height: 120mm; 
-                    border: 4px solid #000; 
-                    border-radius: 16px; 
-                    padding: 25px; 
-                    box-sizing: border-box; 
-                    display: flex; 
-                    flex-direction: column; 
-                    margin-bottom: 30px; 
-                    page-break-inside: avoid; 
-                }
+                /* 🔥 STRICT A4 PAGE SETUP 🔥 */
+                @page { size: A4 portrait; margin: 8mm; }
+                body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; color: #000; background: #fff; width: 194mm; }
                 
-                .header { text-align: center; border-bottom: 4px solid #000; padding-bottom: 12px; margin-bottom: 20px; font-weight: 900; font-size: 32px; letter-spacing: 3px; }
+                .label-box { width: 100%; border: 4px solid #000; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; margin-bottom: 12mm; page-break-inside: avoid; }
+                .header { text-align: center; border-bottom: 4px solid #000; padding-bottom: 10px; margin-bottom: 18px; font-weight: 900; font-size: 28px; letter-spacing: 2px; text-transform: uppercase; }
                 
-                .main-content { display: flex; justify-content: space-between; margin-bottom: 15px; flex: 1; }
+                .main-content { display: flex; justify-content: space-between; margin-bottom: 16px; width: 100%; }
                 
-                .col-left { width: 55%; padding-right: 25px; border-right: 3px dashed #ccc; display: flex; flex-direction: column; }
-                .sec-title { font-size: 18px; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 8px; letter-spacing: 1px; }
-                .cust-name { font-size: 38px; font-weight: 900; margin: 0 0 8px 0; text-transform: uppercase; line-height: 1.1; }
-                .cust-text { font-size: 20px; margin: 0 0 6px 0; line-height: 1.4; font-weight: bold; }
+                .col-left { width: 58%; padding-right: 20px; border-right: 3px dashed #000; display: flex; flex-direction: column; justify-content: space-between; }
+                .sec-title { font-size: 15px; color: #333; text-transform: uppercase; font-weight: 900; margin-bottom: 6px; letter-spacing: 0.5px; }
+                .cust-name { font-size: 34px; font-weight: 900; margin: 0 0 8px 0; text-transform: uppercase; line-height: 1.1; }
+                .cust-text { font-size: 19px; font-weight: bold; margin: 0 0 8px 0; line-height: 1.35; }
+                .cust-phone { font-size: 23px; font-weight: 900; margin: 6px 0 16px 0; }
                 
-                .seller-sec { margin-top: auto; padding-top: 15px; border-top: 2px dashed #eee; }
+                .return-sec { margin-top: auto; padding-top: 14px; border-top: 2px dashed #888; }
                 
-                .col-right { width: 45%; padding-left: 25px; display: flex; flex-direction: column; flex-shrink: 0; }
+                .col-right { width: 42%; padding-left: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
                 
-                .qr-placeholder { display: inline-block; width: 150px; height: 150px; background: #fafafa; border: 2px solid #ddd; padding: 8px; border-radius: 12px; }
-                .qr-text { font-size: 14px; font-weight: 900; margin-top: 8px; text-transform: uppercase; text-align: center; }
+                /* 🔥 FORCE QR SIZE & PREVENT CROPPING 🔥 */
+                .qr-box { text-align: center; border: 2px solid #000; padding: 10px; border-radius: 10px; background: #fff; margin-bottom: 14px; width: 100%; display: flex; flex-direction: column; align-items: center; }
+                .qr-placeholder { width: 150px; height: 150px; display: flex; align-items: center; justify-content: center; }
+                .qr-placeholder img, .qr-placeholder canvas { width: 150px !important; height: 150px !important; display: block !important; }
+                .qr-text { font-size: 12px; font-weight: 900; margin-top: 6px; text-transform: uppercase; text-align: center; letter-spacing: 0.5px; }
                 
-                .amount-box-compact { border: 4px solid #000; border-radius: 16px; text-align: center; padding: 20px 15px; background: #f9f9f9; width: 100%; box-sizing: border-box; margin-top: auto;}
-                .amount-lbl { font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
-                .amount-val { font-size: 56px; font-weight: 900; margin: 5px 0; line-height: 1; }
+                .amount-box-compact { border: 4px solid #000; border-radius: 12px; text-align: center; padding: 12px 10px; background: #f2f2f2; width: 100%; margin-top: auto; }
+                .amount-lbl { font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+                .amount-val { font-size: 42px; font-weight: 900; margin: 4px 0; line-height: 1; }
                 
-                .items-sec { border-top: 3px solid #f0f0f0; padding-top: 15px; margin-bottom: 10px; }
-                .items-list { font-size: 22px; font-weight: bold; line-height: 1.6; display: flex; flex-wrap: wrap; gap: 10px; }
-                .item-tag { background: #f0f0f0; padding: 8px 12px; border-radius: 8px; border: 2px solid #ccc; display: inline-block; }
+                .items-sec { border-top: 3px solid #000; padding-top: 14px; margin-bottom: 10px; }
+                .items-list { font-size: 20px; font-weight: 900; line-height: 1.5; display: flex; flex-wrap: wrap; gap: 10px; }
+                .item-tag { background: #eee; padding: 6px 14px; border-radius: 8px; border: 2px solid #000; display: inline-block; }
                 
-                .footer { text-align: center; font-size: 16px; color: #444; font-weight: bold; margin-top: 20px; border-top: 3px solid #000; padding-top: 15px; }
-                
-                @media print {
-                    body { padding: 0; }
-                }
+                .footer { text-align: center; font-size: 15px; color: #000; font-weight: 900; margin-top: 12px; border-top: 3px solid #000; padding-top: 10px; }
             </style>
         </head>
         <body>
             ${allSlipsHtml}
-
             <script>
                 window.onload = function() {
                     let qrElements = document.querySelectorAll('.qr-placeholder');
@@ -11033,158 +10692,18 @@ function printAllAcceptedSlips() {
                         let url = el.getAttribute('data-url');
                         new QRCode(el, {
                             text: url,
-                            width: 150,
+                            width: 150, 
                             height: 150,
                             colorDark : "#000000",
                             colorLight : "#ffffff",
-                            correctLevel : QRCode.CorrectLevel.L // Keep Error correction Low for easy scanning
+                            correctLevel : QRCode.CorrectLevel.L
                         });
                     });
                     
                     setTimeout(() => {
+                        window.focus();
                         window.print();
-                    }, 800);
-                };
-            <\/script>
-        </body>
-        </html>
-    `;
-
-    let doc = iframe.contentWindow.document;
-    doc.open();
-    doc.write(htmlContent);
-    doc.close();
-}
-
-// =======================================================
-// ✨ NAYA: BATCH PRINT ALL ACCEPTED ORDERS (BADE FONT AUR BADE QR KE SATH) ✨
-// =======================================================
-function printAllAcceptedSlips() {
-    let acceptedOrders = window.globalLiveOrders.filter(o => o.status === 'accepted');
-
-    if (acceptedOrders.length === 0) {
-        iosAlert("No Accepted Orders", "Abhi koi bhi order 'Accepted' status mein nahi hai print karne ke liye.");
-        return;
-    }
-
-    let shopName = globalShopData.shopName || "Store Name";
-    let ownerName = globalShopData.ownerName || "Shopkeeper";
-    let shopPhone = globalShopData.phone || "";
-    let shopAddress = globalShopData.address || "Return address not provided";
-
-    let iframe = document.getElementById('print-iframe');
-    if (!iframe) {
-        iframe = document.createElement('iframe');
-        iframe.id = 'print-iframe';
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-    }
-
-    let allSlipsHtml = acceptedOrders.map((order) => {
-        let mapUrl = (order.lat && order.lng) 
-            ? `https://www.google.com/maps/dir/?api=1&destination=${order.lat},${order.lng}` 
-            : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.customerAddress || '')}`;
-
-        let itemsList = (order.items && order.items.length > 0) 
-            ? order.items.map(i => `<span class="item-tag"><b>${i.qty}x</b> ${i.name}</span>`).join(' ') 
-            : '<span class="item-tag">No items found</span>';
-
-        return `
-            <div class="label-box">
-                <div class="header">SHIPPING LABEL</div>
-                <div class="main-content">
-                    <div class="col-left">
-                        <div class="sec-title">Deliver To:</div>
-                        <p class="cust-name">${order.customerName}</p>
-                        <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
-                        <p class="cust-text" style="font-weight: 900; font-size: 18px; margin-top: 6px;">📞 Ph: ${order.customerPhone}</p>
-                        
-                        <div class="seller-sec">
-                            <span style="font-size: 12px; color: #555; text-transform: uppercase; font-weight: 900;">Sold By:</span> 
-                            <span style="font-size: 15px; font-weight: 900; margin-left: 2px;">${ownerName}</span>
-                            <span style="font-size: 13px; color: #444; font-weight: bold; margin-left: 2px;">(${shopName})</span>
-                        </div>
-                    </div>
-                    
-                    <div class="col-right">
-                        <div style="display: flex; gap: 8px; margin-bottom: 8px; width: 100%; justify-content: space-between;">
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="font-size: 11px; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 3px;">If Undelivered, Return To:</div>
-                                <div style="font-size: 14px; font-weight: 900; margin-bottom: 2px;">${shopName}</div>
-                                <div style="font-size: 12px; font-weight: bold; color: #333; line-height: 1.3;">${shopAddress}</div>
-                                <div style="font-size: 13px; font-weight: 900; margin-top: 4px;">Ph: ${shopPhone}</div>
-                            </div>
-                            
-                            <div class="qr-box" style="width: 100px; flex-shrink: 0; text-align: center;">
-                                <div id="qrcode-${order.id}" class="qr-placeholder" data-url="${mapUrl}"></div>
-                                <div class="qr-text">Scan for Direction</div>
-                            </div>
-                        </div>
-
-                        <div class="amount-box-compact">
-                            <div class="amount-lbl">COLLECT AMOUNT</div>
-                            <div class="amount-val">₹${order.totalAmount}</div>
-                            <div class="amount-lbl">(COD)</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="items-sec">
-                    <div class="sec-title" style="margin-bottom: 6px;">Products to Pack:</div>
-                    <div class="items-list">${itemsList}</div>
-                </div>
-
-                <div class="footer">Order ID: #${order.id.substring(0,8).toUpperCase()} &nbsp;&nbsp;|&nbsp;&nbsp; Date: ${new Date().toLocaleDateString('en-IN')}</div>
-            </div>
-        `;
-    }).join('');
-
-    let htmlContent = `
-        <html>
-        <head>
-            <title>Batch Print - Accepted Orders</title>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
-            <style>
-                body { font-family: 'Arial', sans-serif; margin: 0; padding: 2px; color: #000; background: #fff; }
-                @page { size: auto; margin: 3mm; }
-                .label-box { width: 100%; min-height: 84mm; border: 3px solid #000; border-radius: 12px; padding: 15px 18px; box-sizing: border-box; display: flex; flex-direction: column; margin-bottom: 6mm; page-break-inside: avoid; }
-                .header { text-align: center; border-bottom: 3px solid #000; padding-bottom: 8px; margin-bottom: 12px; font-weight: 900; font-size: 22px; letter-spacing: 3px; }
-                .main-content { display: flex; justify-content: space-between; margin-bottom: 10px; flex: 1; }
-                .col-left { width: 50%; padding-right: 15px; border-right: 2px dashed #ccc; display: flex; flex-direction: column; }
-                .sec-title { font-size: 13px; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 6px; letter-spacing: 1px; }
-                .cust-name { font-size: 24px; font-weight: 900; margin: 0 0 6px 0; text-transform: uppercase; }
-                .cust-text { font-size: 16px; font-weight: bold; margin: 0 0 4px 0; line-height: 1.4; }
-                .seller-sec { margin-top: auto; padding-top: 8px; border-top: 1px dashed #eee; }
-                .col-right { width: 50%; padding-left: 15px; display: flex; flex-direction: column; flex-shrink: 0; }
-                .qr-placeholder { display: inline-block; width: 100px; height: 100px; }
-                .qr-text { font-size: 10px; font-weight: 900; margin-top: 4px; text-transform: uppercase; text-align: center; }
-                .amount-box-compact { border: 3px solid #000; border-radius: 8px; text-align: center; padding: 8px 10px; background: #f9f9f9; width: 100%; box-sizing: border-box; margin-top: auto;}
-                .amount-lbl { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
-                .amount-val { font-size: 32px; font-weight: 900; margin: 2px 0; }
-                .items-sec { border-top: 2px solid #f0f0f0; padding-top: 8px; margin-bottom: 6px; }
-                .items-list { font-size: 15px; font-weight: bold; line-height: 1.5; display: flex; flex-wrap: wrap; gap: 6px; }
-                .item-tag { background: #f0f0f0; padding: 4px 8px; border-radius: 6px; border: 1px solid #ccc; display: inline-block; }
-                .footer { text-align: center; font-size: 13px; color: #444; font-weight: bold; margin-top: 10px; border-top: 2px solid #000; padding-top: 8px; }
-                @media print { body { padding: 0; } }
-            </style>
-        </head>
-        <body>
-            ${allSlipsHtml}
-            <script>
-                window.onload = function() {
-                    let qrElements = document.querySelectorAll('.qr-placeholder');
-                    qrElements.forEach(el => {
-                        let url = el.getAttribute('data-url');
-                        new QRCode(el, {
-                            text: url,
-                            width: 100,
-                            height: 100,
-                            colorDark : "#000000",
-                            colorLight : "#ffffff",
-                            correctLevel : QRCode.CorrectLevel.M
-                        });
-                    });
-                    setTimeout(() => { window.print(); }, 800);
+                    }, 1000);
                 };
             <\/script>
         </body>
@@ -11193,192 +10712,6 @@ function printAllAcceptedSlips() {
 
     let doc = iframe.contentWindow.document;
     doc.open(); doc.write(htmlContent); doc.close();
-}
-
-
-// =======================================================
-// ✨ NAYA: BATCH PRINT ALL ACCEPTED ORDERS (PERFECT E-COMMERCE LAYOUT) ✨
-// =======================================================
-function printAllAcceptedSlips() {
-    // Sirf 'accepted' status wale orders filter karein
-    let acceptedOrders = window.globalLiveOrders.filter(o => o.status === 'accepted');
-
-    if (acceptedOrders.length === 0) {
-        iosAlert("No Accepted Orders", "Abhi koi bhi order 'Accepted' status mein nahi hai print karne ke liye.");
-        return;
-    }
-
-    let shopName = globalShopData.shopName || "Store Name";
-    let ownerName = globalShopData.ownerName || "Shopkeeper";
-    let shopPhone = globalShopData.phone || "";
-    let shopAddress = globalShopData.address || "Return address not provided";
-
-    // Hidden iframe create karna
-    let iframe = document.getElementById('print-iframe');
-    if (!iframe) {
-        iframe = document.createElement('iframe');
-        iframe.id = 'print-iframe';
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-    }
-
-    // Saare slips ka HTML ek sath generate karna
-    let allSlipsHtml = acceptedOrders.map((order) => {
-        let mapUrl = (order.lat && order.lng) 
-            ? `https://www.google.com/maps/dir/?api=1&destination=${order.lat},${order.lng}` 
-            : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.customerAddress || '')}`;
-
-        // Items ki list generate karna
-        let itemsList = (order.items && order.items.length > 0) 
-            ? order.items.map(i => `<span class="item-tag"><b>${i.qty}x</b> ${i.name}</span>`).join(' ') 
-            : '<span class="item-tag">No items found</span>';
-
-        return `
-            <div class="label-box">
-                <div class="header">SHIPPING LABEL</div>
-                
-                <div class="main-content">
-                    <!-- Left Side: Address & Sold By -->
-                    <div class="col-left">
-                        <div class="sec-title">Deliver To:</div>
-                        <p class="cust-name">${order.customerName}</p>
-                        <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
-                        <p class="cust-text" style="font-weight: 900; font-size: 14px; margin-top: 6px;">📞 Ph: ${order.customerPhone}</p>
-                        
-                        <!-- ✨ NAYA: Sirf Sold By, Owner Name aur Shop Name ✨ -->
-                        <div class="seller-sec">
-                            <span style="font-size: 9px; color: #555; text-transform: uppercase; font-weight: 900;">Sold By:</span> 
-                            <span style="font-size: 13px; font-weight: 900; margin-left: 2px;">${ownerName}</span>
-                            <span style="font-size: 11px; color: #444; font-weight: bold; margin-left: 2px;">(${shopName})</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Right Side: Return Address, QR & Amount -->
-                    <div class="col-right">
-                        
-                        <!-- ✨ NAYA: Khali jagah par Return Address aur QR Code ✨ -->
-                        <div style="display: flex; gap: 8px; margin-bottom: 8px; width: 100%;">
-                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                                <div style="font-size: 8px; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 2px;">If Undelivered, Return To:</div>
-                                <div style="font-size: 11px; font-weight: 900; margin-bottom: 2px;">${shopName}</div>
-                                <div style="font-size: 9px; color: #333; line-height: 1.2;">${shopAddress}</div>
-                                <div style="font-size: 10px; font-weight: 900; margin-top: 3px;">Ph: ${shopPhone}</div>
-                            </div>
-                            
-                            <div class="qr-box" style="width: 65px; flex-shrink: 0; text-align: center;">
-                                <div id="qrcode-${order.id}" class="qr-placeholder" data-url="${mapUrl}"></div>
-                                <div class="qr-text">Scan for Direction</div>
-                            </div>
-                        </div>
-
-                        <div class="amount-box-compact">
-                            <div class="amount-lbl">COLLECT AMOUNT</div>
-                            <div class="amount-val">₹${order.totalAmount}</div>
-                            <div class="amount-lbl">(COD)</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Bottom Side: Products (Full Width) -->
-                <div class="items-sec">
-                    <div class="sec-title" style="margin-bottom: 4px;">Products to Pack:</div>
-                    <div class="items-list">${itemsList}</div>
-                </div>
-
-                <div class="footer">
-                    Order ID: #${order.id.substring(0,8).toUpperCase()} &nbsp;&nbsp;|&nbsp;&nbsp; Date: ${new Date().toLocaleDateString('en-IN')}
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    let htmlContent = `
-        <html>
-        <head>
-            <title>Batch Print - Accepted Orders</title>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
-            <style>
-                body { font-family: 'Arial', sans-serif; margin: 0; padding: 2px; color: #000; background: #fff; }
-                @page { size: auto; margin: 3mm; }
-                
-                .label-box { 
-                    width: 100%; 
-                    min-height: 84mm; 
-                    border: 2px solid #000; 
-                    border-radius: 8px; 
-                    padding: 10px 14px; 
-                    box-sizing: border-box; 
-                    display: flex; 
-                    flex-direction: column; 
-                    margin-bottom: 4mm; 
-                    page-break-inside: avoid; 
-                }
-                
-                .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 8px; font-weight: 900; font-size: 18px; letter-spacing: 2px; }
-                
-                .main-content { display: flex; justify-content: space-between; margin-bottom: 8px; flex: 1; }
-                
-                /* ✨ Column sizes adjust kiye hain ✨ */
-                .col-left { width: 52%; padding-right: 12px; border-right: 2px dashed #ccc; display: flex; flex-direction: column; }
-                .sec-title { font-size: 11px; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 4px; letter-spacing: 1px; }
-                .cust-name { font-size: 18px; font-weight: 900; margin: 0 0 4px 0; text-transform: uppercase; }
-                .cust-text { font-size: 13px; margin: 0 0 3px 0; line-height: 1.3; }
-                
-                /* Sold By section ko theek se align kiya */
-                .seller-sec { margin-top: auto; padding-top: 6px; border-top: 1px dashed #eee; }
-                
-                /* ✨ Right Column ko chauda (wide) kiya hai taaki Return Address aa sake ✨ */
-                .col-right { width: 48%; padding-left: 12px; display: flex; flex-direction: column; flex-shrink: 0; }
-                
-                .qr-placeholder { display: inline-block; width: 65px; height: 65px; }
-                .qr-text { font-size: 8px; font-weight: bold; margin-top: 3px; text-transform: uppercase; text-align: center; }
-                
-                .amount-box-compact { border: 2px solid #000; border-radius: 6px; text-align: center; padding: 5px 6px; background: #f9f9f9; width: 100%; box-sizing: border-box; margin-top: auto;}
-                .amount-lbl { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
-                .amount-val { font-size: 22px; font-weight: 900; margin: 1px 0; }
-                
-                .items-sec { border-top: 2px solid #f0f0f0; padding-top: 6px; margin-bottom: 4px; }
-                .items-list { font-size: 11px; line-height: 1.4; display: flex; flex-wrap: wrap; gap: 4px; }
-                .item-tag { background: #f0f0f0; padding: 3px 6px; border-radius: 4px; border: 1px solid #ddd; display: inline-block; }
-                
-                .footer { text-align: center; font-size: 10px; color: #444; font-weight: bold; margin-top: 6px; border-top: 2px solid #000; padding-top: 5px; }
-                
-                @media print {
-                    body { padding: 0; }
-                }
-            </style>
-        </head>
-        <body>
-            ${allSlipsHtml}
-
-            <script>
-                window.onload = function() {
-                    let qrElements = document.querySelectorAll('.qr-placeholder');
-                    qrElements.forEach(el => {
-                        let url = el.getAttribute('data-url');
-                        new QRCode(el, {
-                            text: url,
-                            width: 65,
-                            height: 65,
-                            colorDark : "#000000",
-                            colorLight : "#ffffff",
-                            correctLevel : QRCode.CorrectLevel.L
-                        });
-                    });
-                    
-                    setTimeout(() => {
-                        window.print();
-                    }, 800);
-                };
-            <\/script>
-        </body>
-        </html>
-    `;
-
-    let doc = iframe.contentWindow.document;
-    doc.open();
-    doc.write(htmlContent);
-    doc.close();
 }
 
 // =======================================================

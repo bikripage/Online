@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Linking, Alert, TextInput, ActivityIndicator, Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
-import { Audio } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import firebase from 'firebase/compat/app';
@@ -21,15 +20,16 @@ if (!firebase.apps.length) {
 }
 const db = firebase.firestore();
 
+// ✨ NAYA LOGIC: App open hone par Notification CHUP rahega
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
+    shouldShowAlert: true,  // App open hone par upar popup aayega
+    shouldPlaySound: false, // 🔇 App open hone par aawaz nahi bajegi
     shouldSetBadge: true,
   }),
 });
 
-// 👉 Push Token & Custom Root Sound Setup
+// 👉 Push Token & Background Sound Setup
 async function registerForPushNotificationsAsync() {
   let token;
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -59,7 +59,7 @@ async function registerForPushNotificationsAsync() {
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#FF231F7C',
-      sound: 'voice_alert.wav', 
+      sound: 'voice_alert.wav', // 🔊 Background/Lock screen par ye aawaz bajegi
     });
   }
 
@@ -68,10 +68,8 @@ async function registerForPushNotificationsAsync() {
 
 export default function App() {
   const [orders, setOrders] = useState([]);
-  
   const [currentShopId, setCurrentShopId] = useState(null);
   const [currentShopName, setCurrentShopName] = useState(''); 
-  
   const [shopIdInput, setShopIdInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -88,7 +86,6 @@ export default function App() {
           setCurrentShopId(savedId);
           setCurrentShopName(savedName || 'My Shop');
           
-          // Auto-update token on open
           const pushToken = await registerForPushNotificationsAsync();
           if (pushToken) {
             db.collection('shops').doc(savedId).set({ expoPushToken: pushToken }, { merge: true });
@@ -172,22 +169,6 @@ export default function App() {
   useEffect(() => {
     if (!currentShopId) return;
 
-    let isFirstFetch = true;
-
-    const setupAudio = async () => {
-      try {
-        await Audio.setAudioModeAsync({
-          playsInSilentModeIOS: true,
-          staysActiveInBackground: true,
-          shouldDuckAndroid: true,
-          playThroughEarpieceAndroid: false,
-        });
-      } catch (e) {
-        console.log("Audio Setup Error:", e);
-      }
-    };
-    setupAudio();
-
     const requestPermissions = async () => {
       const { status } = await Notifications.requestPermissionsAsync();
       if (status !== 'granted') {
@@ -196,60 +177,21 @@ export default function App() {
     };
     requestPermissions();
 
+    // ✨ NAYA LOGIC: Yahan se saara "Audio Play" code hata diya gaya hai.
+    // Ye sirf chup-chaap order list update karega.
     const unsubscribe = db.collection('orders')
       .where('shopId', '==', currentShopId)
       .orderBy('createdAt', 'desc')
       .limit(50)
       .onSnapshot((snapshot) => {
         let liveOrders = [];
-
-        if (isFirstFetch) {
-          snapshot.forEach((doc) => {
-            const data = doc.data();
-            if (data.status === 'pending') {
-              liveOrders.push({ id: doc.id, ...data });
-            }
-          });
-          setOrders(liveOrders);
-          isFirstFetch = false; 
-
-        } else {
-          snapshot.docChanges().forEach(async (change) => {
-            if (change.type === 'added') {
-              const newOrder = change.doc.data();
-
-              if (newOrder.status === 'pending') {
-                
-                // ✨ SYSTEM SPEECH HATA KAR CUSTOM AUDIO LAGAYI HAI ✨
-                try {
-                  const { sound } = await Audio.Sound.createAsync(
-                    require('./voice_alert.wav')
-                  );
-                  await sound.playAsync();
-                  
-                  // Memory se clear karne ke liye
-                  sound.setOnPlaybackStatusUpdate((status) => {
-                    if (status.didJustFinish) {
-                      sound.unloadAsync();
-                    }
-                  });
-                } catch (error) {
-                  console.log("Custom sound play error:", error);
-                }
-
-              }
-            }
-          });
-
-          snapshot.forEach((doc) => {
-            const data = doc.data();
-            if (data.status === 'pending') {
-              liveOrders.push({ id: doc.id, ...data });
-            }
-          });
-
-          setOrders(liveOrders);
-        }
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.status === 'pending') {
+            liveOrders.push({ id: doc.id, ...data });
+          }
+        });
+        setOrders(liveOrders);
       });
 
     return () => unsubscribe();

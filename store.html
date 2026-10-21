@@ -1777,8 +1777,9 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
         const payload = {
             to: pushToken,
             sound: 'default', 
-            title: '🛍️ Naya Order Aaya!',
-            body: `${customerName} ne ₹${totalAmount} ka order diya hai. Check BikriPage app!`,
+            // 👇 Yahan English me change kar diya hai 👇
+            title: '🛍️ New Order Received!',
+            body: `${customerName} placed an order for ₹${totalAmount}. Check BikriPage app!`,
             priority: 'high',
             channelId: 'orders'
         };

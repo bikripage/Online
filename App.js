@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Linking, Alert, TextInput, ActivityIndicator, Platform } from 'react-native';
-import * as Speech from 'expo-speech';
 import * as Notifications from 'expo-notifications';
 import { Audio } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -60,7 +59,6 @@ async function registerForPushNotificationsAsync() {
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#FF231F7C',
-      // ✨ YAHAN CUSTOM SOUND SET KI HAI ✨
       sound: 'voice_alert.wav', 
     });
   }
@@ -80,22 +78,11 @@ export default function App() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isCheckingLogin, setIsCheckingLogin] = useState(true);
 
-  // ✨ LANGUAGE STATE ✨
-  const [speechLang, setSpeechLang] = useState('hi-IN');
-  const langRef = useRef(speechLang);
-
-  useEffect(() => {
-    langRef.current = speechLang;
-  }, [speechLang]);
-
   useEffect(() => {
     const checkSavedCredentials = async () => {
       try {
         const savedId = await AsyncStorage.getItem('shopId');
         const savedName = await AsyncStorage.getItem('shopName');
-        const savedLang = await AsyncStorage.getItem('speechLang');
-        
-        if (savedLang) setSpeechLang(savedLang);
         
         if (savedId) {
           setCurrentShopId(savedId);
@@ -182,15 +169,6 @@ export default function App() {
     }
   };
 
-  // ✨ LANGUAGE TOGGLE FUNCTION ✨
-  const toggleLanguage = async () => {
-    const newLang = speechLang === 'hi-IN' ? 'en-US' : 'hi-IN';
-    setSpeechLang(newLang);
-    await AsyncStorage.setItem('speechLang', newLang);
-    
-    Speech.speak(newLang === 'hi-IN' ? "हिंदी भाषा सेट हो गई है" : "English language selected", { language: newLang });
-  };
-
   useEffect(() => {
     if (!currentShopId) return;
 
@@ -236,27 +214,29 @@ export default function App() {
           isFirstFetch = false; 
 
         } else {
-          snapshot.docChanges().forEach((change) => {
+          snapshot.docChanges().forEach(async (change) => {
             if (change.type === 'added') {
               const newOrder = change.doc.data();
 
               if (newOrder.status === 'pending') {
-                const customerName = newOrder.customerName || 'Customer';
-                const amount = newOrder.totalAmount || 0;
                 
-                let msg = "";
-                if (langRef.current === 'hi-IN') {
-                  msg = `${customerName} ने ${amount} रुपये का नया आर्डर भेजा है।`;
-                } else {
-                  msg = `New order received from ${customerName} for ${amount} rupees.`;
+                // ✨ SYSTEM SPEECH HATA KAR CUSTOM AUDIO LAGAYI HAI ✨
+                try {
+                  const { sound } = await Audio.Sound.createAsync(
+                    require('./voice_alert.wav')
+                  );
+                  await sound.playAsync();
+                  
+                  // Memory se clear karne ke liye
+                  sound.setOnPlaybackStatusUpdate((status) => {
+                    if (status.didJustFinish) {
+                      sound.unloadAsync();
+                    }
+                  });
+                } catch (error) {
+                  console.log("Custom sound play error:", error);
                 }
 
-                Speech.stop(); 
-                Speech.speak(msg, {
-                  language: langRef.current,
-                  pitch: 1.1,
-                  rate: 0.9,
-                });
               }
             }
           });
@@ -356,9 +336,6 @@ export default function App() {
         </View>
         
         <View style={styles.headerRightControls}>
-          <TouchableOpacity onPress={toggleLanguage} style={styles.langBtn}>
-            <Text style={styles.langText}>{speechLang === 'hi-IN' ? 'A🗣️ Hindi' : 'A🗣️ Eng'}</Text>
-          </TouchableOpacity>
           <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
             <Text style={styles.logoutText}>Logout</Text>
           </TouchableOpacity>
@@ -396,8 +373,6 @@ const styles = StyleSheet.create({
   headerTitle: { color: 'white', fontSize: 18, fontWeight: 'bold' },
   shopNameText: { color: '#10B981', fontSize: 14, fontWeight: 'bold', marginTop: 4, textTransform: 'uppercase' },
   headerRightControls: { flexDirection: 'row', alignItems: 'center' },
-  langBtn: { backgroundColor: '#F59E0B', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 5, marginRight: 10 },
-  langText: { color: 'white', fontWeight: 'bold', fontSize: 12 },
   logoutBtn: { backgroundColor: '#EF4444', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 5 },
   logoutText: { color: 'white', fontWeight: 'bold', fontSize: 12 },
   card: { backgroundColor: 'white', padding: 15, borderRadius: 15, marginBottom: 15, shadowColor: '#000', shadowOffset: {width: 0, height: 2}, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3, borderLeftWidth: 5, borderLeftColor: '#2563EB' },

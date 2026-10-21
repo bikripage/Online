@@ -10432,22 +10432,20 @@ async function deleteLiveOrder(orderId) {
             }
         };
 
-/* =========================================================
-   BIKRIPAGE — PROFESSIONAL A4 SHIPPING LABEL SYSTEM
-   A4 Portrait | 3 Labels Per Page | Readable Text | QR
-   Replace BOTH old printing functions with this code.
-========================================================= */
+/* =====================================================
+   BIKRIPAGE SHIPPING LABEL — A4 / 4 SLIPS PER PAGE
+   Single order + batch printing
+===================================================== */
 
-const SHIPPING_PRINT_CONFIG = {
-    pageMarginMM: 5,
-    labelHeightMM: 93,
-    labelGapMM: 3,
-    qrSizePX: 256,
-    qrSizeMM: 32
+const BP_LABEL = {
+    margin: 5,
+    height: 70,
+    gap: 2,
+    qrPixels: 280,
+    qrMM: 28
 };
 
-// Safely display customer/product/shop text inside HTML.
-function shippingEscapeHTML(value) {
+function bpEscape(value) {
     return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -10456,45 +10454,38 @@ function shippingEscapeHTML(value) {
         .replace(/'/g, "&#39;");
 }
 
-// Build a Google Maps destination URL.
-function shippingGetMapURL(order) {
-    const hasCoordinates =
-        order.lat !== undefined &&
-        order.lng !== undefined &&
-        order.lat !== null &&
-        order.lng !== null &&
-        String(order.lat).trim() !== "" &&
-        String(order.lng).trim() !== "" &&
-        Number.isFinite(Number(order.lat)) &&
-        Number.isFinite(Number(order.lng)) &&
-        Number(order.lat) >= -90 &&
-        Number(order.lat) <= 90 &&
-        Number(order.lng) >= -180 &&
-        Number(order.lng) <= 180;
+function bpMapURL(order) {
+    const lat = Number(order.lat);
+    const lng = Number(order.lng);
 
-    if (hasCoordinates) {
+    if (
+        order.lat !== "" && order.lat != null &&
+        order.lng !== "" && order.lng != null &&
+        Number.isFinite(lat) && Number.isFinite(lng) &&
+        lat >= -90 && lat <= 90 &&
+        lng >= -180 && lng <= 180
+    ) {
         return "https://www.google.com/maps/dir/?api=1&destination=" +
-            encodeURIComponent(`${order.lat},${order.lng}`);
+            encodeURIComponent(`${lat},${lng}`);
     }
 
     const address = String(order.customerAddress || "").trim();
 
-    if (!address) return "";
-
-    return "https://www.google.com/maps/dir/?api=1&destination=" +
-        encodeURIComponent(address);
+    return address
+        ? "https://www.google.com/maps/dir/?api=1&destination=" +
+            encodeURIComponent(address)
+        : "";
 }
 
-// Reuse one hidden iframe for printing.
-function getShippingPrintFrame() {
-    let iframe = document.getElementById("print-iframe");
+function bpGetFrame() {
+    let frame = document.getElementById("print-iframe");
 
-    if (!iframe) {
-        iframe = document.createElement("iframe");
-        iframe.id = "print-iframe";
-        iframe.title = "Shipping label print preview";
+    if (!frame) {
+        frame = document.createElement("iframe");
+        frame.id = "print-iframe";
+        frame.title = "Shipping labels";
 
-        Object.assign(iframe.style, {
+        Object.assign(frame.style, {
             position: "fixed",
             left: "-10000px",
             top: "0",
@@ -10503,113 +10494,90 @@ function getShippingPrintFrame() {
             border: "0"
         });
 
-        document.body.appendChild(iframe);
+        document.body.appendChild(frame);
     }
 
-    return iframe;
+    return frame;
 }
 
-// Generate a single label's HTML.
-function shippingLabelHTML(order, shopName, shopPhone, index) {
-    const orderId = String(order.id ?? "");
-    const shortId = orderId.substring(0, 8).toUpperCase();
+function bpLabelHTML(order, shopName, shopPhone) {
+    const id = String(order.id ?? "");
+    const shortId = id.substring(0, 8).toUpperCase();
 
-    const customerName = shippingEscapeHTML(
-        order.customerName || "CUSTOMER"
-    );
-
-    const customerAddress = shippingEscapeHTML(
-        order.customerAddress || "Address not provided"
-    );
-
-    const customerPhone = shippingEscapeHTML(
-        order.customerPhone || "Not provided"
-    );
-
-    const safeShopName = shippingEscapeHTML(shopName);
-    const safeShopPhone = shippingEscapeHTML(shopPhone);
-
-    const amountNumber = Number(order.totalAmount);
-    const amount = Number.isFinite(amountNumber)
-        ? amountNumber.toLocaleString("en-IN", {
-            maximumFractionDigits: 2
-        })
-        : shippingEscapeHTML(order.totalAmount ?? "0");
+    const amount = Number(order.totalAmount);
+    const amountText = Number.isFinite(amount)
+        ? amount.toLocaleString("en-IN", { maximumFractionDigits: 2 })
+        : String(order.totalAmount ?? "0");
 
     const items = Array.isArray(order.items) && order.items.length
         ? order.items.map(item => `
-            <span class="item-tag">
-                <b>${shippingEscapeHTML(item.qty ?? 1)}×</b>
-                ${shippingEscapeHTML(item.name || "Product")}
+            <span class="item">
+                <b>${bpEscape(item.qty ?? 1)}×</b>
+                ${bpEscape(item.name || "Product")}
             </span>
         `).join("")
-        : `<span class="item-tag">No items found</span>`;
+        : '<span class="item">No items found</span>';
 
-    const mapURL = shippingGetMapURL(order);
-
-    const date = new Date().toLocaleDateString("en-IN");
+    const mapURL = bpMapURL(order);
 
     return `
-        <section class="label-box">
-            <header class="label-header">
-                <span>BIKRIPAGE</span>
-                <span class="shipping-heading">SHIPPING LABEL</span>
-                <span class="order-badge">#${shippingEscapeHTML(shortId)}</span>
+        <section class="label">
+            <header class="header">
+                <div class="brand">BIKRIPAGE</div>
+                <div class="heading">SHIPPING LABEL</div>
+                <div class="order-id">#${bpEscape(shortId)}</div>
             </header>
 
-            <div class="main-content">
-                <div class="col-left">
-                    <div class="section-title">DELIVER TO</div>
-
-                    <div class="cust-name">${customerName}</div>
-
-                    <div class="cust-address">${customerAddress}</div>
-
-                    <div class="cust-phone">
-                        <span class="phone-label">PHONE</span>
-                        <span>${customerPhone}</span>
+            <div class="content">
+                <div class="customer">
+                    <div class="caption">DELIVER TO</div>
+                    <div class="name">
+                        ${bpEscape(order.customerName || "CUSTOMER")}
+                    </div>
+                    <div class="address">
+                        ${bpEscape(order.customerAddress || "Address not provided")}
+                    </div>
+                    <div class="phone">
+                        <span class="caption">PHONE</span>
+                        ${bpEscape(order.customerPhone || "Not provided")}
                     </div>
                 </div>
 
-                <div class="col-right">
-                    <div class="qr-box">
-                        <div
-                            class="qr-placeholder"
-                            data-url="${shippingEscapeHTML(mapURL)}"
-                        ></div>
-                        <div class="qr-text">
-                            ${mapURL ? "SCAN FOR DIRECTIONS" : "ADDRESS QR UNAVAILABLE"}
+                <div class="right">
+                    <div class="qr-panel">
+                        <div class="qr" data-url="${bpEscape(mapURL)}"></div>
+                        <div class="qr-caption">
+                            ${mapURL ? "SCAN FOR DIRECTIONS" : "ADDRESS UNAVAILABLE"}
                         </div>
                     </div>
 
-                    <div class="amount-box">
-                        <div class="amount-title">COLLECT AMOUNT (COD)</div>
-                        <div class="amount-value">₹${amount}</div>
+                    <div class="cod">
+                        <div class="cod-title">COLLECT AMOUNT (COD)</div>
+                        <div class="amount">₹${bpEscape(amountText)}</div>
                     </div>
                 </div>
             </div>
 
-            <div class="items-sec">
-                <div class="items-title">PACK</div>
-                <div class="items-list">${items}</div>
+            <div class="products">
+                <div class="pack-title">PACK</div>
+                <div class="items">${items}</div>
             </div>
 
-            <footer class="label-footer">
-                <span>Order: #${shippingEscapeHTML(shortId)}</span>
-                <span>Sold by: ${safeShopName}</span>
-                <span>Ph: ${safeShopPhone || "—"}</span>
-                <span>Date: ${date}</span>
+            <footer class="footer">
+                <span>Order: #${bpEscape(shortId)}</span>
+                <span>Sold by: ${bpEscape(shopName)}</span>
+                <span>Phone: ${bpEscape(shopPhone || "—")}</span>
+                <span>Date: ${new Date().toLocaleDateString("en-IN")}</span>
             </footer>
         </section>
     `;
 }
 
-// Shared print stylesheet for BOTH printing modes.
-function shippingPrintCSS() {
+function bpPrintCSS() {
     return `
         @page {
             size: A4 portrait;
-            margin: ${SHIPPING_PRINT_CONFIG.pageMarginMM}mm;
+            margin: 5mm;
         }
 
         * {
@@ -10622,21 +10590,18 @@ function shippingPrintCSS() {
             margin: 0;
             padding: 0;
             width: 100%;
-            background: #fff;
-            color: #000;
             font-family: Arial, Helvetica, sans-serif;
-        }
-
-        body {
-            font-size: 10pt;
+            color: #000;
+            background: #fff;
         }
 
         .sheet {
             width: 100%;
-            height: 285mm;
-            display: flex;
-            flex-direction: column;
-            gap: ${SHIPPING_PRINT_CONFIG.labelGapMM}mm;
+            height: 287mm;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            grid-template-rows: repeat(4, 70mm);
+            gap: 2mm;
             overflow: hidden;
             break-after: page;
             page-break-after: always;
@@ -10647,414 +10612,355 @@ function shippingPrintCSS() {
             page-break-after: auto;
         }
 
-        .label-box {
+        .label {
             width: 100%;
-            height: ${SHIPPING_PRINT_CONFIG.labelHeightMM}mm;
-            flex: 0 0 ${SHIPPING_PRINT_CONFIG.labelHeightMM}mm;
+            height: 70mm;
+            min-width: 0;
+            overflow: hidden;
             border: 1.2pt solid #111;
-            border-radius: 3mm;
-            padding: 4mm 5mm 3mm;
+            border-radius: 2mm;
+            padding: 2.5mm 4mm;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
             background: #fff;
             break-inside: avoid;
             page-break-inside: avoid;
         }
 
-        .label-header {
-            min-height: 10mm;
+        .header {
+            flex: 0 0 7mm;
             display: grid;
             grid-template-columns: 1fr 2fr 1fr;
             align-items: center;
             gap: 2mm;
-            border-bottom: 1.2pt solid #111;
-            padding-bottom: 2mm;
+            border-bottom: 1pt solid #111;
+            padding-bottom: 1.5mm;
         }
 
-        .label-header > span:first-child {
-            font-size: 11pt;
+        .brand {
+            font-size: 10pt;
             font-weight: 900;
-            letter-spacing: .3pt;
         }
 
-        .shipping-heading {
+        .heading {
             text-align: center;
-            font-size: 15pt;
+            font-size: 14pt;
             font-weight: 900;
-            letter-spacing: .7pt;
+            letter-spacing: .4pt;
         }
 
-        .order-badge {
+        .order-id {
             text-align: right;
             font-size: 9pt;
             font-weight: 800;
             overflow-wrap: anywhere;
         }
 
-        .main-content {
+        .content {
             display: grid;
-            grid-template-columns: minmax(0, 1.55fr) minmax(40mm, 1fr);
-            gap: 4mm;
+            grid-template-columns: minmax(0, 1fr) 39mm;
+            gap: 3mm;
             flex: 1;
             min-height: 0;
-            padding: 3mm 0;
+            padding: 2mm 0;
         }
 
-        .col-left {
+        .customer {
             min-width: 0;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            padding-right: 3mm;
             border-right: 1pt dashed #555;
-            padding-right: 4mm;
         }
 
-        .section-title {
-            font-size: 9pt;
+        .caption {
+            font-size: 8pt;
             font-weight: 900;
-            letter-spacing: .5pt;
-            margin-bottom: 1.5mm;
+            letter-spacing: .3pt;
         }
 
-        .cust-name {
-            font-size: 21pt;
+        .name {
+            font-size: 17pt;
+            line-height: 1.1;
             font-weight: 900;
-            line-height: 1.08;
             overflow-wrap: anywhere;
-            margin-bottom: 2mm;
+            margin: 1mm 0;
         }
 
-        .cust-address {
-            font-size: 11pt;
+        .address {
+            font-size: 10pt;
+            line-height: 1.25;
             font-weight: 600;
-            line-height: 1.35;
             overflow-wrap: anywhere;
-            word-break: normal;
         }
 
-        .cust-phone {
+        .phone {
             display: flex;
+            align-items: baseline;
             flex-wrap: wrap;
             gap: 2mm;
-            align-items: baseline;
-            font-size: 13pt;
+            margin-top: 2mm;
+            font-size: 11pt;
+            line-height: 1.15;
             font-weight: 900;
-            margin-top: 3mm;
             overflow-wrap: anywhere;
         }
 
-        .phone-label {
-            font-size: 8pt;
-            letter-spacing: .4pt;
-        }
-
-        .col-right {
+        .right {
             min-width: 0;
             display: flex;
             flex-direction: column;
-            align-items: stretch;
             justify-content: center;
-            gap: 2mm;
+            gap: 1.5mm;
         }
 
-        .qr-box {
-            border: 1pt solid #222;
-            border-radius: 2mm;
-            padding: 2mm;
-            min-height: 43mm;
+        .qr-panel {
+            height: 36mm;
+            flex: 0 0 36mm;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
-            gap: 1mm;
+            align-items: center;
+            gap: .5mm;
+            border: 1pt solid #222;
+            border-radius: 1.5mm;
             background: #fff;
         }
 
-        .qr-placeholder {
-            width: ${SHIPPING_PRINT_CONFIG.qrSizeMM}mm;
-            height: ${SHIPPING_PRINT_CONFIG.qrSizeMM}mm;
+        .qr {
+            width: 28mm;
+            height: 28mm;
+            flex: 0 0 28mm;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex: 0 0 auto;
             background: #fff;
         }
 
-        .qr-placeholder canvas,
-        .qr-placeholder img {
+        .qr canvas,
+        .qr img {
             display: block !important;
-            width: ${SHIPPING_PRINT_CONFIG.qrSizeMM}mm !important;
-            height: ${SHIPPING_PRINT_CONFIG.qrSizeMM}mm !important;
+            width: 28mm !important;
+            height: 28mm !important;
             max-width: none !important;
             max-height: none !important;
-            image-rendering: pixelated;
         }
 
-        .qr-text {
-            text-align: center;
-            font-size: 7.5pt;
+        .qr-caption {
+            font-size: 6.5pt;
+            line-height: 1;
             font-weight: 900;
+            text-align: center;
+        }
+
+        .cod {
+            border: 1.3pt solid #111;
+            border-radius: 1.5mm;
+            text-align: center;
+            padding: 1mm;
+            background: #f2f2f2;
+        }
+
+        .cod-title {
+            font-size: 7pt;
+            line-height: 1.15;
+            font-weight: 900;
+        }
+
+        .amount {
+            font-size: 17pt;
             line-height: 1.1;
-        }
-
-        .amount-box {
-            border: 1.5pt solid #111;
-            border-radius: 2mm;
-            padding: 2mm;
-            text-align: center;
-            background: #f1f1f1;
-        }
-
-        .amount-title {
-            font-size: 8pt;
-            font-weight: 900;
-            line-height: 1.15;
-        }
-
-        .amount-value {
-            font-size: 21pt;
-            line-height: 1.15;
             font-weight: 900;
             overflow-wrap: anywhere;
-            margin: 1mm 0 0;
         }
 
-        .items-sec {
-            flex: 0 0 auto;
-            min-height: 12mm;
-            max-height: 20mm;
+        .products {
+            flex: 0 0 9mm;
+            min-height: 9mm;
+            max-height: 9mm;
             overflow: hidden;
-            border-top: 1pt solid #222;
-            padding-top: 2mm;
             display: flex;
             align-items: flex-start;
             gap: 3mm;
+            border-top: 1pt solid #111;
+            padding-top: 1.5mm;
         }
 
-        .items-title {
-            font-size: 9pt;
+        .pack-title {
+            flex: 0 0 auto;
+            font-size: 8pt;
             font-weight: 900;
             padding-top: 1mm;
-            flex: 0 0 auto;
         }
 
-        .items-list {
+        .items {
+            min-width: 0;
             display: flex;
             flex-wrap: wrap;
-            gap: 1.5mm;
-            min-width: 0;
+            gap: 1mm;
             overflow: hidden;
         }
 
-        .item-tag {
+        .item {
             display: inline-block;
             max-width: 100%;
-            border: .7pt solid #777;
-            border-radius: 1.5mm;
-            padding: 1mm 2mm;
-            font-size: 9pt;
+            padding: .7mm 1.5mm;
+            border: .7pt solid #555;
+            border-radius: 1mm;
+            font-size: 8pt;
+            line-height: 1.15;
             font-weight: 600;
-            line-height: 1.2;
             overflow-wrap: anywhere;
         }
 
-        .label-footer {
+        .footer {
             flex: 0 0 auto;
             display: flex;
-            flex-wrap: wrap;
             justify-content: space-between;
-            gap: 1mm 3mm;
-            border-top: .7pt solid #aaa;
-            margin-top: 2mm;
-            padding-top: 1.5mm;
-            font-size: 7.5pt;
+            flex-wrap: wrap;
+            gap: 1mm 2mm;
+            border-top: .6pt solid #aaa;
+            margin-top: 1mm;
+            padding-top: 1mm;
+            font-size: 6.5pt;
+            line-height: 1.1;
             font-weight: 700;
-            line-height: 1.2;
         }
 
         .qr-error {
-            width: 100%;
+            font-size: 7pt;
             text-align: center;
-            font-size: 9pt;
-            font-weight: 700;
         }
 
         @media screen {
-            body {
-                padding: 5mm;
-            }
-
-            .sheet {
-                margin-bottom: 5mm;
-            }
+            body { padding: 0; }
+            .sheet { margin-bottom: 5mm; }
         }
 
         @media print {
             html, body {
-                width: 100%;
                 margin: 0 !important;
                 padding: 0 !important;
             }
-
-            .sheet {
-                margin: 0 !important;
-            }
+            .sheet { margin: 0 !important; }
         }
     `;
 }
 
-// Load QR library, create QR codes, then open print dialog.
-function runShippingPrint(iframe, htmlContent) {
-    const doc = iframe.contentWindow.document;
-
+function bpRunPrint(frame, html) {
+    const doc = frame.contentWindow.document;
     doc.open();
-    doc.write(htmlContent);
+    doc.write(html);
     doc.close();
 
     let attempts = 0;
+    let printed = false;
 
-    function preparePrint() {
-        if (!iframe.contentWindow || !iframe.contentDocument) return;
+    function prepare() {
+        if (printed) return;
 
-        const printDoc = iframe.contentDocument;
+        const win = frame.contentWindow;
+        const printDoc = frame.contentDocument;
 
-        if (!printDoc.querySelector(".label-box")) return;
-
-        if (typeof iframe.contentWindow.QRCode !== "function") {
-            attempts++;
-
-            if (attempts < 40) {
-                setTimeout(preparePrint, 250);
-                return;
-            }
-
-            alert(
-                "QR library load nahi hui. Internet check karke dobara print karein."
-            );
+        if (!win || !printDoc || !printDoc.querySelector(".label")) {
             return;
         }
 
-        const qrElements = printDoc.querySelectorAll(".qr-placeholder");
+        if (typeof win.QRCode !== "function") {
+            if (++attempts < 40) {
+                setTimeout(prepare, 250);
+            } else {
+                alert("QR library load nahi hui. Internet check karke dobara try karo.");
+            }
+            return;
+        }
 
-        qrElements.forEach(el => {
+        printDoc.querySelectorAll(".qr").forEach(el => {
             const url = el.getAttribute("data-url");
+            el.replaceChildren();
 
             if (!url) {
-                el.innerHTML = '<div class="qr-error">No address available</div>';
+                el.innerHTML = '<div class="qr-error">Address unavailable</div>';
                 return;
             }
 
-            el.innerHTML = "";
-
             try {
-                new iframe.contentWindow.QRCode(el, {
+                new win.QRCode(el, {
                     text: url,
-                    width: SHIPPING_PRINT_CONFIG.qrSizePX,
-                    height: SHIPPING_PRINT_CONFIG.qrSizePX,
+                    width: BP_LABEL.qrPixels,
+                    height: BP_LABEL.qrPixels,
                     colorDark: "#000000",
                     colorLight: "#ffffff",
-                    correctLevel:
-                        iframe.contentWindow.QRCode.CorrectLevel.H
+                    correctLevel: win.QRCode.CorrectLevel.H
                 });
-            } catch (error) {
-                el.innerHTML =
-                    '<div class="qr-error">QR generation failed</div>';
+            } catch (e) {
+                el.innerHTML = '<div class="qr-error">QR failed</div>';
             }
         });
 
-        // Wait for QR images and layout to be ready before printing.
-        const images = Array.from(printDoc.images);
+        printed = true;
 
-        Promise.all(images.map(img => {
-            if (img.complete) return Promise.resolve();
-
-            return new Promise(resolve => {
-                img.onload = resolve;
-                img.onerror = resolve;
-            });
-        })).then(() => {
-            setTimeout(() => {
-                iframe.contentWindow.focus();
-                iframe.contentWindow.print();
-            }, 500);
-        });
+        // Allow the QR canvases and fonts to render before printing.
+        setTimeout(() => {
+            win.focus();
+            win.print();
+        }, 700);
     }
 
-    // Avoid printing before the external QR library loads.
-    const script = doc.querySelector("#shipping-qr-library");
+    const script = doc.querySelector("#bp-qr-library");
 
     if (script) {
-        script.addEventListener("load", preparePrint, { once: true });
         script.addEventListener("error", () => {
-            alert(
-                "QR library load nahi hui. Internet check karke dobara print karein."
-            );
+            alert("QR library load nahi hui. Internet check karo.");
         }, { once: true });
     }
 
-    // Covers cached/already-loaded scripts.
-    setTimeout(preparePrint, 100);
+    setTimeout(prepare, 100);
 }
 
-// Shared page builder. Exactly 3 labels per sheet.
-function printShippingOrders(orders) {
-    if (!Array.isArray(orders) || orders.length === 0) {
+function bpPrintOrders(orders) {
+    if (!Array.isArray(orders) || !orders.length) {
         alert("Print karne ke liye koi order nahi mila.");
         return;
     }
 
     const shopName = globalShopData?.shopName || "BikriPage Store";
     const shopPhone = globalShopData?.phone || "";
-
     const sheets = [];
 
-    for (let i = 0; i < orders.length; i += 3) {
-        const pageOrders = orders.slice(i, i + 3);
-
-        const labels = pageOrders.map((order, index) =>
-            shippingLabelHTML(
-                order,
-                shopName,
-                shopPhone,
-                i + index
-            )
-        ).join("");
+    // Four full-width slips on each A4 page.
+    for (let i = 0; i < orders.length; i += 4) {
+        const labels = orders.slice(i, i + 4)
+            .map(order => bpLabelHTML(order, shopName, shopPhone))
+            .join("");
 
         sheets.push(`<div class="sheet">${labels}</div>`);
     }
 
-    const htmlContent = `
+    const html = `
         <!DOCTYPE html>
-        <html lang="en">
+        <html>
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <title>BikriPage Shipping Labels</title>
-
             <script
-                id="shipping-qr-library"
+                id="bp-qr-library"
                 src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
             ><\/script>
-
-            <style>${shippingPrintCSS()}</style>
+            <style>${bpPrintCSS()}</style>
         </head>
-        <body>
-            ${sheets.join("")}
-        </body>
+        <body>${sheets.join("")}</body>
         </html>
     `;
 
-    const iframe = getShippingPrintFrame();
-    runShippingPrint(iframe, htmlContent);
+    bpRunPrint(bpGetFrame(), html);
 }
 
-// =========================================================
-// 1. PRINT ONE ORDER
-// =========================================================
+// PRINT ONE ORDER
 function generateShippingSlip(orderId) {
     const orders = window.globalLiveOrders || [];
-
     const order = orders.find(o => String(o.id) === String(orderId));
 
     if (!order) {
@@ -11062,34 +10968,25 @@ function generateShippingSlip(orderId) {
         return;
     }
 
-    printShippingOrders([order]);
+    bpPrintOrders([order]);
 }
 
-// =========================================================
-// 2. BATCH PRINT ALL ACCEPTED ORDERS
-//    3 LABELS PER A4 PAGE
-// =========================================================
+// PRINT ALL ACCEPTED ORDERS
 function printAllAcceptedSlips() {
-    const acceptedOrders = (window.globalLiveOrders || [])
+    const orders = (window.globalLiveOrders || [])
         .filter(order => order.status === "accepted");
 
-    if (acceptedOrders.length === 0) {
+    if (!orders.length) {
         if (typeof iosAlert === "function") {
-            iosAlert(
-                "No Accepted Orders",
-                "Abhi koi bhi order Accepted status mein nahi hai."
-            );
+            iosAlert("No Accepted Orders", "Koi accepted order nahi mila.");
         } else {
-            alert("Abhi koi bhi accepted order print karne ke liye nahi hai.");
+            alert("Koi accepted order nahi mila.");
         }
-
         return;
     }
 
-    printShippingOrders(acceptedOrders);
+    bpPrintOrders(orders);
 }
-
-
 
 // =======================================================
 // ✨ NAYA: OUT FOR DELIVERY WHATSAPP MESSAGE ✨

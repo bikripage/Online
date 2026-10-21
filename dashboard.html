@@ -10432,7 +10432,7 @@ async function deleteLiveOrder(orderId) {
             }
         };
 // =======================================================
-// ✨ NAYA: PROFESSIONAL SHIPPING SLIP (100% FIXED PAPER SIZE - mm & pt) ✨
+// ✨ NAYA: SINGLE PRINT (ChatGPT ANALYSIS FIXED - OFFSCREEN IFRAME) ✨
 // =======================================================
 function generateShippingSlip(orderId) {
     let order = window.globalLiveOrders.find(o => o.id === orderId);
@@ -10445,52 +10445,62 @@ function generateShippingSlip(orderId) {
         ? `https://www.google.com/maps/dir/?api=1&destination=${order.lat},${order.lng}` 
         : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.customerAddress || '')}`;
 
+    // 🚀 FIX 1: Iframe ab 'display: none' nahi hai. Isko screen ke bahar chupaya hai.
     let iframe = document.getElementById('print-iframe');
     if (!iframe) {
         iframe = document.createElement('iframe');
         iframe.id = 'print-iframe';
-        iframe.style.display = 'none';
         document.body.appendChild(iframe);
     }
+    // Iframe ko measurable dimensions do, par user ko dikhne mat do
+    iframe.style.position = 'absolute';
+    iframe.style.top = '-10000px';
+    iframe.style.left = '-10000px';
+    iframe.style.width = '100vw';
+    iframe.style.height = '100vh';
+    iframe.style.border = 'none';
 
     let htmlContent = `
+        <!DOCTYPE html>
         <html>
         <head>
             <title>Shipping Label - #${order.id.substring(0,8).toUpperCase()}</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta charset="UTF-8">
             <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
             <style>
-                /* ✨ PRINTING UNITS (mm, pt) USE KIYE HAIN ✨ */
-                body { font-family: 'Arial', sans-serif; margin: 0; padding: 5mm; color: #000; background: #fff; width: 190mm; /* A4 Width */ }
-                @page { size: portrait; margin: 5mm; }
+                /* 🚀 FIX 2: CSS ko scaling aur paper-agnostic (A4/Letter dono ke liye) banaya */
+                * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; color: #000; background: #fff; width: 100%; }
                 
-                .label-box { width: 100%; border: 1mm solid #000; border-radius: 4mm; padding: 6mm; box-sizing: border-box; display: flex; flex-direction: column; margin-bottom: 10mm;}
-                .header { text-align: center; border-bottom: 1mm solid #000; padding-bottom: 3mm; margin-bottom: 5mm; font-weight: 900; font-size: 24pt; letter-spacing: 2px; text-transform: uppercase; }
+                @page { size: auto; margin: 5mm; }
                 
-                .row { display: flex; justify-content: space-between; margin-bottom: 5mm; width: 100%; }
+                .label-box { width: 100%; border: 3pt solid #000; border-radius: 12pt; padding: 20pt; display: flex; flex-direction: column; margin-bottom: 20pt; page-break-inside: avoid; }
+                .header { text-align: center; border-bottom: 3pt solid #000; padding-bottom: 10pt; margin-bottom: 20pt; font-weight: 900; font-size: 24pt; letter-spacing: 2pt; text-transform: uppercase; }
                 
-                .col-left { width: 55%; padding-right: 5mm; border-right: 1mm dashed #ccc; display: flex; flex-direction: column; }
-                .sec-title { font-size: 14pt; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 2mm; }
-                .cust-name { font-size: 32pt; font-weight: 900; margin: 0 0 2mm 0; text-transform: uppercase; line-height: 1.1; }
-                .cust-text { font-size: 16pt; font-weight: bold; margin: 0 0 2mm 0; line-height: 1.4; }
+                .row { display: flex; justify-content: space-between; margin-bottom: 20pt; width: 100%; }
                 
-                .col-right { width: 45%; padding-left: 5mm; display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; }
-                .qr-box { text-align: center; background: #fafafa; border: 0.5mm solid #ddd; padding: 2mm; border-radius: 3mm; }
-                .qr-placeholder { display: inline-block; width: 40mm; height: 40mm; }
-                .qr-text { font-size: 12pt; font-weight: 900; margin-top: 2mm; text-transform: uppercase; text-align: center; }
+                .col-left { width: 60%; padding-right: 20pt; border-right: 2pt dashed #ccc; display: flex; flex-direction: column; }
+                .sec-title { font-size: 12pt; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 8pt; }
+                .cust-name { font-size: 26pt; font-weight: 900; margin: 0 0 6pt 0; text-transform: uppercase; line-height: 1.1; }
+                .cust-text { font-size: 14pt; font-weight: bold; margin: 0 0 6pt 0; line-height: 1.4; }
                 
-                .seller-sec { margin-top: 5mm; text-align: right; width: 100%; }
+                .col-right { width: 40%; padding-left: 20pt; display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; }
+                .qr-box { text-align: center; background: #fafafa; border: 1pt solid #ddd; padding: 5pt; border-radius: 8pt; }
+                .qr-placeholder { display: inline-block; width: 110pt; height: 110pt; }
+                .qr-text { font-size: 10pt; font-weight: 900; margin-top: 5pt; text-transform: uppercase; text-align: center; }
                 
-                .amount-box { border: 1mm solid #000; border-radius: 4mm; text-align: center; padding: 5mm; background: #f9f9f9; margin-top: 4mm; width: 100%; box-sizing: border-box;}
-                .amount-title { font-size: 14pt; font-weight: 900; margin-bottom: 1mm; text-transform: uppercase; letter-spacing: 1px; }
-                .amount-value { font-size: 46pt; font-weight: 900; margin: 0; line-height: 1; }
-                .cod-text { font-size: 16pt; font-weight: 900; letter-spacing: 2px; margin-top: 2mm; }
+                .seller-sec { margin-top: 15pt; text-align: right; width: 100%; }
                 
-                .items-sec { border-top: 1mm solid #f0f0f0; padding-top: 4mm; margin-top: 4mm; }
-                .items-list { font-size: 18pt; font-weight: bold; line-height: 1.6; display: flex; flex-wrap: wrap; gap: 3mm; }
-                .item-tag { background: #f0f0f0; padding: 2mm 4mm; border-radius: 2mm; border: 0.5mm solid #ccc; display: inline-block; }
+                .amount-box { border: 2pt solid #000; border-radius: 12pt; text-align: center; padding: 15pt; background: #f9f9f9; margin-top: 15pt; width: 100%; }
+                .amount-title { font-size: 14pt; font-weight: 900; margin-bottom: 5pt; text-transform: uppercase; letter-spacing: 1pt; }
+                .amount-value { font-size: 40pt; font-weight: 900; margin: 0; line-height: 1; }
+                .cod-text { font-size: 14pt; font-weight: 900; letter-spacing: 2pt; margin-top: 5pt; }
                 
-                .footer { text-align: center; font-size: 12pt; color: #444; font-weight: bold; margin-top: 6mm; border-top: 1mm solid #000; padding-top: 4mm; }
+                .items-sec { border-top: 2pt solid #f0f0f0; padding-top: 15pt; margin-top: 15pt; }
+                .items-list { font-size: 16pt; font-weight: bold; line-height: 1.6; display: flex; flex-wrap: wrap; gap: 8pt; }
+                .item-tag { background: #f0f0f0; padding: 6pt 10pt; border-radius: 6pt; border: 1pt solid #ccc; display: inline-block; }
+                
+                .footer { text-align: center; font-size: 12pt; color: #444; font-weight: bold; margin-top: 20pt; border-top: 2pt solid #000; padding-top: 15pt; }
             </style>
         </head>
         <body>
@@ -10501,7 +10511,7 @@ function generateShippingSlip(orderId) {
                         <div class="sec-title">Deliver To:</div>
                         <p class="cust-name">${order.customerName}</p>
                         <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
-                        <p class="cust-text" style="font-weight: 900; font-size: 20pt; margin-top: 4mm;">📞 Ph: ${order.customerPhone}</p>
+                        <p class="cust-text" style="font-weight: 900; font-size: 18pt; margin-top: 15pt;">📞 Ph: ${order.customerPhone}</p>
                     </div>
                     <div class="col-right">
                         <div class="qr-box">
@@ -10509,8 +10519,8 @@ function generateShippingSlip(orderId) {
                             <div class="qr-text">Scan for Direction</div>
                         </div>
                         <div class="seller-sec">
-                            <div class="sec-title" style="margin-bottom: 1mm;">Sold By:</div>
-                            <p class="cust-text" style="font-weight: 900; font-size: 18pt;">${shopName}</p>
+                            <div class="sec-title" style="margin-bottom: 4pt;">Sold By:</div>
+                            <p class="cust-text" style="font-weight: 900; font-size: 16pt;">${shopName}</p>
                             <p class="cust-text" style="font-size: 14pt;">Ph: ${shopPhone}</p>
                         </div>
                     </div>
@@ -10521,7 +10531,7 @@ function generateShippingSlip(orderId) {
                     <div class="cod-text">(CASH ON DELIVERY)</div>
                 </div>
                 <div class="items-sec">
-                    <div class="sec-title" style="margin-bottom: 2mm;">Products to Pack:</div>
+                    <div class="sec-title" style="margin-bottom: 10pt;">Products to Pack:</div>
                     <div class="items-list">
                         ${order.items.map(i => `<span class="item-tag"><b>${i.qty}x</b>${i.name}</span>`).join(' ')}
                     </div>
@@ -10533,17 +10543,18 @@ function generateShippingSlip(orderId) {
                 window.onload = function() {
                     new QRCode(document.getElementById("qrcode"), {
                         text: "${mapUrl}",
-                        width: 256, /* JS me pixel bada rakha hai taaki clear bane */
+                        width: 256, 
                         height: 256,
                         colorDark : "#000000",
                         colorLight : "#ffffff",
                         correctLevel : QRCode.CorrectLevel.L
                     });
                     
-                    // Thoda time diya taaki QR generate ho aur page render ho sake
+                    // 🚀 FIX 3: 1 Full Second ka delay taaki QR HD mein render ho jaye
                     setTimeout(() => {
+                        window.focus();
                         window.print();
-                    }, 600);
+                    }, 1000);
                 };
             <\/script>
         </body>
@@ -10554,6 +10565,170 @@ function generateShippingSlip(orderId) {
     doc.open();
     doc.write(htmlContent);
     doc.close();
+}
+
+// =======================================================
+// ✨ NAYA: BATCH PRINT (ChatGPT ANALYSIS FIXED - OFFSCREEN IFRAME) ✨
+// =======================================================
+function printAllAcceptedSlips() {
+    let acceptedOrders = window.globalLiveOrders.filter(o => o.status === 'accepted');
+
+    if (acceptedOrders.length === 0) {
+        iosAlert("No Accepted Orders", "Abhi koi bhi order 'Accepted' status mein nahi hai print karne ke liye.");
+        return;
+    }
+
+    let shopName = globalShopData.shopName || "Store Name";
+    let ownerName = globalShopData.ownerName || "Shopkeeper";
+    let shopPhone = globalShopData.phone || "";
+    let shopAddress = globalShopData.address || "Return address not provided";
+
+    // 🚀 FIX 1: Off-screen Iframe
+    let iframe = document.getElementById('print-iframe');
+    if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'print-iframe';
+        document.body.appendChild(iframe);
+    }
+    iframe.style.position = 'absolute';
+    iframe.style.top = '-10000px';
+    iframe.style.left = '-10000px';
+    iframe.style.width = '100vw';
+    iframe.style.height = '100vh';
+    iframe.style.border = 'none';
+
+    let allSlipsHtml = acceptedOrders.map((order) => {
+        let mapUrl = (order.lat && order.lng) 
+            ? `https://www.google.com/maps/dir/?api=1&destination=${order.lat},${order.lng}` 
+            : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.customerAddress || '')}`;
+
+        let itemsList = (order.items && order.items.length > 0) 
+            ? order.items.map(i => `<span class="item-tag"><b>${i.qty}x</b> ${i.name}</span>`).join(' ') 
+            : '<span class="item-tag">No items found</span>';
+
+        return `
+            <div class="label-box">
+                <div class="header">SHIPPING LABEL</div>
+                
+                <div class="main-content">
+                    <div class="col-left">
+                        <div class="sec-title">Deliver To:</div>
+                        <p class="cust-name">${order.customerName}</p>
+                        <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
+                        <p class="cust-text" style="font-weight: 900; font-size: 18pt; margin-top: 10pt;">📞 Ph: ${order.customerPhone}</p>
+                        
+                        <div class="seller-sec">
+                            <span style="font-size: 12pt; color: #555; text-transform: uppercase; font-weight: 900;">Sold By:</span> 
+                            <span style="font-size: 16pt; font-weight: 900; margin-left: 4pt;">${ownerName}</span>
+                            <span style="font-size: 12pt; color: #444; font-weight: bold; margin-left: 4pt;">(${shopName})</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-right">
+                        <div style="display: flex; gap: 10pt; margin-bottom: 10pt; width: 100%;">
+                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                                <div style="font-size: 10pt; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 4pt;">If Undelivered, Return To:</div>
+                                <div style="font-size: 14pt; font-weight: 900; margin-bottom: 4pt;">${shopName}</div>
+                                <div style="font-size: 11pt; color: #333; line-height: 1.3; font-weight: bold;">${shopAddress}</div>
+                                <div style="font-size: 12pt; font-weight: 900; margin-top: 6pt;">Ph: ${shopPhone}</div>
+                            </div>
+                            
+                            <div class="qr-box">
+                                <div id="qrcode-${order.id}" class="qr-placeholder" data-url="${mapUrl}"></div>
+                                <div class="qr-text">Scan for Direction</div>
+                            </div>
+                        </div>
+
+                        <div class="amount-box-compact">
+                            <div class="amount-lbl">COLLECT AMOUNT</div>
+                            <div class="amount-val">₹${order.totalAmount}</div>
+                            <div class="amount-lbl">(COD)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="items-sec">
+                    <div class="sec-title" style="margin-bottom: 10pt;">Products to Pack:</div>
+                    <div class="items-list">${itemsList}</div>
+                </div>
+
+                <div class="footer">
+                    Order ID: #${order.id.substring(0,8).toUpperCase()} &nbsp;&nbsp;|&nbsp;&nbsp; Date: ${new Date().toLocaleDateString('en-IN')}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    let htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Batch Print - Accepted Orders</title>
+            <meta charset="UTF-8">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+            <style>
+                * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; color: #000; background: #fff; width: 100%; }
+                
+                @page { size: auto; margin: 5mm; }
+                
+                .label-box { width: 100%; border: 3pt solid #000; border-radius: 12pt; padding: 15pt; display: flex; flex-direction: column; margin-bottom: 20pt; page-break-inside: avoid; }
+                .header { text-align: center; border-bottom: 3pt solid #000; padding-bottom: 10pt; margin-bottom: 15pt; font-weight: 900; font-size: 22pt; letter-spacing: 2pt; text-transform: uppercase; }
+                
+                .main-content { display: flex; justify-content: space-between; margin-bottom: 15pt; flex: 1; width: 100%; }
+                .col-left { width: 55%; padding-right: 15pt; border-right: 2pt dashed #ccc; display: flex; flex-direction: column; }
+                .sec-title { font-size: 11pt; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 6pt; }
+                .cust-name { font-size: 24pt; font-weight: 900; margin: 0 0 6pt 0; text-transform: uppercase; line-height: 1.1; }
+                .cust-text { font-size: 13pt; font-weight: bold; margin: 0 0 6pt 0; line-height: 1.4; }
+                .seller-sec { margin-top: auto; padding-top: 15pt; border-top: 2pt dashed #eee; }
+                
+                .col-right { width: 45%; padding-left: 15pt; display: flex; flex-direction: column; flex-shrink: 0; }
+                
+                .qr-box { text-align: center; width: 100pt; flex-shrink: 0; }
+                .qr-placeholder { display: inline-block; width: 100pt; height: 100pt; background: #fafafa; border: 1pt solid #ddd; padding: 4pt; border-radius: 6pt; }
+                .qr-text { font-size: 9pt; font-weight: 900; margin-top: 4pt; text-transform: uppercase; text-align: center; }
+                
+                .amount-box-compact { border: 2pt solid #000; border-radius: 10pt; text-align: center; padding: 10pt; background: #f9f9f9; width: 100%; margin-top: auto;}
+                .amount-lbl { font-size: 12pt; font-weight: 900; text-transform: uppercase; letter-spacing: 1pt; }
+                .amount-val { font-size: 36pt; font-weight: 900; margin: 4pt 0; line-height: 1; }
+                
+                .items-sec { border-top: 2pt solid #f0f0f0; padding-top: 15pt; margin-bottom: 10pt; }
+                .items-list { font-size: 14pt; font-weight: bold; line-height: 1.6; display: flex; flex-wrap: wrap; gap: 6pt; }
+                .item-tag { background: #f0f0f0; padding: 6pt 10pt; border-radius: 6pt; border: 1pt solid #ccc; display: inline-block; }
+                
+                .footer { text-align: center; font-size: 11pt; color: #444; font-weight: bold; margin-top: 15pt; border-top: 2pt solid #000; padding-top: 10pt; }
+            </style>
+        </head>
+        <body>
+            ${allSlipsHtml}
+            <script>
+                window.onload = function() {
+                    let qrElements = document.querySelectorAll('.qr-placeholder');
+                    qrElements.forEach(el => {
+                        let url = el.getAttribute('data-url');
+                        new QRCode(el, {
+                            text: url,
+                            width: 256, 
+                            height: 256,
+                            colorDark : "#000000",
+                            colorLight : "#ffffff",
+                            correctLevel : QRCode.CorrectLevel.L
+                        });
+                    });
+                    
+                    // 🚀 FIX 3: Wait for all canvases to draw before printing
+                    setTimeout(() => {
+                        window.focus();
+                        window.print();
+                    }, 1200);
+                };
+            <\/script>
+        </body>
+        </html>
+    `;
+
+    let doc = iframe.contentWindow.document;
+    doc.open(); doc.write(htmlContent); doc.close();
 }
 
 // =======================================================

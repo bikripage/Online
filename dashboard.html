@@ -10432,7 +10432,7 @@ async function deleteLiveOrder(orderId) {
             }
         };
 // =======================================================
-// ✨ 1. SINGLE ORDER SLIP (EXACT A4 PAPER & BIG QR FIX) ✨
+// ✨ 1. SINGLE ORDER SLIP (3 SLIPS PER A4 PAGE, NO RETURN ADDRESS) ✨
 // =======================================================
 function generateShippingSlip(orderId) {
     let order = window.globalLiveOrders.find(o => o.id === orderId);
@@ -10454,8 +10454,8 @@ function generateShippingSlip(orderId) {
     iframe.style.position = 'fixed';
     iframe.style.top = '-9999px';
     iframe.style.left = '-9999px';
-    iframe.style.width = '210mm'; // Exact A4 Width
-    iframe.style.height = '297mm'; // Exact A4 Height
+    iframe.style.width = '210mm';
+    iframe.style.height = '297mm';
     iframe.style.border = 'none';
 
     let htmlContent = `
@@ -10467,38 +10467,47 @@ function generateShippingSlip(orderId) {
             <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
             <style>
                 * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                @page { size: A4 portrait; margin: 6mm; }
+                body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; color: #000; background: #fff; width: 198mm; }
                 
-                /* 🔥 STRICT A4 PAGE SETUP 🔥 */
-                @page { size: A4 portrait; margin: 8mm; }
-                body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; color: #000; background: #fff; width: 194mm; }
+                .label-box { 
+                    width: 100%; 
+                    height: 88mm; /* Ek A4 page par exact 3 slips aayengi */
+                    border: 2.5pt solid #000; 
+                    border-radius: 8pt; 
+                    padding: 10mm 12mm; 
+                    display: flex; 
+                    flex-direction: column; 
+                    justify-content: space-between;
+                    page-break-inside: avoid; 
+                }
+                .header { text-align: center; border-bottom: 2pt solid #000; padding-bottom: 2mm; margin-bottom: 3mm; font-weight: 900; font-size: 16pt; letter-spacing: 1.5px; text-transform: uppercase; }
                 
-                .label-box { width: 100%; border: 4px solid #000; border-radius: 14px; padding: 22px; display: flex; flex-direction: column; page-break-inside: avoid; }
-                .header { text-align: center; border-bottom: 4px solid #000; padding-bottom: 12px; margin-bottom: 20px; font-weight: 900; font-size: 30px; letter-spacing: 2px; text-transform: uppercase; }
+                .main-content { display: flex; justify-content: space-between; align-items: stretch; width: 100%; flex: 1; }
                 
-                .main-content { display: flex; justify-content: space-between; margin-bottom: 20px; width: 100%; }
+                .col-left { width: 58%; padding-right: 4mm; border-right: 1.5pt dashed #000; display: flex; flex-direction: column; justify-content: center; }
+                .sec-title { font-size: 10pt; color: #333; text-transform: uppercase; font-weight: 900; margin-bottom: 2mm; }
+                .cust-name { font-size: 20pt; font-weight: 900; margin: 0 0 2mm 0; text-transform: uppercase; line-height: 1.1; }
+                .cust-text { font-size: 11pt; font-weight: bold; margin: 0 0 2mm 0; line-height: 1.3; }
+                .cust-phone { font-size: 14pt; font-weight: 900; margin-top: 2mm; }
                 
-                .col-left { width: 58%; padding-right: 20px; border-right: 3px dashed #000; display: flex; flex-direction: column; }
-                .sec-title { font-size: 16px; color: #333; text-transform: uppercase; font-weight: 900; margin-bottom: 8px; }
-                .cust-name { font-size: 36px; font-weight: 900; margin: 0 0 10px 0; text-transform: uppercase; line-height: 1.1; }
-                .cust-text { font-size: 20px; font-weight: bold; margin: 0 0 8px 0; line-height: 1.4; }
+                .col-right { width: 42%; padding-left: 4mm; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
                 
-                .col-right { width: 42%; padding-left: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+                .qr-box { text-align: center; background: #fff; border: 1.5pt solid #000; padding: 2mm; border-radius: 6pt; width: 100%; display: flex; flex-direction: column; align-items: center; }
+                .qr-placeholder { width: 24mm; height: 24mm; display: flex; align-items: center; justify-content: center; }
+                .qr-placeholder img, .qr-placeholder canvas { width: 24mm !important; height: 24mm !important; display: block !important; }
+                .qr-text { font-size: 7.5pt; font-weight: 900; margin-top: 1mm; text-transform: uppercase; text-align: center; }
                 
-                /* 🔥 QR CODE SCALING FIX 🔥 */
-                .qr-box { text-align: center; background: #fff; border: 2px solid #000; padding: 10px; border-radius: 10px; margin-bottom: 12px; width: 100%; display: flex; flex-direction: column; align-items: center; }
-                .qr-placeholder { width: 155px; height: 155px; display: flex; align-items: center; justify-content: center; }
-                .qr-placeholder img, .qr-placeholder canvas { width: 155px !important; height: 155px !important; display: block !important; }
-                .qr-text { font-size: 13px; font-weight: 900; margin-top: 6px; text-transform: uppercase; text-align: center; }
+                .amount-box { border: 2pt solid #000; border-radius: 6pt; text-align: center; padding: 2mm; background: #f2f2f2; width: 100%; }
+                .amount-title { font-size: 9pt; font-weight: 900; text-transform: uppercase; }
+                .amount-value { font-size: 20pt; font-weight: 900; margin: 1mm 0; line-height: 1; }
                 
-                .amount-box { border: 4px solid #000; border-radius: 12px; text-align: center; padding: 14px; background: #f2f2f2; width: 100%; margin-top: 10px; }
-                .amount-title { font-size: 15px; font-weight: 900; text-transform: uppercase; }
-                .amount-value { font-size: 46px; font-weight: 900; margin: 4px 0; line-height: 1; }
+                .items-sec { border-top: 1.5pt solid #000; padding-top: 2mm; margin-top: 2mm; display: flex; align-items: center; gap: 4mm; }
+                .items-title { font-size: 9.5pt; font-weight: 900; text-transform: uppercase; white-space: nowrap; }
+                .items-list { font-size: 11pt; font-weight: 900; display: flex; flex-wrap: wrap; gap: 2mm; }
+                .item-tag { background: #eee; padding: 1mm 2.5mm; border-radius: 4pt; border: 1pt solid #000; display: inline-block; }
                 
-                .items-sec { border-top: 3px solid #000; padding-top: 15px; margin-top: 10px; }
-                .items-list { font-size: 22px; font-weight: 900; display: flex; flex-wrap: wrap; gap: 10px; }
-                .item-tag { background: #eee; padding: 8px 14px; border-radius: 8px; border: 2px solid #000; display: inline-block; }
-                
-                .footer { text-align: center; font-size: 16px; color: #000; font-weight: 900; margin-top: 20px; border-top: 3px solid #000; padding-top: 12px; }
+                .footer { text-align: center; font-size: 8.5pt; color: #000; font-weight: 900; margin-top: 2mm; border-top: 1.5pt solid #000; padding-top: 2mm; }
             </style>
         </head>
         <body>
@@ -10509,7 +10518,7 @@ function generateShippingSlip(orderId) {
                         <div class="sec-title">Deliver To:</div>
                         <p class="cust-name">${order.customerName}</p>
                         <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
-                        <p class="cust-text" style="font-weight: 900; font-size: 24px; margin-top: 12px;">📞 Ph: ${order.customerPhone}</p>
+                        <p class="cust-phone">📞 Ph: ${order.customerPhone}</p>
                     </div>
                     <div class="col-right">
                         <div class="qr-box">
@@ -10523,7 +10532,7 @@ function generateShippingSlip(orderId) {
                     </div>
                 </div>
                 <div class="items-sec">
-                    <div class="sec-title">Products to Pack:</div>
+                    <div class="items-title">Pack:</div>
                     <div class="items-list">
                         ${order.items.map(i => `<span class="item-tag">${i.qty}x${i.name}</span>`).join(' ')}
                     </div>
@@ -10535,8 +10544,8 @@ function generateShippingSlip(orderId) {
                 window.onload = function() {
                     new QRCode(document.getElementById("qrcode"), {
                         text: "${mapUrl}",
-                        width: 155,
-                        height: 155,
+                        width: 100,
+                        height: 100,
                         colorDark : "#000000",
                         colorLight : "#ffffff",
                         correctLevel : QRCode.CorrectLevel.L
@@ -10553,7 +10562,7 @@ function generateShippingSlip(orderId) {
 }
 
 // =======================================================
-// ✨ 2. BATCH PRINT ALL ACCEPTED ORDERS (EXACT A4 PAPER FIX) ✨
+// ✨ 2. BATCH PRINT ALL ACCEPTED ORDERS (3 SLIPS PER A4 PAGE) ✨
 // =======================================================
 function printAllAcceptedSlips() {
     let acceptedOrders = window.globalLiveOrders.filter(o => o.status === 'accepted');
@@ -10564,9 +10573,7 @@ function printAllAcceptedSlips() {
     }
 
     let shopName = globalShopData.shopName || "Store Name";
-    let ownerName = globalShopData.ownerName || "Shopkeeper";
     let shopPhone = globalShopData.phone || "";
-    let shopAddress = globalShopData.address || "Return address not provided";
 
     let iframe = document.getElementById('print-iframe');
     if (!iframe) {
@@ -10577,8 +10584,8 @@ function printAllAcceptedSlips() {
     iframe.style.position = 'fixed';
     iframe.style.top = '-9999px';
     iframe.style.left = '-9999px';
-    iframe.style.width = '210mm'; // Exact A4 Width
-    iframe.style.height = '297mm'; // Exact A4 Height
+    iframe.style.width = '210mm';
+    iframe.style.height = '297mm';
     iframe.style.border = 'none';
 
     let allSlipsHtml = acceptedOrders.map((order) => {
@@ -10593,46 +10600,29 @@ function printAllAcceptedSlips() {
         return `
             <div class="label-box">
                 <div class="header">SHIPPING LABEL</div>
-                
                 <div class="main-content">
-                    <!-- LEFT SIDE: CUSTOMER & RETURN ADDRESS -->
                     <div class="col-left">
                         <div class="sec-title">Deliver To:</div>
                         <p class="cust-name">${order.customerName}</p>
                         <p class="cust-text">${order.customerAddress || 'Address not provided'}</p>
                         <p class="cust-phone">📞 Ph: ${order.customerPhone}</p>
-                        
-                        <div class="return-sec">
-                            <div style="font-size: 13px; color: #444; text-transform: uppercase; font-weight: 900; margin-bottom: 3px;">If Undelivered, Return To:</div>
-                            <div style="font-size: 18px; font-weight: 900;">${shopName} (${ownerName})</div>
-                            <div style="font-size: 15px; color: #222; font-weight: bold; line-height: 1.3;">${shopAddress}</div>
-                            <div style="font-size: 16px; font-weight: 900; margin-top: 3px;">Ph: ${shopPhone}</div>
-                        </div>
                     </div>
-                    
-                    <!-- RIGHT SIDE: BIG QR & BIG COD BOX (STACKED VERTICALLY) -->
                     <div class="col-right">
                         <div class="qr-box">
                             <div id="qrcode-${order.id}" class="qr-placeholder" data-url="${mapUrl}"></div>
-                            <div class="qr-text">SCAN FOR DIRECTION</div>
+                            <div class="qr-text">Scan for Direction</div>
                         </div>
-
-                        <div class="amount-box-compact">
-                            <div class="amount-lbl">COLLECT AMOUNT</div>
-                            <div class="amount-val">₹${order.totalAmount}</div>
-                            <div class="amount-lbl">(CASH ON DELIVERY)</div>
+                        <div class="amount-box">
+                            <div class="amount-title">Collect Amount (COD)</div>
+                            <p class="amount-value">₹${order.totalAmount}</p>
                         </div>
                     </div>
                 </div>
-                
                 <div class="items-sec">
-                    <div class="sec-title" style="margin-bottom: 8px;">Products to Pack:</div>
+                    <div class="items-title">Pack:</div>
                     <div class="items-list">${itemsList}</div>
                 </div>
-
-                <div class="footer">
-                    Order ID: #${order.id.substring(0,8).toUpperCase()} &nbsp;&nbsp;|&nbsp;&nbsp; Date: ${new Date().toLocaleDateString('en-IN')}
-                </div>
+                <div class="footer">Order ID: #${order.id.substring(0,8).toUpperCase()} &nbsp;|&nbsp; Sold By: ${shopName} (${shopPhone}) &nbsp;|&nbsp; Date: ${new Date().toLocaleDateString('en-IN')}</div>
             </div>
         `;
     }).join('');
@@ -10646,41 +10636,47 @@ function printAllAcceptedSlips() {
             <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
             <style>
                 * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                @page { size: A4 portrait; margin: 6mm; }
+                body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; color: #000; background: #fff; width: 198mm; }
                 
-                /* 🔥 STRICT A4 PAGE SETUP 🔥 */
-                @page { size: A4 portrait; margin: 8mm; }
-                body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; color: #000; background: #fff; width: 194mm; }
+                .label-box { 
+                    width: 100%; 
+                    height: 88mm; /* Exactly 3 slips per A4 page */
+                    border: 2.5pt solid #000; 
+                    border-radius: 8pt; 
+                    padding: 10mm 12mm; 
+                    display: flex; 
+                    flex-direction: column; 
+                    justify-content: space-between;
+                    page-break-inside: avoid; 
+                    margin-bottom: 4mm; 
+                }
+                .header { text-align: center; border-bottom: 2pt solid #000; padding-bottom: 2mm; margin-bottom: 3mm; font-weight: 900; font-size: 16pt; letter-spacing: 1.5px; text-transform: uppercase; }
                 
-                .label-box { width: 100%; border: 4px solid #000; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; margin-bottom: 12mm; page-break-inside: avoid; }
-                .header { text-align: center; border-bottom: 4px solid #000; padding-bottom: 10px; margin-bottom: 18px; font-weight: 900; font-size: 28px; letter-spacing: 2px; text-transform: uppercase; }
+                .main-content { display: flex; justify-content: space-between; align-items: stretch; width: 100%; flex: 1; }
+                .col-left { width: 58%; padding-right: 4mm; border-right: 1.5pt dashed #000; display: flex; flex-direction: column; justify-content: center; }
+                .sec-title { font-size: 10pt; color: #333; text-transform: uppercase; font-weight: 900; margin-bottom: 2mm; }
+                .cust-name { font-size: 20pt; font-weight: 900; margin: 0 0 2mm 0; text-transform: uppercase; line-height: 1.1; }
+                .cust-text { font-size: 11pt; font-weight: bold; margin: 0 0 2mm 0; line-height: 1.3; }
+                .cust-phone { font-size: 14pt; font-weight: 900; margin-top: 2mm; }
                 
-                .main-content { display: flex; justify-content: space-between; margin-bottom: 16px; width: 100%; }
+                .col-right { width: 42%; padding-left: 4mm; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
                 
-                .col-left { width: 58%; padding-right: 20px; border-right: 3px dashed #000; display: flex; flex-direction: column; justify-content: space-between; }
-                .sec-title { font-size: 15px; color: #333; text-transform: uppercase; font-weight: 900; margin-bottom: 6px; letter-spacing: 0.5px; }
-                .cust-name { font-size: 34px; font-weight: 900; margin: 0 0 8px 0; text-transform: uppercase; line-height: 1.1; }
-                .cust-text { font-size: 19px; font-weight: bold; margin: 0 0 8px 0; line-height: 1.35; }
-                .cust-phone { font-size: 23px; font-weight: 900; margin: 6px 0 16px 0; }
+                .qr-box { text-align: center; background: #fff; border: 1.5pt solid #000; padding: 2mm; border-radius: 6pt; width: 100%; display: flex; flex-direction: column; align-items: center; }
+                .qr-placeholder { width: 24mm; height: 24mm; display: flex; align-items: center; justify-content: center; }
+                .qr-placeholder img, .qr-placeholder canvas { width: 24mm !important; height: 24mm !important; display: block !important; }
+                .qr-text { font-size: 7.5pt; font-weight: 900; margin-top: 1mm; text-transform: uppercase; text-align: center; }
                 
-                .return-sec { margin-top: auto; padding-top: 14px; border-top: 2px dashed #888; }
+                .amount-box { border: 2pt solid #000; border-radius: 6pt; text-align: center; padding: 2mm; background: #f2f2f2; width: 100%; }
+                .amount-title { font-size: 9pt; font-weight: 900; text-transform: uppercase; }
+                .amount-value { font-size: 20pt; font-weight: 900; margin: 1mm 0; line-height: 1; }
                 
-                .col-right { width: 42%; padding-left: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+                .items-sec { border-top: 1.5pt solid #000; padding-top: 2mm; margin-top: 2mm; display: flex; align-items: center; gap: 4mm; }
+                .items-title { font-size: 9.5pt; font-weight: 900; text-transform: uppercase; white-space: nowrap; }
+                .items-list { font-size: 11pt; font-weight: 900; display: flex; flex-wrap: wrap; gap: 2mm; }
+                .item-tag { background: #eee; padding: 1mm 2.5mm; border-radius: 4pt; border: 1pt solid #000; display: inline-block; }
                 
-                /* 🔥 FORCE QR SIZE & PREVENT CROPPING 🔥 */
-                .qr-box { text-align: center; border: 2px solid #000; padding: 10px; border-radius: 10px; background: #fff; margin-bottom: 14px; width: 100%; display: flex; flex-direction: column; align-items: center; }
-                .qr-placeholder { width: 150px; height: 150px; display: flex; align-items: center; justify-content: center; }
-                .qr-placeholder img, .qr-placeholder canvas { width: 150px !important; height: 150px !important; display: block !important; }
-                .qr-text { font-size: 12px; font-weight: 900; margin-top: 6px; text-transform: uppercase; text-align: center; letter-spacing: 0.5px; }
-                
-                .amount-box-compact { border: 4px solid #000; border-radius: 12px; text-align: center; padding: 12px 10px; background: #f2f2f2; width: 100%; margin-top: auto; }
-                .amount-lbl { font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
-                .amount-val { font-size: 42px; font-weight: 900; margin: 4px 0; line-height: 1; }
-                
-                .items-sec { border-top: 3px solid #000; padding-top: 14px; margin-bottom: 10px; }
-                .items-list { font-size: 20px; font-weight: 900; line-height: 1.5; display: flex; flex-wrap: wrap; gap: 10px; }
-                .item-tag { background: #eee; padding: 6px 14px; border-radius: 8px; border: 2px solid #000; display: inline-block; }
-                
-                .footer { text-align: center; font-size: 15px; color: #000; font-weight: 900; margin-top: 12px; border-top: 3px solid #000; padding-top: 10px; }
+                .footer { text-align: center; font-size: 8.5pt; color: #000; font-weight: 900; margin-top: 2mm; border-top: 1.5pt solid #000; padding-top: 2mm; }
             </style>
         </head>
         <body>
@@ -10691,19 +10687,15 @@ function printAllAcceptedSlips() {
                     qrElements.forEach(el => {
                         let url = el.getAttribute('data-url');
                         new QRCode(el, {
+                            width: 100,
+                            height: 100,
                             text: url,
-                            width: 150, 
-                            height: 150,
                             colorDark : "#000000",
                             colorLight : "#ffffff",
                             correctLevel : QRCode.CorrectLevel.L
                         });
                     });
-                    
-                    setTimeout(() => {
-                        window.focus();
-                        window.print();
-                    }, 1000);
+                    setTimeout(() => { window.focus(); window.print(); }, 1000);
                 };
             <\/script>
         </body>
@@ -10713,6 +10705,7 @@ function printAllAcceptedSlips() {
     let doc = iframe.contentWindow.document;
     doc.open(); doc.write(htmlContent); doc.close();
 }
+
 
 // =======================================================
 // ✨ NAYA: OUT FOR DELIVERY WHATSAPP MESSAGE ✨

@@ -129,14 +129,23 @@
         <!-- Thick Divider -->
         <div class="w-full h-2 bg-[#F7F7F9]"></div>
 
-        <!-- SEARCH BAR -->
-        <div class="px-5 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h3 class="font-black text-gray-900 text-lg tracking-tight">Products</h3>
-            <div class="relative w-full sm:w-64">
-                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <input type="text" id="store-product-search" onkeyup="filterStoreProducts(this.value)" placeholder="Search products..." class="w-full bg-[#F7F7F9] px-4 py-3 pl-11 rounded-2xl border border-transparent focus:border-[#007AFF] outline-none text-sm font-semibold transition-all placeholder-gray-400">
-            </div>
+        <!-- SEARCH BAR & FILTER -->
+<div class="px-5 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <h3 class="font-black text-gray-900 text-lg tracking-tight">Products</h3>
+    
+    <div class="flex items-center gap-2 w-full sm:w-auto">
+        <!-- Search Input -->
+        <div class="relative flex-1 sm:w-64">
+            <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            <input type="text" id="store-product-search" onkeyup="filterStoreProducts(this.value)" placeholder="Search products..." class="w-full bg-[#F7F7F9] px-4 py-3 pl-11 rounded-2xl border border-transparent focus:border-[#007AFF] outline-none text-sm font-semibold transition-all placeholder-gray-400">
         </div>
+        
+        <!-- ✨ NAYA SMART FILTER BUTTON ✨ -->
+        <button onclick="openSmartFilter()" class="w-[46px] h-[46px] shrink-0 bg-[#F7F7F9] hover:bg-gray-200 text-gray-700 rounded-2xl flex items-center justify-center transition-all active:scale-95 border border-gray-100 shadow-sm">
+            <i class="fas fa-sliders-h text-[15px]"></i>
+        </button>
+    </div>
+</div>
 
         <!-- ✨ PRODUCT GRID ✨ -->
         <section id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 grid-borders w-full bg-gray-100">
@@ -289,6 +298,57 @@
             </button>
         </div>
     </div>
+<!-- ✨ SMART FILTER MODAL ✨ -->
+<div id="smart-filter-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[200] hidden flex flex-col justify-end transition-all duration-300 opacity-0">
+    <!-- Overlay Click to Close -->
+    <div class="absolute inset-0" onclick="closeSmartFilter()"></div>
+    
+    <div id="smart-filter-content" class="bg-white w-full rounded-t-[2rem] p-6 transform translate-y-full transition-transform duration-300 relative flex flex-col max-h-[85vh] z-10 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
+        
+        <div class="flex justify-between items-center mb-5 border-b border-gray-100 pb-4">
+            <h3 class="font-black text-gray-900 text-lg flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center">
+                    <i class="fas fa-sliders-h text-[13px]"></i>
+                </div>
+                Sort & Filter
+            </h3>
+            <button onclick="closeSmartFilter()" class="w-8 h-8 bg-gray-50 hover:bg-gray-100 rounded-full flex items-center justify-center text-gray-500 active:scale-90 transition">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto custom-scrollbar space-y-6 pb-6">
+            <!-- Sort Options -->
+            <div>
+                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Sort By Price</h4>
+                <div class="flex flex-wrap gap-2.5">
+                    <button onclick="selectSort('default')" id="sort-default" class="filter-sort-btn px-4 py-2.5 rounded-xl border border-gray-900 text-[13px] font-bold bg-gray-900 text-white transition active:scale-95 shadow-sm">Default</button>
+                    <button onclick="selectSort('low-high')" id="sort-low-high" class="filter-sort-btn px-4 py-2.5 rounded-xl border border-gray-200 text-[13px] font-bold text-gray-600 bg-white transition active:scale-95 shadow-sm">Low to High</button>
+                    <button onclick="selectSort('high-low')" id="sort-high-low" class="filter-sort-btn px-4 py-2.5 rounded-xl border border-gray-200 text-[13px] font-bold text-gray-600 bg-white transition active:scale-95 shadow-sm">High to Low</button>
+                </div>
+            </div>
+
+            <!-- Quick Filters -->
+            <div>
+                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Quick Filters</h4>
+                <div class="flex flex-wrap gap-2.5">
+                    <button onclick="toggleQuickFilter('discount')" id="filter-discount" class="filter-quick-btn px-4 py-2.5 rounded-xl border border-gray-200 text-[13px] font-bold text-gray-600 bg-white transition active:scale-95 shadow-sm flex items-center gap-1.5">
+                        <i class="fas fa-tags text-red-500"></i> Offers Only
+                    </button>
+                    <button onclick="toggleQuickFilter('under-99')" id="filter-under-99" class="filter-quick-btn px-4 py-2.5 rounded-xl border border-gray-200 text-[13px] font-bold text-gray-600 bg-white transition active:scale-95 shadow-sm flex items-center gap-1.5">
+                        <i class="fas fa-bolt text-yellow-500"></i> Under ₹99
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="pt-4 border-t border-gray-100 flex gap-3">
+            <button onclick="clearSmartFilters()" class="flex-1 py-3.5 rounded-xl font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 active:scale-95 transition text-sm">Clear All</button>
+            <button onclick="applySmartFilters()" class="flex-[2] py-3.5 rounded-xl font-bold text-white bg-[#007AFF] hover:bg-blue-600 active:scale-95 transition text-sm shadow-[0_8px_20px_rgba(0,122,255,0.2)]">Apply Filters</button>
+        </div>
+    </div>
+</div>
 
     <!-- ✨ FLASH OFFER MODAL ✨ -->
     <div id="flash-offer-modal" class="fixed inset-0 bg-gray-900/80 backdrop-blur-md z-[300] hidden flex items-center justify-center p-4 transition-all duration-500 opacity-0">
@@ -2634,6 +2694,120 @@ function goToCustomerLogin() {
     localStorage.setItem('BikriPage_return_url', window.location.href);
     // User ko index page ke login wale hisse par bhej do
     window.location.href = "index.html?action=login";
+}
+// ===============================================
+// ✨ SMART FILTER & SORTING LOGIC ✨
+// ===============================================
+let currentSortOption = 'default';
+let activeQuickFilters = [];
+
+function openSmartFilter() {
+    const modal = document.getElementById('smart-filter-modal');
+    const content = document.getElementById('smart-filter-content');
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        content.classList.remove('translate-y-full');
+    }, 10);
+    document.body.style.overflow = 'hidden';
+}
+
+function closeSmartFilter() {
+    const modal = document.getElementById('smart-filter-modal');
+    const content = document.getElementById('smart-filter-content');
+    modal.classList.add('opacity-0');
+    content.classList.add('translate-y-full');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }, 300);
+}
+
+function selectSort(option) {
+    currentSortOption = option;
+    document.querySelectorAll('.filter-sort-btn').forEach(btn => {
+        btn.classList.remove('bg-gray-900', 'text-white', 'border-gray-900');
+        btn.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
+    });
+    const activeBtn = document.getElementById('sort-' + option);
+    activeBtn.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
+    activeBtn.classList.add('bg-gray-900', 'text-white', 'border-gray-900');
+}
+
+function toggleQuickFilter(filter) {
+    const btn = document.getElementById('filter-' + filter);
+    const index = activeQuickFilters.indexOf(filter);
+    
+    if (index > -1) {
+        activeQuickFilters.splice(index, 1); // Remove
+        btn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700');
+        btn.classList.add('border-gray-200', 'bg-white', 'text-gray-600');
+    } else {
+        activeQuickFilters.push(filter); // Add
+        btn.classList.remove('border-gray-200', 'bg-white', 'text-gray-600');
+        btn.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-700');
+    }
+}
+
+function clearSmartFilters() {
+    selectSort('default');
+    activeQuickFilters = [];
+    document.querySelectorAll('.filter-quick-btn').forEach(btn => {
+        btn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700');
+        btn.classList.add('border-gray-200', 'bg-white', 'text-gray-600');
+    });
+    applySmartFilters(); // Re-apply to reset view
+}
+
+function applySmartFilters() {
+    const grid = document.getElementById('products-grid');
+    if (!grid) return;
+    
+    let productCards = Array.from(grid.querySelectorAll('.grid-item'));
+    
+    // Sirf product cards choose karega (Loading/Error message ko ignore karega)
+    productCards = productCards.filter(card => card.querySelector('.fa-cart-plus') || card.querySelector('img'));
+
+    // Original position save kar lo (taaki 'Default' dabane par wapas wahi set ho jaye)
+    productCards.forEach((card, idx) => {
+        if (!card.hasAttribute('data-original-index')) {
+            card.setAttribute('data-original-index', idx);
+        }
+    });
+
+    // ✨ 1. Filter Logic ✨
+    productCards.forEach(card => {
+        let isVisible = true;
+        let text = card.innerText;
+        
+        // Card me se price nikalna (Regex use karke ₹ ke baad ka number)
+        let priceMatch = text.match(/₹\s*(\d+)/);
+        let price = priceMatch ? parseInt(priceMatch[1]) : 0;
+        
+        let hasDiscount = text.includes('% OFF');
+
+        if (activeQuickFilters.includes('under-99') && price >= 99) isVisible = false;
+        if (activeQuickFilters.includes('discount') && !hasDiscount) isVisible = false;
+
+        card.style.display = isVisible ? '' : 'none';
+    });
+
+    // ✨ 2. Sorting Logic ✨
+    productCards.sort((a, b) => {
+        if (currentSortOption === 'default') {
+            return parseInt(a.getAttribute('data-original-index')) - parseInt(b.getAttribute('data-original-index'));
+        }
+        
+        let priceA = parseInt(a.innerText.match(/₹\s*(\d+)/)?.[1] || 0);
+        let priceB = parseInt(b.innerText.match(/₹\s*(\d+)/)?.[1] || 0);
+        
+        return currentSortOption === 'low-high' ? priceA - priceB : priceB - priceA;
+    });
+    
+    // Sorted cards ko wapas grid mein append kar do
+    productCards.forEach(card => grid.appendChild(card));
+
+    closeSmartFilter();
 }
 
     </script>

@@ -1586,137 +1586,121 @@
         </div>
     </div>
 
-            <!-- HIDDEN INVOICE HTML FOR IMAGE GENERATION (A4 PREMIUM UI v4 - SLIM FOOTER) -->
-    <div id="receipt-container" style="width: 800px !important; height: 1131px !important; min-width: 800px !important; display: block !important;" class="fixed -left-[9999px] top-0 bg-white text-[#1d1d1f] font-sans overflow-hidden shadow-2xl pb-0 z-[-50]">
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-            .font-inter { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        </style>
+           <!-- HIDDEN INVOICE HTML FOR IMAGE GENERATION (A4 PREMIUM UI v4 - SLIM FOOTER) -->
+<div id="receipt-container" style="width: 800px !important; min-height: 1131px !important; display: block !important;" class="fixed -left-[9999px] top-0 bg-white text-[#1d1d1f] font-sans overflow-visible shadow-2xl pb-0 z-[-50]">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        .font-inter { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    </style>
+    
+    <div class="font-inter flex flex-col min-h-[1131px] w-full bg-white">
         
-        <div class="font-inter flex flex-col h-[1131px] w-full">
+        <!-- PREMIUM HEADER -->
+        <div class="px-14 pt-8 pb-4 flex justify-between items-start shrink-0">
+            <div class="flex items-center gap-5">
+                <div class="relative w-20 h-20 rounded-[20px] bg-gray-50 border border-gray-200 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+                    <div id="default-invoice-watermark" class="absolute inset-0 flex items-center justify-center">
+                        <span id="watermark-initials" class="text-gray-400 text-2xl font-black uppercase tracking-widest">ST</span>
+                    </div>
+                    <img id="bill-store-logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="absolute inset-0 w-full h-full object-cover hidden z-10">
+                </div>
+                <div class="pt-1">
+                    <h1 id="print-store-name" class="text-3xl font-black tracking-tight text-gray-900 leading-none uppercase">STORE NAME</h1>
+                    <p id="print-store-address" class="text-sm text-gray-600 mt-2 max-w-[280px] font-semibold leading-relaxed">Address line goes here</p>
+                    <p class="text-sm text-gray-600 mt-1 font-semibold flex items-center gap-1.5"><i class="fas fa-phone-alt text-[11px] text-gray-500"></i> <span id="print-store-phone">Phone</span></p>
+                </div>
+            </div> 
             
-            <!-- PREMIUM HEADER -->
-            <div class="px-14 pt-16 pb-8 flex justify-between items-start shrink-0">
-                <div class="flex items-center gap-5">
-                    <div class="relative w-20 h-20 rounded-[20px] bg-gray-50 border border-gray-200 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
-                        <div id="default-invoice-watermark" class="absolute inset-0 flex items-center justify-center">
-                            <span id="watermark-initials" class="text-gray-400 text-2xl font-black uppercase tracking-widest">ST</span>
-                        </div>
-                        <img id="bill-store-logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="absolute inset-0 w-full h-full object-cover hidden z-10">
-
-                    </div>
-                    <div class="pt-1">
-                        <h1 id="print-store-name" class="text-3xl font-black tracking-tight text-gray-900 leading-none uppercase">STORE NAME</h1>
-                        <p id="print-store-address" class="text-sm text-gray-600 mt-2 max-w-[280px] font-semibold leading-relaxed">Address line goes here</p>
-                        <p class="text-sm text-gray-600 mt-1 font-semibold flex items-center gap-1.5"><i class="fas fa-phone-alt text-[11px] text-gray-500"></i> <span id="print-store-phone">Phone</span></p>
-                    </div>
-                </div> 
-                
-                <div class="text-right pt-1">
-                    <h2 class="text-5xl font-black tracking-tighter text-gray-900 uppercase leading-none mb-3">Receipt</h2>
-                    <p class="text-sm text-gray-600 font-black tracking-widest uppercase" id="receipt-id">#NJS-0000</p>
-                </div>
+            <div class="text-right pt-1">
+                <h2 class="text-5xl font-black tracking-tighter text-gray-900 uppercase leading-none mb-3">Receipt</h2>
+                <p class="text-sm text-gray-600 font-black tracking-widest uppercase" id="receipt-id">#NJS-0000</p>
             </div>
+        </div>
 
-            <!-- PREMIUM SUB-HEADER CARD -->
-            <div class="mx-14 mb-4 bg-[#fafafa] rounded-[24px] p-5 flex justify-between items-center border border-gray-200 shadow-sm shrink-0">
+        <!-- PREMIUM SUB-HEADER CARD -->
+        <div class="mx-14 mb-4 bg-[#fafafa] rounded-[24px] p-4 flex justify-between items-center border border-gray-200 shadow-sm shrink-0">
+            <div>
+                <p class="text-[11px] text-gray-500 uppercase font-black tracking-widest mb-2">Billed To</p>
+                <p class="text-xl font-black text-gray-900 tracking-tight" id="receipt-name">Customer Name</p>
+                <p class="text-sm text-gray-600 mt-1.5 max-w-[300px] leading-relaxed font-semibold" id="receipt-address">Customer Address</p>
+            </div>
+            <div class="text-right flex flex-col items-end gap-5">
                 <div>
-                    <p class="text-[11px] text-gray-500 uppercase font-black tracking-widest mb-2">Billed To</p>
-                    <p class="text-xl font-black text-gray-900 tracking-tight" id="receipt-name">Customer Name</p>
-                    <p class="text-sm text-gray-600 mt-1.5 max-w-[300px] leading-relaxed font-semibold" id="receipt-address">Customer Address</p>
+                    <p class="text-[11px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Invoice Date</p>
+                    <p class="text-base font-bold text-gray-900" id="receipt-date">-</p>
                 </div>
-                <div class="text-right flex flex-col items-end gap-5">
-                    <div>
-                        <p class="text-[11px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Invoice Date</p>
-                        <p class="text-base font-bold text-gray-900" id="receipt-date">-</p>
+                <div>
+                    <p class="text-[11px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Contact</p>
+                    <p class="text-base font-bold text-gray-900">+91 <span id="receipt-phone">0000000000</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ENHANCED ITEMS TABLE -->
+        <div class="px-14 flex-1">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="border-b-2 border-gray-200 text-gray-500 text-[11px] uppercase tracking-widest font-black">
+                        <th class="py-2 pr-4 w-12">No.</th>
+                        <th class="py-2 px-4">Description</th>
+                        <th class="py-2 px-4 text-center w-20">Qty</th>
+                        <th class="py-2 px-4 text-right w-28">Rate</th>
+                        <th class="py-2 pl-4 text-right w-36">Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="receipt-items" class="text-xs font-semibold text-gray-900">
+                    <!-- JS Injected Items -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- BOTTOM SECTION -->
+        <div class="shrink-0 mt-auto w-full flex flex-col">
+            <div class="mx-14 pt-4 pb-3 flex justify-between items-end border-t border-gray-200 relative z-10">
+                <div class="pb-3 shrink-0">
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-1">Payment Status</p>
+                    <div id="receipt-paystatus" class="inline-flex items-center justify-center h-10 px-6 rounded-full text-sm font-black tracking-widest leading-none shadow-sm">
+                        PAID
                     </div>
-                    <div>
-                        <p class="text-[11px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Contact</p>
-                        <p class="text-base font-bold text-gray-900">+91 <span id="receipt-phone">0000000000</span></p>
+                </div>
+                <div class="w-[380px] shrink-0 bg-[#FCFCFD] rounded-[24px] p-4 border border-gray-100 shadow-sm">
+                    <div id="receipt-breakdown" class="hidden flex-col space-y-2 border-b border-gray-200/60 pb-3 mb-3 text-sm font-bold text-gray-500">
+                        <div class="flex justify-between items-center gap-8">
+                            <span>Subtotal</span>
+                            <span id="receipt-subtotal" class="text-gray-900 text-right">₹0.00</span>
+                        </div>
+                        <div id="receipt-discount-row" class="hidden justify-between items-center gap-8 text-rose-500">
+                            <span>Discount</span>
+                            <span class="text-right bg-rose-50 px-2.5 py-1 rounded-lg text-rose-600">-₹<span id="receipt-discount">0.00</span></span>
+                        </div>
+                        <div id="receipt-delivery-row" class="hidden justify-between items-center gap-8 text-blue-500">
+                            <span>Delivery</span>
+                            <span class="text-right bg-blue-50 px-2.5 py-1 rounded-lg text-blue-600">+₹<span id="receipt-delivery">0.00</span></span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-end gap-4">
+                        <span class="text-[11px] text-gray-400 font-black uppercase tracking-[0.2em] shrink-0 mb-1.5">Grand Total</span>
+                        <span class="text-[32px] font-black text-gray-900 tracking-tighter leading-none text-right break-words drop-shadow-sm" id="receipt-total">₹0.00</span>
                     </div>
                 </div>
             </div>
 
-            <!-- ENHANCED ITEMS TABLE (Takes all remaining space) -->
-            <div class="px-14 flex-1">
-                <table class="w-full text-left">
-                    <thead>
-                        <tr class="border-b-2 border-gray-200 text-gray-500 text-[11px] uppercase tracking-widest font-black">
-                            <th class="py-2 pr-4 w-12">No.</th>
-<th class="py-2 px-4">Description</th>
-                            <th class="py-4 px-4 text-center w-20">Qty</th>
-                            <th class="py-4 px-4 text-right w-28">Rate</th>
-                            <th class="py-4 pl-4 text-right w-36">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody id="receipt-items" class="text-base font-semibold text-gray-900">
-                        <!-- JS Injected Items -->
-                    </tbody>
-                </table>
-            </div>
-
-                 <!-- BOTTOM SECTION (Always at bottom) -->
-            <div class="shrink-0 mt-auto w-full flex flex-col">
-                          <!-- ✨ PREMIUM TOTALS & STATUS SECTION ✨ -->
-                <div class="mx-14 pt-4 pb-3 flex justify-between items-end border-t border-gray-200 relative z-10">
-                    
-                    <!-- Left: Minimalist Status Pill -->
-                    <div class="pb-3 shrink-0">
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-1">Payment Status</p>
-                        <div id="receipt-paystatus" class="inline-flex items-center justify-center h-10 px-6 rounded-full text-sm font-black tracking-widest leading-none shadow-sm">
-                            PAID
-                        </div>
-                    </div>
-
-                    <!-- Right: Premium Floating Total Card (100% CANVAS SAFE FIX) -->
-                    <div class="w-[380px] shrink-0 bg-[#FCFCFD] rounded-[24px] p-4 border border-gray-100 shadow-sm">
-                        <div id="receipt-breakdown" class="hidden flex-col space-y-3 border-b border-gray-200/60 pb-4 mb-4 text-sm font-bold text-gray-500">
-                            <div class="flex justify-between items-center gap-8">
-                                <span>Subtotal</span>
-                                <span id="receipt-subtotal" class="text-gray-900 text-right">₹0.00</span>
-                            </div>
-                            <div id="receipt-discount-row" class="hidden justify-between items-center gap-8 text-rose-500">
-                                <span>Discount</span>
-                                <span class="text-right bg-rose-50 px-2.5 py-1 rounded-lg text-rose-600">-₹<span id="receipt-discount">0.00</span></span>
-                            </div>
-                            <div id="receipt-delivery-row" class="hidden justify-between items-center gap-8 text-blue-500">
-                                <span>Delivery</span>
-                                <span class="text-right bg-blue-50 px-2.5 py-1 rounded-lg text-blue-600">+₹<span id="receipt-delivery">0.00</span></span>
-                            </div>
-                        </div>
-                        
-                        <div class="flex justify-between items-end gap-4">
-                            <span class="text-[11px] text-gray-400 font-black uppercase tracking-[0.2em] shrink-0 mb-1.5">Grand Total</span>
-                            <span class="text-[40px] font-black text-gray-900 tracking-tighter leading-none text-right break-words drop-shadow-sm" id="receipt-total">₹0.00</span>
-                        </div>
-                    </div>
+            <!-- ULTRA SLIM PREMIUM FOOTER -->
+            <div class="mt-4 bg-gray-900 px-14 py-4 flex justify-between items-center rounded-t-[20px] relative overflow-hidden w-full">
+                <div class="absolute inset-0 bg-gradient-to-r from-gray-800 to-gray-900 opacity-50"></div>
+                <div class="relative z-10 text-left">
+                    <p class="text-white font-bold tracking-wide text-[11px]">Built on trust. Delivered with care.</p>
+                    <p class="text-[9px] text-gray-400 font-medium mt-1">ISSUED BY: <span id="print-store-name-footer" class="font-bold text-white uppercase tracking-wider">STORE NAME</span></p>
                 </div>
-
-
-
-
-                <!-- ULTRA SLIM PREMIUM FOOTER -->
-                <div class="mt-6 bg-gray-900 px-14 py-5 flex justify-between items-center rounded-t-[20px] relative overflow-hidden w-full">
-                    <div class="absolute inset-0 bg-gradient-to-r from-gray-800 to-gray-900 opacity-50"></div>
-                    
-                    <!-- Left: Support Info -->
-                    <div class="relative z-10 text-left">
-                        <p class="text-white font-bold tracking-wide text-sm">Built on trust. Delivered with care.</p>
-                        <p class="text-[10px] text-gray-400 font-medium mt-1">ISSUED BY: <span id="print-store-name-footer" class="font-bold text-white uppercase tracking-wider">STORE NAME</span></p>
-                    </div>
-                    
-                    <!-- Right: Watermark -->
-                    <div class="relative z-10 text-right">
-                        <!-- ✨ BRANDED WATERMARK WITH BikriPage LOGO ✨ -->
-                        <p class="text-[11px] text-gray-500 font-bold tracking-widest uppercase relative z-10 flex items-center justify-center gap-2">
-                            POWERED BY <span class="text-white font-black">BikriPage</span> 
-                        </p>
-                    </div>
+                <div class="relative z-10 text-right">
+                    <p class="text-[9px] text-gray-500 font-bold tracking-widest uppercase relative z-10 flex items-center justify-center gap-2">
+                        POWERED BY <span class="text-white font-black">BikriPage</span> 
+                    </p>
                 </div>
             </div>
-
         </div>
     </div>
+</div>
 
 
     <!-- FULL INTEGRATED JAVASCRIPT LOGIC -->
@@ -3555,184 +3539,164 @@ window.openDeliverySettings = function() {
             a.href = URL.createObjectURL(bL); a.download = `BikriPage_Data_${mName}_${y}.csv`; a.click();
         }
 
-                          async function downloadBillImage(id) {
-            if (window.event) window.event.stopPropagation();
+                     async function downloadBillImage(id) {
+    if (window.event) window.event.stopPropagation();
 
-            const b = adminBills.find(x => x.id === id || x.appOrderId === id); 
-            if(!b) return alert("Order not found! Please refresh the page once.");
+    const b = adminBills.find(x => x.id === id || x.appOrderId === id); 
+    if(!b) return alert("Order not found! Please refresh the page once.");
 
-            const btn = window.event ? window.event.currentTarget : null;
-            let origHtml = "";
-            if (btn) { origHtml = btn.innerHTML; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`; btn.disabled = true; }
+    const btn = window.event ? window.event.currentTarget : null;
+    let origHtml = "";
+    if (btn) { origHtml = btn.innerHTML; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`; btn.disabled = true; }
 
-            try {
-                const sName = globalShopData.shopName || "Store";
-                document.getElementById('print-store-name').innerText = sName;
-                document.getElementById('print-store-name-footer').innerText = sName;
-                document.getElementById('print-store-address').innerText = globalShopData.address || "Digital Store";
-                document.getElementById('print-store-phone').innerText = globalShopData.phone || "";
-                
-                document.getElementById('receipt-id').innerText = `#NJS-${b.id.substring(0,6).toUpperCase()}`;
-                document.getElementById('receipt-name').innerText = b.customerName || "Customer";
-                document.getElementById('receipt-phone').innerText = (b.customerPhone && b.customerPhone !== "N/A") ? b.customerPhone : "Not Provided";
-                document.getElementById('receipt-date').innerText = b.date || "-";
-                document.getElementById('receipt-address').innerText = b.address ? b.address.replace(/(https?:\/\/[^\s]+)/g, '').replace(/🔗/g, "").trim() : "Delhi, India";
+    try {
+        const sName = globalShopData.shopName || "Store";
+        document.getElementById('print-store-name').innerText = sName;
+        document.getElementById('print-store-name-footer').innerText = sName;
+        document.getElementById('print-store-address').innerText = globalShopData.address || "Digital Store";
+        document.getElementById('print-store-phone').innerText = globalShopData.phone || "";
+        
+        document.getElementById('receipt-id').innerText = `#NJS-${b.id.substring(0,6).toUpperCase()}`;
+        document.getElementById('receipt-name').innerText = b.customerName || "Customer";
+        document.getElementById('receipt-phone').innerText = (b.customerPhone && b.customerPhone !== "N/A") ? b.customerPhone : "Not Provided";
+        document.getElementById('receipt-date').innerText = b.date || "-";
+        document.getElementById('receipt-address').innerText = b.address ? b.address.replace(/(https?:\/\/[^\s]+)/g, '').replace(/🔗/g, "").trim() : "Delhi, India";
 
-                const watermarkInitials = document.getElementById('watermark-initials');
-                if (watermarkInitials) watermarkInitials.innerText = sName.substring(0, 2).toUpperCase();
+        const watermarkInitials = document.getElementById('watermark-initials');
+        if (watermarkInitials) watermarkInitials.innerText = sName.substring(0, 2).toUpperCase();
 
-                // ✨ PREMIUM PLAN CHECK ✨
-                const userPlan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
-                const isUpgraded = userPlan === 'plus' || userPlan === 'pro' || (typeof globalShopData !== 'undefined' && globalShopData.email === 'netajijhadustore@gmail.com');
-                
-                // 🚀 FIX 1: JAVASCRIPT CSS SELECTOR ERROR (No Brackets Allowed) 🚀
-                const receiptContainer = document.getElementById('receipt-container');
-                let footerPoweredBy = null;
-                
-                // ब्रैकेट वाले क्लास नेम की जगह, हम सीधा टेक्स्ट ('POWERED BY') सर्च करेंगे
-                receiptContainer.querySelectorAll('p').forEach(p => {
-                    if (p.textContent.includes('POWERED BY')) footerPoweredBy = p;
-                });
+        const userPlan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
+        const isUpgraded = userPlan === 'plus' || userPlan === 'pro' || (typeof globalShopData !== 'undefined' && globalShopData.email === 'netajijhadustore@gmail.com');
+        
+        const receiptContainer = document.getElementById('receipt-container');
+        let footerPoweredBy = null;
+        
+        receiptContainer.querySelectorAll('p').forEach(p => {
+            if (p.textContent.includes('POWERED BY')) footerPoweredBy = p;
+        });
 
-                if (footerPoweredBy) {
-                    if (isUpgraded) footerPoweredBy.style.display = 'none';
-                    else footerPoweredBy.style.display = 'flex';
-                }
-
-                // ITEMS INJECTION
-                let iH = ''; let tA = 0;
-                if (b.items) b.items.forEach((i, idx) => {
-                    let t = i.total ? i.total : (i.price * i.qty); tA += t;
-                  iH += `<tr class="border-b border-gray-100 last:border-0"><td class="py-2 pr-4 font-bold text-gray-400">${String(idx+1).padStart(2,'0')}</td><td class="py-2 px-4 font-black text-gray-900">${i.name}</td><td class="py-2 px-4 text-center font-bold">${i.qty}</td><td class="py-2 px-4 text-right font-semibold text-gray-600">₹${parseFloat(i.price).toFixed(2)}</td><td class="py-2 pl-4 text-right font-black text-gray-900">₹${parseFloat(t).toFixed(2)}</td></tr>`;
-
-                }); 
-                document.getElementById('receipt-items').innerHTML = iH;
-
-                // TOTALS CALCULATION
-                let dC = parseFloat(b.discount)||0; let dL = parseFloat(b.delivery)||0;
-                let bD = document.getElementById('receipt-breakdown');
-                if (dC > 0 || dL > 0) {
-                    document.getElementById('receipt-subtotal').innerText = `₹${tA.toFixed(2)}`;
-                    if(dC>0){document.getElementById('receipt-discount').innerText=dC.toFixed(2); document.getElementById('receipt-discount-row').classList.remove('hidden');document.getElementById('receipt-discount-row').classList.add('flex');} else {document.getElementById('receipt-discount-row').classList.add('hidden');}
-                    if(dL>0){document.getElementById('receipt-delivery').innerText=dL.toFixed(2); document.getElementById('receipt-delivery-row').classList.remove('hidden');document.getElementById('receipt-delivery-row').classList.add('flex');} else {document.getElementById('receipt-delivery-row').classList.add('hidden');}
-                    bD.classList.remove('hidden'); bD.classList.add('flex');
-                } else { bD.classList.add('hidden'); bD.classList.remove('flex'); }
-                
-                document.getElementById('receipt-total').innerText = `₹${(parseFloat(b.grandTotal)||0).toFixed(2)}`;
-                                                                  // 🚀 1. THE MAGIC: 100% BULLETPROOF INLINE ALIGNMENT 🚀
-                let isP = b.payStatus && b.payStatus.includes('Paid');
-                let sE = document.getElementById('receipt-paystatus');
-                if(sE) { 
-                    // घड़ी और टिक वाले SVG हटा दिए ताकि टेक्स्ट 100% सेंटर में आ जाए
-                    sE.outerHTML = isP 
-                        ? `<div id="receipt-paystatus" style="display: inline-block; background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; border-radius: 9999px; padding: 0 24px; height: 40px; white-space: nowrap; text-align: center;">
-                            <span style="display: inline-block; vertical-align: middle; line-height: 38px; font-size: 14px; font-weight: 900; letter-spacing: 0.1em;">PAID</span>
-                           </div>` 
-                        : `<div id="receipt-paystatus" style="display: inline-block; background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; border-radius: 9999px; padding: 0 24px; height: 40px; white-space: nowrap; text-align: center;">
-                            <span style="display: inline-block; vertical-align: middle; line-height: 38px; font-size: 14px; font-weight: 900; letter-spacing: 0.1em;">PENDING</span>
-                           </div>`;
-                }
-
-                // 🚀 2. CLEAN DOM & PERFECT PHONE NUMBER ALIGNMENT 🚀
-                const c = document.getElementById('receipt-container');
-                
-                const styleTags = c.querySelectorAll('style');
-                styleTags.forEach(style => {
-                    if(style.innerHTML.includes('@import')) {
-                        style.innerHTML = ".font-inter { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important; }";
-                    }
-                });
-                                                                                                                  // 🚀 ULTRA PREMIUM TYPOGRAPHY (NO SVG) 🚀
-                const phoneText = c.querySelector('#print-store-phone');
-                if(phoneText) {
-                    let parentP = phoneText.parentElement;
-                    parentP.outerHTML = `<p class="mt-1.5" style="display: block; line-height: 16px;">
-                        <span style="color: #9CA3AF; font-size: 9px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; vertical-align: middle;">Phone</span>
-                        <span style="color: #E5E7EB; margin: 0 6px; font-size: 10px; vertical-align: middle;">|</span>
-                        <span id="print-store-phone" style="color: #374151; font-size: 11.5px; font-weight: 800; letter-spacing: 0.5px; vertical-align: middle;">${globalShopData.phone || ""}</span>
-                    </p>`;
-                }
-
-
-
-
-
-
-
-                // 🚀 FIX 2: STRICT SAFE LOGO HANDLING (No DOMException) 🚀
-                const savedImg = localStorage.getItem('BikriPage_profile_img');
-                const billLogo = document.getElementById('bill-store-logo');
-                const watermark = document.getElementById('default-invoice-watermark');
-                
-                // ट्रांसपेरेंट पिक्सेल इस्तेमाल करेंगे ताकि src खाली ना रहे
-                const blankPixel = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-                
-                let logoPromise = Promise.resolve();
-                
-                if (isUpgraded && savedImg && savedImg.startsWith('data:image')) {
-                    billLogo.classList.remove('hidden');
-                    if (watermark) watermark.style.display = 'none';
-                    
-                    billLogo.removeAttribute('crossorigin');
-                    
-                    logoPromise = new Promise((resolve) => {
-                        billLogo.onload = resolve;
-                        billLogo.onerror = () => {
-                            billLogo.src = blankPixel;
-                            billLogo.classList.add('hidden');
-                            if (watermark) watermark.style.display = 'flex';
-                            resolve();
-                        };
-                        billLogo.src = savedImg;
-                    });
-                } else {
-                    if (billLogo) {
-                        // VERY IMPORTANT: यहाँ src को रिमूव नहीं करना है, ब्लैंक पिक्सेल देना है!
-                        billLogo.src = blankPixel; 
-                        billLogo.classList.add('hidden');
-                    }
-                    if (watermark) watermark.style.display = 'flex';
-                }
-
-                await logoPromise; 
-
-                // 3. GENERATE CANVAS
-                setTimeout(() => {
-                    if (typeof html2canvas === 'undefined') {
-                        alert("Library missing.");
-                        if(btn) { btn.innerHTML = origHtml; btn.disabled = false; }
-                        return;
-                    }
-                    
-                    html2canvas(c, { 
-                        scale: 2, 
-                        backgroundColor: "#ffffff", 
-                        useCORS: false,       
-                        allowTaint: false,    
-                        windowWidth: 800,  
-                        width: 800,        
-                        windowHeight: 1131, 
-                        height: 1131,       
-                        logging: false 
-                    }).then(cv => {
-                        let l = document.createElement('a'); 
-                        l.download = `Invoice_${b.customerName.replace(/\s+/g, '_')}.png`; 
-                        l.href = cv.toDataURL("image/png", 1.0); 
-                        l.click();
-                        if(btn) { btn.innerHTML = origHtml; btn.disabled = false; } 
-                    }).catch(e => {
-                        alert("Failed generating image: " + e.message);
-                        if(btn) { btn.innerHTML = origHtml; btn.disabled = false; }
-                    });
-                }, 100);
-
-            } catch (err) {
-                console.error(err);
-                if(btn) { btn.innerHTML = origHtml; btn.disabled = false; }
-                alert("Error: " + err.message);
-            }
+        if (footerPoweredBy) {
+            if (isUpgraded) footerPoweredBy.style.display = 'none';
+            else footerPoweredBy.style.display = 'flex';
         }
 
+        // ITEMS INJECTION (py-1 and text-xs applied here)
+        let iH = ''; let tA = 0;
+        if (b.items) b.items.forEach((i, idx) => {
+            let t = i.total ? i.total : (i.price * i.qty); tA += t;
+            iH += `<tr class="border-b border-gray-100 last:border-0"><td class="py-1 pr-4 font-bold text-gray-400">${String(idx+1).padStart(2,'0')}</td><td class="py-1 px-4 font-black text-gray-900">${i.name}</td><td class="py-1 px-4 text-center font-bold">${i.qty}</td><td class="py-1 px-4 text-right font-semibold text-gray-600">₹${parseFloat(i.price).toFixed(2)}</td><td class="py-1 pl-4 text-right font-black text-gray-900">₹${parseFloat(t).toFixed(2)}</td></tr>`;
+        }); 
+        document.getElementById('receipt-items').innerHTML = iH;
+
+        let dC = parseFloat(b.discount)||0; let dL = parseFloat(b.delivery)||0;
+        let bD = document.getElementById('receipt-breakdown');
+        if (dC > 0 || dL > 0) {
+            document.getElementById('receipt-subtotal').innerText = `₹${tA.toFixed(2)}`;
+            if(dC>0){document.getElementById('receipt-discount').innerText=dC.toFixed(2); document.getElementById('receipt-discount-row').classList.remove('hidden');document.getElementById('receipt-discount-row').classList.add('flex');} else {document.getElementById('receipt-discount-row').classList.add('hidden');}
+            if(dL>0){document.getElementById('receipt-delivery').innerText=dL.toFixed(2); document.getElementById('receipt-delivery-row').classList.remove('hidden');document.getElementById('receipt-delivery-row').classList.add('flex');} else {document.getElementById('receipt-delivery-row').classList.add('hidden');}
+            bD.classList.remove('hidden'); bD.classList.add('flex');
+        } else { bD.classList.add('hidden'); bD.classList.remove('flex'); }
+        
+        document.getElementById('receipt-total').innerText = `₹${(parseFloat(b.grandTotal)||0).toFixed(2)}`;
+
+        let isP = b.payStatus && b.payStatus.includes('Paid');
+        let sE = document.getElementById('receipt-paystatus');
+        if(sE) { 
+            sE.outerHTML = isP 
+                ? `<div id="receipt-paystatus" style="display: inline-block; background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; border-radius: 9999px; padding: 0 24px; height: 40px; white-space: nowrap; text-align: center;">
+                    <span style="display: inline-block; vertical-align: middle; line-height: 38px; font-size: 14px; font-weight: 900; letter-spacing: 0.1em;">PAID</span>
+                   </div>` 
+                : `<div id="receipt-paystatus" style="display: inline-block; background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; border-radius: 9999px; padding: 0 24px; height: 40px; white-space: nowrap; text-align: center;">
+                    <span style="display: inline-block; vertical-align: middle; line-height: 38px; font-size: 14px; font-weight: 900; letter-spacing: 0.1em;">PENDING</span>
+                   </div>`;
+        }
+
+        const c = document.getElementById('receipt-container');
+        
+        const styleTags = c.querySelectorAll('style');
+        styleTags.forEach(style => {
+            if(style.innerHTML.includes('@import')) {
+                style.innerHTML = ".font-inter { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important; }";
+            }
+        });
+
+        const phoneText = c.querySelector('#print-store-phone');
+        if(phoneText) {
+            let parentP = phoneText.parentElement;
+            parentP.outerHTML = `<p class="mt-1.5" style="display: block; line-height: 16px;">
+                <span style="color: #9CA3AF; font-size: 9px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; vertical-align: middle;">Phone</span>
+                <span style="color: #E5E7EB; margin: 0 6px; font-size: 10px; vertical-align: middle;">|</span>
+                <span id="print-store-phone" style="color: #374151; font-size: 11.5px; font-weight: 800; letter-spacing: 0.5px; vertical-align: middle;">${globalShopData.phone || ""}</span>
+            </p>`;
+        }
+
+        const savedImg = localStorage.getItem('BikriPage_profile_img');
+        const billLogo = document.getElementById('bill-store-logo');
+        const watermark = document.getElementById('default-invoice-watermark');
+        const blankPixel = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+        let logoPromise = Promise.resolve();
+        
+        if (isUpgraded && savedImg && savedImg.startsWith('data:image')) {
+            billLogo.classList.remove('hidden');
+            if (watermark) watermark.style.display = 'none';
+            billLogo.removeAttribute('crossorigin');
+            
+            logoPromise = new Promise((resolve) => {
+                billLogo.onload = resolve;
+                billLogo.onerror = () => {
+                    billLogo.src = blankPixel;
+                    billLogo.classList.add('hidden');
+                    if (watermark) watermark.style.display = 'flex';
+                    resolve();
+                };
+                billLogo.src = savedImg;
+            });
+        } else {
+            if (billLogo) {
+                billLogo.src = blankPixel; 
+                billLogo.classList.add('hidden');
+            }
+            if (watermark) watermark.style.display = 'flex';
+        }
+
+        await logoPromise; 
+
+        // 3. GENERATE CANVAS (Dynamic Height via scrollHeight)
+        setTimeout(() => {
+            if (typeof html2canvas === 'undefined') {
+                alert("Library missing.");
+                if(btn) { btn.innerHTML = origHtml; btn.disabled = false; }
+                return;
+            }
+            
+            html2canvas(c, { 
+                scale: 2, 
+                backgroundColor: "#ffffff", 
+                useCORS: false,       
+                allowTaint: false,    
+                windowWidth: 800,  
+                width: 800,        
+                windowHeight: c.scrollHeight, 
+                height: c.scrollHeight,       
+                logging: false 
+            }).then(cv => {
+                let l = document.createElement('a'); 
+                l.download = `Invoice_${b.customerName.replace(/\s+/g, '_')}.png`; 
+                l.href = cv.toDataURL("image/png", 1.0); 
+                l.click();
+                if(btn) { btn.innerHTML = origHtml; btn.disabled = false; } 
+            }).catch(e => {
+                alert("Failed generating image: " + e.message);
+                if(btn) { btn.innerHTML = origHtml; btn.disabled = false; }
+            });
+        }, 100);
+
+    } catch (err) {
+        console.error(err);
+        if(btn) { btn.innerHTML = origHtml; btn.disabled = false; }
+        alert("Error: " + err.message);
+    }
+}
 
 
                          // ==========================================

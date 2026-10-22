@@ -16,6 +16,8 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
 
     <script>
         const firebaseConfig = {
@@ -30,6 +32,7 @@
 
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.firestore();
+        const storage = firebase.storage();
     </script>
 
     <style>
@@ -1595,19 +1598,27 @@ async function checkUserReview() {
         function cancelEdit() { document.getElementById('review-form-container').classList.add('hidden'); document.getElementById('my-review-container').classList.remove('hidden'); }
 
      async function submitStoreReview() {
-    const customerPhone = localStorage.getItem('BikriPage_customer_phone');
-    // ✨ FIX: Submit karte waqt bhi dono ka naam check karega ✨
-    const customerName = localStorage.getItem('BikriPage_customer_name') || localStorage.getItem('BikriPage_owner_name');
+    // ✨ NAYA: Firebase Auth से असली यूज़र चेक करो ✨
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Please log in to submit a review!");
+        return;
+    }
+    const verifiedUserEmail = user.email; // ये 100% असली ID है
+
+    const customerName = localStorage.getItem('BikriPage_customer_name') || localStorage.getItem('BikriPage_owner_name') || "Customer";
     
-    if(!customerPhone) return;
     if (userRating === 0) { alert("Please select a star rating first!"); return; }
     
     const text = document.getElementById('review-text-input').value.trim();
     const btn = document.getElementById('submit-review-btn');
-    btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Saving...`; btn.disabled = true;
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Saving...`; 
+    btn.disabled = true;
     
     try {
-        await db.collection('shops').doc(currentShopId).collection('reviews').doc(customerPhone).set({ 
+        // ✨ LocalStorage की जगह verifiedUserEmail इस्तेमाल करो ✨
+        await db.collection('shops').doc(currentShopId).collection('reviews').doc(verifiedUserEmail).set({ 
             customerName: customerName, 
             rating: userRating, 
             text: text, 
@@ -1620,9 +1631,10 @@ async function checkUserReview() {
         document.getElementById('reviews-list').innerHTML = ""; 
         loadReviews();
     } catch (e) { 
-        alert("Error submitting review."); 
-        btn.disabled = false; 
+        alert("Error submitting review: " + e.message); 
     }
+    btn.innerHTML = origHtml;
+    btn.disabled = false;
 }
 
 
@@ -1917,18 +1929,24 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
 
 
 
-                async function checkoutCartInApp() {
+             async function checkoutCartInApp() {
     let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
     if(cart.length === 0) { alert("Cart is empty!"); return; }
     
+    // ✨ NAYA: Firebase Auth Check ✨
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Please log in to place an order!");
+        return;
+    }
+    const verifiedAccountId = user.email; // 100% सुरक्षित ID
+
     let address = document.getElementById('cart-address').value.trim();
     let custName = document.getElementById('cart-cust-name').value.trim();
     let custWhatsApp = document.getElementById('cart-cust-phone').value.trim();
     
     if(!custName || !custWhatsApp) { alert("Please enter your name and WhatsApp number!"); return; }
     if(!address) { alert("Please enter delivery address!"); return; }
-
-    const accountId = localStorage.getItem('BikriPage_customer_phone');
 
     const btn = document.getElementById('cart-main-btn');
     const origHTML = btn.innerHTML;
@@ -1950,7 +1968,7 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
             const targetShopId = orderData.items[0].shopId || '';
             
             await db.collection('orders').add({
-                customerId: accountId, 
+                customerId: verifiedAccountId, // ✨ LocalStorage की जगह ये यूज़ होगा ✨
                 customerName: custName,
                 customerPhone: custWhatsApp, 
                 customerAddress: address,
@@ -1966,14 +1984,11 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-                       // ✨ NAYA LOGIC: Order place hote hi Notification function call hoga ✨
             await sendAlertToShop(targetShopId, custName, orderData.total);
-
-       
         }
 
         localStorage.setItem(getCartKey(), JSON.stringify([]));
-        updateCartBadge();
+        if (typeof updateCartBadge === 'function') updateCartBadge();
         toggleCartModal();
         showOrderSuccessModal(); 
         
@@ -2092,8 +2107,17 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
             setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 500); 
         }
 
-         async function submitOrder(e) {
+      async function submitOrder(e) {
     e.preventDefault();
+    
+    // ✨ NAYA: Firebase Auth Check ✨
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Please log in to place an order!");
+        return;
+    }
+    const verifiedAccountId = user.email;
+
     const qty = document.getElementById('order-qty').value;
     const custName = document.getElementById('order-cust-name').value.trim();
     const custWhatsApp = document.getElementById('order-cust-phone').value.trim(); 
@@ -2102,8 +2126,6 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
     const total = parseInt(currentOrder.itemPrice) * parseInt(qty);
     const phone = currentOrder.shopPhone || '9876543210';
     
-    const accountId = localStorage.getItem('BikriPage_customer_phone');
-
     const btn = document.getElementById('main-order-btn');
     const origHtml = btn.innerHTML;
     btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Placing...`;
@@ -2111,7 +2133,7 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
 
     try {
         await db.collection('orders').add({
-            customerId: accountId, 
+            customerId: verifiedAccountId, // ✨ LocalStorage की जगह ये यूज़ होगा ✨
             customerName: custName,
             customerPhone: custWhatsApp, 
             customerAddress: address,
@@ -2127,9 +2149,7 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        // ✨ NAYA LOGIC: Direct order place hote hi Notification function call hoga ✨
         await sendAlertToShop(currentOrder.shopId, custName, total);
-
 
         closeOrderModal();
         showOrderSuccessModal(); 
@@ -2141,6 +2161,7 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
         btn.disabled = false;
     }
 }
+
 
         function orderViaWhatsApp() {
             const qty = document.getElementById('order-qty').value;
@@ -2206,56 +2227,74 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
             );
         }
 
-        async function uploadStoreLogo(event) {
-            const loggedInOwner = localStorage.getItem('BikriPage_active_shop');
-            if (loggedInOwner !== currentShopId) {
-                alert("⚠️ Only the store owner can change this logo!");
-                return;
-            }
+     // ✨ NAYA: Store Logo Upload (Firebase Storage + Blob) ✨
+async function uploadStoreLogo(event) {
+    const loggedInOwner = localStorage.getItem('BikriPage_active_shop');
+    if (loggedInOwner !== currentShopId) {
+        alert("⚠️ Only the store owner can change this logo!");
+        return;
+    }
 
-            const file = event.target.files[0];
-            if (!file) return;
+    const file = event.target.files[0];
+    if (!file) return;
 
-            const iconEl = document.getElementById('shop-avatar-icon');
-            const imgEl = document.getElementById('shop-avatar-img');
+    const iconEl = document.getElementById('shop-avatar-icon');
+    const imgEl = document.getElementById('shop-avatar-img');
+    
+    iconEl.className = 'fas fa-spinner fa-spin text-gray-400 text-2xl'; 
+    imgEl.classList.add('hidden');
+    iconEl.style.display = 'block';
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            let size = 200; 
+            let w = img.width, h = img.height;
             
-            iconEl.className = 'fas fa-spinner fa-spin text-gray-400 text-2xl'; 
-            imgEl.classList.add('hidden');
-            iconEl.style.display = 'block';
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = async function() {
-                    const canvas = document.createElement('canvas');
-                    let size = 200; 
-                    let w = img.width, h = img.height;
+            if (w > h) { h = Math.round((h * size) / w); w = size; } 
+            else { w = Math.round((w * size) / h); h = size; }
+            
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            
+            // ✨ Base64 की जगह Blob में कन्वर्ट करना ✨
+            canvas.toBlob(async (blob) => {
+                if(!blob) return;
+                
+                try {
+                    const fileName = Date.now() + '.jpg';
+                    // 🚀 Firebase Storage में अपलोड
+                    const storageRef = firebase.storage().ref().child(`store_logos/${currentShopId}/${fileName}`);
                     
-                    if (w > h) { h = Math.round((h * size) / w); w = size; } 
-                    else { w = Math.round((w * size) / h); h = size; }
-                    
-                    canvas.width = w; canvas.height = h;
-                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    const base64Image = canvas.toDataURL('image/jpeg', 0.8);
+                    const snapshot = await storageRef.put(blob);
+                    const downloadURL = await snapshot.ref.getDownloadURL();
 
-                    imgEl.src = base64Image;
+                    imgEl.src = downloadURL;
                     imgEl.classList.remove('hidden');
                     iconEl.style.display = 'none';
 
-                    try {
-                        await db.collection('shops').doc(currentShopId).update({ storeLogo: base64Image });
-                        alert("Store Logo Updated Successfully! 🎉");
-                    } catch (err) {
-                        alert("Error saving image: " + err.message);
-                        iconEl.className = 'fas fa-store';
-                        iconEl.style.display = 'block';
-                        imgEl.classList.add('hidden');
-                    }
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
+                    // Firestore डेटाबेस अपडेट
+                    await db.collection('shops').doc(currentShopId).update({ storeLogo: downloadURL });
+                    
+                    // लोकल स्टोरेज अपडेट (ताकि पेज रिफ्रेश पर भी रहे)
+                    localStorage.setItem('BikriPage_profile_img', downloadURL);
+                    
+                    alert("Store Logo Updated Successfully! 🎉");
+                } catch (err) {
+                    alert("Error saving image: " + err.message);
+                    iconEl.className = 'fas fa-store';
+                    iconEl.style.display = 'block';
+                    imgEl.classList.add('hidden');
+                }
+            }, 'image/jpeg', 0.8);
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
 
         function closeOrderSuccessModal() {
             const modal = document.getElementById('order-success-modal');

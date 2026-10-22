@@ -17,6 +17,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+<!-- Razorpay SDK -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
     <script>
               const firebaseConfig = {
           apiKey: "AIzaSyCWquftO39vqj83ZtYqtF_sDfkHVNpjd3k",
@@ -4003,13 +4006,17 @@ function trackSearchImpression(shopIdToTrack) {
             btnStarter.className = 'w-full bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl border border-gray-200 mt-auto transition-colors active:scale-95';
             btnStarter.disabled = false;
 
-            btnPlus.innerHTML = 'Upgrade to Plus';
-            btnPlus.className = 'w-full bg-purple-50 hover:bg-purple-100 text-purple-600 font-black py-3.5 rounded-xl border border-purple-200 mt-auto transition-colors active:scale-95';
-            btnPlus.disabled = false;
+       btnPlus.innerHTML = 'Upgrade to Plus';
+btnPlus.className = 'w-full bg-purple-50 hover:bg-purple-100 text-purple-600 font-black py-3.5 rounded-xl border border-purple-200 mt-auto transition-colors active:scale-95';
+btnPlus.disabled = false;
+// ✨ NAYA: Click करने पर 149 रुपये का पेमेंट खोलेगा
+btnPlus.onclick = () => initiateRazorpayPayment('plus', 149);
 
-            btnPro.innerHTML = 'Get Pro VIP 🚀';
-            btnPro.className = 'relative z-10 w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 text-black font-black py-4 rounded-xl mt-auto transition-colors active:scale-95 shadow-md';
-            btnPro.disabled = false;
+btnPro.innerHTML = 'Get Pro VIP 🚀';
+btnPro.className = 'relative z-10 w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 text-black font-black py-4 rounded-xl mt-auto transition-colors active:scale-95 shadow-md';
+btnPro.disabled = false;
+// ✨ NAYA: Click करने पर 299 रुपये का पेमेंट खोलेगा
+btnPro.onclick = () => initiateRazorpayPayment('pro', 299);
 
             // 2. Reset Badges
             badgeStarter.innerHTML = '';
@@ -5293,6 +5300,75 @@ function applySmartFilters() {
     
     productCards.forEach(card => grid.appendChild(card));
     closeSmartFilter();
+}
+// 🔑 अपना Razorpay Key ID यहाँ डालना है (Razorpay Dashboard > Settings > API Keys)
+const RAZORPAY_KEY_ID = "rzp_test_Tqw5ZOVHX6vidX"; 
+
+function initiateRazorpayPayment(planType, amountInINR) {
+    const activeShop = localStorage.getItem('BikriPage_active_shop');
+    const ownerName = localStorage.getItem('BikriPage_owner_name') || 'Merchant';
+    const phone = localStorage.getItem('BikriPage_customer_phone') || '9999999999';
+
+    if (!activeShop) {
+        showIOSAlert("Login Required", "Please log in to your store account to upgrade.");
+        return;
+    }
+
+    const options = {
+        "key": RAZORPAY_KEY_ID, 
+        "amount": amountInINR * 100, // Razorpay पैसे (paise) में अमाउंट लेता है, इसलिए 100 से गुणा किया
+        "currency": "INR",
+        "name": "BikriPage",
+        "description": `Upgrade to ${planType.toUpperCase()} Plan`,
+        "theme": {
+            "color": "#111827" // तुम्हारे डार्क थीम से मैच करने के लिए
+        },
+        "prefill": {
+            "name": ownerName,
+            "contact": phone
+        },
+        // ✨ पेमेंट सक्सेसफुल होने पर ये फंक्शन चलेगा
+        "handler": async function (response) {
+            try {
+                // UI को लोडिंग स्टेट में डालो
+                showIOSAlert("Processing", "Updating your store plan. Please wait...");
+
+                // Firestore में प्लान अपडेट करो
+                await db.collection('shops').doc(activeShop).update({
+                    plan: planType,
+                    isVerified: true, // प्रीमियम वालों को आटोमेटिक वेरिफाइड टिक मिल जाएगा
+                    paymentId: response.razorpay_payment_id,
+                    planStartDate: firebase.firestore.FieldValue.serverTimestamp(),
+                    searchRank: planType === 'pro' ? 100 : 50 // सर्च में ऊपर लाने के लिए
+                });
+
+                closeIOSAlert();
+                
+                // सक्सेस मैसेज और पेज रिफ्रेश
+                iosConfirm(
+                    "Payment Successful! 🎉", 
+                    `Welcome to the ${planType.toUpperCase()} plan. Your new features are unlocked!`, 
+                    "Go to Dashboard", 
+                    "text-green-600"
+                ).then(() => {
+                    window.location.href = `dashboard.html?shop=${activeShop}`;
+                });
+
+            } catch (error) {
+                console.error("Database Update Error:", error);
+                alert("Payment received, but failed to update plan. Contact support.");
+            }
+        }
+    };
+
+    const rzp = new Razorpay(options);
+    
+    // अगर पेमेंट फेल हो जाए
+    rzp.on('payment.failed', function (response) {
+        alert("Payment Failed: " + response.error.description);
+    });
+    
+    rzp.open();
 }
 
     </script>

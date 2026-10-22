@@ -1619,7 +1619,7 @@
             </div>
 
             <!-- PREMIUM SUB-HEADER CARD -->
-            <div class="mx-14 mb-8 bg-[#fafafa] rounded-[24px] p-8 flex justify-between items-center border border-gray-200 shadow-sm shrink-0">
+            <div class="mx-14 mb-4 bg-[#fafafa] rounded-[24px] p-5 flex justify-between items-center border border-gray-200 shadow-sm shrink-0">
                 <div>
                     <p class="text-[11px] text-gray-500 uppercase font-black tracking-widest mb-2">Billed To</p>
                     <p class="text-xl font-black text-gray-900 tracking-tight" id="receipt-name">Customer Name</p>
@@ -1642,8 +1642,8 @@
                 <table class="w-full text-left">
                     <thead>
                         <tr class="border-b-2 border-gray-200 text-gray-500 text-[11px] uppercase tracking-widest font-black">
-                            <th class="py-4 pr-4 w-12">No.</th>
-                            <th class="py-4 px-4">Description</th>
+                            <th class="py-2 pr-4 w-12">No.</th>
+<th class="py-2 px-4">Description</th>
                             <th class="py-4 px-4 text-center w-20">Qty</th>
                             <th class="py-4 px-4 text-right w-28">Rate</th>
                             <th class="py-4 pl-4 text-right w-36">Amount</th>
@@ -1658,7 +1658,7 @@
                  <!-- BOTTOM SECTION (Always at bottom) -->
             <div class="shrink-0 mt-auto w-full flex flex-col">
                           <!-- ✨ PREMIUM TOTALS & STATUS SECTION ✨ -->
-                <div class="mx-14 pt-8 pb-4 flex justify-between items-end border-t border-gray-200 relative z-10">
+                <div class="mx-14 pt-4 pb-3 flex justify-between items-end border-t border-gray-200 relative z-10">
                     
                     <!-- Left: Minimalist Status Pill -->
                     <div class="pb-3 shrink-0">
@@ -1669,7 +1669,7 @@
                     </div>
 
                     <!-- Right: Premium Floating Total Card (100% CANVAS SAFE FIX) -->
-                    <div class="w-[380px] shrink-0 bg-[#FCFCFD] rounded-[24px] p-7 border border-gray-100 shadow-sm">
+                    <div class="w-[380px] shrink-0 bg-[#FCFCFD] rounded-[24px] p-4 border border-gray-100 shadow-sm">
                         <div id="receipt-breakdown" class="hidden flex-col space-y-3 border-b border-gray-200/60 pb-4 mb-4 text-sm font-bold text-gray-500">
                             <div class="flex justify-between items-center gap-8">
                                 <span>Subtotal</span>
@@ -3603,7 +3603,8 @@ window.openDeliverySettings = function() {
                 let iH = ''; let tA = 0;
                 if (b.items) b.items.forEach((i, idx) => {
                     let t = i.total ? i.total : (i.price * i.qty); tA += t;
-                    iH += `<tr class="border-b border-gray-100 last:border-0"><td class="py-5 pr-4 font-bold text-gray-400">${String(idx+1).padStart(2,'0')}</td><td class="py-5 px-4 font-black text-gray-900">${i.name}</td><td class="py-5 px-4 text-center font-bold">${i.qty}</td><td class="py-5 px-4 text-right font-semibold text-gray-600">₹${parseFloat(i.price).toFixed(2)}</td><td class="py-5 pl-4 text-right font-black text-gray-900">₹${parseFloat(t).toFixed(2)}</td></tr>`;
+                  iH += `<tr class="border-b border-gray-100 last:border-0"><td class="py-2 pr-4 font-bold text-gray-400">${String(idx+1).padStart(2,'0')}</td><td class="py-2 px-4 font-black text-gray-900">${i.name}</td><td class="py-2 px-4 text-center font-bold">${i.qty}</td><td class="py-2 px-4 text-right font-semibold text-gray-600">₹${parseFloat(i.price).toFixed(2)}</td><td class="py-2 pl-4 text-right font-black text-gray-900">₹${parseFloat(t).toFixed(2)}</td></tr>`;
+
                 }); 
                 document.getElementById('receipt-items').innerHTML = iH;
 

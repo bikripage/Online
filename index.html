@@ -16,7 +16,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
     <script>
               const firebaseConfig = {
           apiKey: "AIzaSyCWquftO39vqj83ZtYqtF_sDfkHVNpjd3k",
@@ -31,7 +31,9 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-        const googleProvider = new firebase.auth.GoogleAuthProvider();
+       const storage = firebase.storage();
+        const googleProvider = new
+         firebase.auth.GoogleAuthProvider();
     </script>
 
     <style>
@@ -2618,8 +2620,17 @@ await sendAlertToShop(targetShopId, custName, orderData.total);
 
                      // ✨ IN-APP PLACE ORDER (No WhatsApp Redirect) ✨
            // ✨ IN-APP PLACE ORDER (FIXED FOR MY ORDERS) ✨
-              async function submitOrder(e) {
+        async function submitOrder(e) {
     e.preventDefault();
+    
+    // ✨ NAYA: Firebase Auth Check ✨
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Please log in to place an order!");
+        return;
+    }
+    const verifiedAccountId = user.email;
+
     const qty = document.getElementById('order-qty').value;
     const custName = document.getElementById('order-cust-name').value.trim();
     const custWhatsApp = document.getElementById('order-cust-phone').value.trim(); 
@@ -2628,8 +2639,6 @@ await sendAlertToShop(targetShopId, custName, orderData.total);
     const total = parseInt(currentOrder.itemPrice) * parseInt(qty);
     const phone = currentOrder.shopPhone || '9876543210';
     
-    const accountId = localStorage.getItem('BikriPage_customer_phone');
-
     const btn = document.getElementById('main-order-btn');
     const origHtml = btn.innerHTML;
     btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Placing...`;
@@ -2637,7 +2646,7 @@ await sendAlertToShop(targetShopId, custName, orderData.total);
 
     try {
         await db.collection('orders').add({
-            customerId: accountId, 
+            customerId: verifiedAccountId, // ✨ LocalStorage की जगह ये यूज़ होगा ✨
             customerName: custName,
             customerPhone: custWhatsApp, 
             customerAddress: address,
@@ -2653,10 +2662,7 @@ await sendAlertToShop(targetShopId, custName, orderData.total);
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        // ✨ NAYA LOGIC: Direct order place hote hi Notification function call hoga ✨
-await sendAlertToShop(currentOrder.shopId, custName, total);
-
-
+        await sendAlertToShop(currentOrder.shopId, custName, total);
 
         closeOrderModal();
         showOrderSuccessModal(); 
@@ -2933,75 +2939,91 @@ await sendAlertToShop(currentOrder.shopId, custName, total);
                 { enableHighAccuracy: true, timeout: 10000 }
             );
         }
-        // ✨ NAYA: Profile Image Upload & Save Function ✨
-        async function uploadProfileImage(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+       // ✨ NAYA: Profile Image Upload (Firebase Storage + Blob) ✨
+async function uploadProfileImage(event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-            const initEl = document.getElementById('prof-initial');
-            const imgEl = document.getElementById('prof-img-preview');
+    const initEl = document.getElementById('prof-initial');
+    const imgEl = document.getElementById('prof-img-preview');
+    
+    initEl.innerHTML = '<i class="fas fa-spinner fa-spin text-sm"></i>'; 
+    imgEl.classList.add('hidden');
+    initEl.style.display = 'flex';
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            // फोटो को 200px में Compress करना
+            const canvas = document.createElement('canvas');
+            let size = 200; 
+            let w = img.width, h = img.height;
             
-            initEl.innerHTML = '<i class="fas fa-spinner fa-spin text-sm"></i>'; 
-            imgEl.classList.add('hidden');
-            initEl.style.display = 'flex';
+            if (w > h) { h = Math.round((h * size) / w); w = size; } 
+            else { w = Math.round((w * size) / h); h = size; }
+            
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            
+            // ✨ Base64 की जगह Blob में कन्वर्ट करना ✨
+            canvas.toBlob(async (blob) => {
+                if(!blob) {
+                    initEl.style.display = 'flex'; initEl.innerHTML = 'U';
+                    imgEl.classList.add('hidden');
+                    return alert("Image process failed!");
+                }
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = async function() {
-                    // फोटो को 200px में Compress करना (ताकि डेटाबेस न भरे)
-                    const canvas = document.createElement('canvas');
-                    let size = 200; 
-                    let w = img.width, h = img.height;
+                try {
+                    const activeShop = localStorage.getItem('BikriPage_active_shop');
+                    const customerPhone = localStorage.getItem('BikriPage_customer_phone');
                     
-                    if (w > h) { h = Math.round((h * size) / w); w = size; } 
-                    else { w = Math.round((w * size) / h); h = size; }
+                    // फोल्डर का नाम डिसाइड करो (दुकानदार है या कस्टमर)
+                    const folderName = activeShop ? `store_logos/${activeShop}` : `customer_profiles/${customerPhone}`;
+                    const fileName = Date.now() + '.jpg';
                     
-                    canvas.width = w; canvas.height = h;
-                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    
-                    const base64Image = canvas.toDataURL('image/jpeg', 0.8);
+                    // 🚀 Firebase Storage में अपलोड
+                    const storageRef = firebase.storage().ref().child(`${folderName}/${fileName}`);
+                    const snapshot = await storageRef.put(blob);
+                    const downloadURL = await snapshot.ref.getDownloadURL();
 
                     // स्क्रीन पर तुरंत दिखाओ
-                    imgEl.src = base64Image;
+                    imgEl.src = downloadURL;
                     imgEl.classList.remove('hidden');
                     initEl.style.display = 'none';
 
-                    try {
-                        const activeShop = localStorage.getItem('BikriPage_active_shop');
-                        const customerPhone = localStorage.getItem('BikriPage_customer_phone');
-                        
-                        // LocalStorage में सेव करो ताकि हर पेज पर तुरंत मिल जाए
-                        localStorage.setItem('BikriPage_profile_img', base64Image);
+                    // LocalStorage में सेव करो
+                    localStorage.setItem('BikriPage_profile_img', downloadURL);
 
-                        // Firebase में सेव करो
-                                                if (activeShop) {
-                            await db.collection('shops').doc(activeShop).update({ storeLogo: base64Image });
-                        } else if (customerPhone && !customerPhone.includes('@')) {
-                            await db.collection('customers').doc(customerPhone).update({ profileImage: base64Image });
-                        }
-                        
-                        // ✨ Navbar me instantly update karo ✨
-                        const navImg = document.getElementById('nav-profile-img');
-                        const navInitials = document.getElementById('nav-initials');
-                        if (navImg && navInitials) {
-                            navImg.src = base64Image;
-                            navImg.classList.remove('hidden');
-                            navInitials.style.display = 'none';
-                        }
-                        
-                        alert("Profile Image Updated Successfully! 🎉");
-                    } catch (err) {
-                        alert("Error saving image: " + err.message);
-
-                        initEl.style.display = 'flex'; initEl.innerHTML = 'U';
-                        imgEl.classList.add('hidden');
+                    // Firestore में सेव करो
+                    if (activeShop) {
+                        await db.collection('shops').doc(activeShop).update({ storeLogo: downloadURL });
+                    } else if (customerPhone && !customerPhone.includes('@')) {
+                        await db.collection('customers').doc(customerPhone).update({ profileImage: downloadURL });
                     }
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
+                    
+                    // Navbar me instantly update karo
+                    const navImg = document.getElementById('nav-profile-img');
+                    const navInitials = document.getElementById('nav-initials');
+                    if (navImg && navInitials) {
+                        navImg.src = downloadURL;
+                        navImg.classList.remove('hidden');
+                        navInitials.style.display = 'none';
+                    }
+                    
+                    alert("Profile Image Updated Successfully! 🎉");
+                } catch (err) {
+                    alert("Error saving image: " + err.message);
+                    initEl.style.display = 'flex'; initEl.innerHTML = 'U';
+                    imgEl.classList.add('hidden');
+                }
+            }, 'image/jpeg', 0.8);
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
              // ✨ NAYA: Keyboard Jump/Glitch 100% Fix ✨
                function toggleProfEdit() {
             const viewMode = document.getElementById('prof-view-mode');

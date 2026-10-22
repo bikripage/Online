@@ -5302,7 +5302,6 @@ function applySmartFilters() {
     closeSmartFilter();
 }
 function initiateRazorpayPayment(planType, amountInINR) {
-    // ✨ FIX 1: पेमेंट खुलने से पहले Firebase Auth चेक करो
     const user = firebase.auth().currentUser;
     if (!user) {
         alert("Your session has expired! Please log out and log in with Google again to upgrade.");
@@ -5331,33 +5330,43 @@ function initiateRazorpayPayment(planType, amountInINR) {
             "name": ownerName,
             "contact": phone
         },
-        "handler": async function (response) {
-            try {
-                // UI को लोडिंग स्टेट में डालो
-                // (अगर showIOSAlert में दिक्कत आए तो इसे कमेंट कर सकते हो)
-                if(typeof showIOSAlert === 'function') showIOSAlert("Processing", "Updating your store plan. Please wait...");
+        "handler": function (response) {
+            // ✨ FIX: Razorpay के पॉपअप को शांति से बंद होने का टाइम दो (1 सेकंड का डिले)
+            setTimeout(async () => {
+                try {
+                    if(typeof showIOSAlert === 'function') showIOSAlert("Processing", "Unlocking Premium Features...");
 
-                // ✨ FIX 2: Firestore में प्लान अपडेट करो
-                await db.collection('shops').doc(activeShop).update({
-                    plan: planType,
-                    isVerified: true, 
-                    paymentId: response.razorpay_payment_id,
-                    planStartDate: firebase.firestore.FieldValue.serverTimestamp(),
-                    searchRank: planType === 'pro' ? 100 : 50 
-                });
+                    // Firestore में प्लान अपडेट करो
+                    await db.collection('shops').doc(activeShop).update({
+                        plan: planType,
+                        isVerified: true, 
+                        paymentId: response.razorpay_payment_id,
+                        planStartDate: firebase.firestore.FieldValue.serverTimestamp(),
+                        searchRank: planType === 'pro' ? 100 : 50 
+                    });
 
-                if(typeof closeIOSAlert === 'function') closeIOSAlert();
-                
-                alert(`Payment Successful! 🎉 Welcome to the ${planType.toUpperCase()} plan.`);
-                window.location.href = `dashboard.html?shop=${activeShop}`;
+                    if(typeof closeIOSAlert === 'function') closeIOSAlert();
+                    
+                    // ✨ FIX: Native alert() की जगह तुम्हारा प्रीमियम iosConfirm यूज़ किया है
+                    if (typeof iosConfirm === 'function') {
+                        iosConfirm(
+                            "Payment Successful! 🎉", 
+                            `Welcome to the ${planType.toUpperCase()} plan. Your new features are unlocked!`, 
+                            "Go to Dashboard", 
+                            "text-green-600"
+                        ).then(() => {
+                            window.location.href = `dashboard.html?shop=${activeShop}`;
+                        });
+                    } else {
+                        window.location.href = `dashboard.html?shop=${activeShop}`;
+                    }
 
-            } catch (error) {
-                console.error("Database Update Error:", error);
-                if(typeof closeIOSAlert === 'function') closeIOSAlert();
-                
-                // ✨ FIX 3: अगर फिर भी फेल हो, तो असली एरर मैसेज स्क्रीन पर दिखेगा
-                alert("Database Error: " + error.message + "\n\nPayment ID: " + response.razorpay_payment_id + "\n(Please show this to admin to upgrade manually)");
-            }
+                } catch (error) {
+                    console.error("Database Update Error:", error);
+                    if(typeof closeIOSAlert === 'function') closeIOSAlert();
+                    alert("Database Error: " + error.message + "\n\nPayment ID: " + response.razorpay_payment_id);
+                }
+            }, 1000); // 1000ms (1 सेकंड) का डिले
         }
     };
 

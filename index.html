@@ -1713,45 +1713,33 @@ loadHomeBanners();
                         const shop = doc.data();
                         const shopId = doc.id;
 
-                  // ✨ FETCH REAL RATING DYNAMICALLY ✨
+                  // ✨ FETCH REAL STORE RATING DYNAMICALLY ✨
 let realRating = 0;
-if (shop.phone) {
-    try {
-        const revSnap = await db.collection('orders').where('shopPhone', '==', shop.phone).where('status', '==', 'delivered').get();
-        let totalR = 0, count = 0;
-        let seenC = new Set();
+try {
+    // Ye code direct shop ki 'reviews' subcollection se rating nikalega
+    const revSnap = await db.collection('shops').doc(shopId).collection('reviews').get();
+    
+    if (!revSnap.empty) {
+        let totalR = 0;
         revSnap.forEach(rDoc => {
-            let ord = rDoc.data();
-            if(ord.review && ord.review.rating) {
-                // Ek customer ka ek hi review count hoga
-                if(!seenC.has(ord.customerId)) {
-                    seenC.add(ord.customerId);
-                    totalR += ord.review.rating;
-                    count++;
-                }
-            }
+            totalR += rDoc.data().rating || 0;
         });
-        // Agar reviews mile hain toh average nikalo
-        if (count > 0) {
-            realRating = totalR / count;
-        }
-    } catch(e) {
-        console.error("Error fetching ratings: ", e);
+        realRating = totalR / revSnap.size; // Average nikal liya
     }
+} catch(e) {
+    console.error("Error fetching store rating:", e);
 }
 
 // ✨ RATING YA NEW BADGE DIKHANE KA LOGIC ✨
 let badgeOrRatingHtml = '';
 
-// Check karega ki kya realRating 0 se zyada hai, ya database me shop.rating maujud hai jo 0 se zyada hai
 if (realRating > 0 || (shop.rating && parseFloat(shop.rating) > 0)) {
-    // Exact rating 1 decimal point tak nikalega (jaise 4.5)
     let exactRating = realRating > 0 ? realRating.toFixed(1) : parseFloat(shop.rating).toFixed(1);
     
     // Rating wala Badge (Green)
     badgeOrRatingHtml = `<div class="absolute top-0 left-0 bg-green-50 text-green-700 border-b border-r border-green-200 px-3 py-1 rounded-tl-[1.5rem] rounded-br-[14px] font-black text-[10px] shadow-sm z-20 flex items-center gap-1"><i class="fas fa-star text-[9px] mb-[1px]"></i> ${exactRating}</div>`;
 } else {
-    // Agar dono rating 0 hain ya review nahi mila, toh NEW dikhayega (Blue)
+    // Agar rating 0 hai toh NEW dikhayega (Blue)
     badgeOrRatingHtml = `<div class="absolute top-0 left-0 bg-blue-50 text-blue-600 border-b border-r border-blue-200 px-3 py-1 rounded-tl-[1.5rem] rounded-br-[14px] font-black text-[9px] uppercase tracking-wider shadow-sm z-20">NEW</div>`;
 }
 

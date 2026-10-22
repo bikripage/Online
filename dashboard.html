@@ -26,7 +26,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <!-- 👇 YE LINE AAPKE CODE MEIN MISSING HAI 👇 -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCWquftO39vqj83ZtYqtF_sDfkHVNpjd3k",
@@ -43,6 +43,7 @@
         }
         const db = firebase.firestore();
         const auth = firebase.auth();
+        const storage = firebase.storage();
     </script>
 
 
@@ -3078,28 +3079,49 @@ window.openDeliverySettings = function() {
         // ==========================================
         // 7. PRODUCTS LOGIC
         // ==========================================
-     async function processImage(fileInput) {
+     async function uploadImageToStorage(fileInput, folderPath) {
     if (!fileInput.files || fileInput.files.length === 0) return "";
     const file = fileInput.files[0];
-    return new Promise((resolve) => {
+
+    return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = function(e) {
             const img = new Image();
             img.onload = function() {
+                // 1. Image Compress Logic
                 const canvas = document.createElement('canvas');
                 let width = img.width, height = img.height;
                 if (width > 600) { height *= 600 / width; width = 600; }
                 canvas.width = width; canvas.height = height;
                 canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', 0.7)); 
+                
+                // 2. Base64 की जगह Blob (Binary) में कन्वर्ट करो
+                canvas.toBlob(async (blob) => {
+                    if (!blob) return resolve("");
+                    try {
+                        // 3. Unique File Name बनाओ ताकि पुरानी फोटो रिप्लेस ना हो
+                        const fileName = Date.now() + '_' + Math.random().toString(36).substring(7) + '.jpg';
+                        const storageRef = storage.ref().child(`${folderPath}/${fileName}`);
+                        
+                        // 4. Storage में अपलोड करो और URL लाओ
+                        const snapshot = await storageRef.put(blob);
+                        const downloadURL = await snapshot.ref.getDownloadURL();
+                        
+                        resolve(downloadURL); // ✨ ये सिर्फ URL रिटर्न करेगा
+                    } catch (err) {
+                        console.error("Storage Upload Error:", err);
+                        resolve(""); // एरर आने पर ऐप क्रैश न हो इसलिए खाली स्ट्रिंग
+                    }
+                }, 'image/jpeg', 0.7); 
             };
-            img.onerror = function() { resolve(""); }; // NAYA: Error aane par atke nahi
+            img.onerror = () => resolve("");
             img.src = e.target.result;
         };
-        reader.onerror = function() { resolve(""); }; // NAYA: Reader fail hone par atke nahi
+        reader.onerror = () => resolve("");
         reader.readAsDataURL(file);
     });
 }
+
 
           function renderAdminProducts() {
             const list = document.getElementById('admin-products-list'); const cnt = document.getElementById('inventory-count'); if(!list) return; cnt.innerText = storeProducts.length;
@@ -3195,25 +3217,19 @@ window.openDeliverySettings = function() {
     // 👇 2. 'try' block ko Image process hone se pehle shuru karein 👇
     try { 
         // Ab images try block ke andar hain, toh error aane par form atkega nahi
-        const imgBase64_1 = await processImage(document.getElementById('prod-image'));
-        const imgBase64_2 = await processImage(document.getElementById('prod-image2'));
-        const imgBase64_3 = await processImage(document.getElementById('prod-image3'));
+    // नया कोड: (यहाँ हम products/shopId फोल्डर में फोटो डाल रहे हैं)
+const imgUrl_1 = await uploadImageToStorage(document.getElementById('prod-image'), `products/${currentShopId}`);
+const imgUrl_2 = await uploadImageToStorage(document.getElementById('prod-image2'), `products/${currentShopId}`);
+const imgUrl_3 = await uploadImageToStorage(document.getElementById('prod-image3'), `products/${currentShopId}`);
 
-        let currentRank = (typeof globalShopData !== 'undefined' && globalShopData.searchRank) ? globalShopData.searchRank : 0;
-
-        let pd = { 
-            name: n, 
-            mrp: mrpVal, 
-            price: p, 
-            qtySize: qtySize, 
-            unit: unit, 
-            description: desc, 
-            image: imgBase64_1,     
-            image2: imgBase64_2,    
-            image3: imgBase64_3,    
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            searchRank: currentRank
-        };
+let pd = { 
+    name: n, mrp: mrpVal, price: p, qtySize: qtySize, unit: unit, description: desc, 
+    image: imgUrl_1,    // ✨ अब यहाँ URL सेव होगा
+    image2: imgUrl_2,   // ✨ URL
+    image3: imgUrl_3,   // ✨ URL
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    searchRank: currentRank
+};
 
         const doc = await db.collection('shops').doc(currentShopId).collection('products').add(pd); 
         pd.id = doc.id; 
@@ -3268,67 +3284,122 @@ window.openDeliverySettings = function() {
         }
 
         function closeEditProductModal() { const md = document.getElementById('edit-product-modal'); md.classList.remove('opacity-100'); setTimeout(()=>md.classList.add('hidden'),300); }
+async function handleEditProduct(e) {
+    e.preventDefault(); 
+    const n = document.getElementById('edit-prod-name').value.trim(); 
+    const updatedDesc = document.getElementById('edit-prod-desc').value.trim();
+    const mrpVal = parseInt(document.getElementById('edit-prod-mrp').value);
+    const p = parseInt(document.getElementById('edit-prod-price').value); 
+    const qtySize = parseFloat(document.getElementById('edit-prod-qty').value) || 1;
+    const unit = document.getElementById('edit-prod-unit').value;
+    const id = e.target.dataset.id;
 
-        async function handleEditProduct(e) {
-            e.preventDefault(); 
-            const n = document.getElementById('edit-prod-name').value.trim(); 
-            const updatedDesc = document.getElementById('edit-prod-desc').value.trim();
-            const mrpVal = parseInt(document.getElementById('edit-prod-mrp').value);
-            const p = parseInt(document.getElementById('edit-prod-price').value); 
-            const qtySize = parseFloat(document.getElementById('edit-prod-qty').value) || 1;
-            const unit = document.getElementById('edit-prod-unit').value;
-            const id = e.target.dataset.id;
+    if (p > mrpVal) return showIOSAlert("Invalid Price", "Selling Price cannot be greater than MRP!");
+    
+    const btn = e.target.querySelector('button[type="submit"]'); 
+    const orig = btn.innerHTML; // .innerText की जगह .innerHTML यूज़ किया ताकि आइकॉन भी रहे
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Updating...`; 
+    btn.disabled = true;
 
-            if (p > mrpVal) return showIOSAlert("Invalid Price", "Selling Price cannot be greater than MRP!");
+    let updateData = { name: n, mrp: mrpVal, price: p, qtySize: qtySize, unit: unit, description: updatedDesc };
+    
+    try {
+        // ✨ Image Cross/Delete Logic Handle karna ✨
+        const isImg1Visible = !document.getElementById('edit-show-1').classList.contains('hidden');
+        const isImg2Visible = !document.getElementById('edit-show-2').classList.contains('hidden');
+        const isImg3Visible = !document.getElementById('edit-show-3').classList.contains('hidden');
+
+        // ✨ NAYA KOD: Firebase Storage में इमेज अपलोड करना ✨
+        const newImg1 = await uploadImageToStorage(document.getElementById('edit-prod-image'), `products/${currentShopId}`);
+        const newImg2 = await uploadImageToStorage(document.getElementById('edit-prod-image2'), `products/${currentShopId}`);
+        const newImg3 = await uploadImageToStorage(document.getElementById('edit-prod-image3'), `products/${currentShopId}`);
+
+        // Agar naya photo upload kiya toh update karo
+        // Warna agar user ne cross daba diya tha, to firebase se delete kar do
+        if (newImg1 !== "") updateData.image = newImg1;
+        else if (!isImg1Visible) updateData.image = firebase.firestore.FieldValue.delete();
+
+        if (newImg2 !== "") updateData.image2 = newImg2;
+        else if (!isImg2Visible) updateData.image2 = firebase.firestore.FieldValue.delete();
+
+        if (newImg3 !== "") updateData.image3 = newImg3;
+        else if (!isImg3Visible) updateData.image3 = firebase.firestore.FieldValue.delete();
+
+        // Firestore में डेटा सेव करना
+        await db.collection('shops').doc(currentShopId).collection('products').doc(id).update(updateData); 
+        
+        // लोकल UI/Array अपडेट करना ताकि पेज रिफ्रेश न करना पड़े
+        let idx = storeProducts.findIndex(x => x.id === id); 
+        if(idx !== -1) {
+            storeProducts[idx].name = n; 
+            storeProducts[idx].mrp = mrpVal; 
+            storeProducts[idx].price = p; 
+            storeProducts[idx].qtySize = qtySize; 
+            storeProducts[idx].unit = unit; 
+            storeProducts[idx].description = updatedDesc; 
             
-            const btn = e.target.querySelector('button[type="submit"]'); const orig = btn.innerText; 
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Updating...`; btn.disabled = true;
+            if (newImg1 !== "") storeProducts[idx].image = newImg1;
+            else if (!isImg1Visible) storeProducts[idx].image = "";
 
-            let updateData = { name: n, mrp: mrpVal, price: p, qtySize: qtySize, unit: unit, description: updatedDesc };
-            
-            // ✨ Image Cross/Delete Logic Handle karna ✨
-            const isImg1Visible = !document.getElementById('edit-show-1').classList.contains('hidden');
-            const isImg2Visible = !document.getElementById('edit-show-2').classList.contains('hidden');
-            const isImg3Visible = !document.getElementById('edit-show-3').classList.contains('hidden');
+            if (newImg2 !== "") storeProducts[idx].image2 = newImg2;
+            else if (!isImg2Visible) storeProducts[idx].image2 = "";
 
-            const newImg1 = await processImage(document.getElementById('edit-prod-image'));
-            const newImg2 = await processImage(document.getElementById('edit-prod-image2'));
-            const newImg3 = await processImage(document.getElementById('edit-prod-image3'));
+            if (newImg3 !== "") storeProducts[idx].image3 = newImg3;
+            else if (!isImg3Visible) storeProducts[idx].image3 = "";
+        } 
+        renderAdminProducts(); 
+        closeEditProductModal(); 
+        
+    } catch(e) { 
+        alert("Error updating product: " + e.message); 
+    } 
+    
+    // ये हमेशा रन होगा (चाहे पास हो या फेल), बटन वापस नॉर्मल हो जाएगा
+    btn.innerHTML = orig; 
+    btn.disabled = false;
+}
 
-            // Agar naya photo upload kiya toh update karo
-            // Warna agar user ne cross daba diya tha, to firebase se delete kar do
-            if (newImg1 !== "") updateData.image = newImg1;
-            else if (!isImg1Visible) updateData.image = firebase.firestore.FieldValue.delete();
+async function deleteProduct(id) { 
+    if(!confirm("Are you sure you want to delete this product?")) return; 
+    
+    try { 
+        // 1. लोकल एरे से प्रोडक्ट का डेटा निकालो ताकि उसकी इमेजेज के URL मिल सकें
+        const p = storeProducts.find(x => x.id === id);
+        
+        if (p) {
+            // 2. Firebase Storage से इमेज डिलीट करने का छोटा हेल्पर फंक्शन
+            const deleteImageFromStorage = async (imageUrl) => {
+                // चेक करो कि URL मौजूद है और वो Firebase Storage का ही लिंक है
+                if (imageUrl && imageUrl.startsWith("https://firebasestorage")) {
+                    try {
+                        const imgRef = firebase.storage().refFromURL(imageUrl);
+                        await imgRef.delete();
+                    } catch (err) {
+                        console.log("Image already deleted or not found:", err);
+                    }
+                }
+            };
 
-            if (newImg2 !== "") updateData.image2 = newImg2;
-            else if (!isImg2Visible) updateData.image2 = firebase.firestore.FieldValue.delete();
-
-            if (newImg3 !== "") updateData.image3 = newImg3;
-            else if (!isImg3Visible) updateData.image3 = firebase.firestore.FieldValue.delete();
-
-            try { 
-                await db.collection('shops').doc(currentShopId).collection('products').doc(id).update(updateData); 
-                let idx = storeProducts.findIndex(x=>x.id===id); 
-                if(idx!==-1) {
-                    storeProducts[idx].name = n; storeProducts[idx].mrp = mrpVal; storeProducts[idx].price = p; 
-                    storeProducts[idx].qtySize = qtySize; storeProducts[idx].unit = unit; storeProducts[idx].description = updatedDesc; 
-                    
-                    if (newImg1 !== "") storeProducts[idx].image = newImg1;
-                    else if (!isImg1Visible) storeProducts[idx].image = "";
-
-                    if (newImg2 !== "") storeProducts[idx].image2 = newImg2;
-                    else if (!isImg2Visible) storeProducts[idx].image2 = "";
-
-                    if (newImg3 !== "") storeProducts[idx].image3 = newImg3;
-                    else if (!isImg3Visible) storeProducts[idx].image3 = "";
-                } 
-                renderAdminProducts(); closeEditProductModal(); 
-            } catch(e) { alert(e.message); } 
-            
-            btn.innerText = orig; btn.disabled = false;
+            // 3. तीनों इमेजेज (अगर हैं) तो उन्हें बैकग्राउंड में डिलीट करो
+            await deleteImageFromStorage(p.image);
+            await deleteImageFromStorage(p.image2);
+            await deleteImageFromStorage(p.image3);
         }
 
-        async function deleteProduct(id) { if(!confirm("Delete product?")) return; try { await db.collection('shops').doc(currentShopId).collection('products').doc(id).delete(); storeProducts = storeProducts.filter(x=>x.id!==id); renderAdminProducts(); } catch(e){} }
+        // 4. Firestore डेटाबेस से प्रोडक्ट का डेटा उड़ाओ
+        await db.collection('shops').doc(currentShopId).collection('products').doc(id).delete(); 
+        
+        // 5. बिना पेज रिफ्रेश किए UI से प्रोडक्ट हटा दो
+        storeProducts = storeProducts.filter(x => x.id !== id); 
+        renderAdminProducts(); 
+        
+    } catch(e) {
+        console.error("Error deleting product:", e);
+        alert("Error deleting product: " + e.message);
+    } 
+}
+
+
 
         // ==========================================
         // 8. CUSTOMERS LOGIC

@@ -328,18 +328,28 @@
                 </div>
             </div>
 
-            <!-- Quick Filters -->
-            <div>
-                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Quick Filters</h4>
-                <div class="flex flex-wrap gap-2.5">
-                    <button onclick="toggleQuickFilter('discount')" id="filter-discount" class="filter-quick-btn px-4 py-2.5 rounded-xl border border-gray-200 text-[13px] font-bold text-gray-600 bg-white transition active:scale-95 shadow-sm flex items-center gap-1.5">
-                        <i class="fas fa-tags text-red-500"></i> Offers Only
-                    </button>
-                    <button onclick="toggleQuickFilter('under-99')" id="filter-under-99" class="filter-quick-btn px-4 py-2.5 rounded-xl border border-gray-200 text-[13px] font-bold text-gray-600 bg-white transition active:scale-95 shadow-sm flex items-center gap-1.5">
-                        <i class="fas fa-bolt text-yellow-500"></i> Under ₹99
-                    </button>
-                </div>
-            </div>
+     <!-- Quick Filters -->
+<div>
+    <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Quick Filters</h4>
+    <div class="flex flex-wrap gap-2.5">
+        <button onclick="toggleQuickFilter('discount')" id="filter-discount" class="filter-quick-btn px-4 py-2.5 rounded-xl border border-gray-200 text-[13px] font-bold text-gray-600 bg-white transition active:scale-95 shadow-sm flex items-center gap-1.5">
+            <i class="fas fa-tags text-red-500"></i> Offers Only
+        </button>
+        <button onclick="toggleQuickFilter('under-99')" id="filter-under-99" class="filter-quick-btn px-4 py-2.5 rounded-xl border border-gray-200 text-[13px] font-bold text-gray-600 bg-white transition active:scale-95 shadow-sm flex items-center gap-1.5">
+            <i class="fas fa-bolt text-yellow-500"></i> Under ₹99
+        </button>
+        <button onclick="toggleQuickFilter('under-299')" id="filter-under-299" class="filter-quick-btn px-4 py-2.5 rounded-xl border border-gray-200 text-[13px] font-bold text-gray-600 bg-white transition active:scale-95 shadow-sm flex items-center gap-1.5">
+            <i class="fas fa-bolt text-yellow-500"></i> Under ₹299
+        </button>
+        <button onclick="toggleQuickFilter('under-499')" id="filter-under-499" class="filter-quick-btn px-4 py-2.5 rounded-xl border border-gray-200 text-[13px] font-bold text-gray-600 bg-white transition active:scale-95 shadow-sm flex items-center gap-1.5">
+            <i class="fas fa-bolt text-yellow-500"></i> Under ₹499
+        </button>
+        <button onclick="toggleQuickFilter('under-999')" id="filter-under-999" class="filter-quick-btn px-4 py-2.5 rounded-xl border border-gray-200 text-[13px] font-bold text-gray-600 bg-white transition active:scale-95 shadow-sm flex items-center gap-1.5">
+            <i class="fas fa-bolt text-yellow-500"></i> Under ₹999
+        </button>
+    </div>
+</div>
+
         </div>
 
         <!-- Action Buttons -->
@@ -2735,6 +2745,21 @@ function selectSort(option) {
 }
 
 function toggleQuickFilter(filter) {
+    // Agar user naya price filter select kar raha hai, toh baaki price filters hata do
+    if (filter.startsWith('under-')) {
+        const priceFilters = ['under-99', 'under-299', 'under-499', 'under-999'];
+        priceFilters.forEach(f => {
+            if (f !== filter && activeQuickFilters.includes(f)) {
+                activeQuickFilters.splice(activeQuickFilters.indexOf(f), 1);
+                const otherBtn = document.getElementById('filter-' + f);
+                if(otherBtn) {
+                    otherBtn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700');
+                    otherBtn.classList.add('border-gray-200', 'bg-white', 'text-gray-600');
+                }
+            }
+        });
+    }
+
     const btn = document.getElementById('filter-' + filter);
     const index = activeQuickFilters.indexOf(filter);
     
@@ -2749,26 +2774,13 @@ function toggleQuickFilter(filter) {
     }
 }
 
-function clearSmartFilters() {
-    selectSort('default');
-    activeQuickFilters = [];
-    document.querySelectorAll('.filter-quick-btn').forEach(btn => {
-        btn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700');
-        btn.classList.add('border-gray-200', 'bg-white', 'text-gray-600');
-    });
-    applySmartFilters(); // Re-apply to reset view
-}
-
 function applySmartFilters() {
     const grid = document.getElementById('products-grid');
     if (!grid) return;
     
     let productCards = Array.from(grid.querySelectorAll('.grid-item'));
-    
-    // Sirf product cards choose karega (Loading/Error message ko ignore karega)
     productCards = productCards.filter(card => card.querySelector('.fa-cart-plus') || card.querySelector('img'));
 
-    // Original position save kar lo (taaki 'Default' dabane par wapas wahi set ho jaye)
     productCards.forEach((card, idx) => {
         if (!card.hasAttribute('data-original-index')) {
             card.setAttribute('data-original-index', idx);
@@ -2780,13 +2792,16 @@ function applySmartFilters() {
         let isVisible = true;
         let text = card.innerText;
         
-        // Card me se price nikalna (Regex use karke ₹ ke baad ka number)
         let priceMatch = text.match(/₹\s*(\d+)/);
         let price = priceMatch ? parseInt(priceMatch[1]) : 0;
-        
         let hasDiscount = text.includes('% OFF');
 
+        // Sabhi nayi price ranges ki condition check
         if (activeQuickFilters.includes('under-99') && price >= 99) isVisible = false;
+        if (activeQuickFilters.includes('under-299') && price >= 299) isVisible = false;
+        if (activeQuickFilters.includes('under-499') && price >= 499) isVisible = false;
+        if (activeQuickFilters.includes('under-999') && price >= 999) isVisible = false;
+        
         if (activeQuickFilters.includes('discount') && !hasDiscount) isVisible = false;
 
         card.style.display = isVisible ? '' : 'none';
@@ -2804,9 +2819,7 @@ function applySmartFilters() {
         return currentSortOption === 'low-high' ? priceA - priceB : priceB - priceA;
     });
     
-    // Sorted cards ko wapas grid mein append kar do
     productCards.forEach(card => grid.appendChild(card));
-
     closeSmartFilter();
 }
 

@@ -3989,8 +3989,7 @@ function trackSearchImpression(shopIdToTrack) {
         }).catch(err => console.log(err));
     }
 }
-                     // ✨ NAYA: CENTERED iOS STYLE PLAN UI ✨
-        function updatePlanUI(activePlan) {
+                  function updatePlanUI(activePlan) {
     const btnStarter = document.getElementById('btn-starter');
     const btnPlus = document.getElementById('btn-plus');
     const btnPro = document.getElementById('btn-pro');
@@ -4001,36 +4000,26 @@ function trackSearchImpression(shopIdToTrack) {
 
     if(!btnStarter || !btnPlus || !btnPro) return;
 
-    // 1. Pehle sabko default 'Upgrade' par set karo
-    btnStarter.innerHTML = 'Select Starter';
-    btnStarter.className = 'w-full bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl border border-gray-200 mt-auto transition-colors active:scale-95';
-    btnStarter.disabled = false;
-    btnStarter.onclick = () => iosAlert("Downgrade Not Allowed", "You are already on a higher plan.");
-
-    btnPlus.innerHTML = 'Upgrade to Plus';
-    btnPlus.className = 'w-full bg-purple-50 hover:bg-purple-100 text-purple-600 font-black py-3.5 rounded-xl border border-purple-200 mt-auto transition-colors active:scale-95';
-    btnPlus.disabled = false;
-    btnPlus.onclick = () => initiateRazorpayPayment('plus', 149);
-
-    btnPro.innerHTML = 'Get Pro VIP 🚀';
-    btnPro.className = 'relative z-10 w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 text-black font-black py-4 rounded-xl mt-auto transition-colors active:scale-95 shadow-md';
-    btnPro.disabled = false;
-    btnPro.onclick = () => initiateRazorpayPayment('pro', 299);
-
-    // 2. Badges Reset karo
-    badgeStarter.innerHTML = '';
+    // 1. Reset Badges
     badgeStarter.className = 'hidden';
-    
     badgePlus.innerHTML = 'Most Popular';
     badgePlus.className = 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-[10px] font-black uppercase px-4 py-1.5 rounded-full shadow-sm tracking-wider';
-    
     badgePro.innerHTML = 'Best For Business';
     badgePro.className = 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-black text-[10px] font-black uppercase px-4 py-1.5 rounded-full shadow-sm tracking-wider';
 
-    // 3. User ke Current Plan ke hisaab se Buttons Update karo
+    // 2. Base Button Styles
+    btnStarter.className = 'w-full bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl border border-gray-200 mt-auto transition-colors active:scale-95';
+    btnPlus.className = 'w-full bg-purple-50 hover:bg-purple-100 text-purple-600 font-black py-3.5 rounded-xl border border-purple-200 mt-auto transition-colors active:scale-95';
+    btnPro.className = 'relative z-10 w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 text-black font-black py-4 rounded-xl mt-auto transition-colors active:scale-95 shadow-md';
+    
+    btnStarter.disabled = false;
+    btnPlus.disabled = false;
+    btnPro.disabled = false;
+
     const activeBtnClass = 'w-full bg-white/10 text-white font-bold py-4 rounded-xl cursor-not-allowed border border-white/20 mt-auto flex items-center justify-center gap-2';
     const activePlusBtnClass = 'w-full bg-purple-100 text-purple-700 font-bold py-3.5 rounded-xl cursor-not-allowed border border-purple-200 mt-auto flex items-center justify-center gap-2';
-    
+
+    // 3. Logic based on Active Plan
     if (activePlan === 'starter') {
         btnStarter.innerHTML = 'Current Plan';
         btnStarter.className = 'w-full bg-gray-100 text-gray-400 font-bold py-3.5 rounded-xl cursor-not-allowed border mt-auto';
@@ -4039,8 +4028,18 @@ function trackSearchImpression(shopIdToTrack) {
         badgeStarter.innerHTML = 'Active';
         badgeStarter.className = 'bg-gray-100 text-gray-500 text-[10px] font-black uppercase px-3.5 py-1.5 rounded-full border border-gray-200 tracking-wider';
         badgeStarter.classList.remove('hidden');
+
+        btnPlus.innerHTML = 'Upgrade to Plus';
+        btnPlus.onclick = () => initiateRazorpayPayment('plus', 149);
+        
+        btnPro.innerHTML = 'Get Pro VIP 🚀';
+        btnPro.onclick = () => initiateRazorpayPayment('pro', 299);
     } 
     else if (activePlan === 'plus') {
+        btnStarter.innerHTML = 'Downgrade';
+        // ✨ FIX: Yahan showIOSAlert lagaya hai jo perfectly kaam karega
+        btnStarter.onclick = () => showIOSAlert("Downgrade Not Allowed", "You are already on the Plus plan. You cannot downgrade to Starter.", "OK");
+
         btnPlus.innerHTML = '<i class="fas fa-check text-purple-600"></i> Current Plan';
         btnPlus.className = activePlusBtnClass;
         btnPlus.disabled = true;
@@ -4048,11 +4047,16 @@ function trackSearchImpression(shopIdToTrack) {
         badgePlus.innerHTML = 'Active Plan';
         badgePlus.className = 'bg-purple-600 text-white text-[10px] font-black uppercase px-4 py-1.5 rounded-full shadow-sm flex items-center gap-1.5 tracking-wider';
         
-        btnStarter.innerHTML = 'Downgrade';
-        // ✨ NAYA: Downgrade par payment nahi khulega, seedha Alert aayega
-        btnStarter.onclick = () => iosAlert("Downgrade Not Allowed", "You are already on the Plus plan. You cannot downgrade to Starter.");
+        btnPro.innerHTML = 'Upgrade to Pro 🚀';
+        btnPro.onclick = () => initiateRazorpayPayment('pro', 299);
     } 
     else if (activePlan === 'pro') {
+        btnStarter.innerHTML = 'Downgrade';
+        btnStarter.onclick = () => showIOSAlert("Downgrade Not Allowed", "You already have the highest plan (Pro VIP) active.", "OK");
+
+        btnPlus.innerHTML = 'Downgrade';
+        btnPlus.onclick = () => showIOSAlert("Downgrade Not Allowed", "You already have the highest plan (Pro VIP) active.", "OK");
+
         btnPro.innerHTML = '<i class="fas fa-crown text-yellow-400"></i> Current Plan';
         btnPro.className = activeBtnClass;
         btnPro.disabled = true;
@@ -4062,13 +4066,6 @@ function trackSearchImpression(shopIdToTrack) {
 
         const proCard = btnPro.closest('.group');
         if(proCard) proCard.classList.add('ring-2', 'ring-yellow-400/40', 'shadow-[0_10px_30px_rgba(234,179,8,0.1)]');
-
-        btnStarter.innerHTML = 'Downgrade';
-        btnPlus.innerHTML = 'Downgrade';
-        
-        // ✨ NAYA: Downgrade par payment nahi khulega, seedha Alert aayega
-        btnStarter.onclick = () => iosAlert("Downgrade Not Allowed", "You already have the highest plan (Pro VIP) active.");
-        btnPlus.onclick = () => iosAlert("Downgrade Not Allowed", "You already have the highest plan (Pro VIP) active.");
     }
 }
 
@@ -5334,13 +5331,12 @@ function handleUpgradeClick(targetPlan, amount) {
     // Agar sab sahi hai, tabhi payment khulegi
     initiateRazorpayPayment(targetPlan, amount);
 }
-
-let isPaymentSuccess = false; // Isse hum track karenge ki asli me payment hui ya user ne back kiya
+let isPaymentSuccess = false;
 
 function initiateRazorpayPayment(planType, amountInINR) {
     const user = firebase.auth().currentUser;
     if (!user) {
-        alert("Your session has expired! Please log out and log in with Google again to upgrade.");
+        alert("Session expired! Please log in again.");
         return;
     }
 
@@ -5348,12 +5344,9 @@ function initiateRazorpayPayment(planType, amountInINR) {
     const ownerName = localStorage.getItem('BikriPage_owner_name') || 'Merchant';
     const phone = localStorage.getItem('BikriPage_customer_phone') || '9999999999';
 
-    if (!activeShop) {
-        alert("Shop ID missing. Please log in again.");
-        return;
-    }
+    if (!activeShop) return;
 
-    isPaymentSuccess = false; // Reset flag
+    isPaymentSuccess = false;
 
     const options = {
         "key": "rzp_test_Tqw5ZOVHX6vidX", 
@@ -5363,49 +5356,33 @@ function initiateRazorpayPayment(planType, amountInINR) {
         "description": `Upgrade to ${planType.toUpperCase()} Plan`,
         "theme": { "color": "#111827" },
         "prefill": { "name": ownerName, "contact": phone },
-        
-        // 1. HANDLER: Ye tab chalega jab payment done hogi. 
-        // Yahan hum KABHI BHI popup UI nahi dikhayenge. Sirf Database background me update karenge.
         "handler": function (response) {
-            isPaymentSuccess = true; // Mark as success
-            
+            isPaymentSuccess = true; 
             db.collection('shops').doc(activeShop).update({
                 plan: planType,
                 isVerified: true, 
                 paymentId: response.razorpay_payment_id,
                 planStartDate: firebase.firestore.FieldValue.serverTimestamp(),
                 searchRank: planType === 'pro' ? 100 : 50 
-            }).catch(error => {
-                console.error("DB Error:", error);
-            });
+            }).catch(e => console.error(e));
         },
-
-        // 2. MODAL ONDISMISS: Jab Razorpay poori tarah screen se gayab ho jayega
         "modal": {
             "ondismiss": function() {
-                // Agar user ne payment kar di thi aur Razorpay band ho gaya
                 if (isPaymentSuccess) {
-                    iosConfirm(
-                        "Payment Successful! 🎉", 
-                        `Welcome to the ${planType.toUpperCase()} plan. Your features are now unlocked!`, 
-                        "Go to Dashboard",
-                        "text-green-600"
-                    ).then(() => {
-                        window.location.href = `dashboard.html?shop=${activeShop}`;
-                    });
+                    // ✨ NAYA: Koi success alert nahi, seedha redirect! ✨
+                    window.location.href = `dashboard.html?shop=${activeShop}`;
                 }
             }
         }
     };
 
     const rzp = new Razorpay(options);
-    
     rzp.on('payment.failed', function (response) {
         alert("Payment Failed: " + response.error.description);
     });
-    
     rzp.open();
 }
+
 
 // ✨ iOS Premium Alert Function
 function iosConfirm(title, message, btnText) {

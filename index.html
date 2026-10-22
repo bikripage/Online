@@ -5318,7 +5318,7 @@ function initiateRazorpayPayment(planType, amountInINR) {
     }
 
     const options = {
-        "key": "rzp_test_Tqw5ZOVHX6vidX", // 🔑 अपनी Razorpay Key वापस डाल देना
+        "key": "rzp_test_Tqw5ZOVHX6vidX", // 🔑 अपनी Razorpay Test Key यहाँ डालें
         "amount": amountInINR * 100, 
         "currency": "INR",
         "name": "BikriPage",
@@ -5331,42 +5331,42 @@ function initiateRazorpayPayment(planType, amountInINR) {
             "contact": phone
         },
         "handler": function (response) {
-            // ✨ FIX: Razorpay के पॉपअप को शांति से बंद होने का टाइम दो (1 सेकंड का डिले)
-            setTimeout(async () => {
-                try {
-                    if(typeof showIOSAlert === 'function') showIOSAlert("Processing", "Unlocking Premium Features...");
+            // लोडिंग अलर्ट दिखाओ (अगर फंक्शन मौजूद है)
+            if(typeof showIOSAlert === 'function') showIOSAlert("Processing", "Unlocking Premium Features...");
 
-                    // Firestore में प्लान अपडेट करो
-                    await db.collection('shops').doc(activeShop).update({
-                        plan: planType,
-                        isVerified: true, 
-                        paymentId: response.razorpay_payment_id,
-                        planStartDate: firebase.firestore.FieldValue.serverTimestamp(),
-                        searchRank: planType === 'pro' ? 100 : 50 
-                    });
-
+            // 1. बिना ब्राउज़र अटकाए बैकग्राउंड में डेटाबेस अपडेट करो
+            db.collection('shops').doc(activeShop).update({
+                plan: planType,
+                isVerified: true, 
+                paymentId: response.razorpay_payment_id,
+                planStartDate: firebase.firestore.FieldValue.serverTimestamp(),
+                searchRank: planType === 'pro' ? 100 : 50 
+            }).then(() => {
+                // 2. डेटाबेस अपडेट होने के बाद 1.5 सेकंड रुको ताकि Razorpay का पॉपअप खुद बंद हो जाए
+                setTimeout(() => {
                     if(typeof closeIOSAlert === 'function') closeIOSAlert();
                     
-                    // ✨ FIX: Native alert() की जगह तुम्हारा प्रीमियम iosConfirm यूज़ किया है
+                    // 3. फिर अपना सक्सेस मैसेज दिखाओ और पेज बदलो
                     if (typeof iosConfirm === 'function') {
                         iosConfirm(
                             "Payment Successful! 🎉", 
-                            `Welcome to the ${planType.toUpperCase()} plan. Your new features are unlocked!`, 
+                            `Welcome to the ${planType.toUpperCase()} plan. Your features are now unlocked!`, 
                             "Go to Dashboard", 
                             "text-green-600"
                         ).then(() => {
                             window.location.href = `dashboard.html?shop=${activeShop}`;
                         });
                     } else {
+                        alert(`Payment Successful! 🎉 Welcome to the ${planType.toUpperCase()} plan.`);
                         window.location.href = `dashboard.html?shop=${activeShop}`;
                     }
+                }, 1500); 
 
-                } catch (error) {
-                    console.error("Database Update Error:", error);
-                    if(typeof closeIOSAlert === 'function') closeIOSAlert();
-                    alert("Database Error: " + error.message + "\n\nPayment ID: " + response.razorpay_payment_id);
-                }
-            }, 1000); // 1000ms (1 सेकंड) का डिले
+            }).catch((error) => {
+                console.error("Database Update Error:", error);
+                if(typeof closeIOSAlert === 'function') closeIOSAlert();
+                alert("Payment received, but Database Error: " + error.message);
+            });
         }
     };
 

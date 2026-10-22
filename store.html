@@ -1456,49 +1456,54 @@ function checkCustomerAuth() {
         }
 
         function setFormRating(val) { userRating = val; document.getElementById('star-input-container').innerHTML = renderStarsInput(val); }
-
-        async function checkUserReview() {
-            const customerPhone = localStorage.getItem('BikriPage_customer_phone');
-            const customerName = localStorage.getItem('BikriPage_customer_name');
-            const formContainer = document.getElementById('review-form-container');
-            const myReviewContainer = document.getElementById('my-review-container');
-            
-            if (!customerName || !customerPhone) {
-                formContainer.innerHTML = `
-                    <div class="flex flex-col items-center justify-center text-center py-8 bg-[#F7F7F9] rounded-[20px] border border-[#E5E7EB] mb-2 w-full">
-                        <div class="w-12 h-12 bg-white text-[#9CA3AF] rounded-full flex items-center justify-center text-xl mb-3 shadow-sm border border-[#E5E7EB]">
-                            <i class="fas fa-lock"></i>
-                        </div>
-                        <p class="text-sm font-bold text-[#6B7280] mb-4">Log in to explore shops and share your experience. </p>
-<button onclick="goToCustomerLogin()" class="mx-auto bg-[#111827] text-white font-bold py-3 px-8 rounded-xl text-sm active:scale-95 transition shadow-md">
-    Login / Sign Up
-</button>
-
-
-                    </div>
-                `;
-                formContainer.classList.remove('hidden'); 
-                myReviewContainer.classList.add('hidden'); 
-                return;
+async function checkUserReview() {
+    const customerPhone = localStorage.getItem('BikriPage_customer_phone');
+    // ✨ FIX: Customer aur Shopkeeper dono ka naam check karega ✨
+    const customerName = localStorage.getItem('BikriPage_customer_name') || localStorage.getItem('BikriPage_owner_name');
+    const formContainer = document.getElementById('review-form-container');
+    const myReviewContainer = document.getElementById('my-review-container');
+    
+    if (!customerName || !customerPhone) {
+        formContainer.innerHTML = `
+            <div class="flex flex-col items-center justify-center text-center py-8 bg-[#F7F7F9] rounded-[20px] border border-[#E5E7EB] mb-2 w-full">
+                <div class="w-12 h-12 bg-white text-[#9CA3AF] rounded-full flex items-center justify-center text-xl mb-3 shadow-sm border border-[#E5E7EB]">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <p class="text-sm font-bold text-[#6B7280] mb-4">Log in to explore shops and share your experience. </p>
+                <button onclick="goToCustomerLogin()" class="mx-auto bg-[#111827] text-white font-bold py-3 px-8 rounded-xl text-sm active:scale-95 transition shadow-md">
+                    Login / Sign Up
+                </button>
+            </div>
+        `;
+        formContainer.classList.remove('hidden'); 
+        myReviewContainer.classList.add('hidden'); 
+        return;
+    }
+    try {
+        const doc = await db.collection('shops').doc(currentShopId).collection('reviews').doc(customerPhone).get();
+        if (doc.exists) {
+            const data = doc.data(); 
+            userRating = data.rating; 
+            currentUserReviewText = data.text || ""; 
+            let starsHtml = ''; 
+            for(let i=1; i<=5; i++) { 
+                starsHtml += i <= data.rating ? `<i class="fas fa-star text-yellow-400 text-sm"></i> ` : `<i class="far fa-star text-gray-300 text-sm"></i> `; 
             }
-            try {
-                const doc = await db.collection('shops').doc(currentShopId).collection('reviews').doc(customerPhone).get();
-                if (doc.exists) {
-                    const data = doc.data(); userRating = data.rating; currentUserReviewText = data.text || ""; 
-                    let starsHtml = ''; for(let i=1; i<=5; i++) { starsHtml += i <= data.rating ? `<i class="fas fa-star text-yellow-400 text-sm"></i> ` : `<i class="far fa-star text-gray-300 text-sm"></i> `; }
-                    
-                    myReviewContainer.innerHTML = `
-                        <div class="flex items-center justify-between mb-2.5">
-                            <span class="font-black text-gray-900 text-sm">Your Review</span>
-                            <button onclick="showReviewForm(true)" class="text-purple-600 bg-white hover:bg-purple-100 shadow-sm w-8 h-8 flex items-center justify-center rounded-full transition active:scale-90 border border-purple-100"><i class="fas fa-pencil-alt text-[11px]"></i></button>
-                        </div>
-                        <div class="flex mb-2">${starsHtml}</div>
-                        ${currentUserReviewText ? `<p class="text-[13px] text-gray-700 leading-relaxed font-medium whitespace-pre-wrap">${currentUserReviewText}</p>` : ''}
-                    `;
-                    myReviewContainer.classList.remove('hidden'); formContainer.classList.add('hidden');
-                } else { userRating = 0; currentUserReviewText = ""; showReviewForm(false); }
-            } catch (e) { console.error(e); }
+            
+            myReviewContainer.innerHTML = `
+                <div class="flex items-center justify-between mb-2.5">
+                    <span class="font-black text-gray-900 text-sm">Your Review</span>
+                    <button onclick="showReviewForm(true)" class="text-purple-600 bg-white hover:bg-purple-100 shadow-sm w-8 h-8 flex items-center justify-center rounded-full transition active:scale-90 border border-purple-100"><i class="fas fa-pencil-alt text-[11px]"></i></button>
+                </div>
+                <div class="flex mb-2">${starsHtml}</div>
+                ${currentUserReviewText ? `<p class="text-[13px] text-gray-700 leading-relaxed font-medium whitespace-pre-wrap">${currentUserReviewText}</p>` : ''}
+            `;
+            myReviewContainer.classList.remove('hidden'); formContainer.classList.add('hidden');
+        } else { 
+            userRating = 0; currentUserReviewText = ""; showReviewForm(false); 
         }
+    } catch (e) { console.error(e); }
+}
 
         function showReviewForm(isUpdate = false) {
             const formContainer = document.getElementById('review-form-container');
@@ -1518,22 +1523,37 @@ function checkCustomerAuth() {
 
         function cancelEdit() { document.getElementById('review-form-container').classList.add('hidden'); document.getElementById('my-review-container').classList.remove('hidden'); }
 
-        async function submitStoreReview() {
-            const customerPhone = localStorage.getItem('BikriPage_customer_phone');
-            const customerName = localStorage.getItem('BikriPage_customer_name');
-            if(!customerPhone) return;
-            if (userRating === 0) { alert("Please select a star rating first!"); return; }
-            
-            const text = document.getElementById('review-text-input').value.trim();
-            const btn = document.getElementById('submit-review-btn');
-            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Saving...`; btn.disabled = true;
-            
-            try {
-                await db.collection('shops').doc(currentShopId).collection('reviews').doc(customerPhone).set({ customerName: customerName, rating: userRating, text: text, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-                await checkUserReview(); updateAverageRatingDisplay(); 
-                lastReviewDoc = null; hasMoreReviews = true; document.getElementById('reviews-list').innerHTML = ""; loadReviews();
-            } catch (e) { alert("Error submitting review."); btn.disabled = false; }
-        }
+     async function submitStoreReview() {
+    const customerPhone = localStorage.getItem('BikriPage_customer_phone');
+    // ✨ FIX: Submit karte waqt bhi dono ka naam check karega ✨
+    const customerName = localStorage.getItem('BikriPage_customer_name') || localStorage.getItem('BikriPage_owner_name');
+    
+    if(!customerPhone) return;
+    if (userRating === 0) { alert("Please select a star rating first!"); return; }
+    
+    const text = document.getElementById('review-text-input').value.trim();
+    const btn = document.getElementById('submit-review-btn');
+    btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Saving...`; btn.disabled = true;
+    
+    try {
+        await db.collection('shops').doc(currentShopId).collection('reviews').doc(customerPhone).set({ 
+            customerName: customerName, 
+            rating: userRating, 
+            text: text, 
+            timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+        });
+        await checkUserReview(); 
+        updateAverageRatingDisplay(); 
+        lastReviewDoc = null; 
+        hasMoreReviews = true; 
+        document.getElementById('reviews-list').innerHTML = ""; 
+        loadReviews();
+    } catch (e) { 
+        alert("Error submitting review."); 
+        btn.disabled = false; 
+    }
+}
+
 
         async function loadReviews(isLoadMore = false) {
             if (!hasMoreReviews) return;

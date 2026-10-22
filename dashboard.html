@@ -10432,9 +10432,11 @@ async function deleteLiveOrder(orderId) {
             }
         };
 
+
 /* =========================================================
    BIKRIPAGE PROFESSIONAL SHIPPING LABEL
-   A4 PORTRAIT | 4 LABELS PER PAGE | CLEAN PACK SECTION
+   A4 PORTRAIT | 4 LABELS PER PAGE
+   FIXED PRODUCT OVERLAP | CLEAR QR | COD SAFE
 ========================================================= */
 
 const BP_LABEL = {
@@ -10442,10 +10444,11 @@ const BP_LABEL = {
     height: 70,
     gap: 2,
     qrPixels: 280,
-    qrMM: 28
+    qrMM: 28,
+    maxVisibleItems: 3
 };
 
-// Escape customer/shop data before inserting into HTML
+// Escape dynamic data before adding it to HTML
 function bpEscape(value) {
     return String(value ?? "")
         .replace(/&/g, "&amp;")
@@ -10455,7 +10458,7 @@ function bpEscape(value) {
         .replace(/'/g, "&#39;");
 }
 
-// Google Maps destination URL
+// Google Maps URL for the QR code
 function bpMapURL(order) {
     const lat = Number(order.lat);
     const lng = Number(order.lng);
@@ -10482,7 +10485,7 @@ function bpMapURL(order) {
         : "";
 }
 
-// Create/reuse hidden print iframe
+// Reuse hidden print iframe
 function bpGetFrame() {
     let frame = document.getElementById("print-iframe");
 
@@ -10506,12 +10509,41 @@ function bpGetFrame() {
     return frame;
 }
 
-// Generate one shipping label
+// Product list: maximum 3 visible tags, then +N more
+function bpBuildItems(order) {
+    const allItems = Array.isArray(order.items)
+        ? order.items
+        : [];
+
+    if (!allItems.length) {
+        return '<span class="item">No items found</span>';
+    }
+
+    const max = BP_LABEL.maxVisibleItems;
+    const visible = allItems.slice(0, max);
+    const remaining = Math.max(0, allItems.length - max);
+
+    const visibleHTML = visible.map(item => `
+        <span class="item">
+            <b>${bpEscape(item.qty ?? 1)}×</b>
+            ${bpEscape(item.name || "Product")}
+        </span>
+    `).join("");
+
+    const moreHTML = remaining > 0
+        ? `<span class="item more-items">+${remaining} more</span>`
+        : "";
+
+    return visibleHTML + moreHTML;
+}
+
+// Build one shipping label
 function bpLabelHTML(order, shopName, shopPhone) {
     const id = String(order.id ?? "");
     const shortId = id.substring(0, 8).toUpperCase();
 
     const amount = Number(order.totalAmount);
+
     const amountText = Number.isFinite(amount)
         ? amount.toLocaleString("en-IN", {
             maximumFractionDigits: 2
@@ -10519,15 +10551,7 @@ function bpLabelHTML(order, shopName, shopPhone) {
         : String(order.totalAmount ?? "0");
 
     const mapURL = bpMapURL(order);
-
-    const items = Array.isArray(order.items) && order.items.length
-        ? order.items.map(item => `
-            <span class="item">
-                <b>${bpEscape(item.qty ?? 1)}×</b>
-                ${bpEscape(item.name || "Product")}
-            </span>
-        `).join("")
-        : '<span class="item">No items found</span>';
+    const itemsHTML = bpBuildItems(order);
 
     return `
         <section class="label">
@@ -10589,10 +10613,9 @@ function bpLabelHTML(order, shopName, shopPhone) {
                 </div>
             </div>
 
-            <!-- PACK SECTION: no crossing line -->
             <div class="products">
                 <div class="pack-title">PACK:</div>
-                <div class="items">${items}</div>
+                <div class="items">${itemsHTML}</div>
             </div>
 
             <footer class="footer">
@@ -10606,7 +10629,7 @@ function bpLabelHTML(order, shopName, shopPhone) {
     `;
 }
 
-// Complete print stylesheet
+// Complete print CSS
 function bpPrintCSS() {
     return `
         @page {
@@ -10629,7 +10652,7 @@ function bpPrintCSS() {
             background: #fff;
         }
 
-        /* Four full-width labels on every A4 page */
+        /* Exactly four label rows per A4 sheet */
         .sheet {
             width: 100%;
             height: 287mm;
@@ -10699,13 +10722,13 @@ function bpPrintCSS() {
             overflow-wrap: anywhere;
         }
 
-        /* Customer and QR layout */
+        /* Customer and QR area */
         .content {
             display: grid;
             grid-template-columns: minmax(0, 1fr) 39mm;
             gap: 3mm;
 
-            flex: 1;
+            flex: 1 1 auto;
             min-height: 0;
             padding: 2mm 0;
         }
@@ -10719,6 +10742,7 @@ function bpPrintCSS() {
 
             padding-right: 3mm;
             border-right: 1pt dashed #555;
+            overflow: hidden;
         }
 
         .caption {
@@ -10755,7 +10779,7 @@ function bpPrintCSS() {
             overflow-wrap: anywhere;
         }
 
-        /* QR and COD */
+        /* QR and COD stay in their own column */
         .right {
             min-width: 0;
 
@@ -10808,6 +10832,7 @@ function bpPrintCSS() {
         }
 
         .cod {
+            flex: 0 0 auto;
             border: 1.3pt solid #111;
             border-radius: 1.5mm;
 
@@ -10829,19 +10854,20 @@ function bpPrintCSS() {
             overflow-wrap: anywhere;
         }
 
-        /* PACK: no horizontal line through product names */
+        /* Fixed-height PACK row prevents all overlap */
         .products {
             flex: 0 0 10mm;
+            height: 10mm;
             min-height: 10mm;
             max-height: 10mm;
 
             display: flex;
             align-items: center;
-            gap: 3mm;
+            gap: 2mm;
 
             overflow: hidden;
             border: none;
-            padding: 1.5mm 0;
+            padding: 1mm 0;
             margin: 0;
         }
 
@@ -10849,7 +10875,7 @@ function bpPrintCSS() {
             flex: 0 0 auto;
             font-size: 8pt;
             font-weight: 900;
-            padding-top: 1mm;
+            white-space: nowrap;
         }
 
         .items {
@@ -10857,28 +10883,41 @@ function bpPrintCSS() {
             flex: 1;
 
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             align-items: center;
             gap: 1mm;
 
             overflow: hidden;
+            white-space: nowrap;
         }
 
         .item {
-            display: inline-block;
-            max-width: 100%;
+            flex: 0 1 auto;
+            min-width: 0;
+            max-width: 35mm;
 
-            padding: .7mm 1.5mm;
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            padding: 1mm 1.5mm;
             border: .7pt solid #555;
             border-radius: 1mm;
 
-            font-size: 8pt;
+            font-size: 7.5pt;
             line-height: 1.15;
             font-weight: 600;
-            overflow-wrap: anywhere;
         }
 
-        /* Footer separator stays below PACK */
+        .more-items {
+            flex: 0 0 auto;
+            max-width: 20mm;
+            font-weight: 900;
+            background: #eee;
+        }
+
+        /* Footer is separate from PACK */
         .footer {
             flex: 0 0 auto;
 
@@ -10902,10 +10941,6 @@ function bpPrintCSS() {
         }
 
         @media screen {
-            body {
-                padding: 0;
-            }
-
             .sheet {
                 margin-bottom: 5mm;
             }
@@ -10924,7 +10959,7 @@ function bpPrintCSS() {
     `;
 }
 
-// Prepare QR codes before opening print dialog
+// Create QR codes, wait, then open print dialog
 function bpRunPrint(frame, html) {
     const doc = frame.contentWindow.document;
 
@@ -10943,6 +10978,9 @@ function bpRunPrint(frame, html) {
 
         if (!win || !printDoc ||
             !printDoc.querySelector(".label")) {
+            if (++attempts < 40) {
+                setTimeout(prepare, 250);
+            }
             return;
         }
 
@@ -10984,7 +11022,6 @@ function bpRunPrint(frame, html) {
 
         printed = true;
 
-        // Let QR canvases render before printing
         setTimeout(() => {
             win.focus();
             win.print();
@@ -11039,6 +11076,7 @@ function bpPrintOrders(orders) {
 
             <style>${bpPrintCSS()}</style>
         </head>
+
         <body>${sheets.join("")}</body>
         </html>
     `;
@@ -11082,6 +11120,7 @@ function printAllAcceptedSlips() {
 
     bpPrintOrders(orders);
 }
+
 
 
 // =======================================================

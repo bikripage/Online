@@ -5301,69 +5301,68 @@ function applySmartFilters() {
     productCards.forEach(card => grid.appendChild(card));
     closeSmartFilter();
 }
-// 🔑 अपना Razorpay Key ID यहाँ डालना है (Razorpay Dashboard > Settings > API Keys)
-const RAZORPAY_KEY_ID = "rzp_test_Tqw5ZOVHX6vidX"; 
-
 function initiateRazorpayPayment(planType, amountInINR) {
+    // ✨ FIX 1: पेमेंट खुलने से पहले Firebase Auth चेक करो
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Your session has expired! Please log out and log in with Google again to upgrade.");
+        return;
+    }
+
     const activeShop = localStorage.getItem('BikriPage_active_shop');
     const ownerName = localStorage.getItem('BikriPage_owner_name') || 'Merchant';
     const phone = localStorage.getItem('BikriPage_customer_phone') || '9999999999';
 
     if (!activeShop) {
-        showIOSAlert("Login Required", "Please log in to your store account to upgrade.");
+        alert("Shop ID missing. Please log in again.");
         return;
     }
 
     const options = {
-        "key": RAZORPAY_KEY_ID, 
-        "amount": amountInINR * 100, // Razorpay पैसे (paise) में अमाउंट लेता है, इसलिए 100 से गुणा किया
+        "key": "rzp_test_Tqw5ZOVHX6vidX", // 🔑 अपनी Razorpay Key वापस डाल देना
+        "amount": amountInINR * 100, 
         "currency": "INR",
         "name": "BikriPage",
         "description": `Upgrade to ${planType.toUpperCase()} Plan`,
         "theme": {
-            "color": "#111827" // तुम्हारे डार्क थीम से मैच करने के लिए
+            "color": "#111827" 
         },
         "prefill": {
             "name": ownerName,
             "contact": phone
         },
-        // ✨ पेमेंट सक्सेसफुल होने पर ये फंक्शन चलेगा
         "handler": async function (response) {
             try {
                 // UI को लोडिंग स्टेट में डालो
-                showIOSAlert("Processing", "Updating your store plan. Please wait...");
+                // (अगर showIOSAlert में दिक्कत आए तो इसे कमेंट कर सकते हो)
+                if(typeof showIOSAlert === 'function') showIOSAlert("Processing", "Updating your store plan. Please wait...");
 
-                // Firestore में प्लान अपडेट करो
+                // ✨ FIX 2: Firestore में प्लान अपडेट करो
                 await db.collection('shops').doc(activeShop).update({
                     plan: planType,
-                    isVerified: true, // प्रीमियम वालों को आटोमेटिक वेरिफाइड टिक मिल जाएगा
+                    isVerified: true, 
                     paymentId: response.razorpay_payment_id,
                     planStartDate: firebase.firestore.FieldValue.serverTimestamp(),
-                    searchRank: planType === 'pro' ? 100 : 50 // सर्च में ऊपर लाने के लिए
+                    searchRank: planType === 'pro' ? 100 : 50 
                 });
 
-                closeIOSAlert();
+                if(typeof closeIOSAlert === 'function') closeIOSAlert();
                 
-                // सक्सेस मैसेज और पेज रिफ्रेश
-                iosConfirm(
-                    "Payment Successful! 🎉", 
-                    `Welcome to the ${planType.toUpperCase()} plan. Your new features are unlocked!`, 
-                    "Go to Dashboard", 
-                    "text-green-600"
-                ).then(() => {
-                    window.location.href = `dashboard.html?shop=${activeShop}`;
-                });
+                alert(`Payment Successful! 🎉 Welcome to the ${planType.toUpperCase()} plan.`);
+                window.location.href = `dashboard.html?shop=${activeShop}`;
 
             } catch (error) {
                 console.error("Database Update Error:", error);
-                alert("Payment received, but failed to update plan. Contact support.");
+                if(typeof closeIOSAlert === 'function') closeIOSAlert();
+                
+                // ✨ FIX 3: अगर फिर भी फेल हो, तो असली एरर मैसेज स्क्रीन पर दिखेगा
+                alert("Database Error: " + error.message + "\n\nPayment ID: " + response.razorpay_payment_id + "\n(Please show this to admin to upgrade manually)");
             }
         }
     };
 
     const rzp = new Razorpay(options);
     
-    // अगर पेमेंट फेल हो जाए
     rzp.on('payment.failed', function (response) {
         alert("Payment Failed: " + response.error.description);
     });

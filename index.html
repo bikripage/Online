@@ -5330,11 +5330,10 @@ function initiateRazorpayPayment(planType, amountInINR) {
             "name": ownerName,
             "contact": phone
         },
-        "handler": function (response) {
-            // लोडिंग अलर्ट दिखाओ (अगर फंक्शन मौजूद है)
+                "handler": function (response) {
             if(typeof showIOSAlert === 'function') showIOSAlert("Processing", "Unlocking Premium Features...");
 
-            // 1. बिना ब्राउज़र अटकाए बैकग्राउंड में डेटाबेस अपडेट करो
+            // बैकग्राउंड में डेटाबेस अपडेट करो
             db.collection('shops').doc(activeShop).update({
                 plan: planType,
                 isVerified: true, 
@@ -5342,33 +5341,30 @@ function initiateRazorpayPayment(planType, amountInINR) {
                 planStartDate: firebase.firestore.FieldValue.serverTimestamp(),
                 searchRank: planType === 'pro' ? 100 : 50 
             }).then(() => {
-                // 2. डेटाबेस अपडेट होने के बाद 1.5 सेकंड रुको ताकि Razorpay का पॉपअप खुद बंद हो जाए
+                // 1.5 सेकंड रुको ताकि Razorpay का पॉपअप बंद हो जाए
                 setTimeout(() => {
                     if(typeof closeIOSAlert === 'function') closeIOSAlert();
                     
-                    // 3. फिर अपना सक्सेस मैसेज दिखाओ और पेज बदलो
-                    if (typeof iosConfirm === 'function') {
-                        iosConfirm(
-                            "Payment Successful! 🎉", 
-                            `Welcome to the ${planType.toUpperCase()} plan. Your features are now unlocked!`, 
-                            "Go to Dashboard", 
-                            "text-green-600"
-                        ).then(() => {
-                            window.location.href = `dashboard.html?shop=${activeShop}`;
-                        });
-                    } else {
-                        alert(`Payment Successful! 🎉 Welcome to the ${planType.toUpperCase()} plan.`);
+                    // ✨ NAYA: अब ये तुम्हारा 100% प्रीमियम iOS पॉपअप दिखाएगा ✨
+                    iosConfirm(
+                        "Payment Successful! 🎉", 
+                        `Welcome to the ${planType.toUpperCase()} plan. Your features are now unlocked!`, 
+                        "Go to Dashboard",
+                        "text-green-600"
+                    ).then(() => {
                         window.location.href = `dashboard.html?shop=${activeShop}`;
-                    }
+                    });
+                    
                 }, 1500); 
 
             }).catch((error) => {
                 console.error("Database Update Error:", error);
                 if(typeof closeIOSAlert === 'function') closeIOSAlert();
-                alert("Payment received, but Database Error: " + error.message);
+                
+                iosConfirm("Database Error", error.message, "OK");
             });
         }
-    };
+
 
     const rzp = new Razorpay(options);
     
@@ -5377,6 +5373,32 @@ function initiateRazorpayPayment(planType, amountInINR) {
     });
     
     rzp.open();
+}
+// ✨ iOS Premium Alert Function
+function iosConfirm(title, message, btnText) {
+    return new Promise((resolve) => {
+        document.getElementById('ios-confirm-title').innerText = title;
+        document.getElementById('ios-confirm-message').innerText = message;
+        document.getElementById('ios-confirm-btn').innerText = btnText;
+
+        const modal = document.getElementById('ios-confirm-modal');
+        const card = document.getElementById('ios-confirm-card');
+        
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            card.classList.remove('scale-95');
+        }, 10);
+
+        document.getElementById('ios-confirm-btn').onclick = () => {
+            modal.classList.add('opacity-0');
+            card.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                resolve(true);
+            }, 300);
+        };
+    });
 }
 
     </script>
@@ -5414,6 +5436,21 @@ function initiateRazorpayPayment(planType, amountInINR) {
                 <iframe id="video-english" class="w-full h-full object-cover hidden" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
 
+<!-- ✨ iOS STYLE PREMIUM SUCCESS / CONFIRM MODAL ✨ -->
+<div id="ios-confirm-modal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+    <div id="ios-confirm-card" class="bg-white/90 backdrop-blur-xl w-[270px] rounded-[14px] shadow-2xl transform scale-95 transition-transform duration-300 text-center overflow-hidden flex flex-col">
+        <div class="p-5 pt-6 pb-5">
+            <div class="w-14 h-14 bg-[#DCFCE7] text-[#16A34A] rounded-full flex items-center justify-center text-2xl mx-auto mb-4 shadow-sm border border-[#BBF7D0]">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3 id="ios-confirm-title" class="text-[17px] font-semibold text-black leading-tight mb-1.5">Success!</h3>
+            <p id="ios-confirm-message" class="text-[13px] text-black/70 leading-snug">Your payment was successful.</p>
+        </div>
+        <div class="flex border-t border-black/10">
+            <button id="ios-confirm-btn" class="flex-1 py-3.5 text-[17px] text-[#007AFF] font-bold hover:bg-black/5 active:bg-black/10 transition-colors">Go to Dashboard</button>
+        </div>
+    </div>
+</div>
 
 </body>
 </html> 

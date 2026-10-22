@@ -5330,11 +5330,10 @@ function initiateRazorpayPayment(planType, amountInINR) {
             "name": ownerName,
             "contact": phone
         },
-        "handler": function (response) {
-            // 1. Immediately show loading to the user
-            if(typeof showIOSAlert === 'function') showIOSAlert("Processing", "Unlocking Premium Features...");
+              "handler": function (response) {
+            // 1. Yahan se "Processing" wala alert hata diya hai.
+            // Razorpay ko apna Green Tick animation dikhane do, hum background me DB update karenge.
 
-            // 2. Perform the database update entirely in the background
             db.collection('shops').doc(activeShop).update({
                 plan: planType,
                 isVerified: true, 
@@ -5342,27 +5341,28 @@ function initiateRazorpayPayment(planType, amountInINR) {
                 planStartDate: firebase.firestore.FieldValue.serverTimestamp(),
                 searchRank: planType === 'pro' ? 100 : 50 
             }).then(() => {
-                // 3. Once database succeeds, close the loading alert and show the success modal
-                if(typeof closeIOSAlert === 'function') closeIOSAlert();
-                
-                iosConfirm(
-                    "Payment Successful! 🎉", 
-                    `Welcome to the ${planType.toUpperCase()} plan. Your features are now unlocked!`, 
-                    "Go to Dashboard",
-                    "text-green-600"
-                ).then(() => {
-                    window.location.href = `dashboard.html?shop=${activeShop}`;
-                });
+                // 2. Timeout ko badhakar 2500ms (2.5 seconds) kar diya hai.
+                // Itni der me Razorpay ka popup aaram se band ho jayega.
+                setTimeout(() => {
+                    
+                    // 3. Ab ekdum clean screen par tumhara premium iOS popup aayega
+                    iosConfirm(
+                        "Payment Successful! 🎉", 
+                        `Welcome to the ${planType.toUpperCase()} plan. Your features are now unlocked!`, 
+                        "Go to Dashboard",
+                        "text-green-600"
+                    ).then(() => {
+                        window.location.href = `dashboard.html?shop=${activeShop}`;
+                    });
+                    
+                }, 2500); 
 
             }).catch((error) => {
                 console.error("Database Update Error:", error);
-                if(typeof closeIOSAlert === 'function') closeIOSAlert();
                 iosConfirm("Database Error", error.message, "OK");
             });
-            
-            // 4. IMPORTANT: Do nothing else here. Let the handler function finish and exit immediately 
-            // so Razorpay knows the frontend part is complete and can close its modal smoothly.
         }
+
     };
 
     const rzp = new Razorpay(options);

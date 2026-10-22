@@ -5301,38 +5301,42 @@ function applySmartFilters() {
     productCards.forEach(card => grid.appendChild(card));
     closeSmartFilter();
 }
-// ✨ NAYA: Plan Upgrade/Downgrade Checker ✨
+// ✨ 1. PLAN UPGRADE / DOWNGRADE CHECKER (Ab chhota plan nahi khulega) ✨
 function handleUpgradeClick(targetPlan, amount) {
-    // 1. चेक करो कि अभी कौन सा प्लान एक्टिव है
     const currentPlan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'starter';
 
-    // 2. प्लान की ताकत (Priority) सेट करो
     const planWeights = { 'starter': 1, 'plus': 2, 'pro': 3 };
     const currentWeight = planWeights[currentPlan] || 1;
     const targetWeight = planWeights[targetPlan] || 1;
 
-    // 3. अगर कोई छोटे प्लान पर क्लिक करे (Downgrade)
+    // Agar downgrade karne ki koshish kare
     if (targetWeight < currentWeight) {
-        showIOSAlert(
+        iosConfirm(
             "Downgrade Not Allowed", 
-            `You already have the higher ${currentPlan.toUpperCase()} plan active. You cannot downgrade to ${targetPlan.toUpperCase()}.`, 
-            "OK"
+            `You already have the higher ${currentPlan.toUpperCase()} plan. You cannot downgrade.`, 
+            "OK",
+            "text-red-500"
         );
         return;
     } 
-    // 4. अगर उसी प्लान पर दोबारा क्लिक करे
+    // Agar same plan dobara kharidne ki koshish kare
     else if (targetWeight === currentWeight) {
-        showIOSAlert(
+        iosConfirm(
             "Already Active", 
             `Your store is already running on the ${currentPlan.toUpperCase()} plan.`, 
-            "OK"
+            "OK",
+            "text-blue-500"
         );
         return;
     }
 
-    // 5. अगर सब सही है (Upgrade हो रहा है), तो Razorpay खोलो
+    // Agar sab sahi hai, tabhi payment khulegi
     initiateRazorpayPayment(targetPlan, amount);
 }
+
+
+// ✨ 2. PURE EVENT-BASED RAZORPAY (Koi SetTimeout / Jugad nahi) ✨
+let isPaymentSuccess = false; // Flag to track real success
 
 function initiateRazorpayPayment(planType, amountInINR) {
     const user = firebase.auth().currentUser;
@@ -5345,75 +5349,59 @@ function initiateRazorpayPayment(planType, amountInINR) {
     const ownerName = localStorage.getItem('BikriPage_owner_name') || 'Merchant';
     const phone = localStorage.getItem('BikriPage_customer_phone') || '9999999999';
 
-    if (!activeShop) {
-        alert("Shop ID missing. Please log in again.");
-        return;
-    }
+    if (!activeShop) return;
 
-    // ✨ NAYA: पक्का सलूशन (Tracking Flag) ✨
-    let isPaymentSuccess = false;
+    isPaymentSuccess = false; // Reset flag before opening
 
     const options = {
-        "key": "rzp_test_Tqw5ZOVHX6vidX", // 🔑 अपनी Razorpay Test Key यहाँ डालें
+        "key": "rzp_test_Tqw5ZOVHX6vidX", 
         "amount": amountInINR * 100, 
         "currency": "INR",
         "name": "BikriPage",
         "description": `Upgrade to ${planType.toUpperCase()} Plan`,
-        "theme": {
-            "color": "#111827" 
-        },
+        "theme": { "color": "#111827" },
         "prefill": {
             "name": ownerName,
             "contact": phone
         },
-        // 1. PAYMENT SUCCESS HANDLER (सिर्फ बैकग्राउंड डेटाबेस अपडेट के लिए)
+        
+        // 🟢 1. JAISE HI PAYMENT SUCCESS HOGI (Srf Database background me update hoga)
         "handler": function (response) {
-            isPaymentSuccess = true; // मार्क कर दिया कि पेमेंट हो गई
-
-            // बैकग्राउंड में डेटाबेस अपडेट करो
+            isPaymentSuccess = true; 
+            
             db.collection('shops').doc(activeShop).update({
                 plan: planType,
                 isVerified: true, 
                 paymentId: response.razorpay_payment_id,
                 planStartDate: firebase.firestore.FieldValue.serverTimestamp(),
                 searchRank: planType === 'pro' ? 100 : 50 
-            }).catch((error) => {
-                console.error("Database Update Error:", error);
-            });
+            }).catch(e => console.error(e));
         },
-        // ✨ 2. MODAL ONDISMISS EVENT (यही है तुम्हारा पक्का सलूशन) ✨
+
+        // 🟢 2. JAB RAZORPAY APNA DABBA 100% BAND KAR LEGA (Yahan popup aayega)
         "modal": {
             "ondismiss": function() {
-                // यह फंक्शन तब चलता है जब Razorpay का डब्बा स्क्रीन से पूरी तरह हट जाता है।
+                // Check karenge ki kya user ne payment ki thi?
                 if (isPaymentSuccess) {
-                    // अगर पेमेंट सक्सेसफुल थी, तो अब आराम से अपना iOS पॉपअप दिखाओ
-                    if (typeof iosConfirm === 'function') {
-                        iosConfirm(
-                            "Payment Successful! 🎉", 
-                            `Welcome to the ${planType.toUpperCase()} plan. Your features are now unlocked!`, 
-                            "Go to Dashboard", 
-                            "text-green-600"
-                        ).then(() => {
-                            window.location.href = `dashboard.html?shop=${activeShop}`;
-                        });
-                    } else {
+                    iosConfirm(
+                        "Payment Successful! 🎉", 
+                        `Welcome to the ${planType.toUpperCase()} plan. Your features are now unlocked!`, 
+                        "Go to Dashboard",
+                        "text-green-600"
+                    ).then(() => {
                         window.location.href = `dashboard.html?shop=${activeShop}`;
-                    }
+                    });
                 }
-                // अगर isPaymentSuccess फॉल्स है, मतलब यूज़र ने खुद बैक बटन दबाकर पेमेंट कैंसिल कर दी।
             }
         }
     };
 
     const rzp = new Razorpay(options);
-    
     rzp.on('payment.failed', function (response) {
         alert("Payment Failed: " + response.error.description);
     });
-    
     rzp.open();
 }
-
 
 // ✨ iOS Premium Alert Function
 function iosConfirm(title, message, btnText) {

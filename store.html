@@ -553,12 +553,11 @@
     <script>
         // Purana code delete karke ye dalo:
 function checkCustomerAuth() {
-    const customerPhone = localStorage.getItem('BikriPage_customer_phone');
-    const activeShop = localStorage.getItem('BikriPage_active_shop');
+    // ✨ NAYA: Sirf LocalStorage nahi, asli Google Auth check karega
+    const user = firebase.auth().currentUser;
     
-    if (!customerPhone && !activeShop) {
-        // Default alert ki jagah naya premium alert
-        showIOSAlert("Login Required", "Please log in as a customer first to continue shopping.", "Log In", function() {
+    if (!user) {
+        showIOSAlert("Session Expired", "Please log in securely with Google to place orders.", "Log In", function() {
             localStorage.setItem('BikriPage_return_url', window.location.href);
             window.location.href = "index.html?action=login";
         });
@@ -566,7 +565,6 @@ function checkCustomerAuth() {
     }
     return true; 
 }
-
 
         let globalShopPhone = "";
         let globalShopName = "";
@@ -1930,17 +1928,17 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
 
 
 
-             async function checkoutCartInApp() {
+       async function checkoutCartInApp() {
     let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
     if(cart.length === 0) { alert("Cart is empty!"); return; }
     
     // ✨ NAYA: Firebase Auth Check ✨
     const user = firebase.auth().currentUser;
     if (!user) {
-        alert("Please log in to place an order!");
+        alert("Session expired! Please log in again.");
         return;
     }
-    const verifiedAccountId = user.email; // 100% सुरक्षित ID
+    const verifiedAccountId = user.email;
 
     let address = document.getElementById('cart-address').value.trim();
     let custName = document.getElementById('cart-cust-name').value.trim();
@@ -1969,7 +1967,7 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
             const targetShopId = orderData.items[0].shopId || '';
             
             await db.collection('orders').add({
-                customerId: verifiedAccountId, // ✨ LocalStorage की जगह ये यूज़ होगा ✨
+                customerId: verifiedAccountId, // ✨ LocalStorage की जगह असली ID ✨
                 customerName: custName,
                 customerPhone: custWhatsApp, 
                 customerAddress: address,
@@ -1994,6 +1992,7 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
         showOrderSuccessModal(); 
         
     } catch (error) { 
+        console.error("Cart Order Error:", error);
         alert("Error placing order: " + error.message); 
     } finally { 
         btn.innerHTML = origHTML; 
@@ -2108,13 +2107,13 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
             setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 500); 
         }
 
-      async function submitOrder(e) {
+    async function submitOrder(e) {
     e.preventDefault();
     
     // ✨ NAYA: Firebase Auth Check ✨
     const user = firebase.auth().currentUser;
     if (!user) {
-        alert("Please log in to place an order!");
+        alert("Session expired! Please log in again.");
         return;
     }
     const verifiedAccountId = user.email;
@@ -2134,7 +2133,7 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
 
     try {
         await db.collection('orders').add({
-            customerId: verifiedAccountId, // ✨ LocalStorage की जगह ये यूज़ होगा ✨
+            customerId: verifiedAccountId, // ✨ LocalStorage की जगह असली ID ✨
             customerName: custName,
             customerPhone: custWhatsApp, 
             customerAddress: address,
@@ -2156,13 +2155,13 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
         showOrderSuccessModal(); 
         
     } catch (error) {
+        console.error("Order Error:", error);
         alert("Error placing order: " + error.message);
     } finally {
         btn.innerHTML = origHtml;
         btn.disabled = false;
     }
 }
-
 
         function orderViaWhatsApp() {
             const qty = document.getElementById('order-qty').value;

@@ -5318,7 +5318,7 @@ function initiateRazorpayPayment(planType, amountInINR) {
     }
 
     const options = {
-        "key": "rzp_test_Tqw5ZOVHX6vidX", // 🔑 अपनी Razorpay Test Key यहाँ डालें
+        "key": "rzp_test_Tqw5ZOVHX6vidX", 
         "amount": amountInINR * 100, 
         "currency": "INR",
         "name": "BikriPage",
@@ -5330,10 +5330,11 @@ function initiateRazorpayPayment(planType, amountInINR) {
             "name": ownerName,
             "contact": phone
         },
-                "handler": function (response) {
+        "handler": function (response) {
+            // 1. Immediately show loading to the user
             if(typeof showIOSAlert === 'function') showIOSAlert("Processing", "Unlocking Premium Features...");
 
-            // बैकग्राउंड में डेटाबेस अपडेट करो
+            // 2. Perform the database update entirely in the background
             db.collection('shops').doc(activeShop).update({
                 plan: planType,
                 isVerified: true, 
@@ -5341,30 +5342,28 @@ function initiateRazorpayPayment(planType, amountInINR) {
                 planStartDate: firebase.firestore.FieldValue.serverTimestamp(),
                 searchRank: planType === 'pro' ? 100 : 50 
             }).then(() => {
-                // 1.5 सेकंड रुको ताकि Razorpay का पॉपअप बंद हो जाए
-                setTimeout(() => {
-                    if(typeof closeIOSAlert === 'function') closeIOSAlert();
-                    
-                    // ✨ NAYA: अब ये तुम्हारा 100% प्रीमियम iOS पॉपअप दिखाएगा ✨
-                    iosConfirm(
-                        "Payment Successful! 🎉", 
-                        `Welcome to the ${planType.toUpperCase()} plan. Your features are now unlocked!`, 
-                        "Go to Dashboard",
-                        "text-green-600"
-                    ).then(() => {
-                        window.location.href = `dashboard.html?shop=${activeShop}`;
-                    });
-                    
-                }, 1500); 
+                // 3. Once database succeeds, close the loading alert and show the success modal
+                if(typeof closeIOSAlert === 'function') closeIOSAlert();
+                
+                iosConfirm(
+                    "Payment Successful! 🎉", 
+                    `Welcome to the ${planType.toUpperCase()} plan. Your features are now unlocked!`, 
+                    "Go to Dashboard",
+                    "text-green-600"
+                ).then(() => {
+                    window.location.href = `dashboard.html?shop=${activeShop}`;
+                });
 
             }).catch((error) => {
                 console.error("Database Update Error:", error);
                 if(typeof closeIOSAlert === 'function') closeIOSAlert();
-                
                 iosConfirm("Database Error", error.message, "OK");
             });
+            
+            // 4. IMPORTANT: Do nothing else here. Let the handler function finish and exit immediately 
+            // so Razorpay knows the frontend part is complete and can close its modal smoothly.
         }
-
+    };
 
     const rzp = new Razorpay(options);
     
@@ -5374,6 +5373,7 @@ function initiateRazorpayPayment(planType, amountInINR) {
     
     rzp.open();
 }
+
 // ✨ iOS Premium Alert Function
 function iosConfirm(title, message, btnText) {
     return new Promise((resolve) => {

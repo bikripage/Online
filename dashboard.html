@@ -1968,14 +1968,24 @@ function applyProLocks(shopData) {
         const existingLock = btn.querySelector('.pro-lock');
         if (existingLock) existingLock.remove();
 
-        if (!isProActive) {
+                if (!isProActive) {
             btn.insertAdjacentHTML('beforeend', proCrownHtml);
             btn.classList.add('opacity-90');
+            // 🚨 YAHAN BHI 'iosConfirm' LAGA DIYA
             btn.onclick = () => {
-                showIOSAlert("Pro VIP Required", "This advanced feature requires the Pro VIP plan. Please upgrade to unlock.");
-                setTimeout(() => window.location.href='index.html?shop=' + currentShopId + '#merchant-upgrade-plans', 2000);
+                iosConfirm(
+                    "Pro VIP Required", 
+                    "This advanced feature requires the Pro VIP plan. Please upgrade to unlock.",
+                    "View Plans",
+                    "text-purple-600"
+                ).then((confirmed) => {
+                    if(confirmed) {
+                        setTimeout(() => window.location.href='index.html?shop=' + currentShopId + '#merchant-upgrade-plans', 100);
+                    }
+                });
             };
         } else {
+
             btn.classList.remove('opacity-90');
             btn.onclick = btnInfo.action;
         }
@@ -9021,7 +9031,7 @@ const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 modal.classList.add('hidden');
             }, 300); // 300ms baad hide karega jab animation khatam ho jaye
         }
-                    // ==========================================
+                            // ==========================================
         // ✨ NAYA: PREMIUM SOFT-LOCK LOGIC (FIXED) ✨
         // ==========================================
         function checkPremiumAndExecute(callback, featureName = null) {
@@ -9035,7 +9045,7 @@ const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                     message = "Upgrade to Plus or Pro VIP to unlock the Live Orders feature.";
                 }
 
-                // अगर बेसिक यूज़र है, तो अपग्रेड पॉपअप दिखाओ
+                // 🚨 YAHAN BADLAV HAI: 'iosAlert' ki jagah 'iosConfirm' use kar rahe hain taaki 2 buttons aayen
                 iosConfirm(
                     "Premium Feature", 
                     message, 
@@ -9043,17 +9053,19 @@ const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                     "text-purple-600"
                 ).then((confirmed) => {
                     if(confirmed) {
-                        // पॉपअप बंद होने दो और फिर रीडायरेक्ट करो
+                        // Agar user ne 'View Plans' dabaya (true return hua) toh redirect karo
                         setTimeout(() => {
                             window.location.href = `index.html?shop=${currentShopId}#merchant-upgrade-plans`;
                         }, 100);
                     }
+                    // Agar 'Cancel' dabaya (false return hua) toh kuch mat karo, popup apne aap band ho jayega
                 });
             } else {
                 // अगर प्लस या प्रो है, तो फीचर नार्मल चलेगा
                 callback();
             }
         }
+
 
         // ==========================================
         // ✨ FLASH OFFER LOGIC (DASHBOARD) ✨

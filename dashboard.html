@@ -2310,18 +2310,26 @@ function applyProLocks(shopData) {
     const list = document.getElementById('merchant-orders-list');
     if(!list) return;
 
-        // --- ✨ NAYA LOGIC: TOP BUTTON KO BHI CHECK KARKE BLUR KARNA ✨ ---
+         // --- ✨ NAYA LOGIC: TOP BUTTON KO BHI CHECK KARKE BLUR KARNA ✨ ---
     const topPrintWrapper = document.getElementById('top-batch-print-wrapper');
     if(topPrintWrapper) {
         if (globalShopData && globalShopData.homeDelivery === true) {
+            
+            // 🚨 NAYA: Button banate waqt hi Premium Status Check karo 🚨
+            let planType = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
+            let isUserPremium = (planType === 'plus' || planType === 'pro');
+            
+            // Agar user premium nahi hai, to crown se 'hidden' hata do
+            let crownDisplayClass = isUserPremium ? 'hidden' : '';
+
             topPrintWrapper.innerHTML = `
                 <!-- ✨ PINK PLUS CROWN VISIBLE HERE ✨ -->
                 <div class="relative inline-block w-full sm:w-auto">
                     <button onclick="checkPremiumAndExecute(() => printAllAcceptedSlips(), 'orders')" class="w-full sm:w-auto bg-[#111827] hover:bg-black text-white text-sm font-bold px-5 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm active:scale-95">
                         <i class="fas fa-print"></i> Print Accepted Orders
                     </button>
-                    <!-- CROWN KO BUTTON KE BAHAR NIKAL DIYA HAI -->
-                    <div class="premium-lock-icon hidden absolute -top-2.5 -right-2.5 bg-gray-900 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.3)] p-1.5 border border-pink-400 z-50 flex items-center justify-center">
+                    <!-- 🚨 YAHAN CROWN DYNAMIC HO GAYA 🚨 -->
+                    <div class="premium-lock-icon ${crownDisplayClass} absolute -top-2.5 -right-2.5 bg-gray-900 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.3)] p-1.5 border border-pink-400 z-50 flex items-center justify-center">
                         <i class="fas fa-crown text-pink-400 text-[10px] mt-px"></i>
                     </div>
                 </div>

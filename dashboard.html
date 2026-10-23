@@ -441,15 +441,11 @@
                     
                     <button onclick="switchTab('tab-dashboard', this)" class="tab-btn bg-[#111827] text-white px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition shadow-md">Dashboard</button>
                     
-                    <button onclick="let btn=this; checkPremiumAndExecute(() => switchTab('tab-orders', btn), 'orders')" class="relative tab-btn bg-[#F7F7F9] text-[#6B7280] px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition flex items-center gap-1.5">
+                    <button onclick="switchTab('tab-orders', this)" class="relative tab-btn bg-[#F7F7F9] text-[#6B7280] px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition flex items-center gap-1.5">
     Orders
     <span id="live-orders-badge" class="hidden bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-black min-w-[18px] text-center shadow-sm">0</span>
-    
-    <!-- ✨ PINK PLUS CROWN LOCK ✨ -->
-    <div class="premium-lock-icon hidden absolute -top-1.5 -right-1 bg-white rounded-full shadow-sm p-0.5 border border-pink-200 z-10">
-        <i class="fas fa-crown text-pink-500 text-[9px]"></i>
-    </div>
 </button>
+
 
                     <button onclick="switchTab('tab-inventory', this)" class="tab-btn bg-[#F7F7F9] text-[#6B7280] px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition">Inventory</button>
                     <button onclick="switchTab('tab-billing', this)" class="tab-btn bg-[#F7F7F9] text-[#6B7280] px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition">Billing</button>

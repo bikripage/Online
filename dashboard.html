@@ -3633,9 +3633,10 @@ async function deleteProduct(id) {
             // Add Master Reminder Button - Yahan parent div mein 'relative' add karna zaroori hai taaki absolute crown theek jagah aaye
             actionBtns += `
                 <div class="relative w-full">
-                    <button onclick="checkPremiumAndExecute(() => window.open('${waLink}', '_blank'))" class="w-full bg-[#FFF7ED] hover:bg-[#FFEDD5] text-[#EA580C] border border-[#FED7AA] py-2.5 rounded-[8px] text-[12px] font-bold flex justify-center items-center gap-2 transition active:scale-95 shadow-sm">
-                        <i class="fab fa-whatsapp text-[14px]"></i> कुल बाकी ₹${totalUnpaidAmount} का रिमाइंडर भेजें
-                    </button>
+                    <button onclick="checkPremiumAndExecute(() => window.open('${waLink}', '_blank'), 'reminder')" class="w-full bg-[#FFF7ED] hover:bg-[#FFEDD5] text-[#EA580C] border border-[#FED7AA] py-2.5 rounded-[8px] text-[12px] font-bold flex justify-center items-center gap-2 transition active:scale-95 shadow-sm">
+    <i class="fab fa-whatsapp text-[14px]"></i> कुल बाकी ₹${totalUnpaidAmount} का रिमाइंडर भेजें
+</button>
+
                     ${crownHtml}
                 </div>
             `;
@@ -9095,15 +9096,19 @@ const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                             // ==========================================
         // ✨ NAYA: PREMIUM SOFT-LOCK LOGIC (FIXED) ✨
         // ==========================================
-        function checkPremiumAndExecute(callback, featureName = null) {
+             function checkPremiumAndExecute(callback, featureName = null) {
             const plan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
             const isPremium = plan === 'plus' || plan === 'pro';
 
             if (!isPremium) {
                 // Feature ke hisaab se message badlo
                 let message = "Upgrade to Plus or Pro VIP to unlock Smart Reports, Excel Exports, and AI Analytics.";
+                
                 if (featureName === 'orders') {
                     message = "Upgrade to Plus or Pro VIP to unlock the Live Orders feature.";
+                } else if (featureName === 'reminder') {
+                    // ✨ NAYA: Sirf Reminder ke liye specific message ✨
+                    message = "Upgrade to Plus or Pro VIP to unlock the Bulk Payment Reminder feature.";
                 }
 
                 // 🚨 YAHAN BADLAV HAI: 'iosAlert' ki jagah 'iosConfirm' use kar rahe hain taaki 2 buttons aayen
@@ -9119,14 +9124,12 @@ const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                             window.location.href = `index.html?shop=${currentShopId}#merchant-upgrade-plans`;
                         }, 100);
                     }
-                    // Agar 'Cancel' dabaya (false return hua) toh kuch mat karo, popup apne aap band ho jayega
                 });
             } else {
                 // अगर प्लस या प्रो है, तो फीचर नार्मल चलेगा
                 callback();
             }
         }
-
 
         // ==========================================
         // ✨ FLASH OFFER LOGIC (DASHBOARD) ✨

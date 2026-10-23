@@ -3141,53 +3141,30 @@ function applyProLocks(shopData) {
             }
         }
 
-        // ==========================================
-        // 7. PRODUCTS LOGIC
-        // ==========================================
-     async function uploadImageToStorage(fileInput, folderPath) {
+    // 1. Process Image Function (Base64 ke liye)
+async function processImage(fileInput) {
     if (!fileInput.files || fileInput.files.length === 0) return "";
     const file = fileInput.files[0];
-
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = function(e) {
             const img = new Image();
             img.onload = function() {
-                // 1. Image Compress Logic
                 const canvas = document.createElement('canvas');
                 let width = img.width, height = img.height;
                 if (width > 600) { height *= 600 / width; width = 600; }
                 canvas.width = width; canvas.height = height;
                 canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                
-                // 2. Base64 की जगह Blob (Binary) में कन्वर्ट करो
-                canvas.toBlob(async (blob) => {
-                    if (!blob) return resolve("");
-                    try {
-                        // 3. Unique File Name बनाओ ताकि पुरानी फोटो रिप्लेस ना हो
-                        const fileName = Date.now() + '_' + Math.random().toString(36).substring(7) + '.jpg';
-                        const storageRef = storage.ref().child(`${folderPath}/${fileName}`);
-                        
-                        // 4. Storage में अपलोड करो और URL लाओ
-                        const snapshot = await storageRef.put(blob);
-                        const downloadURL = await snapshot.ref.getDownloadURL();
-                        
-                        resolve(downloadURL); // ✨ ये सिर्फ URL रिटर्न करेगा
-                    } catch (err) {
-                        console.error("Storage Upload Error:", err);
-                        resolve(""); // एरर आने पर ऐप क्रैश न हो इसलिए खाली स्ट्रिंग
-                    }
-                }, 'image/jpeg', 0.7); 
+                // Wapas Data URL (Base64) mein image ko save kar raha hai
+                resolve(canvas.toDataURL('image/jpeg', 0.7)); 
             };
-            img.onerror = () => resolve("");
+            img.onerror = function() { resolve(""); }; // Error aane par atke nahi
             img.src = e.target.result;
         };
-        reader.onerror = () => resolve("");
+        reader.onerror = function() { resolve(""); }; // Reader fail hone par atke nahi
         reader.readAsDataURL(file);
     });
 }
-
-
           function renderAdminProducts() {
             const list = document.getElementById('admin-products-list'); const cnt = document.getElementById('inventory-count'); if(!list) return; cnt.innerText = storeProducts.length;
             if (storeProducts.length === 0) { list.innerHTML = `<div class="col-span-full text-center py-6 bg-[#F7F7F9] rounded-[16px] border border-[#E5E7EB]"><p class="text-[#9CA3AF] text-sm font-semibold">No products yet.</p></div>`; return; }
@@ -3228,11 +3205,12 @@ function applyProLocks(shopData) {
             }); list.innerHTML = html;
         }
 
+// 2. Updated Add Product Function
 async function addProduct(e) {
     e.preventDefault(); 
     
     // ==========================================
-    // ✨ NAYA: PLAN KE HISAAB SE PRODUCT LIMIT CHECK ✨
+    // ✨ PLAN KE HISAAB SE PRODUCT LIMIT CHECK ✨
     // ==========================================
     const plan = (typeof globalShopData !== 'undefined' && globalShopData && globalShopData.plan) ? globalShopData.plan : 'basic';
     const email = (typeof globalShopData !== 'undefined' && globalShopData && globalShopData.email) ? globalShopData.email : '';
@@ -3243,7 +3221,6 @@ async function addProduct(e) {
 
     // Agar store me products limit ke barabar ya zyada ho gaye hain toh rok do
     if (storeProducts.length >= maxLimit) {
-        // Customer ko upgrade karne ka popup dikhao
         iosConfirm(
             "Limit Reached! 🚫", 
             `Your current plan allows a maximum of ${maxLimit} items. Please upgrade your plan to add more.`,
@@ -3251,16 +3228,15 @@ async function addProduct(e) {
             "text-purple-600"
         ).then((confirmed) => {
             if(confirmed) {
-                // Seedha upgrade page par bhej do
                 window.location.href = `index.html?shop=${currentShopId}#merchant-upgrade-plans`;
             }
         });
-        return; // Function yahin rok do, product add nahi hoga
+        return; 
     }
     // ==========================================
 
     const n = document.getElementById('prod-name').value.trim(); 
-    const mrpVal = parseInt(document.getElementById('prod-mrp').value); // MRP
+    const mrpVal = parseInt(document.getElementById('prod-mrp').value); 
     const p = parseInt(document.getElementById('prod-price').value);
     const qtySize = parseFloat(document.getElementById('prod-qty').value) || 1;
     const unit = document.getElementById('prod-unit').value;
@@ -3272,18 +3248,16 @@ async function addProduct(e) {
         return;
     }
 
-    // Yahan 'button' ki jagah 'button[type="submit"]' lagana zaruri hai
     const btn = e.target.querySelector('button[type="submit"]'); 
     const orig = btn.innerHTML; 
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...'; 
     btn.disabled = true;
 
     try { 
-        // Ab images try block ke andar hain, toh error aane par form atkega nahi
-        // नया कोड: (यहाँ हम products/shopId फोल्डर में फोटो डाल रहे हैं)
-        const imgUrl_1 = await uploadImageToStorage(document.getElementById('prod-image'), `products/${currentShopId}`);
-        const imgUrl_2 = await uploadImageToStorage(document.getElementById('prod-image2'), `products/${currentShopId}`);
-        const imgUrl_3 = await uploadImageToStorage(document.getElementById('prod-image3'), `products/${currentShopId}`);
+        // 🚨 YAHAN FIX HAI: Wapas se processImage use kar rahe hain taaki Storage ka issue na aaye 🚨
+        const imgBase64_1 = await processImage(document.getElementById('prod-image'));
+        const imgBase64_2 = await processImage(document.getElementById('prod-image2'));
+        const imgBase64_3 = await processImage(document.getElementById('prod-image3'));
 
         // Plan check karke rank score tay karein
         let rankScore = 0;
@@ -3300,11 +3274,11 @@ async function addProduct(e) {
             qtySize: qtySize, 
             unit: unit, 
             description: desc, 
-            image: imgUrl_1,    
-            image2: imgUrl_2,   
-            image3: imgUrl_3,   
+            image: imgBase64_1,     
+            image2: imgBase64_2,    
+            image3: imgBase64_3,    
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            searchRank: rankScore // Yahan currentRank ki jagah rankScore
+            searchRank: rankScore // currentRank ka error fixed
         };
 
         const doc = await db.collection('shops').doc(currentShopId).collection('products').add(pd); 
@@ -3320,13 +3294,10 @@ async function addProduct(e) {
         }
         
         renderAdminProducts(); 
-        iosAlert("Success", "Product added successfully!");
-
     } catch(err) { 
-        console.error("Firebase Error in addProduct: ", err); // Yeh line bahut zaroori hai
-        iosAlert("Error", "Product add karne me problem aayi: " + err.message); 
+        console.error("Firebase Error in addProduct: ", err); 
+        alert(err.message); 
     } finally {
-        // 🚨 Yeh 'finally' block ensure karega ki button humesha wapas normal ho jaye
         btn.innerHTML = orig; 
         btn.disabled = false;
     }

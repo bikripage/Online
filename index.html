@@ -5395,7 +5395,12 @@ function handleUpgradeClick(targetPlan, amount) {
         return;
     }
 
+    // Agar sab sahi hai, tabhi payment khulegi
+    initiateRazorpayPayment(targetPlan, amount);
+}
 // ✨ NAYA: CLEAN RAZORPAY PAYMENT LOGIC (NO DOUBLE SUCCESS ALERT) ✨
+let isPaymentSuccess = false;
+
 function initiateRazorpayPayment(planType, amountInINR) {
     const user = firebase.auth().currentUser;
     if (!user) {
@@ -5409,7 +5414,7 @@ function initiateRazorpayPayment(planType, amountInINR) {
 
     if (!activeShop) return;
 
-    let isPaymentSuccess = false;
+    isPaymentSuccess = false;
 
     const options = {
         "key": "rzp_test_Tqw5ZOVHX6vidX", 
@@ -5450,15 +5455,13 @@ function initiateRazorpayPayment(planType, amountInINR) {
                 planStartDate: firebase.firestore.FieldValue.serverTimestamp(),
                 searchRank: planType === 'pro' ? 100 : 50 
             }).then(() => {
-                // ✨ FIX: Yahan se custom alert hata diya gaya hai. 
-                // Razorpay ke native success tick ke baad seedha dashboard par bhej do.
                 window.location.href = `dashboard.html?shop=${activeShop}`;
             }).catch(e => console.error(e));
         },
         
         "modal": {
             "ondismiss": function() {
-                // Backup Redirect: Agar Razorpay modal dismiss ho aur payment successful ho
+                // Backup Redirect
                 if (isPaymentSuccess) {
                     window.location.href = `dashboard.html?shop=${activeShop}`;
                 }
@@ -5474,7 +5477,6 @@ function initiateRazorpayPayment(planType, amountInINR) {
     
     rzp.open();
 }
-
 
 // ✨ iOS Premium Alert Function
 function iosConfirm(title, message, btnText) {

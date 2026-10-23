@@ -3239,7 +3239,7 @@ async function addProduct(e) {
     
     let maxLimit = 20; // Default Starter Plan
     if (plan === 'plus') maxLimit = 100;
-    if (plan === 'pro') maxLimit = 500; // VIP/Admin
+    if (plan === 'pro' || email === 'netajijhadustore@gmail.com') maxLimit = 500; // VIP/Admin
 
     // Agar store me products limit ke barabar ya zyada ho gaye hain toh rok do
     if (storeProducts.length >= maxLimit) {
@@ -3272,13 +3272,12 @@ async function addProduct(e) {
         return;
     }
 
-    // 👇 1. Yahan 'button' ki jagah 'button[type="submit"]' lagana zaruri hai 👇
+    // Yahan 'button' ki jagah 'button[type="submit"]' lagana zaruri hai
     const btn = e.target.querySelector('button[type="submit"]'); 
     const orig = btn.innerHTML; 
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...'; 
     btn.disabled = true;
 
-    // 👇 2. 'try' block ko Image process hone se pehle shuru karein 👇
     try { 
         // Ab images try block ke andar hain, toh error aane par form atkega nahi
         // नया कोड: (यहाँ हम products/shopId फोल्डर में फोटो डाल रहे हैं)
@@ -3295,12 +3294,17 @@ async function addProduct(e) {
         }
 
         let pd = { 
-            name: n, mrp: mrpVal, price: p, qtySize: qtySize, unit: unit, description: desc, 
+            name: n, 
+            mrp: mrpVal, 
+            price: p, 
+            qtySize: qtySize, 
+            unit: unit, 
+            description: desc, 
             image: imgUrl_1,    
             image2: imgUrl_2,   
             image3: imgUrl_3,   
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            searchRank: rankScore // Yahan currentRank ki jagah rankScore use karein
+            searchRank: rankScore // Yahan currentRank ki jagah rankScore
         };
 
         const doc = await db.collection('shops').doc(currentShopId).collection('products').add(pd); 
@@ -3316,17 +3320,17 @@ async function addProduct(e) {
         }
         
         renderAdminProducts(); 
+        iosAlert("Success", "Product added successfully!");
+
     } catch(err) { 
-        console.error("Add Product Error: ", err); // Browser console mein error check kar
-        alert(err.message); 
-    } 
-    
-    // Ye line hamesha run hogi aur button ko theek kar degi
-    btn.innerHTML = orig; 
-    btn.disabled = false;
+        console.error("Firebase Error in addProduct: ", err); // Yeh line bahut zaroori hai
+        iosAlert("Error", "Product add karne me problem aayi: " + err.message); 
+    } finally {
+        // 🚨 Yeh 'finally' block ensure karega ki button humesha wapas normal ho jaye
+        btn.innerHTML = orig; 
+        btn.disabled = false;
+    }
 }
-
-
 
                       function openEditProductModal(id) {
             const p = storeProducts.find(x=>x.id===id); if(!p) return; 

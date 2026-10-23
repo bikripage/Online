@@ -5366,9 +5366,7 @@ function applySmartFilters() {
     productCards.forEach(card => grid.appendChild(card));
     closeSmartFilter();
 }
-// ==========================================
-// ✨ 2. PLAN UPGRADE CHECKER ✨
-// ==========================================
+// ✨ 1. PLAN UPGRADE / DOWNGRADE CHECKER (Ab chhota plan nahi khulega) ✨
 function handleUpgradeClick(targetPlan, amount) {
     const currentPlan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'starter';
 
@@ -5376,6 +5374,7 @@ function handleUpgradeClick(targetPlan, amount) {
     const currentWeight = planWeights[currentPlan] || 1;
     const targetWeight = planWeights[targetPlan] || 1;
 
+    // Agar downgrade karne ki koshish kare
     if (targetWeight < currentWeight) {
         iosConfirm(
             "Downgrade Not Allowed", 
@@ -5385,6 +5384,7 @@ function handleUpgradeClick(targetPlan, amount) {
         );
         return;
     } 
+    // Agar same plan dobara kharidne ki koshish kare
     else if (targetWeight === currentWeight) {
         iosConfirm(
             "Already Active", 
@@ -5395,11 +5395,9 @@ function handleUpgradeClick(targetPlan, amount) {
         return;
     }
 
+    // Agar sab sahi hai, tabhi payment khulegi
     initiateRazorpayPayment(targetPlan, amount);
 }
-// ==========================================
-// ✨ 3. CLEAN RAZORPAY LOGIC (FRONTEND ONLY) ✨
-// ==========================================
 let isPaymentSuccess = false;
 
 function initiateRazorpayPayment(planType, amountInINR) {
@@ -5415,6 +5413,7 @@ function initiateRazorpayPayment(planType, amountInINR) {
 
     if (!activeShop) return;
 
+    // पेमेंट खुलने से पहले फ्लैग रीसेट करो
     isPaymentSuccess = false;
 
     const options = {
@@ -5429,11 +5428,12 @@ function initiateRazorpayPayment(planType, amountInINR) {
         "handler": function (response) {
             isPaymentSuccess = true; 
             
-            // UI Update
+            // 1. INSTANT UI UPDATE (PRICING BUTTONS)
             if (typeof updatePlanUI === 'function') {
                 updatePlanUI(planType);
             }
 
+            // 2. PROFILE MENU BADGE UPDATE
             const planEl = document.getElementById('prof-active-plan');
             if (planEl) {
                 let badge = typeof getVIPBadge === 'function' ? getVIPBadge(true, planType) : '';
@@ -5448,7 +5448,7 @@ function initiateRazorpayPayment(planType, amountInINR) {
                 globalShopData.plan = planType;
             }
 
-            // Backend Update (Direct via Frontend for now)
+            // 3. BACKGROUND DATABASE UPDATE
             db.collection('shops').doc(activeShop).update({
                 plan: planType,
                 isVerified: true, 
@@ -5456,13 +5456,15 @@ function initiateRazorpayPayment(planType, amountInINR) {
                 planStartDate: firebase.firestore.FieldValue.serverTimestamp(),
                 searchRank: planType === 'pro' ? 100 : 50 
             }).then(() => {
-                // Success hote hi bina kisi alert ke seedha dashboard par bhej do
-                window.location.href = `dashboard.html?shop=${activeShop}`;
+                // 4. INSTANT GRID REFRESH (होम पेज पर तुरंत VIP बैज लाने के लिए)
+                if (typeof fetchLiveShops === 'function') fetchLiveShops();
+                if (typeof fetchGlobalProducts === 'function') fetchGlobalProducts();
             }).catch(e => console.error(e));
         },
         
         "modal": {
             "ondismiss": function() {
+                // 5. जैसे ही RAZORPAY बंद होगा, सीधा REDIRECT (बिना किसी अलर्ट के)
                 if (isPaymentSuccess) {
                     window.location.href = `dashboard.html?shop=${activeShop}`;
                 }
@@ -5479,17 +5481,13 @@ function initiateRazorpayPayment(planType, amountInINR) {
     rzp.open();
 }
 
-// ==========================================
-// ✨ 4. iOS PREMIUM ALERT FUNCTION ✨
-// ==========================================
-function iosConfirm(title, message, btnText, btnColor = "text-[#007AFF]") {
+
+// ✨ iOS Premium Alert Function
+function iosConfirm(title, message, btnText) {
     return new Promise((resolve) => {
         document.getElementById('ios-confirm-title').innerText = title;
         document.getElementById('ios-confirm-message').innerText = message;
-        
-        const btn = document.getElementById('ios-confirm-btn');
-        btn.innerText = btnText;
-        btn.className = `flex-1 py-3.5 text-[17px] font-bold hover:bg-black/5 active:bg-black/10 transition-colors ${btnColor}`;
+        document.getElementById('ios-confirm-btn').innerText = btnText;
 
         const modal = document.getElementById('ios-confirm-modal');
         const card = document.getElementById('ios-confirm-card');
@@ -5500,7 +5498,7 @@ function iosConfirm(title, message, btnText, btnColor = "text-[#007AFF]") {
             card.classList.remove('scale-95');
         }, 10);
 
-        btn.onclick = () => {
+        document.getElementById('ios-confirm-btn').onclick = () => {
             modal.classList.add('opacity-0');
             card.classList.add('scale-95');
             setTimeout(() => {
@@ -5510,6 +5508,7 @@ function iosConfirm(title, message, btnText, btnColor = "text-[#007AFF]") {
         };
     });
 }
+
     </script>
 
        <!-- ✨ PREMIUM VIDEO TUTORIAL MODAL ✨ -->

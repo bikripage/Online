@@ -3642,116 +3642,190 @@ function closeLogoutModal() {
             
             closeMapPicker();
         }
-                           // ✨ NAYA: DYNAMIC PRICING FEATURES (WITH ADVANCED ANALYTICS) ✨
-        function updateDynamicPricing(businessType) {
-            let features = { starter: '', plus: '', pro: '' };
+                         // ✨ NAYA: DYNAMIC PRICING FEATURES (FULLY UPDATED WITH CATEGORIES, ALERTS & CROWN LOGIC) ✨
+function updateDynamicPricing(businessType) {
+    let features = { starter: '', plus: '', pro: '' };
 
-            if (businessType === 'Service Provider') {
-                features.starter = `
-                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-gray-400 mt-1"></i> <span>Max 20 Services Listing</span></li>
-                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-gray-400 mt-1"></i> <span class="font-bold text-gray-600">WhatsApp Bookings Only</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-file-invoice text-gray-400 mt-1"></i> <span>Authorised Bill (Watermarked)</span></li>
-                    <li class="flex items-start gap-2 text-gray-400"><i class="fas fa-users text-gray-300 mt-1"></i> <span>Basic CRM (No Reminders)</span></li>`;
-                features.plus = `
-                    <li class="flex items-start gap-2"><i class="fas fa-crown text-purple-500 mt-1"></i> <span>VIP Crown Lite & Custom Bills</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-purple-500 mt-1"></i> <span class="font-bold">App & WhatsApp Bookings</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-level-up-alt text-purple-500 mt-1"></i> <span>Rank Above Basic Shops</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-purple-500 mt-1"></i> <span>Up to 100 Services</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-chart-pie text-purple-500 mt-1"></i> <span class="font-bold">Advanced Analytics & Graphs</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-file-excel text-purple-500 mt-1"></i> <span>Smart Report & Excel Data</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-robot text-purple-500 mt-1"></i> <span>AI 'Explain My Report'</span></li>
-                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-purple-500 mt-1"></i> <span class="font-bold">1-Click Payment Reminders</span></li>`;
-                features.pro = `
-                    <li class="flex items-start gap-2 text-white font-bold"><i class="fas fa-crown text-yellow-400 mt-1"></i> <span>Premium Gold VIP Crown + All Plus</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-yellow-400 mt-1"></i> <span class="text-white font-bold">App & WhatsApp Bookings</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-trophy text-yellow-400 mt-1"></i> <span>#1 Top Search Ranking</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-boxes text-yellow-400 mt-1"></i> <span>Expand to 500 Services</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-chart-line text-yellow-400 mt-1"></i> <span class="text-white font-bold">Full Analytics & Graphs</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-headset text-yellow-400 mt-1"></i> <span>Priority WhatsApp Support</span></li>
-                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-gift text-yellow-400 mt-1"></i> <span class="text-white font-bold">Create Flash Offers</span></li>`; 
-            
-            } else if (businessType === 'Wholesaler') {
-                features.starter = `
-                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-gray-400 mt-1"></i> <span>Max 20 Bulk Items Listing</span></li>
-                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-gray-400 mt-1"></i> <span class="font-bold text-gray-600">WhatsApp Orders Only</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-file-invoice text-gray-400 mt-1"></i> <span>Authorised Bill (Watermarked)</span></li>
-                    <li class="flex items-start gap-2 text-gray-400"><i class="fas fa-users text-gray-300 mt-1"></i> <span>Basic CRM (No Reminders)</span></li>`;
-                features.plus = `
-                    <li class="flex items-start gap-2"><i class="fas fa-crown text-purple-500 mt-1"></i> <span>VIP Crown Lite & Custom Bills</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-purple-500 mt-1"></i> <span class="font-bold">Order via App & WhatsApp</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-level-up-alt text-purple-500 mt-1"></i> <span>Rank Above Basic Shops</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-purple-500 mt-1"></i> <span>Up to 100 Bulk Items</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-chart-pie text-purple-500 mt-1"></i> <span class="font-bold">Advanced Analytics & Graphs</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-file-excel text-purple-500 mt-1"></i> <span>Smart Report & Excel Data</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-robot text-purple-500 mt-1"></i> <span>AI 'Explain My Report'</span></li>
-                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-purple-500 mt-1"></i> <span class="font-bold">1-Click Payment Reminders</span></li>`;
-                features.pro = `
-                   <li class="flex items-start gap-2 text-white font-bold"><i class="fas fa-crown text-yellow-400 mt-1"></i> <span>Premium Gold VIP Crown + All Plus</span></li>
-                   <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-yellow-400 mt-1"></i> <span class="text-white font-bold">Order via App & WhatsApp</span></li>
-                   <li class="flex items-start gap-2"><i class="fas fa-trophy text-yellow-400 mt-1"></i> <span>#1 Top Search Ranking</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-boxes text-yellow-400 mt-1"></i> <span>Expand to 500 Bulk Items</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-chart-line text-yellow-400 mt-1"></i> <span class="text-white font-bold">Full Analytics & Graphs</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-headset text-yellow-400 mt-1"></i> <span>Priority WhatsApp Support</span></li>
-                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-gift text-yellow-400 mt-1"></i> <span class="text-white font-bold">Create Flash Offers</span></li>`; 
-            
-            } else if (businessType === 'Manufacturer') {
-                features.starter = `
-                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-gray-400 mt-1"></i> <span>Max 20 Catalog Items</span></li>
-                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-gray-400 mt-1"></i> <span class="font-bold text-gray-600">WhatsApp Orders Only</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-file-invoice text-gray-400 mt-1"></i> <span>Authorised Bill (Watermarked)</span></li>
-                    <li class="flex items-start gap-2 text-gray-400"><i class="fas fa-users text-gray-300 mt-1"></i> <span>Basic CRM (No Reminders)</span></li>`;
-                features.plus = `
-                   <li class="flex items-start gap-2"><i class="fas fa-crown text-purple-500 mt-1"></i> <span>VIP Crown Lite & Custom Bills</span></li>
-                   <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-purple-500 mt-1"></i> <span class="font-bold">Order via App & WhatsApp</span></li>
-                   <li class="flex items-start gap-2"><i class="fas fa-level-up-alt text-purple-500 mt-1"></i> <span>Rank Above Basic Shops</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-purple-500 mt-1"></i> <span>Up to 100 Catalog Items</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-chart-pie text-purple-500 mt-1"></i> <span class="font-bold">Advanced Analytics & Graphs</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-file-excel text-purple-500 mt-1"></i> <span>Smart Report & Excel Data</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-robot text-purple-500 mt-1"></i> <span>AI 'Explain My Report'</span></li>
-                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-purple-500 mt-1"></i> <span class="font-bold">1-Click Payment Reminders</span></li>`;
-                features.pro = `
-                    <li class="flex items-start gap-2 text-white font-bold"><i class="fas fa-crown text-yellow-400 mt-1"></i> <span>Premium Gold VIP Crown + All Plus</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-yellow-400 mt-1"></i> <span class="text-white font-bold">Order via App & WhatsApp</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-trophy text-yellow-400 mt-1"></i> <span>#1 Top Search Ranking</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-boxes text-yellow-400 mt-1"></i> <span>Expand to 500 Catalog Items</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-chart-line text-yellow-400 mt-1"></i> <span class="text-white font-bold">Full Analytics & Graphs</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-headset text-yellow-400 mt-1"></i> <span>Priority WhatsApp Support</span></li>
-                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-gift text-yellow-400 mt-1"></i> <span class="text-white font-bold">Create Flash Offers</span></li>`; 
-            
-            } else {
-                // Default Retailer (Normal Shop)
-                features.starter = `
-                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-gray-400 mt-1"></i> <span>Max 20 Products Listing</span></li>
-                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-gray-400 mt-1"></i> <span class="font-bold text-gray-600">WhatsApp Orders Only</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-file-invoice text-gray-400 mt-1"></i> <span>Authorised Bill (Watermarked)</span></li>
-                    <li class="flex items-start gap-2 text-gray-400"><i class="fas fa-users text-gray-300 mt-1"></i> <span>Basic CRM (No Reminders)</span></li>`;
-                features.plus = `
-                 <li class="flex items-start gap-2"><i class="fas fa-crown text-purple-500 mt-1"></i> <span>VIP Crown Lite & Custom Bills</span></li>
-                 <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-purple-500 mt-1"></i> <span class="font-bold">Order via App & WhatsApp</span></li>
-                 <li class="flex items-start gap-2"><i class="fas fa-level-up-alt text-purple-500 mt-1"></i> <span>Rank Above Basic Shops</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-purple-500 mt-1"></i> <span>Up to 100 Products</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-chart-pie text-purple-500 mt-1"></i> <span class="font-bold">Advanced Analytics & Graphs</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-file-excel text-purple-500 mt-1"></i> <span>Smart Report & Excel Data</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-robot text-purple-500 mt-1"></i> <span>AI 'Explain My Report'</span></li>
-                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-purple-500 mt-1"></i> <span class="font-bold">1-Click Payment Reminders</span></li>`;
-                features.pro = `
-                    <li class="flex items-start gap-2 text-white font-bold"><i class="fas fa-crown text-yellow-400 mt-1"></i> <span>Premium Gold VIP Crown + All Plus</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-yellow-400 mt-1"></i> <span class="text-white font-bold">Order via App & WhatsApp</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-trophy text-yellow-400 mt-1"></i> <span>#1 Top Search Ranking</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-boxes text-yellow-400 mt-1"></i> <span>Expand to 500 Products</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-chart-line text-yellow-400 mt-1"></i> <span class="text-white font-bold">Full Analytics & Graphs</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-headset text-yellow-400 mt-1"></i> <span>Priority WhatsApp Support</span></li>
-                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-gift text-yellow-400 mt-1"></i> <span class="text-white font-bold">Create Flash Offers</span></li>`; 
-            }
+    // 🏷️ Category Header Helper
+    const catHeader = (title, textColor) => 
+        `<li class="pt-3 pb-1 mb-1 mt-1 border-b border-gray-100/20"><span class="text-[10px] font-black uppercase tracking-widest ${textColor}">${title}</span></li>`;
 
-            if(document.getElementById('plan-features-starter')) document.getElementById('plan-features-starter').innerHTML = features.starter;
-            if(document.getElementById('plan-features-plus')) document.getElementById('plan-features-plus').innerHTML = features.plus;
-            if(document.getElementById('plan-features-pro')) document.getElementById('plan-features-pro').innerHTML = features.pro;
-        }
+    if (businessType === 'Service Provider') {
+        features.starter = `
+            ${catHeader('Store & Listing', 'text-gray-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-check-circle text-gray-400 mt-1"></i> <span>Max 20 Services Listing</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-file-invoice text-gray-400 mt-1"></i> <span>Authorised Bill (Watermarked)</span></li>
+            
+            ${catHeader('Orders & CRM', 'text-gray-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-gray-400 mt-1"></i> <span class="font-bold text-gray-600">App & WhatsApp Bookings (No Alert)</span></li>
+            <li class="flex items-start gap-2 text-gray-400"><i class="fas fa-users text-gray-300 mt-1"></i> <span>Basic CRM (No Reminders)</span></li>`;
+            
+        features.plus = `
+            ${catHeader('Store & Listing', 'text-purple-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-crown text-purple-500 mt-1"></i> <span>VIP Crown Lite & Custom Bills</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-check-circle text-purple-500 mt-1"></i> <span>Up to 100 Services</span></li>
+            
+            ${catHeader('Orders & CRM', 'text-purple-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-purple-500 mt-1"></i> <span class="font-bold">App & WhatsApp Bookings</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-bell text-purple-500 mt-1"></i> <span class="font-bold">Live Order Alert App</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-print text-purple-500 mt-1"></i> <span class="font-bold">Print Shipping Labels</span></li>
+            <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-purple-500 mt-1"></i> <span class="font-bold">1-Click Payment Reminders</span></li>
+            
+            ${catHeader('Analytics & Growth', 'text-purple-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-level-up-alt text-purple-500 mt-1"></i> <span>Rank Above Basic Shops</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-chart-pie text-purple-500 mt-1"></i> <span class="font-bold">Advanced Analytics & Graphs</span></li>`;
+            
+        features.pro = `
+            ${catHeader('Store & Listing', 'text-yellow-500')}
+            <li class="flex items-start gap-2 text-white font-bold"><i class="fas fa-crown text-yellow-400 mt-1"></i> <span>Premium Gold VIP Crown + All Plus</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-boxes text-yellow-400 mt-1"></i> <span>Expand to 500 Services</span></li>
+            
+            ${catHeader('Orders & CRM', 'text-yellow-500')}
+            <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-yellow-400 mt-1"></i> <span class="text-white font-bold">App & WhatsApp Bookings</span></li>
+            <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-headset text-yellow-400 mt-1"></i> <span>Priority Support</span></li>
+            
+            ${catHeader('Analytics & Growth', 'text-yellow-500')}
+            <li class="flex items-start gap-2"><i class="fas fa-trophy text-yellow-400 mt-1"></i> <span>#1 Top Search Ranking</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-file-excel text-yellow-400 mt-1"></i> <span class="text-white font-bold">Smart Report & Excel Data</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-robot text-yellow-400 mt-1"></i> <span class="text-white font-bold">AI 'Explain My Report'</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-gift text-yellow-400 mt-1"></i> <span class="text-white font-bold">Create Flash Offers</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-chart-line text-yellow-400 mt-1"></i> <span class="text-white font-bold">Full Analytics & Graphs</span></li>`; 
+    
+    } else if (businessType === 'Wholesaler') {
+        features.starter = `
+            ${catHeader('Store & Listing', 'text-gray-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-check-circle text-gray-400 mt-1"></i> <span>Max 20 Bulk Items Listing</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-file-invoice text-gray-400 mt-1"></i> <span>Authorised Bill (Watermarked)</span></li>
+            
+            ${catHeader('Orders & CRM', 'text-gray-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-gray-400 mt-1"></i> <span class="font-bold text-gray-600">App & WhatsApp Orders (No Alert)</span></li>
+            <li class="flex items-start gap-2 text-gray-400"><i class="fas fa-users text-gray-300 mt-1"></i> <span>Basic CRM (No Reminders)</span></li>`;
+            
+        features.plus = `
+            ${catHeader('Store & Listing', 'text-purple-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-crown text-purple-500 mt-1"></i> <span>VIP Crown Lite & Custom Bills</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-check-circle text-purple-500 mt-1"></i> <span>Up to 100 Bulk Items</span></li>
+            
+            ${catHeader('Orders & CRM', 'text-purple-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-purple-500 mt-1"></i> <span class="font-bold">Order via App & WhatsApp</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-bell text-purple-500 mt-1"></i> <span class="font-bold">Live Order Alert App</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-print text-purple-500 mt-1"></i> <span class="font-bold">Print Shipping Labels</span></li>
+            <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-purple-500 mt-1"></i> <span class="font-bold">1-Click Payment Reminders</span></li>
+            
+            ${catHeader('Analytics & Growth', 'text-purple-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-level-up-alt text-purple-500 mt-1"></i> <span>Rank Above Basic Shops</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-chart-pie text-purple-500 mt-1"></i> <span class="font-bold">Advanced Analytics & Graphs</span></li>`;
+            
+        features.pro = `
+            ${catHeader('Store & Listing', 'text-yellow-500')}
+            <li class="flex items-start gap-2 text-white font-bold"><i class="fas fa-crown text-yellow-400 mt-1"></i> <span>Premium Gold VIP Crown + All Plus</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-boxes text-yellow-400 mt-1"></i> <span>Expand to 500 Bulk Items</span></li>
+            
+            ${catHeader('Orders & CRM', 'text-yellow-500')}
+            <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-yellow-400 mt-1"></i> <span class="text-white font-bold">Order via App & WhatsApp</span></li>
+            <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-headset text-yellow-400 mt-1"></i> <span>Priority Support</span></li>
+            
+            ${catHeader('Analytics & Growth', 'text-yellow-500')}
+            <li class="flex items-start gap-2"><i class="fas fa-trophy text-yellow-400 mt-1"></i> <span>#1 Top Search Ranking</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-file-excel text-yellow-400 mt-1"></i> <span class="text-white font-bold">Smart Report & Excel Data</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-robot text-yellow-400 mt-1"></i> <span class="text-white font-bold">AI 'Explain My Report'</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-gift text-yellow-400 mt-1"></i> <span class="text-white font-bold">Create Flash Offers</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-chart-line text-yellow-400 mt-1"></i> <span class="text-white font-bold">Full Analytics & Graphs</span></li>`; 
+    
+    } else if (businessType === 'Manufacturer') {
+        features.starter = `
+            ${catHeader('Store & Listing', 'text-gray-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-check-circle text-gray-400 mt-1"></i> <span>Max 20 Catalog Items</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-file-invoice text-gray-400 mt-1"></i> <span>Authorised Bill (Watermarked)</span></li>
+            
+            ${catHeader('Orders & CRM', 'text-gray-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-gray-400 mt-1"></i> <span class="font-bold text-gray-600">App & WhatsApp Orders (No Alert)</span></li>
+            <li class="flex items-start gap-2 text-gray-400"><i class="fas fa-users text-gray-300 mt-1"></i> <span>Basic CRM (No Reminders)</span></li>`;
+            
+        features.plus = `
+            ${catHeader('Store & Listing', 'text-purple-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-crown text-purple-500 mt-1"></i> <span>VIP Crown Lite & Custom Bills</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-check-circle text-purple-500 mt-1"></i> <span>Up to 100 Catalog Items</span></li>
+            
+            ${catHeader('Orders & CRM', 'text-purple-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-purple-500 mt-1"></i> <span class="font-bold">Order via App & WhatsApp</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-bell text-purple-500 mt-1"></i> <span class="font-bold">Live Order Alert App</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-print text-purple-500 mt-1"></i> <span class="font-bold">Print Shipping Labels</span></li>
+            <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-purple-500 mt-1"></i> <span class="font-bold">1-Click Payment Reminders</span></li>
+            
+            ${catHeader('Analytics & Growth', 'text-purple-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-level-up-alt text-purple-500 mt-1"></i> <span>Rank Above Basic Shops</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-chart-pie text-purple-500 mt-1"></i> <span class="font-bold">Advanced Analytics & Graphs</span></li>`;
+            
+        features.pro = `
+            ${catHeader('Store & Listing', 'text-yellow-500')}
+            <li class="flex items-start gap-2 text-white font-bold"><i class="fas fa-crown text-yellow-400 mt-1"></i> <span>Premium Gold VIP Crown + All Plus</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-boxes text-yellow-400 mt-1"></i> <span>Expand to 500 Catalog Items</span></li>
+            
+            ${catHeader('Orders & CRM', 'text-yellow-500')}
+            <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-yellow-400 mt-1"></i> <span class="text-white font-bold">Order via App & WhatsApp</span></li>
+            <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-headset text-yellow-400 mt-1"></i> <span>Priority Support</span></li>
+            
+            ${catHeader('Analytics & Growth', 'text-yellow-500')}
+            <li class="flex items-start gap-2"><i class="fas fa-trophy text-yellow-400 mt-1"></i> <span>#1 Top Search Ranking</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-file-excel text-yellow-400 mt-1"></i> <span class="text-white font-bold">Smart Report & Excel Data</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-robot text-yellow-400 mt-1"></i> <span class="text-white font-bold">AI 'Explain My Report'</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-gift text-yellow-400 mt-1"></i> <span class="text-white font-bold">Create Flash Offers</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-chart-line text-yellow-400 mt-1"></i> <span class="text-white font-bold">Full Analytics & Graphs</span></li>`; 
+    
+    } else {
+        // Default Retailer (Normal Shop)
+        features.starter = `
+            ${catHeader('Store & Listing', 'text-gray-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-check-circle text-gray-400 mt-1"></i> <span>Max 20 Products Listing</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-file-invoice text-gray-400 mt-1"></i> <span>Authorised Bill (Watermarked)</span></li>
+            
+            ${catHeader('Orders & CRM', 'text-gray-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-gray-400 mt-1"></i> <span class="font-bold text-gray-600">App & WhatsApp Orders (No Alert)</span></li>
+            <li class="flex items-start gap-2 text-gray-400"><i class="fas fa-users text-gray-300 mt-1"></i> <span>Basic CRM (No Reminders)</span></li>`;
+            
+        features.plus = `
+            ${catHeader('Store & Listing', 'text-purple-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-crown text-purple-500 mt-1"></i> <span>VIP Crown Lite & Custom Bills</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-check-circle text-purple-500 mt-1"></i> <span>Up to 100 Products</span></li>
+            
+            ${catHeader('Orders & CRM', 'text-purple-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-purple-500 mt-1"></i> <span class="font-bold">Order via App & WhatsApp</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-bell text-purple-500 mt-1"></i> <span class="font-bold">Live Order Alert App</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-print text-purple-500 mt-1"></i> <span class="font-bold">Print Shipping Labels</span></li>
+            <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-purple-500 mt-1"></i> <span class="font-bold">1-Click Payment Reminders</span></li>
+            
+            ${catHeader('Analytics & Growth', 'text-purple-400')}
+            <li class="flex items-start gap-2"><i class="fas fa-level-up-alt text-purple-500 mt-1"></i> <span>Rank Above Basic Shops</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-chart-pie text-purple-500 mt-1"></i> <span class="font-bold">Advanced Analytics & Graphs</span></li>`;
+            
+        features.pro = `
+            ${catHeader('Store & Listing', 'text-yellow-500')}
+            <li class="flex items-start gap-2 text-white font-bold"><i class="fas fa-crown text-yellow-400 mt-1"></i> <span>Premium Gold VIP Crown + All Plus</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-boxes text-yellow-400 mt-1"></i> <span>Expand to 500 Products</span></li>
+            
+            ${catHeader('Orders & CRM', 'text-yellow-500')}
+            <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-yellow-400 mt-1"></i> <span class="text-white font-bold">Order via App & WhatsApp</span></li>
+            <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-headset text-yellow-400 mt-1"></i> <span>Priority Support</span></li>
+            
+            ${catHeader('Analytics & Growth', 'text-yellow-500')}
+            <li class="flex items-start gap-2"><i class="fas fa-trophy text-yellow-400 mt-1"></i> <span>#1 Top Search Ranking</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-file-excel text-yellow-400 mt-1"></i> <span class="text-white font-bold">Smart Report & Excel Data</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-robot text-yellow-400 mt-1"></i> <span class="text-white font-bold">AI 'Explain My Report'</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-gift text-yellow-400 mt-1"></i> <span class="text-white font-bold">Create Flash Offers</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-chart-line text-yellow-400 mt-1"></i> <span class="text-white font-bold">Full Analytics & Graphs</span></li>`; 
+    }
+
+    if(document.getElementById('plan-features-starter')) document.getElementById('plan-features-starter').innerHTML = features.starter;
+    if(document.getElementById('plan-features-plus')) document.getElementById('plan-features-plus').innerHTML = features.plus;
+    if(document.getElementById('plan-features-pro')) document.getElementById('plan-features-pro').innerHTML = features.pro;
+}
+
+
 
 
 

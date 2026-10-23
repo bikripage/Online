@@ -5366,7 +5366,9 @@ function applySmartFilters() {
     productCards.forEach(card => grid.appendChild(card));
     closeSmartFilter();
 }
-// ✨ 1. PLAN UPGRADE / DOWNGRADE CHECKER (Ab chhota plan nahi khulega) ✨
+// ==========================================
+// ✨ 2. PLAN UPGRADE CHECKER ✨
+// ==========================================
 function handleUpgradeClick(targetPlan, amount) {
     const currentPlan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'starter';
 
@@ -5374,7 +5376,6 @@ function handleUpgradeClick(targetPlan, amount) {
     const currentWeight = planWeights[currentPlan] || 1;
     const targetWeight = planWeights[targetPlan] || 1;
 
-    // Agar downgrade karne ki koshish kare
     if (targetWeight < currentWeight) {
         iosConfirm(
             "Downgrade Not Allowed", 
@@ -5384,7 +5385,6 @@ function handleUpgradeClick(targetPlan, amount) {
         );
         return;
     } 
-    // Agar same plan dobara kharidne ki koshish kare
     else if (targetWeight === currentWeight) {
         iosConfirm(
             "Already Active", 
@@ -5395,10 +5395,11 @@ function handleUpgradeClick(targetPlan, amount) {
         return;
     }
 
-    // Agar sab sahi hai, tabhi payment khulegi
     initiateRazorpayPayment(targetPlan, amount);
 }
-// ✨ NAYA: CLEAN RAZORPAY PAYMENT LOGIC (NO DOUBLE SUCCESS ALERT) ✨
+// ==========================================
+// ✨ 3. CLEAN RAZORPAY LOGIC (FRONTEND ONLY) ✨
+// ==========================================
 let isPaymentSuccess = false;
 
 function initiateRazorpayPayment(planType, amountInINR) {
@@ -5428,7 +5429,7 @@ function initiateRazorpayPayment(planType, amountInINR) {
         "handler": function (response) {
             isPaymentSuccess = true; 
             
-            // 1. INSTANT UI UPDATE
+            // UI Update
             if (typeof updatePlanUI === 'function') {
                 updatePlanUI(planType);
             }
@@ -5447,7 +5448,7 @@ function initiateRazorpayPayment(planType, amountInINR) {
                 globalShopData.plan = planType;
             }
 
-            // 2. BACKGROUND DATABASE UPDATE & REDIRECT
+            // Backend Update (Direct via Frontend for now)
             db.collection('shops').doc(activeShop).update({
                 plan: planType,
                 isVerified: true, 
@@ -5455,13 +5456,13 @@ function initiateRazorpayPayment(planType, amountInINR) {
                 planStartDate: firebase.firestore.FieldValue.serverTimestamp(),
                 searchRank: planType === 'pro' ? 100 : 50 
             }).then(() => {
+                // Success hote hi bina kisi alert ke seedha dashboard par bhej do
                 window.location.href = `dashboard.html?shop=${activeShop}`;
             }).catch(e => console.error(e));
         },
         
         "modal": {
             "ondismiss": function() {
-                // Backup Redirect
                 if (isPaymentSuccess) {
                     window.location.href = `dashboard.html?shop=${activeShop}`;
                 }
@@ -5478,12 +5479,17 @@ function initiateRazorpayPayment(planType, amountInINR) {
     rzp.open();
 }
 
-// ✨ iOS Premium Alert Function
-function iosConfirm(title, message, btnText) {
+// ==========================================
+// ✨ 4. iOS PREMIUM ALERT FUNCTION ✨
+// ==========================================
+function iosConfirm(title, message, btnText, btnColor = "text-[#007AFF]") {
     return new Promise((resolve) => {
         document.getElementById('ios-confirm-title').innerText = title;
         document.getElementById('ios-confirm-message').innerText = message;
-        document.getElementById('ios-confirm-btn').innerText = btnText;
+        
+        const btn = document.getElementById('ios-confirm-btn');
+        btn.innerText = btnText;
+        btn.className = `flex-1 py-3.5 text-[17px] font-bold hover:bg-black/5 active:bg-black/10 transition-colors ${btnColor}`;
 
         const modal = document.getElementById('ios-confirm-modal');
         const card = document.getElementById('ios-confirm-card');
@@ -5494,7 +5500,7 @@ function iosConfirm(title, message, btnText) {
             card.classList.remove('scale-95');
         }, 10);
 
-        document.getElementById('ios-confirm-btn').onclick = () => {
+        btn.onclick = () => {
             modal.classList.add('opacity-0');
             card.classList.add('scale-95');
             setTimeout(() => {
@@ -5504,7 +5510,6 @@ function iosConfirm(title, message, btnText) {
         };
     });
 }
-
     </script>
 
        <!-- ✨ PREMIUM VIDEO TUTORIAL MODAL ✨ -->

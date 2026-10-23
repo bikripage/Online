@@ -3228,47 +3228,46 @@ function applyProLocks(shopData) {
             }); list.innerHTML = html;
         }
 
+async function addProduct(e) {
+    e.preventDefault(); 
+    
+    // ==========================================
+    // ✨ NAYA: PLAN KE HISAAB SE PRODUCT LIMIT CHECK ✨
+    // ==========================================
+    const plan = (typeof globalShopData !== 'undefined' && globalShopData && globalShopData.plan) ? globalShopData.plan : 'basic';
+    const email = (typeof globalShopData !== 'undefined' && globalShopData && globalShopData.email) ? globalShopData.email : '';
+    
+    let maxLimit = 20; // Default Starter Plan
+    if (plan === 'plus') maxLimit = 100;
+    if (plan === 'pro') maxLimit = 500; // VIP/Admin
 
-                    async function addProduct(e) {
-            e.preventDefault(); 
-            
-            // ==========================================
-            // ✨ NAYA: PLAN KE HISAAB SE PRODUCT LIMIT CHECK ✨
-            // ==========================================
-            const plan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
-            const email = (typeof globalShopData !== 'undefined' && globalShopData.email) ? globalShopData.email : '';
-            
-            let maxLimit = 20; // Default Starter Plan
-            if (plan === 'plus') maxLimit = 100;
-            if (plan === 'pro') maxLimit = 500; // VIP/Admin
-
-            // Agar store me products limit ke barabar ya zyada ho gaye hain toh rok do
-            if (storeProducts.length >= maxLimit) {
-                // Customer ko upgrade karne ka popup dikhao
-                iosConfirm(
-                    "Limit Reached! 🚫", 
-                    `Your current plan allows a maximum of ${maxLimit} items. Please upgrade your plan to add more.`,
-                    "Upgrade Plan",
-                    "text-purple-600"
-                ).then((confirmed) => {
-                    if(confirmed) {
-                        // Seedha upgrade page par bhej do
-                        window.location.href = `index.html?shop=${currentShopId}#merchant-upgrade-plans`;
-                    }
-                });
-                return; // Function yahin rok do, product add nahi hoga
+    // Agar store me products limit ke barabar ya zyada ho gaye hain toh rok do
+    if (storeProducts.length >= maxLimit) {
+        // Customer ko upgrade karne ka popup dikhao
+        iosConfirm(
+            "Limit Reached! 🚫", 
+            `Your current plan allows a maximum of ${maxLimit} items. Please upgrade your plan to add more.`,
+            "Upgrade Plan",
+            "text-purple-600"
+        ).then((confirmed) => {
+            if(confirmed) {
+                // Seedha upgrade page par bhej do
+                window.location.href = `index.html?shop=${currentShopId}#merchant-upgrade-plans`;
             }
-            // ==========================================
+        });
+        return; // Function yahin rok do, product add nahi hoga
+    }
+    // ==========================================
 
-            const n = document.getElementById('prod-name').value.trim(); 
-            const mrpVal = parseInt(document.getElementById('prod-mrp').value); // MRP
-            const p = parseInt(document.getElementById('prod-price').value);
-            const qtySize = parseFloat(document.getElementById('prod-qty').value) || 1;
-            const unit = document.getElementById('prod-unit').value;
-            const desc = document.getElementById('prod-desc').value.trim();
+    const n = document.getElementById('prod-name').value.trim(); 
+    const mrpVal = parseInt(document.getElementById('prod-mrp').value); // MRP
+    const p = parseInt(document.getElementById('prod-price').value);
+    const qtySize = parseFloat(document.getElementById('prod-qty').value) || 1;
+    const unit = document.getElementById('prod-unit').value;
+    const desc = document.getElementById('prod-desc').value.trim();
 
-            // Selling Price kabhi MRP se zyada nahi ho sakti
-            if (p > mrpVal) {
+    // Selling Price kabhi MRP se zyada nahi ho sakti
+    if (p > mrpVal) {
         showIOSAlert("Invalid Price", "Selling Price cannot be greater than MRP!");
         return;
     }
@@ -3282,31 +3281,27 @@ function applyProLocks(shopData) {
     // 👇 2. 'try' block ko Image process hone se pehle shuru karein 👇
     try { 
         // Ab images try block ke andar hain, toh error aane par form atkega nahi
-    // नया कोड: (यहाँ हम products/shopId फोल्डर में फोटो डाल रहे हैं)
-const imgUrl_1 = await uploadImageToStorage(document.getElementById('prod-image'), `products/${currentShopId}`);
-const imgUrl_2 = await uploadImageToStorage(document.getElementById('prod-image2'), `products/${currentShopId}`);
-const imgUrl_3 = await uploadImageToStorage(document.getElementById('prod-image3'), `products/${currentShopId}`);
+        // नया कोड: (यहाँ हम products/shopId फोल्डर में फोटो डाल रहे हैं)
+        const imgUrl_1 = await uploadImageToStorage(document.getElementById('prod-image'), `products/${currentShopId}`);
+        const imgUrl_2 = await uploadImageToStorage(document.getElementById('prod-image2'), `products/${currentShopId}`);
+        const imgUrl_3 = await uploadImageToStorage(document.getElementById('prod-image3'), `products/${currentShopId}`);
 
-// Plan check karke rank score tay karein
-let planType = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
-let storeEmail = (typeof globalShopData !== 'undefined' && globalShopData.email) ? globalShopData.email : '';
-let rankScore = 0;
+        // Plan check karke rank score tay karein
+        let rankScore = 0;
+        if (plan === 'pro' || email === 'netajijhadustore@gmail.com') {
+            rankScore = 100;
+        } else if (plan === 'plus') {
+            rankScore = 50;
+        }
 
-if (planType === 'pro' || storeEmail === 'netajijhadustore@gmail.com') {
-    rankScore = 100;
-} else if (planType === 'plus') {
-    rankScore = 50;
-}
-
-let pd = { 
-    name: n, mrp: mrpVal, price: p, qtySize: qtySize, unit: unit, description: desc, 
-    image: imgUrl_1,    
-    image2: imgUrl_2,   
-    image3: imgUrl_3,   
-    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    searchRank: rankScore // Yahan currentRank ki jagah rankScore use karein
-};
-
+        let pd = { 
+            name: n, mrp: mrpVal, price: p, qtySize: qtySize, unit: unit, description: desc, 
+            image: imgUrl_1,    
+            image2: imgUrl_2,   
+            image3: imgUrl_3,   
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            searchRank: rankScore // Yahan currentRank ki jagah rankScore use karein
+        };
 
         const doc = await db.collection('shops').doc(currentShopId).collection('products').add(pd); 
         pd.id = doc.id; 
@@ -3322,6 +3317,7 @@ let pd = {
         
         renderAdminProducts(); 
     } catch(err) { 
+        console.error("Add Product Error: ", err); // Browser console mein error check kar
         alert(err.message); 
     } 
     
@@ -3329,6 +3325,7 @@ let pd = {
     btn.innerHTML = orig; 
     btn.disabled = false;
 }
+
 
 
                       function openEditProductModal(id) {

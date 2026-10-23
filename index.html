@@ -1307,7 +1307,7 @@ async function handleShopSubmit(e) {
 
     <!-- OTHER SECTIONS -->
     <div class="relative z-20 bg-white rounded-t-[3rem] shadow-[0_-10px_40px_rgba(0,0,0,0.03)] border-t border-gray-100 pb-10">
-        \${merchantWhyChooseUsSection}
+        ${merchantWhyChooseUsSection}
     </div>
 
 </div>
@@ -5344,6 +5344,7 @@ function initiateRazorpayPayment(planType, amountInINR) {
 
     if (!activeShop) return;
 
+    // पेमेंट खुलने से पहले फ्लैग रीसेट करो
     isPaymentSuccess = false;
 
     const options = {
@@ -5358,13 +5359,12 @@ function initiateRazorpayPayment(planType, amountInINR) {
         "handler": function (response) {
             isPaymentSuccess = true; 
             
-            // ✨ 1. INSTANT UI UPDATE (BINA REFRESH KIYE) ✨
-            // Ye line chalte hi cards ke button 'Current Plan' aur 'Downgrade' ban jayenge
+            // 1. INSTANT UI UPDATE (PRICING BUTTONS)
             if (typeof updatePlanUI === 'function') {
                 updatePlanUI(planType);
             }
 
-            // ✨ 2. PROFILE MENU KA BADGE BHI TURANT UPDATE KARO ✨
+            // 2. PROFILE MENU BADGE UPDATE
             const planEl = document.getElementById('prof-active-plan');
             if (planEl) {
                 let badge = typeof getVIPBadge === 'function' ? getVIPBadge(true, planType) : '';
@@ -5375,38 +5375,42 @@ function initiateRazorpayPayment(planType, amountInINR) {
                 }
             }
 
-            // ✨ 3. GLOBAL VARIABLE UPDATE KARO TAQKI DOWNGRADE CHECKER KO PATA CHAL JAYE ✨
             if (typeof globalShopData !== 'undefined') {
                 globalShopData.plan = planType;
             }
 
-            // 4. Background me database update
+            // 3. BACKGROUND DATABASE UPDATE
             db.collection('shops').doc(activeShop).update({
                 plan: planType,
                 isVerified: true, 
                 paymentId: response.razorpay_payment_id,
                 planStartDate: firebase.firestore.FieldValue.serverTimestamp(),
                 searchRank: planType === 'pro' ? 100 : 50 
+            }).then(() => {
+                // 4. INSTANT GRID REFRESH (होम पेज पर तुरंत VIP बैज लाने के लिए)
+                if (typeof fetchLiveShops === 'function') fetchLiveShops();
+                if (typeof fetchGlobalProducts === 'function') fetchGlobalProducts();
             }).catch(e => console.error(e));
         },
         
         "modal": {
             "ondismiss": function() {
+                // 5. जैसे ही RAZORPAY बंद होगा, सीधा REDIRECT (बिना किसी अलर्ट के)
                 if (isPaymentSuccess) {
-                    // Agar tumhe success ke baad dashboard par bhejna hai toh is line ko un-comment kar lena:
-                    // window.location.href = `dashboard.html?shop=${activeShop}`;
+                    window.location.href = `dashboard.html?shop=${activeShop}`;
                 }
             }
         }
     };
 
     const rzp = new Razorpay(options);
+    
     rzp.on('payment.failed', function (response) {
         alert("Payment Failed: " + response.error.description);
     });
+    
     rzp.open();
 }
-
 
 
 // ✨ iOS Premium Alert Function

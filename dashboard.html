@@ -584,10 +584,16 @@
                     <p class="text-[12px] text-gray-400 mt-1">Get instant voice alerts for new orders on your phone.</p>
                 </div>
                 
-                <!-- ⬇️ YAHAN APNE APK KA LINK DAALNA HAI ⬇️ -->
-                <a href="https://github.com/bikripage/Online/releases/download/Alert/alert-app.apk" target="_blank" class="w-full sm:w-auto bg-[#10B981] hover:bg-[#059669] text-white text-sm font-bold px-4 h-10 rounded-[10px] flex justify-center items-center gap-2 transition active:scale-95 shadow-sm">
+                              <!-- ⬇️ YAHAN APNE APK KA LINK DAALNA HAI ⬇️ -->
+                <!-- ✨ PINK PLUS CROWN ADDED HERE ✨ -->
+                <button onclick="checkPremiumAndExecute(() => window.open('https://github.com/bikripage/Online/releases/download/Alert/alert-app.apk', '_blank'), 'orders')" class="relative w-full sm:w-auto bg-[#10B981] hover:bg-[#059669] text-white text-sm font-bold px-4 h-10 rounded-[10px] flex justify-center items-center gap-2 transition active:scale-95 shadow-sm">
                     <i class="fas fa-download"></i> Download App
-                </a>
+                    
+                    <div class="premium-lock-icon hidden absolute -top-2 -right-2 bg-gray-900 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.3)] p-1 border border-pink-400 z-10 flex items-center justify-center">
+                        <i class="fas fa-crown text-pink-400 text-[10px] mt-px"></i>
+                    </div>
+                </button>
+
             </div>
 
             <div class="mt-4 bg-[#1F2937] p-4 rounded-[12px] border border-gray-700">
@@ -2304,13 +2310,18 @@ function applyProLocks(shopData) {
     const list = document.getElementById('merchant-orders-list');
     if(!list) return;
 
-    // --- ✨ NAYA LOGIC: TOP BUTTON KO BHI CHECK KARKE BLUR KARNA ✨ ---
+        // --- ✨ NAYA LOGIC: TOP BUTTON KO BHI CHECK KARKE BLUR KARNA ✨ ---
     const topPrintWrapper = document.getElementById('top-batch-print-wrapper');
     if(topPrintWrapper) {
         if (globalShopData && globalShopData.homeDelivery === true) {
             topPrintWrapper.innerHTML = `
-                <button onclick="printAllAcceptedSlips()" class="w-full sm:w-auto bg-[#111827] hover:bg-black text-white text-sm font-bold px-5 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm active:scale-95">
+                <!-- ✨ PINK PLUS CROWN ADDED HERE ✨ -->
+                <button onclick="checkPremiumAndExecute(() => printAllAcceptedSlips(), 'orders')" class="relative w-full sm:w-auto bg-[#111827] hover:bg-black text-white text-sm font-bold px-5 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm active:scale-95">
                     <i class="fas fa-print"></i> Print Accepted Orders
+                    
+                    <div class="premium-lock-icon hidden absolute -top-2 -right-2 bg-gray-900 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.3)] p-1 border border-pink-400 z-10 flex items-center justify-center">
+                        <i class="fas fa-crown text-pink-400 text-[10px] mt-px"></i>
+                    </div>
                 </button>
             `;
         } else {
@@ -2331,6 +2342,7 @@ function applyProLocks(shopData) {
             `;
         }
     }
+
     // -------------------------------------------------------------
 
     if(orders.length === 0) {

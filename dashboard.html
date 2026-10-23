@@ -584,17 +584,18 @@
                     <p class="text-[12px] text-gray-400 mt-1">Get instant voice alerts for new orders on your phone.</p>
                 </div>
                 
-                              <!-- ⬇️ YAHAN APNE APK KA LINK DAALNA HAI ⬇️ -->
+                                              <!-- ⬇️ YAHAN APNE APK KA LINK DAALNA HAI ⬇️ -->
                 <!-- ✨ PINK PLUS CROWN ADDED HERE ✨ -->
-                <button onclick="checkPremiumAndExecute(() => window.open('https://github.com/bikripage/Online/releases/download/Alert/alert-app.apk', '_blank'), 'orders')" class="relative w-full sm:w-auto bg-[#10B981] hover:bg-[#059669] text-white text-sm font-bold px-4 h-10 rounded-[10px] flex justify-center items-center gap-2 transition active:scale-95 shadow-sm">
-                    <i class="fas fa-download"></i> Download App
-                    
+                <div class="relative w-full sm:w-auto">
+                    <button onclick="checkPremiumAndExecute(() => window.open('https://github.com/bikripage/Online/releases/download/Alert/alert-app.apk', '_blank'), 'orders')" class="w-full sm:w-auto bg-[#10B981] hover:bg-[#059669] text-white text-sm font-bold px-4 h-10 rounded-[10px] flex justify-center items-center gap-2 transition active:scale-95 shadow-sm">
+                        <i class="fas fa-download"></i> Download App
+                    </button>
+                    <!-- ✨ EXACT SAME CROWN CLASS AS PRINT BUTTON ✨ -->
                     <div class="premium-lock-icon hidden absolute -top-2 -right-2 bg-gray-900 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.3)] p-1 border border-pink-400 z-10 flex items-center justify-center">
                         <i class="fas fa-crown text-pink-400 text-[10px] mt-px"></i>
                     </div>
-                </button>
+                </div>
 
-            </div>
 
             <div class="mt-4 bg-[#1F2937] p-4 rounded-[12px] border border-gray-700">
                 <div class="flex justify-between items-center mb-2">
@@ -2318,23 +2319,22 @@ function applyProLocks(shopData) {
             // 🚨 NAYA: Button banate waqt hi Premium Status Check karo 🚨
             let planType = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
             let isUserPremium = (planType === 'plus' || planType === 'pro');
-            
-            // Agar user premium nahi hai, to crown se 'hidden' hata do
             let crownDisplayClass = isUserPremium ? 'hidden' : '';
 
             topPrintWrapper.innerHTML = `
                 <!-- ✨ PINK PLUS CROWN VISIBLE HERE ✨ -->
-                <div class="relative inline-block w-full sm:w-auto">
+                <div class="relative w-full sm:w-auto">
                     <button onclick="checkPremiumAndExecute(() => printAllAcceptedSlips(), 'orders')" class="w-full sm:w-auto bg-[#111827] hover:bg-black text-white text-sm font-bold px-5 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm active:scale-95">
                         <i class="fas fa-print"></i> Print Accepted Orders
                     </button>
-                    <!-- 🚨 YAHAN CROWN DYNAMIC HO GAYA 🚨 -->
-                    <div class="premium-lock-icon ${crownDisplayClass} absolute -top-2.5 -right-2.5 bg-gray-900 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.3)] p-1.5 border border-pink-400 z-50 flex items-center justify-center">
+                    <!-- ✨ EXACT SAME CROWN CLASS AS DOWNLOAD APP ✨ -->
+                    <div class="premium-lock-icon ${crownDisplayClass} absolute -top-2 -right-2 bg-gray-900 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.3)] p-1 border border-pink-400 z-10 flex items-center justify-center">
                         <i class="fas fa-crown text-pink-400 text-[10px] mt-px"></i>
                     </div>
                 </div>
             `;
         } else {
+
             topPrintWrapper.innerHTML = `
                 <div class="relative w-full sm:w-auto cursor-pointer group" onclick="openDeliverySettings()">
                     <!-- Halka Blur Wala Dummy Button -->

@@ -3287,14 +3287,26 @@ const imgUrl_1 = await uploadImageToStorage(document.getElementById('prod-image'
 const imgUrl_2 = await uploadImageToStorage(document.getElementById('prod-image2'), `products/${currentShopId}`);
 const imgUrl_3 = await uploadImageToStorage(document.getElementById('prod-image3'), `products/${currentShopId}`);
 
+// Plan check karke rank score tay karein
+let planType = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
+let storeEmail = (typeof globalShopData !== 'undefined' && globalShopData.email) ? globalShopData.email : '';
+let rankScore = 0;
+
+if (planType === 'pro' || storeEmail === 'netajijhadustore@gmail.com') {
+    rankScore = 100;
+} else if (planType === 'plus') {
+    rankScore = 50;
+}
+
 let pd = { 
     name: n, mrp: mrpVal, price: p, qtySize: qtySize, unit: unit, description: desc, 
-    image: imgUrl_1,    // ✨ अब यहाँ URL सेव होगा
-    image2: imgUrl_2,   // ✨ URL
-    image3: imgUrl_3,   // ✨ URL
+    image: imgUrl_1,    
+    image2: imgUrl_2,   
+    image3: imgUrl_3,   
     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    searchRank: currentRank
+    searchRank: rankScore // Yahan currentRank ki jagah rankScore use karein
 };
+
 
         const doc = await db.collection('shops').doc(currentShopId).collection('products').add(pd); 
         pd.id = doc.id; 

@@ -442,11 +442,15 @@
                     <button onclick="switchTab('tab-dashboard', this)" class="tab-btn bg-[#111827] text-white px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition shadow-md">Dashboard</button>
                     
                     <button onclick="let btn=this; checkPremiumAndExecute(() => switchTab('tab-orders', btn))" class="relative tab-btn bg-[#F7F7F9] text-[#6B7280] px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition flex items-center gap-1.5">
-                        Orders
-                        <span id="live-orders-badge" class="hidden bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-black min-w-[18px] text-center shadow-sm">0</span>
-                        <div class="premium-lock-icon hidden absolute -top-1.5 -right-1 bg-white rounded-full shadow-sm p-0.5 border border-yellow-200 z-10"><i class="fas fa-crown text-yellow-500 text-[9px]"></i></div>
-                    </button>
-                    
+    Orders
+    <span id="live-orders-badge" class="hidden bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-black min-w-[18px] text-center shadow-sm">0</span>
+    
+    <!-- ✨ PINK PLUS CROWN LOCK ✨ -->
+    <div class="premium-lock-icon hidden absolute -top-1.5 -right-1 bg-white rounded-full shadow-sm p-0.5 border border-pink-200 z-10">
+        <i class="fas fa-crown text-pink-500 text-[9px]"></i>
+    </div>
+</button>
+
                     <button onclick="switchTab('tab-inventory', this)" class="tab-btn bg-[#F7F7F9] text-[#6B7280] px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition">Inventory</button>
                     <button onclick="switchTab('tab-billing', this)" class="tab-btn bg-[#F7F7F9] text-[#6B7280] px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition">Billing</button>
                     <button onclick="switchTab('tab-crm', this)" class="tab-btn bg-[#F7F7F9] text-[#6B7280] px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition">Customers</button>
@@ -485,38 +489,23 @@
                                     <h3 class="text-xl font-black text-[#111827] flex items-center gap-3"><div class="w-10 h-10 bg-[#E0E7FF] text-[#2563EB] rounded-[12px] flex items-center justify-center"><i class="fas fa-chart-pie"></i></div>Business Insights</h3>
                                     <input type="month" id="insight-month-picker" onchange="renderInsights(); renderAdminBills();" class="ios-input h-10 px-3 text-sm font-semibold cursor-pointer w-full sm:w-auto">
                                 </div>
-                                                                    <!-- Smart Report & Excel Data Buttons (WITH PREMIUM LOCKS) -->
+                                                                                                    <!-- Smart Report & Excel Data Buttons (WITH PRO LOCKS) -->
                                 <div class="grid grid-cols-2 gap-3 mb-5 mt-4">
-                                    <button onclick="checkPremiumAndExecute(() => openDownloadModal('smart'))" class="relative w-full bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-100 font-bold py-3 rounded-[14px] text-xs sm:text-sm transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
+                                    <button id="btn-smart-report" class="relative w-full bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-100 font-bold py-3 rounded-[14px] text-xs sm:text-sm transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
                                         <i class="fas fa-file-invoice text-lg"></i> Smart Report
-                                        <!-- Crown Icon for Basic Users -->
-                                        <div class="premium-lock-icon hidden absolute -top-1.5 -right-1.5 bg-white rounded-full shadow-md p-1 border border-yellow-200">
-                                            <i class="fas fa-crown text-yellow-500 text-[10px]"></i>
-                                        </div>
                                     </button>
                                     
-                                    <button onclick="checkPremiumAndExecute(() => openDownloadModal('excel'))" class="relative w-full bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-100 font-bold py-3 rounded-[14px] text-xs sm:text-sm transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
+                                    <button id="btn-excel-data" class="relative w-full bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-100 font-bold py-3 rounded-[14px] text-xs sm:text-sm transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
                                         <i class="fas fa-file-excel text-lg"></i> Excel Data
-                                        <!-- Crown Icon for Basic Users -->
-                                        <div class="premium-lock-icon hidden absolute -top-1.5 -right-1.5 bg-white rounded-full shadow-md p-1 border border-yellow-200">
-                                            <i class="fas fa-crown text-yellow-500 text-[10px]"></i>
-                                        </div>
                                     </button>
                                     
                                     <!-- ✨ iOS PREMIUM AI BUTTON ✨ -->
-                                    <button onclick="checkPremiumAndExecute(analyzeWithAI)" class="w-full md:col-span-1 col-span-2 relative bg-white text-[#1D1D1F] font-bold py-3 rounded-[16px] text-[14px] transition-all active:scale-[0.96] flex items-center justify-center gap-3 shadow-[0_6px_24px_rgba(0,0,0,0.06)] border border-[#E5E7EB] overflow-hidden">
-                                        <!-- Apple Style Subtle Gradient Background -->
+                                    <button id="btn-ai-report" class="w-full md:col-span-1 col-span-2 relative bg-white text-[#1D1D1F] font-bold py-3 rounded-[16px] text-[14px] transition-all active:scale-[0.96] flex items-center justify-center gap-3 shadow-[0_6px_24px_rgba(0,0,0,0.06)] border border-[#E5E7EB] overflow-hidden">
                                         <div class="absolute inset-0 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 opacity-70"></div>
-                                        <!-- iOS Colorful Magic Icon -->
                                         <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-[#007AFF] via-[#AF52DE] to-[#FF2D55] flex items-center justify-center shadow-sm relative z-10">
                                             <i class="fas fa-sparkles text-white text-[12px]"></i>
                                         </div>
-                                        <!-- Aasan English Text -->
                                         <span class="relative z-10 tracking-wide">Explain My Report</span>
-                                        <!-- Crown Icon for Basic Users -->
-                                        <div class="premium-lock-icon hidden absolute top-1/2 -translate-y-1/2 right-3 bg-white rounded-full shadow-md p-1.5 border border-yellow-200 z-20">
-                                            <i class="fas fa-crown text-yellow-500 text-[12px]"></i>
-                                        </div>
                                     </button>
                                 </div>
 
@@ -1946,6 +1935,48 @@ window.openDeliverySettings = function() {
         }
 
         function enterDashboard() { document.getElementById('congrats-screen').classList.add('hidden'); loadShopData(); }
+// ✨ NAYA: Pro VIP Smart Lock System ✨
+function applyProLocks(shopData) {
+    let isProActive = false;
+    if (shopData.plan === 'pro') {
+        let dateToCheck = shopData.planStartDate ? shopData.planStartDate.toDate() : (shopData.createdAt ? shopData.createdAt.toDate() : new Date());
+        let daysLeft = 30 - Math.floor((new Date() - dateToCheck) / (1000 * 60 * 60 * 24));
+        
+        if (daysLeft > 0) isProActive = true; 
+    }
+
+    const proCrownHtml = `
+        <div class="pro-lock absolute -top-2 -right-2 w-[22px] h-[22px] bg-[#111827] rounded-full flex items-center justify-center shadow-md border border-[#FFD700]/50 z-10 ring-2 ring-white">
+            <i class="fas fa-crown text-[#FFD700] text-[9px]"></i>
+        </div>
+    `;
+
+    const featureBtns = [
+        { id: 'btn-smart-report', action: () => openDownloadModal('smart') }, 
+        { id: 'btn-excel-data', action: () => openDownloadModal('excel') }, 
+        { id: 'btn-ai-report', action: () => analyzeWithAI() }
+    ];
+
+    featureBtns.forEach(btnInfo => {
+        const btn = document.getElementById(btnInfo.id);
+        if (!btn) return;
+
+        const existingLock = btn.querySelector('.pro-lock');
+        if (existingLock) existingLock.remove();
+
+        if (!isProActive) {
+            btn.insertAdjacentHTML('beforeend', proCrownHtml);
+            btn.classList.add('opacity-90');
+            btn.onclick = () => {
+                showIOSAlert("Pro VIP Required", "This advanced feature requires the Pro VIP plan. Please upgrade to unlock.");
+                setTimeout(() => window.location.href='index.html?shop=' + currentShopId + '#merchant-upgrade-plans', 2000);
+            };
+        } else {
+            btn.classList.remove('opacity-90');
+            btn.onclick = btnInfo.action;
+        }
+    });
+}
 
                // ✨ 2. लोड डेटा फंक्शन (SAFE & SYNTAX ERROR FIXED)
         async function loadShopData() {
@@ -1953,6 +1984,8 @@ window.openDeliverySettings = function() {
                 const doc = await db.collection('shops').doc(currentShopId).get();
                 if (doc.exists) {
                     globalShopData = doc.data();
+                                      applyProLocks(globalShopData);
+                                      
                                        // Check Premium and Show/Hide Crown Locks on Buttons
                     const userPlan = globalShopData.plan || 'basic';
                     const isUserPremium = userPlan === 'plus' || userPlan === 'pro';

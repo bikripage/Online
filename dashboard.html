@@ -3559,90 +3559,109 @@ async function deleteProduct(id) {
             btn.innerText = orig; 
             btn.disabled = false;
         }
-             function viewCustomerInsights(idKey) {
-            const c = allCustomersMap[idKey]; if(!c) return;
-            
-            // ✨ NAYA: Check Premium Status for Crown Icon directly in Modal ✨
-            const userPlan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
-            const isPremium = userPlan === 'plus' || userPlan === 'pro';
-            const crownHtml = isPremium ? '' : `<div class="absolute top-1/2 -translate-y-1/2 right-3 bg-white rounded-full shadow-md p-1 border border-yellow-200"><i class="fas fa-crown text-yellow-500 text-[10px]"></i></div>`;
+         function viewCustomerInsights(idKey) {
+    const c = allCustomersMap[idKey]; 
+    if(!c) return;
+    
+    // ✨ NAYA: Check Premium Status for Crown Icon directly in Modal ✨
+    const userPlan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
+    const isPremium = userPlan === 'plus' || userPlan === 'pro';
+    const crownHtml = isPremium ? '' : `<div class="bg-white rounded-full shadow-sm p-0.5 ml-1 border border-yellow-200"><i class="fas fa-crown text-yellow-500 text-[9px]"></i></div>`;
 
-            let oHtml = c.orders.sort((a,b)=>b.timestamp-a.timestamp).map(o => {
-                let pS = o.payStatus || 'Unpaid';
-                let isUnpaid = !pS.includes('Paid'); // Check if bill is unpaid
-                let pC = !isUnpaid ? 'text-[#16A34A]' : 'text-[#DC2626]'; // Green if paid, Red if unpaid
-                
-                // ✨ Devanagari Payment Reminder Button (Only for Unpaid Bills) ✨
-                let reminderBtn = '';
-                if (isUnpaid && c.phone !== 'N/A') {
-                    let shopN = typeof globalShopData !== 'undefined' ? globalShopData.shopName : 'Store';
-                    
-                    let itemsBought = o.items.map(i => `${i.qty}x ${i.name}`).join(', ');
-                    
-                    let msg = `नमस्ते ${c.name} जी,\n\nबस एक छोटा सा रिमाइंडर था। आपके पिछले ऑर्डर (${itemsBought}) का ₹${o.grandTotal} का पेमेंट अभी बाकी है।\n\nऑर्डर डेट: ${o.date}\n\nजब भी टाइम मिले, कृपया ₹${o.grandTotal} का पेमेंट कर दीजिए, ताकि आपका हिसाब क्लियर हो जाए।\n\nबाकी राशि: ₹${o.grandTotal}\n\nअगर पेमेंट हो चुका है, तो इस मैसेज को इग्नोर कर दीजिए।\n\nधन्यवाद जी।\n— ${shopN}`;
-                    
-                    let waLink = `https://wa.me/91${c.phone}?text=${encodeURIComponent(msg)}`;
-                    
-                    // ✨ PREMIUM LOCK APPLIED HERE ✨
-                    reminderBtn = `
-                    <button onclick="checkPremiumAndExecute(() => window.open('${waLink}', '_blank'))" class="relative mt-3 w-full bg-[#FFF7ED] hover:bg-[#FFEDD5] text-[#EA580C] border border-[#FED7AA] py-2.5 rounded-[10px] text-[11px] font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm">
-                        <i class="fab fa-whatsapp text-[14px]"></i> पेमेंट रिमाइंडर भेजें (₹${o.grandTotal})
-                        ${crownHtml}
-                    </button>`;
-                }
+    let totalUnpaidAmount = 0;
+    let unpaidOrdersDetails = [];
 
-                return `
-                <div class="bg-white border border-[#E5E7EB] rounded-[16px] p-4 mb-3 shadow-sm">
-                    <div class="flex justify-between border-b border-[#E5E7EB] pb-2 mb-2">
-                        <div>
-                            <p class="text-xs font-bold text-[#111827]">${o.date}</p>
-                            <p class="text-[9px] text-[#9CA3AF] font-mono mt-0.5">#${o.id.substring(0,8).toUpperCase()}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm font-black text-[#16A34A]">₹${o.grandTotal}</p>
-                            <p class="text-[9px] font-bold ${pC} uppercase">${pS}</p>
-                        </div>
-                    </div>
-                    <p class="text-[11px] text-[#6B7280] leading-snug font-medium">${o.items.map(i=>`${i.qty}x${i.name}`).join(', ')}</p>
-                    ${reminderBtn}
-                </div>`;
-            }).join('');
-            
-            // Chat & Call Buttons (Side by Side)
-            let actionBtns = c.phone !== 'N/A' ? `
-                <a href="https://wa.me/91${c.phone}" target="_blank" class="bg-[#DCFCE7] hover:bg-[#BBF7D0] text-[#16A34A] px-3.5 py-1.5 rounded-[8px] text-[11px] font-bold flex items-center gap-1.5 transition">
-                    <i class="fab fa-whatsapp text-[13px]"></i> Chat
-                </a>
-                <a href="tel:+91${c.phone}" class="bg-[#E0E7FF] hover:bg-[#BFDBFE] text-[#2563EB] px-3.5 py-1.5 rounded-[8px] text-[11px] font-bold flex items-center gap-1.5 transition">
-                    <i class="fas fa-phone-alt text-[11px]"></i> Call
-                </a>
-            ` : '';
-            
-            document.getElementById('customer-insights-content').innerHTML = `
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-16 h-16 bg-[#FCE7F3] text-[#DB2777] rounded-[16px] flex justify-center items-center text-2xl font-bold shrink-0 shadow-sm border border-[#FBCFE8]">${c.name.charAt(0).toUpperCase()}</div>
-                    <div class="min-w-0">
-                        <h2 class="text-lg font-black text-[#111827] truncate">${c.name}</h2>
-                        <div class="flex flex-wrap gap-2 mt-2">${actionBtns}</div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <div class="bg-[#F7F7F9] border border-[#E5E7EB] rounded-[16px] p-4 text-center">
-                        <p class="text-[10px] text-[#6B7280] font-bold uppercase mb-1">Total Spent</p>
-                        <p class="text-xl font-black text-[#2563EB]">₹${c.totalSpent}</p>
-                    </div>
-                    <div class="bg-[#F7F7F9] border border-[#E5E7EB] rounded-[16px] p-4 text-center">
-                        <p class="text-[10px] text-[#6B7280] font-bold uppercase mb-1">Total Orders</p>
-                        <p class="text-xl font-black text-[#111827]">${c.orders.length}</p>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="text-[11px] text-[#6B7280] font-bold uppercase border-b border-[#E5E7EB] pb-2 mb-3">Order History</h4>
-                    <div class="max-h-[300px] overflow-y-auto custom-scrollbar pr-1 pb-4">${oHtml}</div>
-                </div>
-            `;
-            const md = document.getElementById('customer-insights-modal'); md.classList.remove('hidden'); setTimeout(()=>md.classList.add('opacity-100'),10);
+    // 1. Order History HTML and calculation for Unpaid Orders
+    let oHtml = c.orders.sort((a,b)=>b.timestamp-a.timestamp).map(o => {
+        let pS = o.payStatus || 'Unpaid';
+        let isUnpaid = !pS.includes('Paid'); 
+        let pC = !isUnpaid ? 'text-[#16A34A]' : 'text-[#DC2626]'; 
+        
+        // Agar unpaid hai, to details collect karo combined message ke liye
+        if (isUnpaid) {
+            totalUnpaidAmount += o.grandTotal;
+            let itemsStr = o.items.map(i => `${i.qty}x ${i.name}`).join(', ');
+            unpaidOrdersDetails.push(`• Date: ${o.date}\n  Items: ${itemsStr}\n  Amount: ₹${o.grandTotal}`);
         }
+
+        return `
+        <div class="bg-white border border-[#E5E7EB] rounded-[16px] p-4 mb-3 shadow-sm">
+            <div class="flex justify-between border-b border-[#E5E7EB] pb-2 mb-2">
+                <div>
+                    <p class="text-xs font-bold text-[#111827]">${o.date}</p>
+                    <p class="text-[9px] text-[#9CA3AF] font-mono mt-0.5">#${o.id.substring(0,8).toUpperCase()}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-black text-[#16A34A]">₹${o.grandTotal}</p>
+                    <p class="text-[9px] font-bold ${pC} uppercase">${pS}</p>
+                </div>
+            </div>
+            <p class="text-[11px] text-[#6B7280] leading-snug font-medium">${o.items.map(i=>`${i.qty}x${i.name}`).join(', ')}</p>
+        </div>`;
+    }).join('');
+    
+    // 2. Chat, Call, and NEW Bulk Reminder Button
+    let actionBtns = '';
+    
+    if (c.phone !== 'N/A') {
+        actionBtns += `
+            <a href="https://wa.me/91${c.phone}" target="_blank" class="bg-[#DCFCE7] hover:bg-[#BBF7D0] text-[#16A34A] px-3.5 py-1.5 rounded-[8px] text-[11px] font-bold flex items-center gap-1.5 transition">
+                <i class="fab fa-whatsapp text-[13px]"></i> Chat
+            </a>
+            <a href="tel:+91${c.phone}" class="bg-[#E0E7FF] hover:bg-[#BFDBFE] text-[#2563EB] px-3.5 py-1.5 rounded-[8px] text-[11px] font-bold flex items-center gap-1.5 transition">
+                <i class="fas fa-phone-alt text-[11px]"></i> Call
+            </a>
+        `;
+
+        // Bulk Reminder Button sirf tab dikhega jab koi unpaid order ho
+        if (totalUnpaidAmount > 0) {
+            let shopN = typeof globalShopData !== 'undefined' ? globalShopData.shopName : 'Store';
+            let ordersListString = unpaidOrdersDetails.join('\n\n');
+            
+            let combinedMsg = `नमस्ते ${c.name} जी,\n\nबस एक छोटा सा रिमाइंडर था। आपके कुछ पुराने ऑर्डर्स का कुल ₹${totalUnpaidAmount} का पेमेंट अभी बाकी है।\n\n*बाकी ऑर्डर्स की जानकारी:*\n\n${ordersListString}\n\nजब भी टाइम मिले, कृपया कुल ₹${totalUnpaidAmount} का पेमेंट कर दीजिए, ताकि आपका हिसाब क्लियर हो जाए।\n\nअगर पेमेंट हो चुका है, तो इस मैसेज को इग्नोर कर दीजिए।\n\nधन्यवाद जी।\n— ${shopN}`;
+            
+            // Link banaya (URL encode ke saath taaki spaces text mein theek dikhe)
+            let waLink = `https://wa.me/91${c.phone}?text=${encodeURIComponent(combinedMsg)}`;
+            
+            // Add Master Reminder Button
+            actionBtns += `
+                <button onclick="checkPremiumAndExecute(() => window.open('${waLink}', '_blank'))" class="w-full mt-2 bg-[#FFF7ED] hover:bg-[#FFEDD5] text-[#EA580C] border border-[#FED7AA] py-2 rounded-[8px] text-[11px] font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm">
+                    <i class="fab fa-whatsapp text-[14px]"></i> कुल बाकी ₹${totalUnpaidAmount} का रिमाइंडर भेजें
+                    ${crownHtml}
+                </button>
+            `;
+        }
+    }
+    
+    // 3. Final Modal HTML
+    document.getElementById('customer-insights-content').innerHTML = `
+        <div class="flex items-center gap-4 mb-6">
+            <div class="w-16 h-16 bg-[#FCE7F3] text-[#DB2777] rounded-[16px] flex justify-center items-center text-2xl font-bold shrink-0 shadow-sm border border-[#FBCFE8]">${c.name.charAt(0).toUpperCase()}</div>
+            <div class="min-w-0 w-full">
+                <h2 class="text-lg font-black text-[#111827] truncate">${c.name}</h2>
+                <div class="flex flex-wrap gap-2 mt-2 w-full">${actionBtns}</div>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mb-6">
+            <div class="bg-[#F7F7F9] border border-[#E5E7EB] rounded-[16px] p-4 text-center">
+                <p class="text-[10px] text-[#6B7280] font-bold uppercase mb-1">Total Spent</p>
+                <p class="text-xl font-black text-[#2563EB]">₹${c.totalSpent}</p>
+            </div>
+            <div class="bg-[#F7F7F9] border border-[#E5E7EB] rounded-[16px] p-4 text-center">
+                <p class="text-[10px] text-[#6B7280] font-bold uppercase mb-1">Total Orders</p>
+                <p class="text-xl font-black text-[#111827]">${c.orders.length}</p>
+            </div>
+        </div>
+        <div>
+            <h4 class="text-[11px] text-[#6B7280] font-bold uppercase border-b border-[#E5E7EB] pb-2 mb-3">Order History</h4>
+            <div class="max-h-[300px] overflow-y-auto custom-scrollbar pr-1 pb-4">${oHtml}</div>
+        </div>
+    `;
+    
+    const md = document.getElementById('customer-insights-modal'); 
+    md.classList.remove('hidden'); 
+    setTimeout(() => md.classList.add('opacity-100'), 10);
+}
 
 
         function closeCustomerInsights() { const md = document.getElementById('customer-insights-modal'); md.classList.remove('opacity-100'); setTimeout(()=>md.classList.add('hidden'),300); }

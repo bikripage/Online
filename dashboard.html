@@ -3559,14 +3559,20 @@ async function deleteProduct(id) {
             btn.innerText = orig; 
             btn.disabled = false;
         }
-         function viewCustomerInsights(idKey) {
+     function viewCustomerInsights(idKey) {
     const c = allCustomersMap[idKey]; 
     if(!c) return;
     
     // ✨ NAYA: Check Premium Status for Crown Icon directly in Modal ✨
     const userPlan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
     const isPremium = userPlan === 'plus' || userPlan === 'pro';
-    const crownHtml = isPremium ? '' : `<div class="bg-white rounded-full shadow-sm p-0.5 ml-1 border border-yellow-200"><i class="fas fa-crown text-yellow-500 text-[9px]"></i></div>`;
+    
+    // ✨ YAHAN CHANGE HAI: Pink Plus Crown wala design add kiya hai ✨
+    const crownHtml = isPremium ? '' : `
+        <div class="premium-lock-icon absolute -top-2 -right-2 bg-gray-900 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.3)] p-1 border border-pink-400 z-10 flex items-center justify-center">
+            <i class="fas fa-crown text-pink-400 text-[10px] mt-px"></i>
+        </div>
+    `;
 
     let totalUnpaidAmount = 0;
     let unpaidOrdersDetails = [];
@@ -3605,12 +3611,14 @@ async function deleteProduct(id) {
     
     if (c.phone !== 'N/A') {
         actionBtns += `
-            <a href="https://wa.me/91${c.phone}" target="_blank" class="bg-[#DCFCE7] hover:bg-[#BBF7D0] text-[#16A34A] px-3.5 py-1.5 rounded-[8px] text-[11px] font-bold flex items-center gap-1.5 transition">
-                <i class="fab fa-whatsapp text-[13px]"></i> Chat
-            </a>
-            <a href="tel:+91${c.phone}" class="bg-[#E0E7FF] hover:bg-[#BFDBFE] text-[#2563EB] px-3.5 py-1.5 rounded-[8px] text-[11px] font-bold flex items-center gap-1.5 transition">
-                <i class="fas fa-phone-alt text-[11px]"></i> Call
-            </a>
+            <div class="flex w-full gap-2 mb-3">
+                <a href="https://wa.me/91${c.phone}" target="_blank" class="flex-1 bg-[#DCFCE7] hover:bg-[#BBF7D0] text-[#16A34A] py-2 rounded-[8px] text-[11px] font-bold flex justify-center items-center gap-1.5 transition">
+                    <i class="fab fa-whatsapp text-[13px]"></i> Chat
+                </a>
+                <a href="tel:+91${c.phone}" class="flex-1 bg-[#E0E7FF] hover:bg-[#BFDBFE] text-[#2563EB] py-2 rounded-[8px] text-[11px] font-bold flex justify-center items-center gap-1.5 transition">
+                    <i class="fas fa-phone-alt text-[11px]"></i> Call
+                </a>
+            </div>
         `;
 
         // Bulk Reminder Button sirf tab dikhega jab koi unpaid order ho
@@ -3620,27 +3628,31 @@ async function deleteProduct(id) {
             
             let combinedMsg = `नमस्ते ${c.name} जी,\n\nबस एक छोटा सा रिमाइंडर था। आपके कुछ पुराने ऑर्डर्स का कुल ₹${totalUnpaidAmount} का पेमेंट अभी बाकी है।\n\n*बाकी ऑर्डर्स की जानकारी:*\n\n${ordersListString}\n\nजब भी टाइम मिले, कृपया कुल ₹${totalUnpaidAmount} का पेमेंट कर दीजिए, ताकि आपका हिसाब क्लियर हो जाए।\n\nअगर पेमेंट हो चुका है, तो इस मैसेज को इग्नोर कर दीजिए।\n\nधन्यवाद जी।\n— ${shopN}`;
             
-            // Link banaya (URL encode ke saath taaki spaces text mein theek dikhe)
             let waLink = `https://wa.me/91${c.phone}?text=${encodeURIComponent(combinedMsg)}`;
             
-            // Add Master Reminder Button
+            // Add Master Reminder Button - Yahan parent div mein 'relative' add karna zaroori hai taaki absolute crown theek jagah aaye
             actionBtns += `
-                <button onclick="checkPremiumAndExecute(() => window.open('${waLink}', '_blank'))" class="w-full mt-2 bg-[#FFF7ED] hover:bg-[#FFEDD5] text-[#EA580C] border border-[#FED7AA] py-2 rounded-[8px] text-[11px] font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm">
-                    <i class="fab fa-whatsapp text-[14px]"></i> कुल बाकी ₹${totalUnpaidAmount} का रिमाइंडर भेजें
+                <div class="relative w-full">
+                    <button onclick="checkPremiumAndExecute(() => window.open('${waLink}', '_blank'))" class="w-full bg-[#FFF7ED] hover:bg-[#FFEDD5] text-[#EA580C] border border-[#FED7AA] py-2.5 rounded-[8px] text-[12px] font-bold flex justify-center items-center gap-2 transition active:scale-95 shadow-sm">
+                        <i class="fab fa-whatsapp text-[14px]"></i> कुल बाकी ₹${totalUnpaidAmount} का रिमाइंडर भेजें
+                    </button>
                     ${crownHtml}
-                </button>
+                </div>
             `;
         }
     }
     
     // 3. Final Modal HTML
     document.getElementById('customer-insights-content').innerHTML = `
-        <div class="flex items-center gap-4 mb-6">
+        <div class="flex items-center gap-4 mb-4">
             <div class="w-16 h-16 bg-[#FCE7F3] text-[#DB2777] rounded-[16px] flex justify-center items-center text-2xl font-bold shrink-0 shadow-sm border border-[#FBCFE8]">${c.name.charAt(0).toUpperCase()}</div>
-            <div class="min-w-0 w-full">
+            <div class="min-w-0 flex-1">
                 <h2 class="text-lg font-black text-[#111827] truncate">${c.name}</h2>
-                <div class="flex flex-wrap gap-2 mt-2 w-full">${actionBtns}</div>
+                <p class="text-[11px] font-bold text-gray-500 mb-2">${c.phone}</p>
             </div>
+        </div>
+        <div class="w-full mb-6">
+            ${actionBtns}
         </div>
         <div class="grid grid-cols-2 gap-3 mb-6">
             <div class="bg-[#F7F7F9] border border-[#E5E7EB] rounded-[16px] p-4 text-center">

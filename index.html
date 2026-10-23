@@ -5358,6 +5358,12 @@ function initiateRazorpayPayment(planType, amountInINR) {
         "prefill": { "name": ownerName, "contact": phone },
         "handler": function (response) {
             isPaymentSuccess = true; 
+            
+            // ✨ INSTANT UI UPDATE (BINA REFRESH KIYE) ✨
+            // Ye line chalte hi tumhare cards par "Current Plan", VIP crown aur "Downgrade" turant update ho jayenge!
+            updatePlanUI(planType);
+
+            // Background me database update
             db.collection('shops').doc(activeShop).update({
                 plan: planType,
                 isVerified: true, 
@@ -5369,8 +5375,8 @@ function initiateRazorpayPayment(planType, amountInINR) {
         "modal": {
             "ondismiss": function() {
                 if (isPaymentSuccess) {
-                    // ✨ NAYA: Koi success alert nahi, seedha redirect! ✨
-                    window.location.href = `dashboard.html?shop=${activeShop}`;
+                    // Yahan humne sab hata diya hai. 
+                    // Jaise hi Razorpay ka popup band hoga, user ko bina refresh kiye apna chamatkata hua VIP plan dikh jayega!
                 }
             }
         }
@@ -5382,6 +5388,7 @@ function initiateRazorpayPayment(planType, amountInINR) {
     });
     rzp.open();
 }
+
 
 
 // ✨ iOS Premium Alert Function

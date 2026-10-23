@@ -441,7 +441,7 @@
                     
                     <button onclick="switchTab('tab-dashboard', this)" class="tab-btn bg-[#111827] text-white px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition shadow-md">Dashboard</button>
                     
-                    <button onclick="let btn=this; checkPremiumAndExecute(() => switchTab('tab-orders', btn))" class="relative tab-btn bg-[#F7F7F9] text-[#6B7280] px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition flex items-center gap-1.5">
+                    <button onclick="let btn=this; checkPremiumAndExecute(() => switchTab('tab-orders', btn), 'orders')" class="relative tab-btn bg-[#F7F7F9] text-[#6B7280] px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition flex items-center gap-1.5">
     Orders
     <span id="live-orders-badge" class="hidden bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-black min-w-[18px] text-center shadow-sm">0</span>
     
@@ -499,14 +499,18 @@
                                         <i class="fas fa-file-excel text-lg"></i> Excel Data
                                     </button>
                                     
-                                    <!-- ✨ iOS PREMIUM AI BUTTON ✨ -->
-                                    <button id="btn-ai-report" class="w-full md:col-span-1 col-span-2 relative bg-white text-[#1D1D1F] font-bold py-3 rounded-[16px] text-[14px] transition-all active:scale-[0.96] flex items-center justify-center gap-3 shadow-[0_6px_24px_rgba(0,0,0,0.06)] border border-[#E5E7EB] overflow-hidden">
-                                        <div class="absolute inset-0 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 opacity-70"></div>
+                                                                      <!-- ✨ iOS PREMIUM AI BUTTON ✨ -->
+                                    <button id="btn-ai-report" class="w-full md:col-span-1 col-span-2 relative bg-white text-[#1D1D1F] font-bold py-3 rounded-[16px] text-[14px] transition-all active:scale-[0.96] flex items-center justify-center gap-3 shadow-[0_6px_24px_rgba(0,0,0,0.06)] border border-[#E5E7EB]"> <!-- ✨ YAHAN SE overflow-hidden HATA DIYA ✨ -->
+                                        <!-- Apple Style Subtle Gradient Background -->
+                                        <div class="absolute inset-0 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 opacity-70 rounded-[16px]"></div> <!-- ✨ YAHAN rounded-[16px] JOD DIYA ✨ -->
+                                        <!-- iOS Colorful Magic Icon -->
                                         <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-[#007AFF] via-[#AF52DE] to-[#FF2D55] flex items-center justify-center shadow-sm relative z-10">
                                             <i class="fas fa-sparkles text-white text-[12px]"></i>
                                         </div>
+                                        <!-- Aasan English Text -->
                                         <span class="relative z-10 tracking-wide">Explain My Report</span>
                                     </button>
+
                                 </div>
 
 
@@ -9017,24 +9021,32 @@ const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 modal.classList.add('hidden');
             }, 300); // 300ms baad hide karega jab animation khatam ho jaye
         }
-               // ==========================================
+                    // ==========================================
         // ✨ NAYA: PREMIUM SOFT-LOCK LOGIC (FIXED) ✨
         // ==========================================
-        function checkPremiumAndExecute(callback) {
+        function checkPremiumAndExecute(callback, featureName = null) {
             const plan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
             const isPremium = plan === 'plus' || plan === 'pro';
 
             if (!isPremium) {
+                // Feature ke hisaab se message badlo
+                let message = "Upgrade to Plus or Pro VIP to unlock Smart Reports, Excel Exports, and AI Analytics.";
+                if (featureName === 'orders') {
+                    message = "Upgrade to Plus or Pro VIP to unlock the Live Orders feature.";
+                }
+
                 // अगर बेसिक यूज़र है, तो अपग्रेड पॉपअप दिखाओ
                 iosConfirm(
                     "Premium Feature", 
-                    "Upgrade to Plus or Pro VIP to unlock Smart Reports, Excel Exports, AI Analytics, and Live Orders.", 
+                    message, 
                     "View Plans", 
                     "text-purple-600"
                 ).then((confirmed) => {
                     if(confirmed) {
-                        // ✨ FIX: सीधा index.html के प्लान सेक्शन पर भेज दो ✨
-                        window.location.href = `index.html?shop=${currentShopId}#merchant-upgrade-plans`;
+                        // पॉपअप बंद होने दो और फिर रीडायरेक्ट करो
+                        setTimeout(() => {
+                            window.location.href = `index.html?shop=${currentShopId}#merchant-upgrade-plans`;
+                        }, 100);
                     }
                 });
             } else {

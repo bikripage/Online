@@ -2310,7 +2310,7 @@ function applyProLocks(shopData) {
     const list = document.getElementById('merchant-orders-list');
     if(!list) return;
 
-         // --- ✨ NAYA LOGIC: TOP BUTTON KO BHI CHECK KARKE BLUR KARNA ✨ ---
+        // --- ✨ NAYA LOGIC: TOP BUTTON KO BHI CHECK KARKE BLUR KARNA ✨ ---
     const topPrintWrapper = document.getElementById('top-batch-print-wrapper');
     if(topPrintWrapper) {
         if (globalShopData && globalShopData.homeDelivery === true) {
@@ -2327,7 +2327,6 @@ function applyProLocks(shopData) {
                 </div>
             `;
         } else {
-
             topPrintWrapper.innerHTML = `
                 <div class="relative w-full sm:w-auto cursor-pointer group" onclick="openDeliverySettings()">
                     <!-- Halka Blur Wala Dummy Button -->

@@ -3346,7 +3346,7 @@ async function handleEditProduct(e) {
     if (p > mrpVal) return showIOSAlert("Invalid Price", "Selling Price cannot be greater than MRP!");
     
     const btn = e.target.querySelector('button[type="submit"]'); 
-    const orig = btn.innerHTML; // .innerText की जगह .innerHTML यूज़ किया ताकि आइकॉन भी रहे
+    const orig = btn.innerHTML; 
     btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Updating...`; 
     btn.disabled = true;
 
@@ -3358,10 +3358,10 @@ async function handleEditProduct(e) {
         const isImg2Visible = !document.getElementById('edit-show-2').classList.contains('hidden');
         const isImg3Visible = !document.getElementById('edit-show-3').classList.contains('hidden');
 
-        // ✨ NAYA KOD: Firebase Storage में इमेज अपलोड करना ✨
-        const newImg1 = await uploadImageToStorage(document.getElementById('edit-prod-image'), `products/${currentShopId}`);
-        const newImg2 = await uploadImageToStorage(document.getElementById('edit-prod-image2'), `products/${currentShopId}`);
-        const newImg3 = await uploadImageToStorage(document.getElementById('edit-prod-image3'), `products/${currentShopId}`);
+        // 🚨 YAHAN FIX HAI: uploadImageToStorage ki jagah wapas processImage laga diya 🚨
+        const newImg1 = await processImage(document.getElementById('edit-prod-image'));
+        const newImg2 = await processImage(document.getElementById('edit-prod-image2'));
+        const newImg3 = await processImage(document.getElementById('edit-prod-image3'));
 
         // Agar naya photo upload kiya toh update karo
         // Warna agar user ne cross daba diya tha, to firebase se delete kar do
@@ -3374,10 +3374,10 @@ async function handleEditProduct(e) {
         if (newImg3 !== "") updateData.image3 = newImg3;
         else if (!isImg3Visible) updateData.image3 = firebase.firestore.FieldValue.delete();
 
-        // Firestore में डेटा सेव करना
+        // Firestore mein data save karna
         await db.collection('shops').doc(currentShopId).collection('products').doc(id).update(updateData); 
         
-        // लोकल UI/Array अपडेट करना ताकि पेज रिफ्रेश न करना पड़े
+        // Local UI/Array update karna
         let idx = storeProducts.findIndex(x => x.id === id); 
         if(idx !== -1) {
             storeProducts[idx].name = n; 
@@ -3401,11 +3401,10 @@ async function handleEditProduct(e) {
         
     } catch(e) { 
         alert("Error updating product: " + e.message); 
-    } 
-    
-    // ये हमेशा रन होगा (चाहे पास हो या फेल), बटन वापस नॉर्मल हो जाएगा
-    btn.innerHTML = orig; 
-    btn.disabled = false;
+    } finally {
+        btn.innerHTML = orig; 
+        btn.disabled = false;
+    }
 }
 
 async function deleteProduct(id) { 

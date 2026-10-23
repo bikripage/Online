@@ -5356,14 +5356,33 @@ function initiateRazorpayPayment(planType, amountInINR) {
         "description": `Upgrade to ${planType.toUpperCase()} Plan`,
         "theme": { "color": "#111827" },
         "prefill": { "name": ownerName, "contact": phone },
+        
         "handler": function (response) {
             isPaymentSuccess = true; 
             
-            // ✨ INSTANT UI UPDATE (BINA REFRESH KIYE) ✨
-            // Ye line chalte hi tumhare cards par "Current Plan", VIP crown aur "Downgrade" turant update ho jayenge!
-            updatePlanUI(planType);
+            // ✨ 1. INSTANT UI UPDATE (BINA REFRESH KIYE) ✨
+            // Ye line chalte hi cards ke button 'Current Plan' aur 'Downgrade' ban jayenge
+            if (typeof updatePlanUI === 'function') {
+                updatePlanUI(planType);
+            }
 
-            // Background me database update
+            // ✨ 2. PROFILE MENU KA BADGE BHI TURANT UPDATE KARO ✨
+            const planEl = document.getElementById('prof-active-plan');
+            if (planEl) {
+                let badge = typeof getVIPBadge === 'function' ? getVIPBadge(true, planType) : '';
+                if (planType === 'pro') {
+                    planEl.innerHTML = `${badge} <span class="text-yellow-500 drop-shadow-sm font-black">Pro VIP</span>`;
+                } else if (planType === 'plus') {
+                    planEl.innerHTML = `${badge} <span class="text-purple-600 drop-shadow-sm font-black">Plus</span>`;
+                }
+            }
+
+            // ✨ 3. GLOBAL VARIABLE UPDATE KARO TAQKI DOWNGRADE CHECKER KO PATA CHAL JAYE ✨
+            if (typeof globalShopData !== 'undefined') {
+                globalShopData.plan = planType;
+            }
+
+            // 4. Background me database update
             db.collection('shops').doc(activeShop).update({
                 plan: planType,
                 isVerified: true, 
@@ -5372,11 +5391,12 @@ function initiateRazorpayPayment(planType, amountInINR) {
                 searchRank: planType === 'pro' ? 100 : 50 
             }).catch(e => console.error(e));
         },
+        
         "modal": {
             "ondismiss": function() {
                 if (isPaymentSuccess) {
-                    // Yahan humne sab hata diya hai. 
-                    // Jaise hi Razorpay ka popup band hoga, user ko bina refresh kiye apna chamatkata hua VIP plan dikh jayega!
+                    // Agar tumhe success ke baad dashboard par bhejna hai toh is line ko un-comment kar lena:
+                    // window.location.href = `dashboard.html?shop=${activeShop}`;
                 }
             }
         }

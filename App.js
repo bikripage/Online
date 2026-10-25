@@ -29,7 +29,7 @@ Notifications.setNotificationHandler({
   }),
 });
 
-// 👉 Push Token & Background Sound Setup
+// 👉 1. Update this function to show exact error on screen
 async function registerForPushNotificationsAsync() {
   let token;
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -46,11 +46,16 @@ async function registerForPushNotificationsAsync() {
   }
 
   try {
-    token = (await Notifications.getExpoPushTokenAsync({
+    // Attempt to get the token
+    const tokenData = await Notifications.getExpoPushTokenAsync({
       projectId: 'f04fd7db-de71-48be-b31a-2e244b307168'
-    })).data;
+    });
+    token = tokenData.data;
   } catch (e) {
+    // ✨ PERMANENT FIX: Ab error chhupkar console mein nahi jayega, seedha screen par aayega!
+    Alert.alert("🚨 Token Error (Screenshot bhejna)", String(e.message || e));
     console.log("Push token error:", e);
+    return null; // Return null so login knows it failed
   }
 
   if (Platform.OS === 'android') {
@@ -59,7 +64,7 @@ async function registerForPushNotificationsAsync() {
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#FF231F7C',
-      sound: 'voice_alert.wav', // 🔊 Background/Lock screen par ye aawaz bajegi
+      sound: 'voice_alert.wav',
     });
   }
 
@@ -99,58 +104,58 @@ export default function App() {
     checkSavedCredentials();
   }, []);
 
-  const handleLogin = async () => {
-    const shopId = shopIdInput.trim();
-    const pwd = passwordInput.trim();
+  // 👉 2. Update handleLogin to alert if token is missing
+const handleLogin = async () => {
+  const shopId = shopIdInput.trim();
+  const pwd = passwordInput.trim();
 
-    if (shopId === '' || pwd === '') {
-      Alert.alert('Error', 'Shop ID aur Password dono daalna zaroori hai');
+  if (shopId === '' || pwd === '') {
+    Alert.alert('Error', 'Shop ID aur Password dono daalna zaroori hai');
+    return;
+  }
+
+  setIsLoggingIn(true);
+  try {
+    const shopDoc = await db.collection('shops').doc(shopId).get();
+
+    if (!shopDoc.exists) {
+      Alert.alert('Error', 'Ye Shop ID nahi mili!');
+      setIsLoggingIn(false);
       return;
     }
 
-    setIsLoggingIn(true);
-    try {
-      const shopDoc = await db.collection('shops').doc(shopId).get();
-
-      if (!shopDoc.exists) {
-        Alert.alert('Error', 'Ye Shop ID nahi mili!');
-        setIsLoggingIn(false);
-        return;
-      }
-
-      const shopData = shopDoc.data();
-      if (shopData.password !== pwd) {
-        Alert.alert('Error', 'Galat Password!');
-        setIsLoggingIn(false);
-        return;
-      }
-
-      const fetchedShopName = shopData.shopName || shopId;
-      await AsyncStorage.setItem('shopId', shopId);
-      await AsyncStorage.setItem('shopName', fetchedShopName);
-      
-      try {
-        const pushToken = await registerForPushNotificationsAsync();
-        if (pushToken) {
-          await db.collection('shops').doc(shopId).set(
-            { expoPushToken: pushToken },
-            { merge: true }
-          );
-        }
-      } catch (tokenError) {
-        console.log("Token Error:", tokenError);
-      }
-      
-      setCurrentShopId(shopId);
-      setCurrentShopName(fetchedShopName);
-      
-      Alert.alert('Login Successful! ✅', `Welcome, ${fetchedShopName}`);
-
-    } catch (e) {
-      Alert.alert('Asli Error 👇', e.message || 'Kuch galat ho gaya');
+    const shopData = shopDoc.data();
+    if (shopData.password !== pwd) {
+      Alert.alert('Error', 'Galat Password!');
+      setIsLoggingIn(false);
+      return;
     }
-    setIsLoggingIn(false);
-  };
+
+    const fetchedShopName = shopData.shopName || shopId;
+    
+    // ✨ Token yahan generate hoga
+    const pushToken = await registerForPushNotificationsAsync();
+    
+    if (pushToken) {
+      await db.collection('shops').doc(shopId).set(
+        { expoPushToken: pushToken },
+        { merge: true }
+      );
+      Alert.alert('Login Successful! ✅', `Welcome, ${fetchedShopName}\n\nPush Token Generated Successfully!`);
+    } else {
+      Alert.alert('Login Half-Successful ⚠️', `Aap login toh ho gaye hain, lekin Push Token generate nahi hua. (Upar wala error check karein)`);
+    }
+
+    await AsyncStorage.setItem('shopId', shopId);
+    await AsyncStorage.setItem('shopName', fetchedShopName);
+    setCurrentShopId(shopId);
+    setCurrentShopName(fetchedShopName);
+
+  } catch (e) {
+    Alert.alert('Database Error', e.message || 'Kuch galat ho gaya');
+  }
+  setIsLoggingIn(false);
+};
 
   const handleLogout = async () => {
     try {

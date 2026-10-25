@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://bikripage.github.io/Online/sitemap.xml

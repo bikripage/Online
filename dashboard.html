@@ -22,11 +22,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
        <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <!-- 👇 YE LINE AAPKE CODE MEIN MISSING HAI 👇 -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCWquftO39vqj83ZtYqtF_sDfkHVNpjd3k",
@@ -2984,6 +2984,7 @@ function applyProLocks(shopData) {
             // Grand Total = Item Total - Discount + Delivery - Advance
             let gt = Math.max(0, itemTot - disc + del - adv); 
             tot.innerText = `₹${gt}`;
+            } 
 
 
         async function saveBillProcess(isSend) {

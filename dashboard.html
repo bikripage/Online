@@ -776,7 +776,8 @@
 <div id="tab-billing" class="tab-content hidden space-y-8 pb-24">
 
                             <div class="ios-card p-6 sm:p-8 border border-[#E5E7EB]">
-                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6"><h3 class="text-xl font-bold text-[#111827] flex items-center gap-2"><div class="w-10 h-10 bg-[#DCFCE7] text-[#16A34A] rounded-[12px] flex items-center justify-center"><i class="fas fa-file-invoice-dollar"></i></div>Billing System</h3><button onclick="openCreateBillModal()" class="w-full sm:w-auto bg-[#16A34A] hover:bg-[#15803D] text-white text-sm font-bold px-5 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm"><i class="fas fa-plus"></i> New Bill</button></div>
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6"><h3 class="text-xl font-bold text-[#111827] flex items-center gap-2"><div class="w-10 h-10 bg-[#DCFCE7] text-[#16A34A] rounded-[12px] flex items-center justify-center"><i class="fas fa-file-invoice-dollar"></i></div>Billing System</h3><button onclick="openBillingChoiceModal()" class="w-full sm:w-auto bg-[#16A34A] hover:bg-[#15803D] text-white text-sm font-bold px-5 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm"><i class="fas fa-plus"></i> New Bill</button>
+</div>
                                 <div class="flex flex-col sm:flex-row gap-3 mb-6"><div class="relative flex-1"><i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]"></i><input type="text" id="admin-search-order" onkeyup="renderAdminBills()" placeholder="Search Order ID or Name..." class="w-full ios-input pl-11 pr-4 text-sm font-semibold outline-none"></div><select id="admin-filter-status" onchange="renderAdminBills()" class="w-full sm:w-40 ios-input px-4 text-xs font-bold tracking-wide outline-none cursor-pointer"><option value="All">ALL STATUS</option><option value="Paid">PAID</option><option value="Unpaid">UNPAID</option><option value="Delivered">DELIVERED</option><option value="Processing">PROCESSING</option><option value="Cancelled">CANCELLED</option></select></div>
                                 <div class="flex justify-between items-center border-b border-[#E5E7EB] pb-2 mb-4"><h4 class="text-[11px] text-[#6B7280] uppercase tracking-wider font-bold">Recent Bills</h4><span id="admin-total-orders" class="text-xs font-bold text-[#2563EB] bg-[#E0E7FF] px-2 py-0.5 rounded-full">0</span></div>
                                 <div id="admin-bills-list" class="flex flex-col gap-3 max-h-80 overflow-y-auto custom-scrollbar p-1"></div>
@@ -10295,6 +10296,52 @@ function trackEvent(eventType) {
             </div>
         </div>
     </div>
+        <!-- ✨ iOS STYLE BILLING CHOICE MODAL ✨ -->
+    <div id="ios-billing-choice-modal" class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center transition-all duration-300 opacity-0">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeBillingChoiceModal()"></div>
+        <div id="ios-billing-choice-card" class="bg-[#F2F2F7] w-full sm:w-[380px] rounded-t-[24px] sm:rounded-[24px] shadow-2xl transform translate-y-full sm:translate-y-0 sm:scale-95 transition-transform duration-300 overflow-hidden flex flex-col relative z-10 pb-safe">
+            
+            <!-- Mobile Handle -->
+            <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mt-3 sm:hidden"></div>
+            
+            <!-- Header -->
+            <div class="p-4 flex justify-between items-center bg-white border-b border-gray-200 shrink-0 mt-2 sm:mt-0">
+                <span class="text-[#007AFF] font-medium text-[15px] cursor-pointer" onclick="closeBillingChoiceModal()">Cancel</span>
+                <h3 class="text-[16px] font-bold text-black tracking-tight">Select Bill Type</h3>
+                <span class="w-[50px]"></span>
+            </div>
+            
+            <!-- Options -->
+            <div class="p-4 bg-white space-y-3">
+                
+                <!-- Option 1: Listed Products -->
+                <button onclick="closeBillingChoiceModal(); setTimeout(openCreateBillModal, 300);" class="w-full bg-white border border-gray-200 rounded-[16px] p-4 flex items-center gap-4 hover:bg-gray-50 active:bg-gray-100 transition-colors shadow-sm text-left group">
+                    <div class="w-12 h-12 rounded-[12px] bg-green-50 text-green-600 flex items-center justify-center text-xl shrink-0 group-active:scale-95 transition-transform">
+                        <i class="fas fa-box-open"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-[15px] font-bold text-gray-900 leading-tight mb-0.5">Listed Products</h4>
+                        <p class="text-[11px] font-semibold text-gray-500">Create bill using your inventory</p>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-300 ml-auto text-sm"></i>
+                </button>
+
+                <!-- Option 2: Smart Calculator (Unlisted) -->
+                <button onclick="closeBillingChoiceModal(); setTimeout(() => { window.location.href = 'smart-calc.html'; }, 300);" class="w-full bg-white border border-gray-200 rounded-[16px] p-4 flex items-center gap-4 hover:bg-gray-50 active:bg-gray-100 transition-colors shadow-sm text-left group">
+                    <div class="w-12 h-12 rounded-[12px] bg-purple-50 text-purple-600 flex items-center justify-center text-xl shrink-0 group-active:scale-95 transition-transform">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-[15px] font-bold text-gray-900 leading-tight mb-0.5">Custom / Quick Item</h4>
+                        <p class="text-[11px] font-semibold text-gray-500">Calculate & bill unlisted items</p>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-300 ml-auto text-sm"></i>
+                </button>
+                
+            </div>
+        </div>
+    </div>
+
        <script>
         // ==========================================
         // ✨ STRICT SECURITY LOCK FOR DASHBOARD ✨
@@ -11475,6 +11522,35 @@ setTimeout(loadAppSecurityDetails, 2500);
                 }
             }, 1500); // Wait for shop data to load first
         });
+        // ==========================================
+        // ✨ iOS BILLING CHOICE MODAL LOGIC ✨
+        // ==========================================
+        function openBillingChoiceModal() {
+            const modal = document.getElementById('ios-billing-choice-modal');
+            const card = document.getElementById('ios-billing-choice-card');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('translate-y-full', 'sm:scale-95');
+            }, 10);
+            
+            // Background scroll disable karein
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeBillingChoiceModal() {
+            const modal = document.getElementById('ios-billing-choice-modal');
+            const card = document.getElementById('ios-billing-choice-card');
+            
+            modal.classList.add('opacity-0');
+            card.classList.add('translate-y-full', 'sm:scale-95');
+            
+            setTimeout(() => { 
+                modal.classList.add('hidden'); 
+                document.body.style.overflow = 'auto'; // Background scroll wapas enable
+            }, 300);
+        }
 
     </script>
 

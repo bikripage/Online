@@ -11441,6 +11441,37 @@ async function saveNewAppPassword() {
 
 // Call loadAppSecurityDetails jab page load ho jaye
 setTimeout(loadAppSecurityDetails, 2500);
+        // ✨ SMART CALCULATOR TO DASHBOARD CONNECTION ✨
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('action') === 'smart_bill') {
+                    let smartDraft = localStorage.getItem('BikriPage_SmartDraft');
+                    if (smartDraft) {
+                        let parsedDraft = JSON.parse(smartDraft);
+                        
+                        // 1. Bill Modal Open Karo
+                        openCreateBillModal();
+                        
+                        // 2. Draft Items set karo
+                        draftBillItems = parsedDraft.map(item => ({
+                            id: 'smart_' + item.id,
+                            name: item.name + " (" + item.displayDesc + ")",
+                            price: item.price,
+                            qty: 1, // Quantity 1 rahegi kyunki price pehle hi calculate ho chuka hai
+                            total: item.price
+                        }));
+                        
+                        // 3. Render karo aur Storage saaf karo
+                        renderDraftBill();
+                        localStorage.removeItem('BikriPage_SmartDraft');
+                        
+                        // 4. URL se action hata do taaki refresh karne par wapas pop-up na aaye
+                        window.history.replaceState(null, '', window.location.pathname + '?shop=' + currentShopId);
+                    }
+                }
+            }, 1500); // Wait for shop data to load first
+        });
 
     </script>
 

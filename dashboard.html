@@ -1425,16 +1425,22 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 mb-4">
+                                <!-- ✨ NAYA: Advance Box added & grid changed to 3 columns ✨ -->
+                <div class="grid grid-cols-3 gap-3 mb-4">
                     <div>
-                        <label class="text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-1 block">Discount (₹)</label>
-                        <input type="number" id="bill-discount" value="0" min="0" oninput="renderDraftBill()" class="w-full bg-[#F7F7F9] border border-[#E5E7EB] rounded-[12px] px-3 py-2 text-[#111827] text-sm font-semibold outline-none">
+                        <label class="text-[9px] sm:text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-1 block">Discount (₹)</label>
+                        <input type="number" id="bill-discount" value="0" min="0" oninput="renderDraftBill()" class="w-full bg-[#F7F7F9] border border-[#E5E7EB] rounded-[12px] px-3 py-2 text-[#111827] text-sm font-semibold outline-none transition focus:border-purple-500">
                     </div>
                     <div>
-                        <label class="text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-1 block">Delivery (₹)</label>
-                        <input type="number" id="bill-delivery" value="0" min="0" oninput="renderDraftBill()" class="w-full bg-[#F7F7F9] border border-[#E5E7EB] rounded-[12px] px-3 py-2 text-[#111827] text-sm font-semibold outline-none">
+                        <label class="text-[9px] sm:text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-1 block">Delivery (₹)</label>
+                        <input type="number" id="bill-delivery" value="0" min="0" oninput="renderDraftBill()" class="w-full bg-[#F7F7F9] border border-[#E5E7EB] rounded-[12px] px-3 py-2 text-[#111827] text-sm font-semibold outline-none transition focus:border-purple-500">
+                    </div>
+                    <div>
+                        <label class="text-[9px] sm:text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-1 block">Advance (₹)</label>
+                        <input type="number" id="bill-advance" value="0" min="0" oninput="renderDraftBill()" class="w-full bg-[#F7F7F9] border border-[#E5E7EB] rounded-[12px] px-3 py-2 text-[#111827] text-sm font-semibold outline-none transition focus:border-purple-500">
                     </div>
                 </div>
+
                 
                 <div class="mb-6">
                     <label class="text-[10px] text-[#A855F7] font-bold uppercase tracking-wider mb-1 block"><i class="fas fa-layer-group"></i> Link to Tracker</label>
@@ -2920,7 +2926,11 @@ function applyProLocks(shopData) {
         function openCreateBillModal() {
             draftBillItems = []; document.getElementById('bill-cust-name').value=''; document.getElementById('bill-cust-phone').value='';
             document.getElementById('bill-qty-input').value='1'; document.getElementById('bill-pay-status').value='Paid';
-            document.getElementById('bill-discount').value='0'; document.getElementById('bill-delivery').value='0';
+                        // ✨ NAYA: Reset advance field
+            document.getElementById('bill-discount').value='0'; 
+            document.getElementById('bill-delivery').value='0';
+            document.getElementById('bill-advance').value='0';
+ 
             const md = document.getElementById('bill-pay-mode'); md.value='UPI (Online)'; md.disabled=false;
             
             const prodSel = document.getElementById('bill-product-select');
@@ -2966,9 +2976,15 @@ function applyProLocks(shopData) {
             if(draftBillItems.length === 0) { tb.innerHTML = ''; em.style.display='block'; tot.innerText='₹0'; return; }
             em.style.display='none';
             tb.innerHTML = draftBillItems.map(i => { itemTot += i.total; return `<tr><td class="py-3 pl-4 text-[#111827] font-semibold">${i.name}</td><td class="py-3 text-center text-[#6B7280]">${i.qty}</td><td class="py-3 text-right text-[#6B7280]">₹${i.price}</td><td class="py-3 text-right pr-4 text-[#16A34A] font-bold">₹${i.total}</td><td class="py-3 text-center"><i class="fas fa-times text-[#DC2626] cursor-pointer" onclick="removeDraftItem('${i.id}')"></i></td></tr>`; }).join('');
-            let disc = parseInt(document.getElementById('bill-discount').value)||0; let del = parseInt(document.getElementById('bill-delivery').value)||0;
-            let gt = Math.max(0, itemTot - disc + del); tot.innerText = `₹${gt}`;
-        }
+                     // ✨ NAYA: Advance calculation added
+            let disc = parseInt(document.getElementById('bill-discount').value)||0; 
+            let del = parseInt(document.getElementById('bill-delivery').value)||0;
+            let adv = parseInt(document.getElementById('bill-advance').value)||0;
+            
+            // Grand Total = Item Total - Discount + Delivery - Advance
+            let gt = Math.max(0, itemTot - disc + del - adv); 
+            tot.innerText = `₹${gt}`;
+
 
         async function saveBillProcess(isSend) {
             const n = document.getElementById('bill-cust-name').value.trim(); const p = document.getElementById('bill-cust-phone').value.trim();
@@ -2977,11 +2993,30 @@ function applyProLocks(shopData) {
             
             const btn = event.currentTarget; const orig = btn.innerHTML; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`; btn.disabled = true;
             
-            let disc = parseInt(document.getElementById('bill-discount').value)||0; let del = parseInt(document.getElementById('bill-delivery').value)||0;
-            let iTot = draftBillItems.reduce((s, i) => s + i.total, 0); let gt = Math.max(0, iTot - disc + del);
+                      // ✨ NAYA: Advance calculation and saving to database
+            let disc = parseInt(document.getElementById('bill-discount').value)||0; 
+            let del = parseInt(document.getElementById('bill-delivery').value)||0;
+            let adv = parseInt(document.getElementById('bill-advance').value)||0;
+            
+            let iTot = draftBillItems.reduce((s, i) => s + i.total, 0); 
+            let gt = Math.max(0, iTot - disc + del - adv);
             const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
             
-            let nb = { date: dateStr, customerName: n, customerPhone: p||"N/A", items: [...draftBillItems], discount: disc, delivery: del, grandTotal: gt, payStatus: document.getElementById('bill-pay-status').value, payMode: document.getElementById('bill-pay-mode').value, deliveryStatus: 'Processing', timestamp: firebase.firestore.FieldValue.serverTimestamp() };
+            let nb = { 
+                date: dateStr, 
+                customerName: n, 
+                customerPhone: p||"N/A", 
+                items: [...draftBillItems], 
+                discount: disc, 
+                delivery: del,
+                advance: adv, // 👈 Naya advance add ho gaya
+                grandTotal: gt, 
+                payStatus: document.getElementById('bill-pay-status').value, 
+                payMode: document.getElementById('bill-pay-mode').value, 
+                deliveryStatus: 'Processing', 
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+            };
+
             let tId = document.getElementById('bill-tracker-select').value;
 
             try {
@@ -2995,8 +3030,12 @@ function applyProLocks(shopData) {
                     let st = nb.payStatus === 'Paid' ? 'Paid ✅' : 'Pending';
                     let m = `*${globalShopData.shopName.toUpperCase()}*%0A%0A*ORDER INVOICE*%0AName: ${n}%0APhone: ${p}%0ADate: ${dateStr}%0A%0A*SUMMARY*%0A`;
                     draftBillItems.forEach(i => m += `${i.qty}x ${i.name} = ₹${i.total}%0A`);
-                    m += `%0A`; if(disc>0) m+=`Discount: -₹${disc}%0A`; if(del>0) m+=`Delivery: +₹${del}%0A`;
-                    m += `*GRAND TOTAL: ₹${gt}*%0A%0AStatus: ${st}%0AMode: ${nb.payMode}%0A%0AThank you!`;
+                                     m += `%0A`; 
+                    if(disc>0) m+=`Discount: -₹${disc}%0A`; 
+                    if(del>0) m+=`Delivery: +₹${del}%0A`;
+                    if(adv>0) m+=`Advance Paid: -₹${adv}%0A`; // 👈 Naya WhatsApp msg me advance
+                    m += `*GRAND TOTAL (Pending): ₹${gt}*%0A%0AStatus: ${st}%0AMode: ${nb.payMode}%0A%0AThank you!`;
+
                     window.open(`https://wa.me/91${p}?text=${m}`, '_blank');
               } else iosAlert("Success", "✅ Bill Saved Successfully!");
 

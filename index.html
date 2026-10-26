@@ -1155,49 +1155,155 @@ async function handleShopSubmit(e) {
             const heroContent = document.getElementById('hero-content');
             const searchInput = document.getElementById('search-input');
 
-            // --- 🍎 SHOP OWNER "WHY SELL ON BikriPage" SECTION 🍎 ---
+                       // --- 🍎 SHOP OWNER "WHY SELL ON BikriPage" SECTION 🍎 ---
             const merchantWhyChooseUsSection = `
-                <div class="relative z-20 reveal w-full max-w-5xl mx-auto mt-20 sm:mt-32 text-left px-4 sm:px-0">
-                    <div class="text-center mb-10 sm:mb-16">
-                        <h3 class="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">Why Choose us?</h3>
-                        <p class="text-gray-500 mt-3 font-medium text-sm sm:text-lg">Take your local business online, with zero hassle and maximum profits.</p>
+                <style>
+                    /* Infinite Looping Workflow Animation */
+                    .workflow-grid {
+                        display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 1rem;
+                        position: relative;
+                    }
+                    @media (min-width: 768px) {
+                        .workflow-grid {
+                            grid-template-columns: repeat(3, 1fr);
+                            gap: 1.5rem;
+                        }
+                    }
+                    
+                    @keyframes stepActive {
+                        0%, 15% {
+                            transform: scale(1.05) translateY(-5px);
+                            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                            border-color: var(--active-border);
+                            background: #ffffff;
+                            opacity: 1;
+                            z-index: 10;
+                        }
+                        16%, 100% {
+                            transform: scale(1) translateY(0);
+                            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+                            border-color: #F3F4F6;
+                            background: #F9FAFB;
+                            opacity: 0.6;
+                            z-index: 1;
+                        }
+                    }
+                    
+                    @keyframes iconPop {
+                        0%, 15% { transform: scale(1.2); color: var(--active-border); }
+                        16%, 100% { transform: scale(1); color: #9CA3AF; }
+                    }
+
+                    .wf-card {
+                        animation: stepActive 12s infinite;
+                        border: 2px solid #F3F4F6;
+                        border-radius: 1.5rem;
+                        padding: 1.5rem;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        text-align: center;
+                        transition: all 0.3s ease;
+                    }
+                    
+                    .wf-card i {
+                        animation: iconPop 12s infinite;
+                        color: #9CA3AF;
+                        font-size: 2rem;
+                        transition: all 0.3s ease;
+                    }
+
+                    /* Step Timing - 2 sec intervals out of 12s loop */
+                    .wf-card:nth-child(1) { animation-delay: 0s; --active-border: #3B82F6; } /* Blue */
+                    .wf-card:nth-child(1) i { animation-delay: 0s; }
+                    
+                    .wf-card:nth-child(2) { animation-delay: 2s; --active-border: #10B981; } /* Green */
+                    .wf-card:nth-child(2) i { animation-delay: 2s; }
+                    
+                    .wf-card:nth-child(3) { animation-delay: 4s; --active-border: #8B5CF6; } /* Purple */
+                    .wf-card:nth-child(3) i { animation-delay: 4s; }
+                    
+                    .wf-card:nth-child(4) { animation-delay: 6s; --active-border: #F59E0B; } /* Yellow */
+                    .wf-card:nth-child(4) i { animation-delay: 6s; }
+                    
+                    .wf-card:nth-child(5) { animation-delay: 8s; --active-border: #EC4899; } /* Pink */
+                    .wf-card:nth-child(5) i { animation-delay: 8s; }
+                    
+                    .wf-card:nth-child(6) { animation-delay: 10s; --active-border: #14B8A6; } /* Teal */
+                    .wf-card:nth-child(6) i { animation-delay: 10s; }
+
+                </style>
+
+                <div class="relative z-20 reveal w-full max-w-5xl mx-auto mt-20 sm:mt-32 text-center px-4 sm:px-0">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-50 border border-purple-100 text-purple-600 text-[11px] font-black tracking-widest uppercase mb-4 shadow-sm">
+                        <i class="fas fa-sync-alt fa-spin"></i> Automated Business Loop
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
+                    <h3 class="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight mb-4">How BikriPage Works?</h3>
+                    <p class="text-gray-500 font-medium text-sm sm:text-lg mb-10">Everything happens in a continuous loop, so you focus only on growth.</p>
+                    
+                    <div class="workflow-grid">
                         
-                        <div class="group glass-card hover:bg-white hover:shadow-[0_30px_60px_rgba(59,130,246,0.12)] hover:-translate-y-2 active:scale-95 transition-all duration-500 rounded-[2rem] p-8 cursor-pointer reveal delay-100">
-                            <div class="w-16 h-16 bg-blue-50 text-blue-600 border border-blue-100 rounded-[1.2rem] flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 14h6"></path><path d="M9 10h6"></path><path d="M9 18h6"></path>
-                                </svg>
+                        <!-- 1. Order -->
+                        <div class="wf-card">
+                            <div class="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mb-4 shadow-inner">
+                                <i class="fas fa-cart-arrow-down"></i>
                             </div>
-                            <h4 class="font-black text-gray-900 text-xl mb-3">Track Orders & Customers</h4>
-                            <p class="text-gray-500 text-sm leading-relaxed">Easily manage all your incoming orders and customer details in one powerful, unified dashboard.</p>
+                            <h4 class="font-black text-gray-900 text-[15px] sm:text-[17px] mb-1">1. Orders Arrive</h4>
+                            <p class="text-[11px] sm:text-xs text-gray-500 font-medium">Customers order online</p>
                         </div>
 
-                        <div class="group glass-card hover:bg-white hover:shadow-[0_30px_60px_rgba(99,102,241,0.12)] hover:-translate-y-2 active:scale-95 transition-all duration-500 rounded-[2rem] p-8 cursor-pointer reveal delay-200">
-                            <div class="w-16 h-16 bg-indigo-50 text-indigo-500 border border-indigo-100 rounded-[1.2rem] flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline>
-                                </svg>
+                        <!-- 2. Alert -->
+                        <div class="wf-card">
+                            <div class="w-16 h-16 rounded-2xl bg-green-50 flex items-center justify-center mb-4 shadow-inner">
+                                <i class="fas fa-mobile-alt"></i>
                             </div>
-                            <h4 class="font-black text-gray-900 text-xl mb-3">Create Digital Bills</h4>
-                            <p class="text-gray-500 text-sm leading-relaxed">Generate smart digital invoices instantly and share them with your customers directly via WhatsApp.</p>
+                            <h4 class="font-black text-gray-900 text-[15px] sm:text-[17px] mb-1">2. Live Alerts</h4>
+                            <p class="text-[11px] sm:text-xs text-gray-500 font-medium">Phone rings instantly</p>
                         </div>
 
-                        <!-- ✨ CLEAN PIE CHART FOR DEEP INSIGHTS ✨ -->
-                        <div class="group glass-card hover:bg-white hover:shadow-[0_30px_60px_rgba(168,85,247,0.12)] hover:-translate-y-2 active:scale-95 transition-all duration-500 rounded-[2rem] p-8 cursor-pointer reveal delay-300">
-                            <div class="w-16 h-16 bg-purple-50 text-purple-600 border border-purple-100 rounded-[1.2rem] flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path>
-                                </svg>
+                        <!-- 3. Bill -->
+                        <div class="wf-card">
+                            <div class="w-16 h-16 rounded-2xl bg-purple-50 flex items-center justify-center mb-4 shadow-inner">
+                                <i class="fas fa-file-invoice"></i>
                             </div>
-                            <h4 class="font-black text-gray-900 text-xl mb-3">Detailed Insights</h4>
-                            <p class="text-gray-500 text-sm leading-relaxed">Get deep analytics on your daily sales, popular items, and overall business growth at a glance.</p>
+                            <h4 class="font-black text-gray-900 text-[15px] sm:text-[17px] mb-1">3. Bill Generation</h4>
+                            <p class="text-[11px] sm:text-xs text-gray-500 font-medium">Auto-creates digital invoice</p>
                         </div>
 
+                        <!-- 4. Graph -->
+                        <div class="wf-card">
+                            <div class="w-16 h-16 rounded-2xl bg-yellow-50 flex items-center justify-center mb-4 shadow-inner">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <h4 class="font-black text-gray-900 text-[15px] sm:text-[17px] mb-1">4. Calculations</h4>
+                            <p class="text-[11px] sm:text-xs text-gray-500 font-medium">Graphs & accounts update</p>
+                        </div>
+
+                        <!-- 5. Reminder -->
+                        <div class="wf-card">
+                            <div class="w-16 h-16 rounded-2xl bg-pink-50 flex items-center justify-center mb-4 shadow-inner">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <h4 class="font-black text-gray-900 text-[15px] sm:text-[17px] mb-1">5. Reminders</h4>
+                            <p class="text-[11px] sm:text-xs text-gray-500 font-medium">Send payment alerts</p>
+                        </div>
+
+                        <!-- 6. Excel -->
+                        <div class="wf-card">
+                            <div class="w-16 h-16 rounded-2xl bg-teal-50 flex items-center justify-center mb-4 shadow-inner">
+                                <i class="fas fa-file-excel"></i>
+                            </div>
+                            <h4 class="font-black text-gray-900 text-[15px] sm:text-[17px] mb-1">6. Excel Export</h4>
+                            <p class="text-[11px] sm:text-xs text-gray-500 font-medium">Download complete data</p>
+                        </div>
+                        
                     </div>
                 </div>
             `;
+
 
             if (activeShop) {
                 // 🔹 SHOP OWNER

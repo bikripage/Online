@@ -55,7 +55,7 @@
                     </h2>
                 </div>
                 
-                <!-- ✨ NAYA: Saved/Recent Items Chips -->
+                <!-- ✨ NAYA: Saved/Recent Items Chips With Delete Option -->
                 <div id="recent-items-container" class="flex gap-2 overflow-x-auto custom-scrollbar pb-3 mb-2 hidden">
                     <!-- Chips JS se aayenge -->
                 </div>
@@ -131,9 +131,8 @@
                     <span id="item-count" class="bg-purple-100 text-purple-600 text-[10px] font-black px-2.5 py-1 rounded-lg border border-purple-200">0 Items</span>
                 </div>
                 
-                <!-- Item List (ERROR FIXED HERE) -->
+                <!-- Item List -->
                 <div class="flex-1 overflow-y-auto custom-scrollbar p-3 relative">
-                    <!-- Empty State is now separate from the UL list -->
                     <div id="cart-empty" class="text-center py-16 opacity-60">
                         <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
                             <i class="fas fa-shopping-basket text-2xl text-gray-400"></i>
@@ -141,7 +140,6 @@
                         <p class="text-sm font-bold text-gray-600">List is empty</p>
                         <p class="text-[11px] text-gray-400 mt-1 max-w-[200px] mx-auto font-medium">Calculate items on the left to add them to your list.</p>
                     </div>
-                    <!-- The actual list -->
                     <ul id="cart-list" class="space-y-2"></ul>
                 </div>
 
@@ -154,7 +152,6 @@
                         </div>
                     </div>
                     
-                    <!-- ✨ NAYA: Make Bill Button -->
                     <button onclick="sendToDashboardBill()" class="w-full bg-gradient-to-r from-green-600 to-emerald-500 text-white font-black text-[15px] py-4 rounded-2xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2">
                         Make Final Bill <i class="fas fa-file-invoice"></i>
                     </button>
@@ -176,6 +173,20 @@
             </div>
             <div class="overflow-y-auto custom-scrollbar bg-white flex-1 p-2">
                 <div id="picker-list" class="flex flex-col bg-white rounded-xl overflow-hidden border border-gray-100 divide-y divide-gray-100 shadow-sm"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✨ iOS STYLE CONFIRM MODAL (For History Delete) ✨ -->
+    <div id="ios-confirm-modal" class="fixed inset-0 z-[150] hidden flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div id="ios-confirm-card" class="bg-white/90 backdrop-blur-xl w-[270px] rounded-[14px] shadow-2xl transform scale-95 transition-transform duration-300 text-center overflow-hidden flex flex-col">
+            <div class="p-4 pt-5 pb-4">
+                <h3 id="ios-confirm-title" class="text-[17px] font-semibold text-black leading-tight mb-1">Delete Item</h3>
+                <p id="ios-confirm-message" class="text-[13px] text-black/70 leading-snug">Are you sure you want to delete this saved item?</p>
+            </div>
+            <div class="flex border-t border-black/10">
+                <button onclick="closeIosConfirm(false)" class="flex-1 py-3 text-[17px] text-[#007AFF] font-normal border-r border-black/10 hover:bg-black/5 active:bg-black/10 transition-colors">Cancel</button>
+                <button id="ios-confirm-btn" class="flex-1 py-3 text-[17px] text-[#FF3B30] font-semibold hover:bg-black/5 active:bg-black/10 transition-colors">Delete</button>
             </div>
         </div>
     </div>
@@ -211,7 +222,7 @@
             window.location.href = `dashboard.html?shop=${shopId}`;
         }
 
-        // --- History / Quick Save Logic ---
+        // --- History / Quick Save Logic (WITH DELETE) ---
         function renderHistoryChips() {
             const container = document.getElementById('recent-items-container');
             if (savedHistory.length === 0) {
@@ -222,9 +233,17 @@
             let html = '';
             savedHistory.forEach((item, index) => {
                 let shortUnit = item.rateKey === 'kg' ? 'Kg' : (item.rateKey === 'liter' ? 'Ltr' : item.rateKey);
-                html += `<button onclick="applyHistoryItem(${index})" class="shrink-0 bg-blue-50 border border-blue-200 text-blue-700 px-3 py-1.5 rounded-full text-xs font-bold hover:bg-blue-100 transition whitespace-nowrap">
-                    ${item.name} (₹${item.rate}/${shortUnit})
-                </button>`;
+                
+                // Chip Design - Click to Apply, Cross to Delete
+                html += `
+                <div class="shrink-0 flex items-center bg-blue-50 border border-blue-200 rounded-full pr-1 overflow-hidden group">
+                    <button onclick="applyHistoryItem(${index})" class="text-blue-700 pl-3 pr-2 py-1.5 text-xs font-bold hover:bg-blue-100 transition whitespace-nowrap">
+                        ${item.name} (₹${item.rate}/${shortUnit})
+                    </button>
+                    <button onclick="promptDeleteHistory(${index})" class="w-5 h-5 flex items-center justify-center rounded-full bg-blue-100 text-blue-500 hover:bg-red-500 hover:text-white transition-colors">
+                        <i class="fas fa-times text-[9px]"></i>
+                    </button>
+                </div>`;
             });
             container.innerHTML = html;
         }
@@ -239,13 +258,48 @@
 
         function saveToHistory(name, rate, rateKey) {
             if (!name) return;
-            // Agar pehle se hai toh hata do (taaki top par aaye)
             savedHistory = savedHistory.filter(i => i.name.toLowerCase() !== name.toLowerCase());
-            // Top par add karo
             savedHistory.unshift({ name, rate, rateKey });
             if (savedHistory.length > 8) savedHistory.pop(); // Max 8 items
             localStorage.setItem('SmartCalc_History', JSON.stringify(savedHistory));
             renderHistoryChips();
+        }
+
+        // ✨ iOS Style Confirm Modal For History Delete
+        let historyIndexToDelete = -1;
+
+        function promptDeleteHistory(index) {
+            historyIndexToDelete = index;
+            const item = savedHistory[index];
+            
+            document.getElementById('ios-confirm-message').innerText = `Do you want to remove '${item.name}' from your saved list?`;
+            
+            const modal = document.getElementById('ios-confirm-modal');
+            const card = document.getElementById('ios-confirm-card');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+            }, 10);
+            
+            document.getElementById('ios-confirm-btn').onclick = () => closeIosConfirm(true);
+        }
+
+        function closeIosConfirm(isConfirmed) {
+            const modal = document.getElementById('ios-confirm-modal');
+            const card = document.getElementById('ios-confirm-card');
+            
+            modal.classList.add('opacity-0');
+            card.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+
+            if (isConfirmed && historyIndexToDelete > -1) {
+                savedHistory.splice(historyIndexToDelete, 1);
+                localStorage.setItem('SmartCalc_History', JSON.stringify(savedHistory));
+                renderHistoryChips();
+                historyIndexToDelete = -1;
+            }
         }
         // ---------------------------------
 
@@ -357,7 +411,7 @@
             cart.push(item);
             saveToHistory(name, rate, currentRateKey); // Auto-save for next time
             
-            document.getElementById('calc-qty').value = ''; // Sirf quantity clear karo taaki same item jaldi dal sake
+            document.getElementById('calc-qty').value = ''; 
             autoCalculate();
             renderCart();
         }
@@ -375,7 +429,7 @@
 
             if (cart.length === 0) {
                 list.innerHTML = '';
-                empty.style.display = 'block'; // ✨ ERROR FIXED: Ye ab null nahi hoga
+                empty.style.display = 'block'; 
                 document.getElementById('cart-subtotal').innerText = '₹0';
                 return;
             }
@@ -416,16 +470,12 @@
             renderCart();
         }
 
-        // ✨ NAYA: SEND TO DASHBOARD BILL LOGIC ✨
         function sendToDashboardBill() {
             if (cart.length === 0) {
-                alert("Bhai pehle kuch items calculate karke list mein daalo!");
+                alert("Please calculate and add items first!");
                 return;
             }
-            // Dashboard ko bhejney ke liye local storage me save karo
             localStorage.setItem('BikriPage_SmartDraft', JSON.stringify(cart));
-            
-            // Dashboard par bhej do ek special code ke sath
             const shopId = localStorage.getItem('BikriPage_active_shop') || '';
             window.location.href = `dashboard.html?shop=${shopId}&action=smart_bill`;
         }

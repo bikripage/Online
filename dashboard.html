@@ -3145,7 +3145,7 @@ function applyProLocks(shopData) {
                     <div class="bg-[#F7F7F9] p-3 rounded-[12px] border border-[#E5E7EB] text-center flex flex-col justify-between">
                         <p class="text-[10px] text-[#6B7280] font-bold uppercase mb-1">Status</p>
                         <p class="text-sm font-black ${pC}">${displayStatus}</p>
-                        <select onchange="updatePaymentStatus('${b.id}', this.value)" class="bg-white border border-[#E5E7EB] rounded-[8px] px-1 py-1.5 text-[11px] font-bold text-[#111827] outline-none w-full text-center mt-1 cursor-pointer shadow-sm">
+                        <select onchange="toggleAdminPaymentStatus('${b.id}', this.value)" class="bg-white border-[#E5E7EB] rounded-[8px] px-1 py-1.5 text-[11px] font-bold text-[#111827] outline-none w-full text-center mt-1 cursor-pointer shadow-sm">
                             <option value="Unpaid" ${b.payStatus==='Unpaid'?'selected':''}>Unpaid</option>
                             <option value="Advance" ${b.payStatus==='Advance'?'selected':''}>Partial Paid</option>
                             <option value="Paid" ${b.payStatus==='Paid'?'selected':''}>Paid</option>

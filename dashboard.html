@@ -11503,15 +11503,26 @@ setTimeout(loadAppSecurityDetails, 2500);
                         // 1. Bill Modal Open Karo
                         openCreateBillModal();
                         
-                        // 2. Draft Items set karo
-                        draftBillItems = parsedDraft.map(item => ({
-                            id: 'smart_' + item.id,
-                            name: item.name + " (" + item.displayDesc + ")",
-                            price: item.price,
-                            qty: 1, // Quantity 1 rahegi kyunki price pehle hi calculate ho chuka hai
-                            total: item.price
-                        }));
-                        
+                                               // 2. Draft Items set karo (✨ FIX: Smart Qty & Price Calculation)
+                        draftBillItems = parsedDraft.map(item => {
+                            // Text में से नंबर (Quantity) निकालो (e.g. "10 Pcs" -> 10)
+                            let parsedQty = parseFloat(item.displayDesc) || 1;
+                            
+                            // 1 पीस/ग्राम का रेट निकालो
+                            let unitPrice = item.price / parsedQty;
+                            
+                            // Text में से नंबर हटा कर सिर्फ यूनिट का नाम रखो (e.g. "Pcs")
+                            let unitName = item.displayDesc.replace(/[0-9.]+\s*/, '').trim();
+
+                            return {
+                                id: 'smart_' + item.id,
+                                name: item.name + (unitName ? ` (${unitName})` : ''),
+                                price: parseFloat(unitPrice.toFixed(2)),
+                                qty: parsedQty, 
+                                total: item.price
+                            };
+                        });
+
                         // 3. Render karo aur Storage saaf karo
                         renderDraftBill();
                         localStorage.removeItem('BikriPage_SmartDraft');

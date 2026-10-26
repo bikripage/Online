@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart Store Calculator | Premium iOS</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root { --ios-spring: cubic-bezier(0.25, 1, 0.5, 1); }
+        body { background-color: #F2F2F7; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        .ios-input-box { background: #F7F7F9; border-radius: 14px; height: 50px; transition: all 0.3s var(--ios-spring); border: 1px solid #E5E7EB; display: flex; align-items: center; padding: 0 16px; }
+        .ios-input-box:focus-within { background: #FFFFFF; border-color: #A855F7; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.1); }
+        .ios-input-box input { width: 100%; background: transparent; outline: none; }
+        
+        .ios-select-btn { background: #F7F7F9; border-radius: 14px; height: 50px; border: 1px solid #E5E7EB; display: flex; justify-content: space-between; align-items: center; padding: 0 16px; font-size: 14px; font-weight: 700; color: #1F2937; cursor: pointer; transition: all 0.2s ease; }
+        .ios-select-btn:active { background: #E5E7EB; transform: scale(0.98); }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+        .custom-scrollbar { -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+    </style>
+</head>
+<body class="text-[#111827] h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-[#E5E7EB] h-[68px] flex items-center justify-between px-4 sm:px-6 shrink-0 z-10 shadow-sm">
+        <div class="flex items-center gap-3">
+            <button onclick="goBack()" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-700 active:scale-95 transition">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div>
+                <h1 class="text-[17px] font-black tracking-tight leading-tight">Smart Calc</h1>
+                <p class="text-[11px] text-gray-500 font-bold uppercase tracking-wider">Retail Billing</p>
+            </div>
+        </div>
+        <button onclick="clearAll()" class="text-xs font-bold text-red-500 bg-red-50 px-3 py-2 rounded-[10px] active:scale-95 transition flex items-center gap-1.5">
+            <i class="fas fa-trash-alt"></i> Clear
+        </button>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8">
+        <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 items-start pb-20">
+            
+            <!-- LEFT PANEL: Smart Calculator Form -->
+            <div class="bg-white rounded-[24px] shadow-sm border border-[#E5E7EB] p-5 sm:p-6 relative overflow-hidden">
+                <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+                    <h2 class="text-[11px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                        <i class="fas fa-keyboard text-gray-300"></i> Calculate Item
+                    </h2>
+                </div>
+                
+                <!-- ✨ NAYA: Saved/Recent Items Chips -->
+                <div id="recent-items-container" class="flex gap-2 overflow-x-auto custom-scrollbar pb-3 mb-2 hidden">
+                    <!-- Chips JS se aayenge -->
+                </div>
+                
+                <div class="space-y-5">
+                    <!-- Item Name -->
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 ml-1">Item Name</label>
+                        <div class="ios-input-box">
+                            <i class="fas fa-box text-gray-300 mr-3"></i>
+                            <input type="text" id="calc-name" placeholder="e.g. Sugar, Sweets, Pipe" class="text-sm font-bold text-gray-900">
+                        </div>
+                    </div>
+
+                    <!-- Rate & Unit -->
+                    <div class="flex gap-3">
+                        <div class="flex-1">
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 ml-1">Rate (₹)</label>
+                            <div class="ios-input-box">
+                                <span class="text-gray-400 font-bold mr-2 border-r border-gray-200 pr-2">₹</span>
+                                <input type="number" inputmode="decimal" id="calc-rate" oninput="autoCalculate()" placeholder="0" class="text-lg font-black text-gray-900">
+                            </div>
+                        </div>
+                        <div class="w-[130px] shrink-0">
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 ml-1">Per</label>
+                            <button type="button" onclick="openPicker('rate')" class="ios-select-btn">
+                                <span id="display-rate-unit">Kg</span>
+                                <i class="fas fa-chevron-down text-[10px] text-gray-400"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Required Quantity -->
+                    <div class="flex gap-3">
+                        <div class="flex-1">
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 ml-1">Customer Wants</label>
+                            <div class="ios-input-box !border-blue-200 !bg-blue-50/50 focus-within:!bg-white focus-within:!border-blue-500">
+                                <input type="number" inputmode="decimal" id="calc-qty" oninput="autoCalculate()" placeholder="e.g. 250" class="text-lg font-black text-blue-600">
+                            </div>
+                        </div>
+                        <div class="w-[130px] shrink-0">
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 ml-1">In Unit</label>
+                            <button type="button" onclick="openPicker('req')" class="ios-select-btn">
+                                <span id="display-req-unit">Grams</span>
+                                <i class="fas fa-chevron-down text-[10px] text-gray-400"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Instant Result Box -->
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-[16px] p-4 flex justify-between items-center shadow-sm">
+                        <div>
+                            <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Final Price</p>
+                            <p class="text-[11px] font-semibold text-blue-800 mt-1 opacity-80" id="calc-formula">0 x 0</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-3xl font-black text-blue-700 tracking-tight" id="calc-result">₹0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="addCalculatedItem()" class="w-full bg-[#111827] text-white font-bold h-[52px] rounded-[14px] mt-6 active:scale-95 transition-transform flex justify-center items-center gap-2 shadow-lg hover:shadow-xl">
+                    Add to List <i class="fas fa-plus-circle"></i>
+                </button>
+            </div>
+
+            <!-- RIGHT PANEL: Current Cart / Bill -->
+            <div class="bg-white rounded-[24px] shadow-sm border border-[#E5E7EB] flex flex-col h-[520px]">
+                <div class="p-5 border-b border-gray-100 flex justify-between items-center shrink-0 bg-[#F9FAFB] rounded-t-[24px]">
+                    <h2 class="text-[11px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                        <i class="fas fa-receipt text-gray-400"></i> Current Items
+                    </h2>
+                    <span id="item-count" class="bg-purple-100 text-purple-600 text-[10px] font-black px-2.5 py-1 rounded-lg border border-purple-200">0 Items</span>
+                </div>
+                
+                <!-- Item List (ERROR FIXED HERE) -->
+                <div class="flex-1 overflow-y-auto custom-scrollbar p-3 relative">
+                    <!-- Empty State is now separate from the UL list -->
+                    <div id="cart-empty" class="text-center py-16 opacity-60">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-shopping-basket text-2xl text-gray-400"></i>
+                        </div>
+                        <p class="text-sm font-bold text-gray-600">List is empty</p>
+                        <p class="text-[11px] text-gray-400 mt-1 max-w-[200px] mx-auto font-medium">Calculate items on the left to add them to your list.</p>
+                    </div>
+                    <!-- The actual list -->
+                    <ul id="cart-list" class="space-y-2"></ul>
+                </div>
+
+                <!-- Footer Checkout Area -->
+                <div class="p-5 bg-white rounded-b-[24px] border-t border-gray-100 shrink-0 shadow-[0_-4px_20px_rgba(0,0,0,0.02)]">
+                    <div class="flex justify-between items-end mb-4">
+                        <div>
+                            <span class="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1 block">Total Amount</span>
+                            <span class="text-3xl font-black text-gray-900 tracking-tighter" id="cart-subtotal">₹0</span>
+                        </div>
+                    </div>
+                    
+                    <!-- ✨ NAYA: Make Bill Button -->
+                    <button onclick="sendToDashboardBill()" class="w-full bg-gradient-to-r from-green-600 to-emerald-500 text-white font-black text-[15px] py-4 rounded-2xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2">
+                        Make Final Bill <i class="fas fa-file-invoice"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- iOS STYLE BOTTOM SHEET PICKER -->
+    <div id="ios-picker-modal" class="fixed inset-0 z-[100] hidden flex items-end sm:items-center justify-center transition-all duration-300 opacity-0">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closePicker()"></div>
+        <div id="ios-picker-card" class="bg-[#F2F2F7] w-full sm:w-[360px] rounded-t-[24px] sm:rounded-[24px] shadow-2xl transform translate-y-full sm:translate-y-0 sm:scale-95 transition-transform duration-300 overflow-hidden flex flex-col max-h-[75vh] relative z-10 pb-safe">
+            <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mt-3 sm:hidden"></div>
+            <div class="p-4 flex justify-between items-center bg-white border-b border-gray-200 shrink-0 mt-2 sm:mt-0">
+                <span class="text-[#007AFF] font-medium text-[15px] cursor-pointer" onclick="closePicker()">Cancel</span>
+                <h3 id="picker-title" class="text-[16px] font-bold text-black tracking-tight">Select Unit</h3>
+                <span class="w-[50px]"></span>
+            </div>
+            <div class="overflow-y-auto custom-scrollbar bg-white flex-1 p-2">
+                <div id="picker-list" class="flex flex-col bg-white rounded-xl overflow-hidden border border-gray-100 divide-y divide-gray-100 shadow-sm"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        // Data Configuration
+        const unitData = {
+            'kg': { label: 'Per Kg', icon: 'fas fa-balance-scale', subUnits: [{val: 'kg', label: 'Kilo (Kg)'}, {val: 'g', label: 'Grams (g)'}] },
+            'liter': { label: 'Per Liter', icon: 'fas fa-tint', subUnits: [{val: 'liter', label: 'Liter (L)'}, {val: 'ml', label: 'Milli (ML)'}] },
+            'meter': { label: 'Per Meter', icon: 'fas fa-ruler', subUnits: [{val: 'meter', label: 'Meter (m)'}, {val: 'cm', label: 'Centimeter (cm)'}] },
+            'dozen': { label: 'Per Dozen', icon: 'fas fa-egg', subUnits: [{val: 'dozen', label: 'Dozen'}, {val: 'pc', label: 'Pieces (Pcs)'}] },
+            'pc': { label: 'Per Piece', icon: 'fas fa-cube', subUnits: [{val: 'pc', label: 'Piece (Pcs)'}] },
+            'box': { label: 'Per Box', icon: 'fas fa-boxes', subUnits: [{val: 'box', label: 'Box'}] },
+            'packet': { label: 'Per Packet', icon: 'fas fa-box-open', subUnits: [{val: 'packet', label: 'Packet'}] }
+        };
+
+        // State Variables
+        let currentRateKey = 'kg';
+        let currentReqKey = 'g'; 
+        let cart = [];
+        let currentCalculatedPrice = 0;
+        let activePickerType = null;
+        let savedHistory = JSON.parse(localStorage.getItem('SmartCalc_History')) || [];
+
+        window.onload = function() {
+            updateUI();
+            renderHistoryChips();
+        };
+
+        function goBack() {
+            const shopId = localStorage.getItem('BikriPage_active_shop') || '';
+            window.location.href = `dashboard.html?shop=${shopId}`;
+        }
+
+        // --- History / Quick Save Logic ---
+        function renderHistoryChips() {
+            const container = document.getElementById('recent-items-container');
+            if (savedHistory.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+            container.classList.remove('hidden');
+            let html = '';
+            savedHistory.forEach((item, index) => {
+                let shortUnit = item.rateKey === 'kg' ? 'Kg' : (item.rateKey === 'liter' ? 'Ltr' : item.rateKey);
+                html += `<button onclick="applyHistoryItem(${index})" class="shrink-0 bg-blue-50 border border-blue-200 text-blue-700 px-3 py-1.5 rounded-full text-xs font-bold hover:bg-blue-100 transition whitespace-nowrap">
+                    ${item.name} (₹${item.rate}/${shortUnit})
+                </button>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function applyHistoryItem(index) {
+            let item = savedHistory[index];
+            document.getElementById('calc-name').value = item.name;
+            document.getElementById('calc-rate').value = item.rate;
+            selectUnit(item.rateKey, true); // Auto set unit
+            document.getElementById('calc-qty').focus();
+        }
+
+        function saveToHistory(name, rate, rateKey) {
+            if (!name) return;
+            // Agar pehle se hai toh hata do (taaki top par aaye)
+            savedHistory = savedHistory.filter(i => i.name.toLowerCase() !== name.toLowerCase());
+            // Top par add karo
+            savedHistory.unshift({ name, rate, rateKey });
+            if (savedHistory.length > 8) savedHistory.pop(); // Max 8 items
+            localStorage.setItem('SmartCalc_History', JSON.stringify(savedHistory));
+            renderHistoryChips();
+        }
+        // ---------------------------------
+
+        function openPicker(type) {
+            activePickerType = type;
+            const modal = document.getElementById('ios-picker-modal');
+            const card = document.getElementById('ios-picker-card');
+            const list = document.getElementById('picker-list');
+            const title = document.getElementById('picker-title');
+            let html = '';
+
+            if (type === 'rate') {
+                title.innerText = 'Select Rate Unit';
+                Object.keys(unitData).forEach(key => {
+                    let isSel = (currentRateKey === key);
+                    html += `<button onclick="selectUnit('${key}')" class="w-full text-left px-4 py-3.5 flex justify-between items-center hover:bg-gray-50 active:bg-gray-100 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="w-7 h-7 rounded-md bg-gray-100 text-gray-500 flex items-center justify-center text-xs"><i class="${unitData[key].icon}"></i></div>
+                            <span class="text-[15px] ${isSel ? 'text-[#007AFF] font-bold' : 'text-gray-900 font-semibold'}">${unitData[key].label}</span>
+                        </div>
+                        ${isSel ? '<i class="fas fa-check text-[#007AFF] text-[15px]"></i>' : ''}
+                    </button>`;
+                });
+            } else if (type === 'req') {
+                title.innerText = 'Customer Wants In';
+                const availableSubUnits = unitData[currentRateKey].subUnits;
+                availableSubUnits.forEach(sub => {
+                    let isSel = (currentReqKey === sub.val);
+                    html += `<button onclick="selectUnit('${sub.val}')" class="w-full text-left px-4 py-4 flex justify-between items-center hover:bg-gray-50 active:bg-gray-100 transition-colors">
+                        <span class="text-[15px] ${isSel ? 'text-[#007AFF] font-bold' : 'text-gray-900 font-semibold'}">${sub.label}</span>
+                        ${isSel ? '<i class="fas fa-check text-[#007AFF] text-[15px]"></i>' : ''}
+                    </button>`;
+                });
+            }
+
+            list.innerHTML = html;
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); card.classList.remove('translate-y-full', 'sm:scale-95'); }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePicker() {
+            const modal = document.getElementById('ios-picker-modal');
+            const card = document.getElementById('ios-picker-card');
+            modal.classList.add('opacity-0'); card.classList.add('translate-y-full', 'sm:scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = ''; }, 300);
+        }
+
+        function selectUnit(val, isFromHistory = false) {
+            if (activePickerType === 'rate' || isFromHistory) {
+                currentRateKey = val;
+                const subUnits = unitData[val].subUnits;
+                if (subUnits.length > 1) currentReqKey = subUnits[1].val; 
+                else currentReqKey = subUnits[0].val;
+            } else {
+                currentReqKey = val;
+            }
+            updateUI();
+            if(!isFromHistory) closePicker();
+        }
+
+        function updateUI() {
+            document.getElementById('display-rate-unit').innerText = unitData[currentRateKey].label.replace('Per ', '');
+            let reqLabel = unitData[currentRateKey].subUnits.find(s => s.val === currentReqKey)?.label || '';
+            document.getElementById('display-req-unit').innerText = reqLabel.split(' ')[0]; 
+            autoCalculate();
+        }
+
+        function autoCalculate() {
+            let rate = parseFloat(document.getElementById('calc-rate').value) || 0;
+            let qty = parseFloat(document.getElementById('calc-qty').value) || 0;
+            let formulaText = "";
+            currentCalculatedPrice = 0;
+
+            if (rate > 0 && qty > 0) {
+                if (currentRateKey === 'kg' && currentReqKey === 'g') { currentCalculatedPrice = (rate / 1000) * qty; formulaText = `(₹${rate} / 1000) x ${qty}g`; } 
+                else if (currentRateKey === 'liter' && currentReqKey === 'ml') { currentCalculatedPrice = (rate / 1000) * qty; formulaText = `(₹${rate} / 1000) x ${qty}ml`; } 
+                else if (currentRateKey === 'meter' && currentReqKey === 'cm') { currentCalculatedPrice = (rate / 100) * qty; formulaText = `(₹${rate} / 100) x ${qty}cm`; } 
+                else if (currentRateKey === 'dozen' && currentReqKey === 'pc') { currentCalculatedPrice = (rate / 12) * qty; formulaText = `(₹${rate} / 12) x ${qty}pcs`; } 
+                else {
+                    currentCalculatedPrice = rate * qty;
+                    let displayUnit = currentReqKey === 'pc' ? 'pcs' : currentReqKey;
+                    formulaText = `₹${rate} x ${qty} ${displayUnit}`;
+                }
+            }
+
+            document.getElementById('calc-result').innerText = '₹' + currentCalculatedPrice.toFixed(2).replace(/\.00$/, '');
+            document.getElementById('calc-formula').innerText = formulaText || "0 x 0";
+        }
+
+        function addCalculatedItem() {
+            if (currentCalculatedPrice <= 0) {
+                alert("Please enter a valid rate and quantity.");
+                return;
+            }
+
+            let name = document.getElementById('calc-name').value.trim() || 'Item';
+            let rate = document.getElementById('calc-rate').value;
+            let qty = document.getElementById('calc-qty').value;
+            let reqLabel = document.getElementById('display-req-unit').innerText;
+
+            let item = {
+                id: Date.now(),
+                name: name,
+                displayDesc: `${qty} ${reqLabel}`, 
+                price: parseFloat(currentCalculatedPrice.toFixed(2))
+            };
+
+            cart.push(item);
+            saveToHistory(name, rate, currentRateKey); // Auto-save for next time
+            
+            document.getElementById('calc-qty').value = ''; // Sirf quantity clear karo taaki same item jaldi dal sake
+            autoCalculate();
+            renderCart();
+        }
+
+        function removeCartItem(id) {
+            cart = cart.filter(item => item.id !== id);
+            renderCart();
+        }
+
+        function renderCart() {
+            const list = document.getElementById('cart-list');
+            const empty = document.getElementById('cart-empty');
+            
+            document.getElementById('item-count').innerText = `${cart.length} Item${cart.length !== 1 ? 's' : ''}`;
+
+            if (cart.length === 0) {
+                list.innerHTML = '';
+                empty.style.display = 'block'; // ✨ ERROR FIXED: Ye ab null nahi hoga
+                document.getElementById('cart-subtotal').innerText = '₹0';
+                return;
+            }
+
+            empty.style.display = 'none';
+            let html = '';
+            let subtotal = 0;
+
+            cart.forEach(item => {
+                subtotal += item.price;
+                html += `
+                <li class="bg-white border border-gray-100 rounded-[14px] p-3 flex justify-between items-center shadow-sm">
+                    <div class="min-w-0 pr-3">
+                        <p class="text-[13px] font-bold text-gray-900 truncate">${item.name}</p>
+                        <p class="text-[10px] font-semibold text-gray-500 mt-0.5">${item.displayDesc}</p>
+                    </div>
+                    <div class="flex items-center gap-3 shrink-0">
+                        <span class="font-black text-gray-800 text-[15px]">₹${item.price.replace ? item.price : item.price.toFixed(2).replace(/\.00$/, '')}</span>
+                        <button onclick="removeCartItem(${item.id})" class="w-8 h-8 bg-red-50 text-red-500 rounded-[10px] flex items-center justify-center hover:bg-red-100 transition">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    </div>
+                </li>`;
+            });
+
+            list.innerHTML = html;
+            document.getElementById('cart-subtotal').innerText = '₹' + subtotal.toFixed(2).replace(/\.00$/, '');
+            list.parentElement.scrollTop = list.parentElement.scrollHeight;
+        }
+
+        function clearAll() {
+            if(cart.length > 0 && !confirm("Clear everything?")) return;
+            cart = [];
+            document.getElementById('calc-name').value = '';
+            document.getElementById('calc-rate').value = '';
+            document.getElementById('calc-qty').value = '';
+            autoCalculate();
+            renderCart();
+        }
+
+        // ✨ NAYA: SEND TO DASHBOARD BILL LOGIC ✨
+        function sendToDashboardBill() {
+            if (cart.length === 0) {
+                alert("Bhai pehle kuch items calculate karke list mein daalo!");
+                return;
+            }
+            // Dashboard ko bhejney ke liye local storage me save karo
+            localStorage.setItem('BikriPage_SmartDraft', JSON.stringify(cart));
+            
+            // Dashboard par bhej do ek special code ke sath
+            const shopId = localStorage.getItem('BikriPage_active_shop') || '';
+            window.location.href = `dashboard.html?shop=${shopId}&action=smart_bill`;
+        }
+    </script>
+</body>
+</html>

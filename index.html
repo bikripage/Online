@@ -1155,89 +1155,119 @@ async function handleShopSubmit(e) {
             const heroContent = document.getElementById('hero-content');
             const searchInput = document.getElementById('search-input');
 
-                                            // --- 🍎 SHOP OWNER "WHY SELL ON BikriPage" SECTION (PREMIUM iOS ANIMATION) 🍎 ---
+            // --- 🍎 SHOP OWNER "WHY SELL ON BikriPage" SECTION (ULTRA PREMIUM 6-STEP 3D STAGE) 🍎 ---
             const merchantWhyChooseUsSection = `
                 <style>
-                    /* Master Loop Timing: 15 seconds */
+                    /* Master Loop Timing: 18 seconds (3s per step) */
                     
                     /* Left Side: Text Highlight Animations */
-                    .step-1-anim { animation: hl1 15s infinite; }
-                    .step-2-anim { animation: hl2 15s infinite; }
-                    .step-3-anim { animation: hl3 15s infinite; }
-                    .step-4-anim { animation: hl4 15s infinite; }
-                    .step-5-anim { animation: hl5 15s infinite; }
+                    .step-1-anim { animation: hl1 18s infinite; }
+                    .step-2-anim { animation: hl2 18s infinite; }
+                    .step-3-anim { animation: hl3 18s infinite; }
+                    .step-4-anim { animation: hl4 18s infinite; }
+                    .step-5-anim { animation: hl5 18s infinite; }
+                    .step-6-anim { animation: hl6 18s infinite; }
 
                     @keyframes hl1 { 
-                        0%, 18% { opacity: 1; transform: scale(1.02); background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-color: #E5E7EB; } 
-                        20%, 100% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; } 
+                        0%, 14% { opacity: 1; transform: scale(1.02); background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-color: #E5E7EB; } 
+                        16%, 100% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; } 
                     }
                     @keyframes hl2 { 
-                        0%, 18% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; } 
-                        20%, 38% { opacity: 1; transform: scale(1.02); background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-color: #E5E7EB; } 
-                        40%, 100% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; } 
+                        0%, 14% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; } 
+                        16%, 31% { opacity: 1; transform: scale(1.02); background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-color: #E5E7EB; } 
+                        33%, 100% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; } 
                     }
                     @keyframes hl3 { 
-                        0%, 38% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; } 
-                        40%, 58% { opacity: 1; transform: scale(1.02); background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-color: #E5E7EB; } 
-                        60%, 100% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; } 
+                        0%, 31% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; } 
+                        33%, 48% { opacity: 1; transform: scale(1.02); background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-color: #E5E7EB; } 
+                        50%, 100% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; } 
                     }
                     @keyframes hl4 { 
-                        0%, 58% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; } 
-                        60%, 78% { opacity: 1; transform: scale(1.02); background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-color: #E5E7EB; } 
-                        80%, 100% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; } 
+                        0%, 48% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; } 
+                        50%, 64% { opacity: 1; transform: scale(1.02); background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-color: #E5E7EB; } 
+                        66%, 100% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; } 
                     }
                     @keyframes hl5 { 
-                        0%, 78% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; } 
-                        80%, 98% { opacity: 1; transform: scale(1.02); background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-color: #E5E7EB; } 
+                        0%, 64% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; } 
+                        66%, 81% { opacity: 1; transform: scale(1.02); background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-color: #E5E7EB; } 
+                        83%, 100% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; }
+                    }
+                    @keyframes hl6 { 
+                        0%, 81% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; } 
+                        83%, 98% { opacity: 1; transform: scale(1.02); background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-color: #E5E7EB; } 
                         100% { opacity: 0.4; transform: scale(1); background: transparent; box-shadow: none; border-color: transparent; }
                     }
 
-                    /* Right Side: 3D Stage Animations */
-                    .stg-1 { animation: st1 15s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; }
-                    .stg-2 { animation: st2 15s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; }
-                    .stg-3 { animation: st3 15s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; }
-                    .stg-4 { animation: st4 15s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; }
-                    .stg-5 { animation: st5 15s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; }
+                    /* Right Side: 3D Stage Animations (6 Steps) */
+                    .stg-1 { animation: st1 18s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; }
+                    .stg-2 { animation: st2 18s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; }
+                    .stg-3 { animation: st3 18s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; }
+                    .stg-4 { animation: st4 18s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; }
+                    .stg-5 { animation: st5 18s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; }
+                    .stg-6 { animation: st6 18s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; }
 
+                    /* Smooth Overlaps for elements */
                     @keyframes st1 { 
                         0%, 2% { transform: translateY(-40px) scale(0.9); opacity: 0; } 
-                        5%, 15% { transform: translateY(0) scale(1); opacity: 1; } 
-                        18%, 100% { transform: translateY(-40px) scale(0.9); opacity: 0; } 
+                        4%, 14% { transform: translateY(0) scale(1); opacity: 1; } 
+                        16%, 100% { transform: translateY(-30px) scale(0.95); opacity: 0; } 
                     }
                     @keyframes st2 { 
-                        0%, 20%, 22% { transform: translateY(50px) scale(0.85); opacity: 0; } 
-                        25%, 35% { transform: translateY(0) scale(1); opacity: 1; } 
-                        38%, 100% { transform: translateY(50px) scale(0.85); opacity: 0; } 
+                        0%, 14%, 16% { transform: translateY(-40px) scale(0.9); opacity: 0; } 
+                        18%, 31% { transform: translateY(0) scale(1); opacity: 1; } 
+                        33%, 100% { transform: translateY(-30px) scale(0.95); opacity: 0; } 
                     }
                     @keyframes st3 { 
-                        0%, 40%, 42% { transform: scale(0.9); opacity: 0; } 
-                        45%, 55% { transform: scale(1); opacity: 1; } 
-                        58%, 100% { transform: scale(0.9); opacity: 0; } 
+                        0%, 31%, 33% { transform: translateY(60px) scale(0.8); opacity: 0; } 
+                        35%, 48% { transform: translateY(0) scale(1); opacity: 1; } 
+                        50%, 100% { transform: translateY(60px) scale(0.85); opacity: 0; } 
                     }
                     @keyframes st4 { 
-                        0%, 60%, 62% { transform: scale(0.5) translateY(30px); opacity: 0; } 
-                        65%, 75% { transform: scale(1) translateY(0); opacity: 1; } 
-                        78%, 100% { transform: scale(0.5) translateY(30px); opacity: 0; } 
+                        0%, 48%, 50% { transform: scale(0.9); opacity: 0; } 
+                        52%, 64% { transform: scale(1); opacity: 1; } 
+                        66%, 100% { transform: scale(0.95); opacity: 0; } 
                     }
                     @keyframes st5 { 
-                        0%, 80%, 82% { transform: scale(0.3) rotate(-15deg); opacity: 0; } 
-                        85%, 95% { transform: scale(1) rotate(0deg); opacity: 1; } 
-                        98%, 100% { transform: scale(0.3) rotate(15deg); opacity: 0; } 
+                        0%, 64%, 66% { transform: scale(0.5) translateY(40px) rotate(-10deg); opacity: 0; } 
+                        68%, 81% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; } 
+                        83%, 100% { transform: scale(0.8) translateY(20px) rotate(5deg); opacity: 0; } 
+                    }
+                    @keyframes st6 { 
+                        0%, 81%, 83% { transform: scale(0.5) translateY(40px) rotate(10deg); opacity: 0; } 
+                        85%, 98% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; } 
+                        100% { transform: scale(0.5) translateY(-20px) rotate(-5deg); opacity: 0; } 
                     }
                     
-                    /* Graph Bars Animation inside Step 3 */
-                    .bar-grow { animation: barAnim 15s infinite ease-out; height: 6px; }
+                    /* Graph Bars Animation inside Step 4 */
+                    .bar-grow { animation: barAnim 18s infinite ease-out; height: 6px; }
                     @keyframes barAnim { 
-                        0%, 44% { height: 6px; } 
-                        48%, 56% { height: var(--h); } 
-                        59%, 100% { height: 6px; } 
+                        0%, 50% { height: 6px; } 
+                        53%, 64% { height: var(--h); } 
+                        66%, 100% { height: 6px; } 
                     }
+
+                    /* Background Ambient Orbs */
+                    @keyframes floatOrb {
+                        0%, 100% { transform: translate(0, 0) scale(1); }
+                        33% { transform: translate(30px, -40px) scale(1.1); }
+                        66% { transform: translate(-20px, 30px) scale(0.9); }
+                    }
+                    .ambient-orb-1 { animation: floatOrb 12s infinite ease-in-out; }
+                    .ambient-orb-2 { animation: floatOrb 15s infinite ease-in-out reverse; }
+                    
+                    /* Constant Floating Elements */
+                    @keyframes gentleFloat {
+                        0%, 100% { transform: translateY(0px); }
+                        50% { transform: translateY(-10px); }
+                    }
+                    .float-badge-1 { animation: gentleFloat 4s infinite ease-in-out; }
+                    .float-badge-2 { animation: gentleFloat 5s infinite ease-in-out 1s; }
                 </style>
 
-                <div class="relative z-20 reveal w-full max-w-[1050px] mx-auto mt-16 sm:mt-24 px-4 sm:px-6">
+                <div class="relative z-20 reveal w-full max-w-[1100px] mx-auto mt-12 sm:mt-24 px-4 sm:px-6">
                     
                     <!-- Header -->
-                    <div class="text-center mb-8 sm:mb-12 reveal active">
+                    <div class="text-center mb-8 sm:mb-10 reveal active">
                         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-[10px] font-black tracking-widest uppercase mb-4 shadow-sm">
                             <span class="relative flex h-2 w-2">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
@@ -1252,119 +1282,169 @@ async function handleShopSubmit(e) {
                     <!-- Main Dashboard Widget -->
                     <div class="flex flex-col lg:flex-row gap-6 lg:gap-10 items-stretch bg-white/70 backdrop-blur-2xl rounded-[24px] sm:rounded-[2.5rem] p-4 sm:p-8 border border-gray-100 shadow-[0_15px_50px_rgba(0,0,0,0.04)] reveal active delay-100">
                         
-                        <!-- LEFT: Interactive Text List (Mobile Adjusted) -->
-                        <div class="w-full lg:w-[45%] flex flex-col gap-1.5 sm:gap-2">
+                        <!-- LEFT: Interactive Text List (Now 6 Steps) -->
+                        <div class="w-full lg:w-[45%] flex flex-col gap-1 sm:gap-1.5">
                             
-                            <div class="step-1-anim flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-[18px] border border-transparent">
-                                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-lg sm:text-xl shrink-0"><i class="fas fa-bell"></i></div>
+                            <div class="step-1-anim flex items-center gap-3 sm:gap-4 p-2.5 sm:p-3.5 rounded-[18px] border border-transparent">
+                                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-cyan-50 text-cyan-600 flex items-center justify-center text-lg shrink-0"><i class="fas fa-shopping-cart"></i></div>
                                 <div>
-                                    <h4 class="text-[14px] sm:text-[16px] font-black text-gray-900 leading-tight">New Order Alert</h4>
-                                    <p class="text-[11px] sm:text-xs text-gray-500 font-semibold mt-0.5">Customer orders, phone rings instantly</p>
+                                    <h4 class="text-[13px] sm:text-[15px] font-black text-gray-900 leading-tight">1. Orders Arrive</h4>
+                                    <p class="text-[10.5px] sm:text-[11.5px] text-gray-500 font-semibold mt-0.5">Customers place orders online</p>
                                 </div>
                             </div>
 
-                            <div class="step-2-anim flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-[18px] border border-transparent">
-                                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg sm:text-xl shrink-0"><i class="fas fa-file-invoice"></i></div>
+                            <div class="step-2-anim flex items-center gap-3 sm:gap-4 p-2.5 sm:p-3.5 rounded-[18px] border border-transparent">
+                                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-lg shrink-0"><i class="fas fa-bell"></i></div>
                                 <div>
-                                    <h4 class="text-[14px] sm:text-[16px] font-black text-gray-900 leading-tight">Bill Generated</h4>
-                                    <p class="text-[11px] sm:text-xs text-gray-500 font-semibold mt-0.5">Digital invoice created automatically</p>
+                                    <h4 class="text-[13px] sm:text-[15px] font-black text-gray-900 leading-tight">2. Live Alerts</h4>
+                                    <p class="text-[10.5px] sm:text-[11.5px] text-gray-500 font-semibold mt-0.5">Your phone rings instantly</p>
                                 </div>
                             </div>
 
-                            <div class="step-3-anim flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-[18px] border border-transparent">
-                                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-lg sm:text-xl shrink-0"><i class="fas fa-chart-pie"></i></div>
+                            <div class="step-3-anim flex items-center gap-3 sm:gap-4 p-2.5 sm:p-3.5 rounded-[18px] border border-transparent">
+                                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg shrink-0"><i class="fas fa-file-invoice"></i></div>
                                 <div>
-                                    <h4 class="text-[14px] sm:text-[16px] font-black text-gray-900 leading-tight">Auto Calculations</h4>
-                                    <p class="text-[11px] sm:text-xs text-gray-500 font-semibold mt-0.5">Sales and profits update in real-time</p>
+                                    <h4 class="text-[13px] sm:text-[15px] font-black text-gray-900 leading-tight">3. Bill Generated</h4>
+                                    <p class="text-[10.5px] sm:text-[11.5px] text-gray-500 font-semibold mt-0.5">Digital invoice created automatically</p>
                                 </div>
                             </div>
 
-                            <div class="step-4-anim flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-[18px] border border-transparent">
-                                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-green-50 text-green-600 flex items-center justify-center text-lg sm:text-xl shrink-0"><i class="fab fa-whatsapp"></i></div>
+                            <div class="step-4-anim flex items-center gap-3 sm:gap-4 p-2.5 sm:p-3.5 rounded-[18px] border border-transparent">
+                                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-lg shrink-0"><i class="fas fa-chart-pie"></i></div>
                                 <div>
-                                    <h4 class="text-[14px] sm:text-[16px] font-black text-gray-900 leading-tight">WhatsApp Reminder</h4>
-                                    <p class="text-[11px] sm:text-xs text-gray-500 font-semibold mt-0.5">Auto payment links & updates sent</p>
+                                    <h4 class="text-[13px] sm:text-[15px] font-black text-gray-900 leading-tight">4. Auto Calculations</h4>
+                                    <p class="text-[10.5px] sm:text-[11.5px] text-gray-500 font-semibold mt-0.5">Sales and profits update in real-time</p>
                                 </div>
                             </div>
 
-                            <div class="step-5-anim flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-[18px] border border-transparent">
-                                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg sm:text-xl shrink-0"><i class="fas fa-file-excel"></i></div>
+                            <div class="step-5-anim flex items-center gap-3 sm:gap-4 p-2.5 sm:p-3.5 rounded-[18px] border border-transparent">
+                                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-green-50 text-green-600 flex items-center justify-center text-lg shrink-0"><i class="fab fa-whatsapp"></i></div>
                                 <div>
-                                    <h4 class="text-[14px] sm:text-[16px] font-black text-gray-900 leading-tight">Excel Export</h4>
-                                    <p class="text-[11px] sm:text-xs text-gray-500 font-semibold mt-0.5">Download complete data anytime</p>
+                                    <h4 class="text-[13px] sm:text-[15px] font-black text-gray-900 leading-tight">5. 1-Click Payment Reminder</h4>
+                                    <p class="text-[10.5px] sm:text-[11.5px] text-gray-500 font-semibold mt-0.5">Auto payment links & updates sent</p>
+                                </div>
+                            </div>
+
+                            <div class="step-6-anim flex items-center gap-3 sm:gap-4 p-2.5 sm:p-3.5 rounded-[18px] border border-transparent">
+                                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg shrink-0"><i class="fas fa-file-excel"></i></div>
+                                <div>
+                                    <h4 class="text-[13px] sm:text-[15px] font-black text-gray-900 leading-tight">6. Excel Export</h4>
+                                    <p class="text-[10.5px] sm:text-[11.5px] text-gray-500 font-semibold mt-0.5">Download complete data anytime</p>
                                 </div>
                             </div>
 
                         </div>
 
                         <!-- RIGHT: 3D iOS Animation Stage -->
-                        <div class="w-full lg:w-[55%] h-[320px] sm:h-[420px] bg-gradient-to-br from-[#F5F5F7] to-[#EAEAEF] rounded-[1.5rem] sm:rounded-[2rem] border-[3px] border-white shadow-inner relative overflow-hidden flex items-center justify-center reveal active delay-200">
+                        <div class="w-full lg:w-[55%] h-[360px] sm:h-[450px] bg-gradient-to-br from-[#F5F5F9] to-[#E5E5EA] rounded-[1.5rem] sm:rounded-[2rem] border-[4px] border-white shadow-inner relative overflow-hidden flex items-center justify-center reveal active delay-200">
                             
                             <!-- Premium Background Ambient Glows -->
                             <div class="absolute inset-0" style="background-image: radial-gradient(rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 20px 20px;"></div>
-                            <div class="absolute -top-10 -left-10 w-48 h-48 bg-blue-300 rounded-full blur-[60px] opacity-40"></div>
-                            <div class="absolute -bottom-10 -right-10 w-48 h-48 bg-purple-300 rounded-full blur-[60px] opacity-40"></div>
+                            <div class="ambient-orb-1 absolute -top-12 -left-12 w-56 h-56 bg-blue-400 rounded-full blur-[70px] opacity-40 mix-blend-multiply"></div>
+                            <div class="ambient-orb-2 absolute -bottom-12 -right-12 w-64 h-64 bg-purple-400 rounded-full blur-[80px] opacity-40 mix-blend-multiply"></div>
 
-                            <!-- Central Alignment Wrapper -->
-                            <div class="relative w-full max-w-[260px] sm:max-w-[300px] h-[260px] sm:h-[300px] flex items-center justify-center">
+                            <!-- ALWAYS VISIBLE: Background Floating Badges (Fills empty space) -->
+                            <div class="float-badge-1 absolute top-8 left-6 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-white shadow-sm flex items-center gap-2 z-10 hidden sm:flex">
+                                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                <span class="text-[10px] font-black text-gray-700 tracking-wide">Store Online</span>
+                            </div>
+                            <div class="float-badge-2 absolute bottom-10 right-6 bg-white/80 backdrop-blur-md px-3 py-2 rounded-xl border border-white shadow-sm flex items-center gap-2 z-10">
+                                <div class="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-[10px]"><i class="fas fa-chart-line"></i></div>
+                                <div>
+                                    <p class="text-[8px] text-gray-500 font-bold uppercase tracking-wider">Total Sales</p>
+                                    <p class="text-xs font-black text-gray-900">+45% <i class="fas fa-arrow-up text-green-500 text-[9px]"></i></p>
+                                </div>
+                            </div>
 
-                                <!-- Element 1: iOS Notification -->
-                                <div class="stg-1 absolute top-0 w-full bg-white/90 backdrop-blur-xl border border-white p-3 sm:p-4 rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.1)] flex items-center gap-3 sm:gap-4 z-50">
-                                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg sm:text-xl shadow-md shrink-0 animate-pulse">
-                                        <i class="fas fa-bell"></i>
+                            <!-- ALWAYS VISIBLE: Central Glass Pedestal / Dashboard Mockup -->
+                            <div class="absolute bottom-[-10px] w-[85%] max-w-[340px] h-[160px] bg-white/60 backdrop-blur-xl border-t border-l border-r border-white/80 shadow-[0_-15px_40px_rgba(0,0,0,0.05)] rounded-t-[30px] z-20 flex flex-col p-5">
+                                <div class="w-12 h-1.5 bg-gray-300/50 rounded-full mx-auto mb-4"></div>
+                                <div class="flex justify-between items-center mb-3 opacity-60">
+                                    <div class="w-20 h-3 bg-gray-300 rounded-full"></div>
+                                    <div class="w-8 h-3 bg-gray-300 rounded-full"></div>
+                                </div>
+                                <div class="flex justify-between items-center opacity-60">
+                                    <div class="w-full h-[60px] bg-gray-200/50 rounded-xl"></div>
+                                </div>
+                            </div>
+
+                            <!-- ANIMATED CENTRAL ELEMENTS WRAPPER -->
+                            <div class="relative w-full max-w-[280px] sm:max-w-[320px] h-[280px] sm:h-[320px] flex items-center justify-center z-30">
+
+                                <!-- Element 1: Order Arrives -->
+                                <div class="stg-1 absolute top-4 w-[85%] bg-white/95 backdrop-blur-xl border border-gray-100 p-3 sm:p-4 rounded-[20px] shadow-[0_20px_40px_rgba(0,0,0,0.08)] flex flex-col items-center text-center gap-2 z-50">
+                                    <div class="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-600 text-xl shadow-inner shrink-0">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-black text-gray-900 text-[13px] sm:text-[14px] leading-tight">Order #1023 Placed</h4>
+                                        <p class="text-[11px] sm:text-xs text-gray-500 font-bold mt-1">₹1,250 • 2 Items</p>
+                                    </div>
+                                </div>
+
+                                <!-- Element 2: Phone Alert / Notification -->
+                                <div class="stg-2 absolute top-0 w-[95%] bg-white/95 backdrop-blur-xl border border-white p-3 sm:p-4 rounded-[20px] shadow-[0_20px_40px_rgba(0,0,0,0.12)] flex items-center gap-3 sm:gap-4 z-50">
+                                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-tr from-blue-500 to-blue-600 rounded-[14px] flex items-center justify-center text-white text-lg sm:text-xl shadow-md shrink-0">
+                                        <i class="fas fa-bell animate-pulse"></i>
                                     </div>
                                     <div class="min-w-0 flex-1">
                                         <div class="flex justify-between items-center mb-0.5">
                                             <p class="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase tracking-widest">BikriPage</p>
                                             <p class="text-[9px] font-bold text-gray-400">now</p>
                                         </div>
-                                        <h4 class="font-black text-gray-900 text-[13px] sm:text-[14px] leading-tight truncate">New Order Arrived!</h4>
-                                        <p class="text-[11px] sm:text-xs text-blue-600 font-bold mt-0.5 truncate">₹1,250 from Rahul Sharma</p>
+                                        <h4 class="font-black text-gray-900 text-[13px] sm:text-[15px] leading-tight truncate">New Order Arrived!</h4>
+                                        <p class="text-[11px] sm:text-xs text-blue-600 font-bold mt-0.5 truncate">Rahul Sharma ordered</p>
                                     </div>
                                 </div>
 
-                                <!-- Element 2: Bill/Invoice -->
-                                <div class="stg-2 absolute w-[90%] bg-white p-4 sm:p-5 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-gray-100 flex flex-col gap-3 z-40">
-                                    <div class="flex justify-between items-center border-b border-dashed border-gray-200 pb-2">
-                                        <span class="font-black text-[10px] text-gray-400 uppercase tracking-widest"><i class="fas fa-store text-gray-300 mr-1"></i> Your Store</span>
-                                        <span class="font-mono text-[10px] font-bold text-gray-400">#ORD-123</span>
+                                <!-- Element 3: Bill/Invoice -->
+                                <div class="stg-3 absolute bottom-[20px] w-[85%] bg-white p-4 sm:p-5 rounded-[24px] shadow-[0_25px_50px_rgba(0,0,0,0.15)] border border-gray-100 flex flex-col gap-3 z-40">
+                                    <div class="flex justify-between items-center border-b border-dashed border-gray-200 pb-2.5">
+                                        <span class="font-black text-[10px] text-gray-400 uppercase tracking-widest"><i class="fas fa-store text-gray-300 mr-1.5"></i> Digital Bill</span>
+                                        <span class="bg-gray-100 px-2 py-1 rounded text-[9px] font-bold text-gray-500">#ORD-1023</span>
                                     </div>
                                     <div>
-                                        <div class="flex justify-between text-[11px] sm:text-xs font-bold text-gray-600 mb-1.5"><span>1x Premium Item</span><span>₹1000</span></div>
+                                        <div class="flex justify-between text-[11px] sm:text-xs font-bold text-gray-600 mb-1.5"><span>2x Premium Items</span><span>₹1000</span></div>
                                         <div class="flex justify-between text-[11px] sm:text-xs font-bold text-gray-600"><span>Tax & Delivery</span><span>+₹250</span></div>
                                     </div>
-                                    <div class="flex justify-between items-center bg-green-50 p-2 sm:p-2.5 rounded-xl border border-green-100">
+                                    <div class="flex justify-between items-center bg-green-50 p-2.5 rounded-xl border border-green-100 mt-1">
                                         <span class="text-[10px] font-black text-green-700 uppercase tracking-widest">Total</span>
                                         <span class="text-sm sm:text-base font-black text-green-600">₹1,250</span>
                                     </div>
                                 </div>
 
-                                <!-- Element 3: Graph growing -->
-                                <div class="stg-3 absolute w-full h-[180px] sm:h-[200px] bg-white p-4 sm:p-5 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-gray-100 flex flex-col justify-end z-30">
-                                    <p class="absolute top-4 left-5 text-[11px] sm:text-xs font-black text-gray-800 uppercase tracking-widest">Sales Updated</p>
-                                    <p class="absolute top-8 left-5 text-xl sm:text-2xl font-black text-green-500">₹5,400</p>
-                                    <div class="flex items-end justify-between h-[100px] w-full gap-2 sm:gap-3 border-b-2 border-gray-100 pb-0.5">
-                                        <div class="w-full bg-gradient-to-t from-blue-200 to-blue-400 rounded-t-lg bar-grow relative" style="--h: 35px"><span class="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-gray-400">M</span></div>
-                                        <div class="w-full bg-gradient-to-t from-purple-300 to-purple-500 rounded-t-lg bar-grow relative" style="--h: 60px"><span class="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-gray-400">T</span></div>
-                                        <div class="w-full bg-gradient-to-t from-green-400 to-green-500 rounded-t-lg bar-grow relative" style="--h: 90px"><span class="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-green-600 bg-green-50 px-1 rounded shadow-sm">W</span></div>
+                                <!-- Element 4: Graph growing -->
+                                <div class="stg-4 absolute bottom-[15px] w-[90%] bg-white p-4 sm:p-5 rounded-[24px] shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-gray-100 flex flex-col z-50">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div>
+                                            <p class="text-[10px] sm:text-[11px] font-black text-gray-400 uppercase tracking-widest">Sales Updated</p>
+                                            <p class="text-xl sm:text-2xl font-black text-gray-900 leading-none mt-1">₹5,400</p>
+                                        </div>
+                                        <div class="w-8 h-8 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center text-xs"><i class="fas fa-chart-line"></i></div>
+                                    </div>
+                                    <div class="flex items-end justify-between h-[80px] w-full gap-2 sm:gap-3">
+                                        <div class="w-full bg-gradient-to-t from-gray-200 to-gray-300 rounded-t-lg bar-grow relative" style="--h: 30px"></div>
+                                        <div class="w-full bg-gradient-to-t from-blue-300 to-blue-500 rounded-t-lg bar-grow relative" style="--h: 55px"></div>
+                                        <div class="w-full bg-gradient-to-t from-green-400 to-green-500 rounded-t-lg bar-grow relative shadow-[0_5px_15px_rgba(34,197,94,0.3)]" style="--h: 75px"><span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-black text-green-700 bg-green-50 px-1.5 py-0.5 rounded shadow-sm border border-green-100">Today</span></div>
                                     </div>
                                 </div>
 
-                                <!-- Element 4: WhatsApp Message Bubble -->
-                                <div class="stg-4 absolute right-0 sm:-right-4 top-10 sm:top-14 max-w-[200px] sm:max-w-[240px] bg-[#DCFCE7] p-3 sm:p-4 rounded-2xl rounded-tr-sm shadow-[0_15px_35px_rgba(22,163,74,0.15)] border border-[#BBF7D0] flex items-start gap-3 z-50">
-                                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-green-500 rounded-full flex items-center justify-center text-white text-sm sm:text-lg shrink-0 shadow-md">
+                                <!-- Element 5: WhatsApp Payment Reminder -->
+                                <div class="stg-5 absolute right-[-10px] sm:right-[-20px] top-[40px] max-w-[200px] sm:max-w-[240px] bg-white p-3 sm:p-4 rounded-[20px] rounded-tr-sm shadow-[0_20px_40px_rgba(22,163,74,0.15)] border border-green-100 flex items-start gap-3 z-50">
+                                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-tr from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white text-sm sm:text-lg shrink-0 shadow-md">
                                         <i class="fab fa-whatsapp"></i>
                                     </div>
                                     <div class="flex-1">
-                                        <h4 class="font-black text-green-900 text-[11px] sm:text-xs uppercase tracking-wider mb-0.5">Reminder Sent</h4>
-                                        <p class="text-[11px] sm:text-xs text-green-800 font-semibold leading-snug">Hi Rahul, order confirmed! Secure Payment Link: 🔗...</p>
+                                        <h4 class="font-black text-gray-900 text-[11px] sm:text-[13px] leading-tight mb-1">Reminder Sent</h4>
+                                        <p class="text-[10px] sm:text-[11px] text-gray-500 font-semibold leading-snug">Hi Rahul, your order is confirmed! Pay securely here: 🔗...</p>
                                     </div>
                                 </div>
 
-                                <!-- Element 5: Excel Document -->
-                                <div class="stg-5 absolute w-24 h-28 sm:w-28 sm:h-32 bg-white rounded-2xl shadow-[0_20px_50px_rgba(16,185,129,0.2)] border-2 border-emerald-100 flex flex-col items-center justify-center gap-2 z-50">
-                                    <div class="w-12 h-12 sm:w-14 sm:h-14 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 text-2xl sm:text-3xl"><i class="fas fa-file-excel"></i></div>
-                                    <span class="text-[9px] sm:text-[10px] font-black text-emerald-700 uppercase tracking-widest">Data.csv</span>
+                                <!-- Element 6: Excel Document -->
+                                <div class="stg-6 absolute bottom-[60px] left-[20px] w-28 h-32 sm:w-32 sm:h-36 bg-white rounded-[24px] shadow-[0_25px_50px_rgba(16,185,129,0.2)] border border-emerald-100 flex flex-col items-center justify-center gap-2 z-50">
+                                    <div class="w-12 h-12 sm:w-14 sm:h-14 bg-emerald-50 rounded-[14px] flex items-center justify-center text-emerald-500 text-2xl sm:text-3xl"><i class="fas fa-file-excel"></i></div>
+                                    <span class="text-[10px] font-black text-gray-800 tracking-wide mt-1">Data.csv</span>
+                                    <span class="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full uppercase tracking-widest">Downloaded</span>
                                 </div>
 
                             </div>

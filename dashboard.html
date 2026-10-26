@@ -1411,9 +1411,11 @@
                     <div>
                         <label class="text-[11px] text-[#6B7280] font-bold uppercase tracking-wider mb-1.5 block">Payment Status</label>
                         <select id="bill-pay-status" onchange="handlePaymentStatusChange()" class="w-full bg-[#F7F7F9] border border-[#E5E7EB] rounded-[12px] px-3 py-2.5 text-[#111827] text-sm font-semibold outline-none transition cursor-pointer">
-                            <option value="Paid">Paid</option>
-                            <option value="Unpaid">Unpaid</option>
-                        </select>
+    <option value="Paid">Paid</option>
+    <option value="Advance">Partial Paid</option>
+    <option value="Unpaid">Unpaid</option>
+</select>
+
                     </div>
                     <div>
                         <label class="text-[11px] text-[#6B7280] font-bold uppercase tracking-wider mb-1.5 block">Method</label>
@@ -1667,20 +1669,26 @@
                     </div>
                 </div>
                 <div class="w-[380px] shrink-0 bg-[#FCFCFD] rounded-[24px] p-4 border border-gray-100 shadow-sm">
-                    <div id="receipt-breakdown" class="hidden flex-col space-y-2 border-b border-gray-200/60 pb-3 mb-3 text-sm font-bold text-gray-500">
-                        <div class="flex justify-between items-center gap-8">
-                            <span>Subtotal</span>
-                            <span id="receipt-subtotal" class="text-gray-900 text-right">₹0.00</span>
-                        </div>
-                        <div id="receipt-discount-row" class="hidden justify-between items-center gap-8 text-rose-500">
-                            <span>Discount</span>
-                            <span class="text-right bg-rose-50 px-2.5 py-1 rounded-lg text-rose-600">-₹<span id="receipt-discount">0.00</span></span>
-                        </div>
-                        <div id="receipt-delivery-row" class="hidden justify-between items-center gap-8 text-blue-500">
-                            <span>Delivery</span>
-                            <span class="text-right bg-blue-50 px-2.5 py-1 rounded-lg text-blue-600">+₹<span id="receipt-delivery">0.00</span></span>
-                        </div>
-                    </div>
+                <div id="receipt-breakdown" class="hidden flex-col space-y-2 border-b border-gray-200/60 pb-3 mb-3 text-sm font-bold text-gray-500">
+    <div class="flex justify-between items-center gap-8">
+        <span>Subtotal</span>
+        <span id="receipt-subtotal" class="text-gray-900 text-right">₹0.00</span>
+    </div>
+    <div id="receipt-discount-row" class="hidden justify-between items-center gap-8 text-rose-500">
+        <span>Discount</span>
+        <span class="text-right bg-rose-50 px-2.5 py-1 rounded-lg text-rose-600">-₹<span id="receipt-discount">0.00</span></span>
+    </div>
+    <div id="receipt-delivery-row" class="hidden justify-between items-center gap-8 text-blue-500">
+        <span>Delivery</span>
+        <span class="text-right bg-blue-50 px-2.5 py-1 rounded-lg text-blue-600">+₹<span id="receipt-delivery">0.00</span></span>
+    </div>
+    <!-- Partial Paid (Advance) Row -->
+    <div id="receipt-advance-row" class="hidden justify-between items-center gap-8 text-amber-500">
+        <span>Advance Paid</span>
+        <span class="text-right bg-amber-50 px-2.5 py-1 rounded-lg text-amber-600">-₹<span id="receipt-advance">0.00</span></span>
+    </div>
+</div>
+
                     <div class="flex justify-between items-end gap-4">
                         <span class="text-[11px] text-gray-400 font-black uppercase tracking-[0.2em] shrink-0 mb-1.5">Grand Total</span>
                         <span class="text-[32px] font-black text-gray-900 tracking-tighter leading-none text-right break-words drop-shadow-sm" id="receipt-total">₹0.00</span>
@@ -2718,75 +2726,96 @@ function applyProLocks(shopData) {
         // ==========================================
         // 4. INSIGHTS & ANALYTICS (Safe Chart Load & Short Date + Year)
         // ==========================================
-        function renderInsights() {
-            let allTimeSale = 0, allTimeUdhar = 0, monthSale = 0, monthProfit = 0, monthUdhar = 0; let dailySales = {};
-            const monthPicker = document.getElementById('insight-month-picker');
-            let selectedYear = new Date().getFullYear(); let selectedMonth = new Date().getMonth(); 
-            if (monthPicker && monthPicker.value) { const p = monthPicker.value.split('-'); selectedYear = parseInt(p[0]); selectedMonth = parseInt(p[1]) - 1; }
-            let monthKey = `${selectedYear}-${(selectedMonth + 1).toString().padStart(2, '0')}`;
+     function renderInsights() {
+    let allTimeSale = 0, allTimeUdhar = 0, monthSale = 0, monthProfit = 0, monthUdhar = 0; let dailySales = {};
+    const monthPicker = document.getElementById('insight-month-picker');
+    let selectedYear = new Date().getFullYear(); let selectedMonth = new Date().getMonth(); 
+    if (monthPicker && monthPicker.value) { const p = monthPicker.value.split('-'); selectedYear = parseInt(p[0]); selectedMonth = parseInt(p[1]) - 1; }
+    let monthKey = `${selectedYear}-${(selectedMonth + 1).toString().padStart(2, '0')}`;
 
-            adminBills.forEach(bill => {
-                let isCancelled = bill.deliveryStatus && bill.deliveryStatus.toLowerCase() === 'cancelled';
-                if (isCancelled) return; 
-                allTimeSale += bill.grandTotal;
-                if (!bill.payStatus || !bill.payStatus.includes('Paid')) allTimeUdhar += bill.grandTotal;
-                let billDate;
-                if (bill.timestamp && typeof bill.timestamp.toDate === 'function') billDate = bill.timestamp.toDate();
-                else if (bill.timestamp && bill.timestamp.seconds) billDate = new Date(bill.timestamp.seconds * 1000);
-                else { let p = bill.date.split('/'); if(p.length===3) billDate=new Date(p[2],p[1]-1,p[0]); else billDate=new Date(bill.date); }
-                
-                if (billDate && !isNaN(billDate) && billDate.getMonth() === selectedMonth && billDate.getFullYear() === selectedYear) {
-                    monthSale += bill.grandTotal;
-                    if (bill.payStatus && bill.payStatus.includes('Paid')) monthProfit += bill.grandTotal; else monthUdhar += bill.grandTotal;
-                    if(!dailySales[bill.date]) dailySales[bill.date] = 0; dailySales[bill.date] += bill.grandTotal;
-                }
-            });
+    adminBills.forEach(bill => {
+        let isCancelled = bill.deliveryStatus && bill.deliveryStatus.toLowerCase() === 'cancelled';
+        if (isCancelled) return; 
 
-            let bestDay = '-'; let maxSale = 0;
-            for (const [day, sale] of Object.entries(dailySales)) { 
-                if (sale > maxSale) { 
-                    maxSale = sale; 
-                    let shortDate = day;
-                    let parts = day.split(' ');
-                    if(parts.length >= 3) { shortDate = `${parts[0]} ${parts[1].substring(0, 3)} ${parts[2]}`; } 
-                    else if (parts.length >= 2) { shortDate = `${parts[0]} ${parts[1].substring(0, 3)}`; }
-                    bestDay = `${shortDate} (₹${sale})`; 
-                } 
-            }
-
-            let currentInvestment = allInvestments[monthKey] || 0; let netProfit = monthProfit - currentInvestment;
-            document.getElementById('insight-display-investment').innerText = `₹${currentInvestment}`;
-            let netProfitEl = document.getElementById('insight-net-profit');
-            if(netProfitEl) {
-                netProfitEl.innerText = `₹${netProfit}`;
-                netProfitEl.className = netProfit < 0 ? "font-black text-xl text-[#DC2626]" : "font-black text-xl text-[#16A34A]";
-            }
-
-            document.getElementById('insight-all-time').innerText = `₹${allTimeSale}`; document.getElementById('insight-monthly').innerText = `₹${monthSale}`;
-            document.getElementById('insight-udhar').innerText = `₹${allTimeUdhar}`; document.getElementById('insight-profit').innerText = `₹${monthProfit}`;
-            document.getElementById('insight-udhar-list').innerText = `₹${monthUdhar}`; document.getElementById('insight-best-day').innerText = bestDay;
-
-            const ctx = document.getElementById('insightsChart');
-            const chartWrapper = document.getElementById('chart-container-wrapper');
-            
-            if(ctx) {
-                if (typeof Chart === 'undefined') { if(chartWrapper) chartWrapper.style.display = 'none'; return; }
-                if(chartWrapper) chartWrapper.style.display = 'flex'; 
-                if(insightChartInstance) { insightChartInstance.destroy(); }
-                
-                let dataValues, bgColors;
-                if (monthProfit === 0 && monthUdhar === 0 && currentInvestment === 0) { 
-                    dataValues = [1]; bgColors = ['#E5E7EB']; 
-                } else {
-                    if (netProfit >= 0) { dataValues = [netProfit, currentInvestment, monthUdhar]; bgColors = ['#16A34A', '#2563EB', '#DC2626']; } 
-                    else { let loss = Math.abs(netProfit); dataValues = [monthProfit, loss, monthUdhar]; bgColors = ['#16A34A', '#F97316', '#DC2626']; }
-                }
-                insightChartInstance = new Chart(ctx, {
-                    type: 'doughnut', data: { datasets: [{ data: dataValues, backgroundColor: bgColors, borderWidth: 0, hoverOffset: 4 }] },
-                    options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
-                });
-            }
+        // ✨ FIX: असली सेल = बचा हुआ ग्रांड टोटल + जो एडवांस मिल चुका है
+        let realSale = (bill.grandTotal || 0) + (bill.advance || 0);
+        allTimeSale += realSale;
+        
+        if (bill.payStatus === 'Unpaid') {
+            allTimeUdhar += realSale;
+        } else if (bill.payStatus === 'Advance') {
+            allTimeUdhar += (bill.grandTotal || 0); // सिर्फ बचा हुआ पैसा उधार में जायेगा
         }
+
+        let billDate;
+        if (bill.timestamp && typeof bill.timestamp.toDate === 'function') billDate = bill.timestamp.toDate();
+        else if (bill.timestamp && bill.timestamp.seconds) billDate = new Date(bill.timestamp.seconds * 1000);
+        else { let p = bill.date.split('/'); if(p.length===3) billDate=new Date(p[2],p[1]-1,p[0]); else billDate=new Date(bill.date); }
+        
+        if (billDate && !isNaN(billDate) && billDate.getMonth() === selectedMonth && billDate.getFullYear() === selectedYear) {
+            monthSale += realSale;
+            
+            // ✨ FIX: Advance और Paid दोनों का सही कैश कैलकुलेशन
+            if (bill.payStatus === 'Paid') {
+                monthProfit += realSale;
+            } else if (bill.payStatus === 'Advance') {
+                monthProfit += (bill.advance || 0);      // हाथ में आया कैश (एडवांस)
+                monthUdhar += (bill.grandTotal || 0);    // पेंडिंग पैसा
+            } else {
+                monthUdhar += realSale;
+            }
+
+            if(!dailySales[bill.date]) dailySales[bill.date] = 0; 
+            dailySales[bill.date] += realSale;
+        }
+    });
+
+    let bestDay = '-'; let maxSale = 0;
+    for (const [day, sale] of Object.entries(dailySales)) { 
+        if (sale > maxSale) { 
+            maxSale = sale; 
+            let shortDate = day;
+            let parts = day.split(' ');
+            if(parts.length >= 3) { shortDate = `${parts[0]} ${parts[1].substring(0, 3)} ${parts[2]}`; } 
+            else if (parts.length >= 2) { shortDate = `${parts[0]} ${parts[1].substring(0, 3)}`; }
+            bestDay = `${shortDate} (₹${sale})`; 
+        } 
+    }
+
+    let currentInvestment = allInvestments[monthKey] || 0; let netProfit = monthProfit - currentInvestment;
+    document.getElementById('insight-display-investment').innerText = `₹${currentInvestment}`;
+    let netProfitEl = document.getElementById('insight-net-profit');
+    if(netProfitEl) {
+        netProfitEl.innerText = `₹${netProfit}`;
+        netProfitEl.className = netProfit < 0 ? "font-black text-xl text-[#DC2626]" : "font-black text-xl text-[#16A34A]";
+    }
+
+    document.getElementById('insight-all-time').innerText = `₹${allTimeSale}`; document.getElementById('insight-monthly').innerText = `₹${monthSale}`;
+    document.getElementById('insight-udhar').innerText = `₹${allTimeUdhar}`; document.getElementById('insight-profit').innerText = `₹${monthProfit}`;
+    document.getElementById('insight-udhar-list').innerText = `₹${monthUdhar}`; document.getElementById('insight-best-day').innerText = bestDay;
+
+    // Chart.js Code... (बाकी का चार्ट वाला कोड वैसा ही रहेगा)
+    const ctx = document.getElementById('insightsChart');
+    const chartWrapper = document.getElementById('chart-container-wrapper');
+    if(ctx) {
+        if (typeof Chart === 'undefined') { if(chartWrapper) chartWrapper.style.display = 'none'; return; }
+        if(chartWrapper) chartWrapper.style.display = 'flex'; 
+        if(insightChartInstance) { insightChartInstance.destroy(); }
+        
+        let dataValues, bgColors;
+        if (monthProfit === 0 && monthUdhar === 0 && currentInvestment === 0) { 
+            dataValues = [1]; bgColors = ['#E5E7EB']; 
+        } else {
+            if (netProfit >= 0) { dataValues = [netProfit, currentInvestment, monthUdhar]; bgColors = ['#16A34A', '#2563EB', '#DC2626']; } 
+            else { let loss = Math.abs(netProfit); dataValues = [monthProfit, loss, monthUdhar]; bgColors = ['#16A34A', '#F97316', '#DC2626']; }
+        }
+        insightChartInstance = new Chart(ctx, {
+            type: 'doughnut', data: { datasets: [{ data: dataValues, backgroundColor: bgColors, borderWidth: 0, hoverOffset: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
+        });
+    }
+}
+
 
 
         async function addMonthlyExpense(e) {
@@ -2970,22 +2999,20 @@ function applyProLocks(shopData) {
 
         function removeDraftItem(id) { draftBillItems = draftBillItems.filter(i => i.id !== id); renderDraftBill(); }
 
-        function renderDraftBill() {
+            function renderDraftBill() {
             const tb = document.getElementById('draft-bill-items-list'); const em = document.getElementById('draft-bill-empty'); const tot = document.getElementById('draft-bill-total');
             let itemTot = 0;
             if(draftBillItems.length === 0) { tb.innerHTML = ''; em.style.display='block'; tot.innerText='₹0'; return; }
             em.style.display='none';
             tb.innerHTML = draftBillItems.map(i => { itemTot += i.total; return `<tr><td class="py-3 pl-4 text-[#111827] font-semibold">${i.name}</td><td class="py-3 text-center text-[#6B7280]">${i.qty}</td><td class="py-3 text-right text-[#6B7280]">₹${i.price}</td><td class="py-3 text-right pr-4 text-[#16A34A] font-bold">₹${i.total}</td><td class="py-3 text-center"><i class="fas fa-times text-[#DC2626] cursor-pointer" onclick="removeDraftItem('${i.id}')"></i></td></tr>`; }).join('');
-                     // ✨ NAYA: Advance calculation added
+            
             let disc = parseInt(document.getElementById('bill-discount').value)||0; 
             let del = parseInt(document.getElementById('bill-delivery').value)||0;
             let adv = parseInt(document.getElementById('bill-advance').value)||0;
             
-            // Grand Total = Item Total - Discount + Delivery - Advance
             let gt = Math.max(0, itemTot - disc + del - adv); 
             tot.innerText = `₹${gt}`;
-            } 
-
+        } // <-- YAHAN BRACKET GAYAB THA, AB THEEK HAI!
 
         async function saveBillProcess(isSend) {
             const n = document.getElementById('bill-cust-name').value.trim(); const p = document.getElementById('bill-cust-phone').value.trim();
@@ -2994,7 +3021,6 @@ function applyProLocks(shopData) {
             
             const btn = event.currentTarget; const orig = btn.innerHTML; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`; btn.disabled = true;
             
-                      // ✨ NAYA: Advance calculation and saving to database
             let disc = parseInt(document.getElementById('bill-discount').value)||0; 
             let del = parseInt(document.getElementById('bill-delivery').value)||0;
             let adv = parseInt(document.getElementById('bill-advance').value)||0;
@@ -3010,7 +3036,7 @@ function applyProLocks(shopData) {
                 items: [...draftBillItems], 
                 discount: disc, 
                 delivery: del,
-                advance: adv, // 👈 Naya advance add ho gaya
+                advance: adv, 
                 grandTotal: gt, 
                 payStatus: document.getElementById('bill-pay-status').value, 
                 payMode: document.getElementById('bill-pay-mode').value, 
@@ -3028,14 +3054,14 @@ function applyProLocks(shopData) {
                 }
                 closeCreateBillModal(); renderAdminBills(); processCustomerData();
                 if(isSend) {
-                    let st = nb.payStatus === 'Paid' ? 'Paid ✅' : 'Pending';
+                    let pStatusTxt = nb.payStatus === 'Paid' ? 'Paid ✅' : (nb.payStatus === 'Advance' ? 'Partial Paid ⏳' : 'Pending ❌');
                     let m = `*${globalShopData.shopName.toUpperCase()}*%0A%0A*ORDER INVOICE*%0AName: ${n}%0APhone: ${p}%0ADate: ${dateStr}%0A%0A*SUMMARY*%0A`;
                     draftBillItems.forEach(i => m += `${i.qty}x ${i.name} = ₹${i.total}%0A`);
-                                     m += `%0A`; 
+                    m += `%0A`; 
                     if(disc>0) m+=`Discount: -₹${disc}%0A`; 
                     if(del>0) m+=`Delivery: +₹${del}%0A`;
-                    if(adv>0) m+=`Advance Paid: -₹${adv}%0A`; // 👈 Naya WhatsApp msg me advance
-                    m += `*GRAND TOTAL (Pending): ₹${gt}*%0A%0AStatus: ${st}%0AMode: ${nb.payMode}%0A%0AThank you!`;
+                    if(adv>0) m+=`Advance Paid: -₹${adv}%0A`; 
+                    m += `*GRAND TOTAL (Pending): ₹${gt}*%0A%0AStatus: ${pStatusTxt}%0AMode: ${nb.payMode}%0A%0AThank you!`;
 
                     window.open(`https://wa.me/91${p}?text=${m}`, '_blank');
               } else iosAlert("Success", "✅ Bill Saved Successfully!");
@@ -3043,6 +3069,7 @@ function applyProLocks(shopData) {
             } catch(e) { alert("Error: " + e.message); }
             finally { btn.innerHTML = orig; btn.disabled = false; }
         }
+
         function saveBillOnly(e) { e.preventDefault(); saveBillProcess(false); }
         function saveAndSendBill(e) { e.preventDefault(); saveBillProcess(true); }
 
@@ -3068,9 +3095,10 @@ function applyProLocks(shopData) {
             
             let html = '';
             filtered.forEach(b => {
-                let pS = b.payStatus||'Unpaid'; let pM = b.payMode||'Cash'; let dS = b.deliveryStatus||'Processing';
-                let isP = pS.includes('Paid'); let isD = dS==='Delivered'; let isC = dS==='Cancelled';
-                let bdg = isP ? `<span class="bg-[#DCFCE7] text-[#16A34A] text-[9px] px-1.5 py-0.5 rounded font-bold ml-2">PAID</span>` : `<span class="bg-[#FEF2F2] text-[#DC2626] text-[9px] px-1.5 py-0.5 rounded font-bold ml-2">UNPAID</span>`;
+                                        let pS = b.payStatus||'Unpaid'; let pM = b.payMode||'Cash'; let dS = b.deliveryStatus||'Processing';
+                let isD = dS==='Delivered'; let isC = dS==='Cancelled';
+                let bdg = pS === 'Paid' ? `<span class="bg-[#DCFCE7] text-[#16A34A] text-[9px] px-1.5 py-0.5 rounded font-bold ml-2">PAID</span>` : (pS === 'Advance' ? `<span class="bg-[#FEF3C7] text-[#D97706] text-[9px] px-1.5 py-0.5 rounded font-bold ml-2">PARTIAL PAID</span>` : `<span class="bg-[#FEF2F2] text-[#DC2626] text-[9px] px-1.5 py-0.5 rounded font-bold ml-2">UNPAID</span>`);
+
                 let dTxt = `<span class="text-[#6B7280] bg-[#F3F4F6] px-2 py-0.5 rounded text-[10px] font-bold"><i class="fas fa-spinner fa-spin mr-1"></i> Proc</span>`;
                 if(isD) dTxt = `<span class="text-[#16A34A] bg-[#DCFCE7] px-2 py-0.5 rounded text-[10px] font-bold"><i class="fas fa-check-circle mr-1"></i> Deliv</span>`;
                 else if(isC) dTxt = `<span class="text-[#DC2626] bg-[#FEF2F2] px-2 py-0.5 rounded text-[10px] font-bold"><i class="fas fa-times-circle mr-1"></i> Canc</span>`;
@@ -3092,11 +3120,17 @@ function applyProLocks(shopData) {
             if(document.activeElement.id !== 'admin-search-order' && document.activeElement.id !== 'admin-filter-status') renderInsights();
         }
 
-        function viewAdminOrderDetails(id) {
+      function viewAdminOrderDetails(id) {
             const b = adminBills.find(x => x.id === id); if(!b) return;
             let ih = b.items.map(i => `<div class="flex justify-between text-sm text-[#4B5563] mb-1 border-b border-[#E5E7EB] pb-1"><span class="truncate pr-2">${i.qty}x ${i.name}</span><span class="font-semibold text-[#111827]">₹${i.total||(i.qty*i.price)}</span></div>`).join('');
-            let dS = b.deliveryStatus||'Processing'; let isP = b.payStatus&&b.payStatus.includes('Paid'); let nS = isP?'Unpaid':'Paid';
-            let tC = isP ? 'bg-[#FEF2F2] text-[#DC2626]' : 'bg-[#DCFCE7] text-[#16A34A]';
+            
+            let dS = b.deliveryStatus||'Processing'; 
+            let advHtml = b.advance > 0 ? `<div class="flex justify-between items-center mt-1 border-t border-[#E5E7EB] pt-1.5"><span class="text-[#6B7280] font-bold text-[10px] uppercase">Advance Paid</span><span class="text-[#D97706] font-bold text-xs">-₹${b.advance}</span></div>` : '';
+            
+            let isP = b.payStatus === 'Paid';
+            let isA = b.payStatus === 'Advance';
+            let pC = isP ? 'text-[#16A34A]' : (isA ? 'text-[#D97706]' : 'text-[#DC2626]');
+            let displayStatus = isA ? 'Partial Paid' : (b.payStatus || 'Unpaid');
 
             document.getElementById('admin-order-details-content').innerHTML = `
                 <div class="flex justify-between mb-4"><div class="min-w-0"><p class="text-xs text-[#9CA3AF]">Order ID</p><p class="text-sm font-mono font-bold text-[#111827]">#${b.id}</p></div><div class="text-right"><p class="text-xs text-[#9CA3AF]">Date</p><p class="text-sm font-bold text-[#111827]">${b.date}</p></div></div>
@@ -3106,13 +3140,25 @@ function applyProLocks(shopData) {
                 </div>
                 <div class="bg-[#F7F7F9] p-3 rounded-[12px] mb-4 border border-[#E5E7EB]"><p class="text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-2">Customer</p><p class="text-sm font-bold text-[#111827]"><i class="fas fa-user text-[#A855F7] mr-1"></i> ${b.customerName}</p><p class="text-xs font-semibold text-[#6B7280] mt-1"><i class="fab fa-whatsapp text-[#16A34A] mr-1"></i> ${b.customerPhone}</p></div>
                 ${b.address ? `<div class="bg-[#F7F7F9] p-3 rounded-[12px] mb-4 border border-[#E5E7EB]"><p class="text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-1">Address</p><div class="text-sm text-[#4B5563] font-medium leading-relaxed">${b.address.replace(/(https?:\/\/[^\s]+)/g, '<br><a href="$1" target="_blank" class="text-[#2563EB] hover:underline font-bold text-xs mt-1 inline-block">Open Map <i class="fas fa-external-link-alt"></i></a>')}</div></div>`:''}
-                <div class="bg-[#F7F7F9] p-3 rounded-[12px] mb-4 border border-[#E5E7EB]"><p class="text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-2 border-b border-[#E5E7EB] pb-2">Items</p>${ih}<div class="flex justify-between items-center mt-2 pt-2"><span class="text-[#6B7280] font-bold text-xs">TOTAL</span><span class="text-[#16A34A] font-black text-lg">₹${b.grandTotal}</span></div></div>
-                <div class="grid grid-cols-2 gap-3"><div class="bg-[#F7F7F9] p-3 rounded-[12px] border border-[#E5E7EB] text-center flex flex-col justify-between"><p class="text-[10px] text-[#6B7280] font-bold uppercase mb-1">Status</p><p class="text-sm font-black ${isP?'text-[#16A34A]':'text-[#DC2626]'}">${b.payStatus||'Unpaid'}</p><button onclick="toggleAdminPaymentStatus('${b.id}','${nS}')" class="mt-2 w-full text-[10px] font-bold py-1.5 rounded-[6px] ${tC}">Mark ${nS}</button></div><div class="bg-[#F7F7F9] p-3 rounded-[12px] border border-[#E5E7EB] text-center flex flex-col justify-center"><p class="text-[10px] text-[#6B7280] font-bold uppercase mb-1">Mode</p><select onchange="updatePaymentMode('${b.id}', this.value)" ${!isP ? 'disabled' : ''} class="bg-white border border-[#E5E7EB] rounded-[8px] px-1 py-1.5 text-[11px] font-bold text-[#111827] outline-none w-full text-center mt-1 cursor-pointer shadow-sm disabled:opacity-50"><option value="None" ${!isP || b.payMode==='None' ? 'selected' : ''}>None</option><option value="UPI (Online)" ${isP && b.payMode==='UPI (Online)' ? 'selected' : ''}>UPI (Online)</option><option value="Cash (Offline)" ${isP && b.payMode==='Cash (Offline)' ? 'selected' : ''}>Cash (Offline)</option></select></div>
-</div>
+                <div class="bg-[#F7F7F9] p-3 rounded-[12px] mb-4 border border-[#E5E7EB]"><p class="text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-2 border-b border-[#E5E7EB] pb-2">Items</p>${ih}<div class="flex justify-between items-center mt-2 pt-2"><span class="text-[#6B7280] font-bold text-xs">TOTAL</span><span class="text-[#16A34A] font-black text-lg">₹${b.grandTotal}</span></div>${advHtml}</div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-[#F7F7F9] p-3 rounded-[12px] border border-[#E5E7EB] text-center flex flex-col justify-between">
+                        <p class="text-[10px] text-[#6B7280] font-bold uppercase mb-1">Status</p>
+                        <p class="text-sm font-black ${pC}">${displayStatus}</p>
+                        <select onchange="updatePaymentStatus('${b.id}', this.value)" class="bg-white border border-[#E5E7EB] rounded-[8px] px-1 py-1.5 text-[11px] font-bold text-[#111827] outline-none w-full text-center mt-1 cursor-pointer shadow-sm">
+                            <option value="Unpaid" ${b.payStatus==='Unpaid'?'selected':''}>Unpaid</option>
+                            <option value="Advance" ${b.payStatus==='Advance'?'selected':''}>Partial Paid</option>
+                            <option value="Paid" ${b.payStatus==='Paid'?'selected':''}>Paid</option>
+                        </select>
+                    </div>
+                    <div class="bg-[#F7F7F9] p-3 rounded-[12px] border border-[#E5E7EB] text-center flex flex-col justify-center">
+                        <p class="text-[10px] text-[#6B7280] font-bold uppercase mb-1">Mode</p>
+                        <select onchange="updatePaymentMode('${b.id}', this.value)" ${b.payStatus==='Unpaid' ? 'disabled' : ''} class="bg-white border border-[#E5E7EB] rounded-[8px] px-1 py-1.5 text-[11px] font-bold text-[#111827] outline-none w-full text-center mt-1 cursor-pointer shadow-sm disabled:opacity-50"><option value="None" ${b.payMode==='None' ? 'selected' : ''}>None</option><option value="UPI (Online)" ${b.payMode==='UPI (Online)' ? 'selected' : ''}>UPI (Online)</option><option value="Cash (Offline)" ${b.payMode==='Cash (Offline)' ? 'selected' : ''}>Cash (Offline)</option></select>
+                    </div>
+                </div>
             `;
             const m = document.getElementById('admin-order-details-modal'); m.classList.remove('hidden'); setTimeout(()=>m.classList.add('opacity-100'),10);
         }
-
         function closeAdminOrderDetails() { const m = document.getElementById('admin-order-details-modal'); m.classList.remove('opacity-100'); setTimeout(()=>m.classList.add('hidden'),300); }
         function toggleDateField(id) { let s=document.getElementById(`admin-delivery-select-${id}`); let d=document.getElementById(`admin-delivery-date-${id}`); if(s.value==='Custom') {d.classList.remove('hidden');d.classList.add('block');} else {d.classList.add('hidden');d.classList.remove('block');} }
         
@@ -3779,28 +3825,34 @@ async function deleteProduct(id) {
         }); 
         document.getElementById('receipt-items').innerHTML = iH;
 
-        let dC = parseFloat(b.discount)||0; let dL = parseFloat(b.delivery)||0;
+          let dC = parseFloat(b.discount)||0; let dL = parseFloat(b.delivery)||0;
+        let bAdv = parseFloat(b.advance)||0; 
+        
         let bD = document.getElementById('receipt-breakdown');
-        if (dC > 0 || dL > 0) {
+        if (dC > 0 || dL > 0 || bAdv > 0) {
             document.getElementById('receipt-subtotal').innerText = `₹${tA.toFixed(2)}`;
             if(dC>0){document.getElementById('receipt-discount').innerText=dC.toFixed(2); document.getElementById('receipt-discount-row').classList.remove('hidden');document.getElementById('receipt-discount-row').classList.add('flex');} else {document.getElementById('receipt-discount-row').classList.add('hidden');}
             if(dL>0){document.getElementById('receipt-delivery').innerText=dL.toFixed(2); document.getElementById('receipt-delivery-row').classList.remove('hidden');document.getElementById('receipt-delivery-row').classList.add('flex');} else {document.getElementById('receipt-delivery-row').classList.add('hidden');}
+            if(bAdv>0){document.getElementById('receipt-advance').innerText=bAdv.toFixed(2); document.getElementById('receipt-advance-row').classList.remove('hidden');document.getElementById('receipt-advance-row').classList.add('flex');} else {document.getElementById('receipt-advance-row').classList.add('hidden');document.getElementById('receipt-advance-row').classList.remove('flex');}
+            
             bD.classList.remove('hidden'); bD.classList.add('flex');
         } else { bD.classList.add('hidden'); bD.classList.remove('flex'); }
         
         document.getElementById('receipt-total').innerText = `₹${(parseFloat(b.grandTotal)||0).toFixed(2)}`;
 
-        let isP = b.payStatus && b.payStatus.includes('Paid');
+        let isP = b.payStatus === 'Paid';
+        let isA = b.payStatus === 'Advance';
         let sE = document.getElementById('receipt-paystatus');
         if(sE) { 
-            sE.outerHTML = isP 
-                ? `<div id="receipt-paystatus" style="display: inline-block; background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; border-radius: 9999px; padding: 0 24px; height: 40px; white-space: nowrap; text-align: center;">
-                    <span style="display: inline-block; vertical-align: middle; line-height: 38px; font-size: 14px; font-weight: 900; letter-spacing: 0.1em;">PAID</span>
-                   </div>` 
-                : `<div id="receipt-paystatus" style="display: inline-block; background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; border-radius: 9999px; padding: 0 24px; height: 40px; white-space: nowrap; text-align: center;">
-                    <span style="display: inline-block; vertical-align: middle; line-height: 38px; font-size: 14px; font-weight: 900; letter-spacing: 0.1em;">PENDING</span>
-                   </div>`;
+            if (isP) {
+                sE.outerHTML = `<div id="receipt-paystatus" style="display: inline-block; background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; border-radius: 9999px; padding: 0 24px; height: 40px; white-space: nowrap; text-align: center;"><span style="display: inline-block; vertical-align: middle; line-height: 38px; font-size: 14px; font-weight: 900; letter-spacing: 0.1em;">PAID</span></div>`;
+            } else if (isA) {
+                sE.outerHTML = `<div id="receipt-paystatus" style="display: inline-block; background: #FFFBEB; color: #B45309; border: 1px solid #FDE68A; border-radius: 9999px; padding: 0 24px; height: 40px; white-space: nowrap; text-align: center;"><span style="display: inline-block; vertical-align: middle; line-height: 38px; font-size: 13px; font-weight: 900; letter-spacing: 0.08em;">PARTIAL PAID</span></div>`;
+            } else {
+                sE.outerHTML = `<div id="receipt-paystatus" style="display: inline-block; background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; border-radius: 9999px; padding: 0 24px; height: 40px; white-space: nowrap; text-align: center;"><span style="display: inline-block; vertical-align: middle; line-height: 38px; font-size: 14px; font-weight: 900; letter-spacing: 0.1em;">PENDING</span></div>`;
+            }
         }
+
 
         const c = document.getElementById('receipt-container');
         
@@ -8741,64 +8793,64 @@ td.mono {
                // ==========================================
         // 📊 EXCEL / CSV DATA EXPORT FUNCTION
         // ==========================================
-        function downloadExcelData() {
-            let mPick = document.getElementById('insight-month-picker');
-            let y = new Date().getFullYear();
-            let m = new Date().getMonth();
-            if (mPick && mPick.value) {
-                const p = mPick.value.split('-');
-                y = parseInt(p[0]);
-                m = parseInt(p[1]) - 1;
-            }
-            const displayMonth = new Date(y, m).toLocaleString('default', { month: 'long' });
+     function downloadExcelData() {
+    let mPick = document.getElementById('insight-month-picker');
+    let y = new Date().getFullYear();
+    let m = new Date().getMonth();
+    if (mPick && mPick.value) {
+        const p = mPick.value.split('-');
+        y = parseInt(p[0]);
+        m = parseInt(p[1]) - 1;
+    }
+    const displayMonth = new Date(y, m).toLocaleString('default', { month: 'long' });
 
-            let csvContent = "Order ID,Date,Customer Name,Phone,Items Ordered,Total Amount (Rs),Payment Mode,Payment Status,Delivery Status\n";
-            let hasData = false;
+    // ✨ FIX: Advance Paid कॉलम जोड़ा गया
+    let csvContent = "Order ID,Date,Customer Name,Phone,Items Ordered,Advance Paid,Total Amount (Pending),Payment Mode,Payment Status,Delivery Status\n";
+    let hasData = false;
 
-            adminBills.forEach(b => {
-                let bD;
-                if (b.timestamp && typeof b.timestamp.toDate === 'function') bD = b.timestamp.toDate();
-                else if (b.timestamp && b.timestamp.seconds) bD = new Date(b.timestamp.seconds * 1000);
-                else { let pa = b.date.split('/'); if (pa.length === 3) bD = new Date(pa[2], pa[1] - 1, pa[0]); else bD = new Date(b.date); }
+    adminBills.forEach(b => {
+        let bD;
+        if (b.timestamp && typeof b.timestamp.toDate === 'function') bD = b.timestamp.toDate();
+        else if (b.timestamp && b.timestamp.seconds) bD = new Date(b.timestamp.seconds * 1000);
+        else { let pa = b.date.split('/'); if (pa.length === 3) bD = new Date(pa[2], pa[1] - 1, pa[0]); else bD = new Date(b.date); }
 
-                if (bD && !isNaN(bD) && bD.getMonth() === m && bD.getFullYear() === y) {
-                    hasData = true;
-                    let id = (b.id || "").substring(0,8).toUpperCase();
-                    let date = b.date || "";
-                    let name = (b.customerName || "N/A").replace(/,/g, " "); 
-                    let phone = b.customerPhone || "N/A";
-                    let items = (b.items ? b.items.map(i => `${i.qty}x ${i.name}`).join(' | ') : "-").replace(/,/g, " ");
-                    let total = b.grandTotal || 0;
-                    let payMode = b.payMode || "-";
-                    let payStatus = (b.payStatus || "UNPAID").replace(/,/g, " ");
-                    let delStatus = (b.deliveryStatus || "PROCESSING").replace(/,/g, " ");
+        if (bD && !isNaN(bD) && bD.getMonth() === m && bD.getFullYear() === y) {
+            hasData = true;
+            let id = (b.id || "").substring(0,8).toUpperCase();
+            let date = b.date || "";
+            let name = (b.customerName || "N/A").replace(/,/g, " "); 
+            let phone = b.customerPhone || "N/A";
+            let items = (b.items ? b.items.map(i => `${i.qty}x ${i.name}`).join(' | ') : "-").replace(/,/g, " ");
+            let advance = b.advance || 0; // ✨ नया वेरिएबल
+            let total = b.grandTotal || 0;
+            let payMode = b.payMode || "-";
+            let payStatus = (b.payStatus || "UNPAID").replace(/,/g, " ");
+            let delStatus = (b.deliveryStatus || "PROCESSING").replace(/,/g, " ");
 
-                    csvContent += `${id},${date},${name},${phone},${items},${total},${payMode},${payStatus},${delStatus}\n`;
-                }
-            });
-
-            if (!hasData) {
-                alert("No orders found for " + displayMonth + " " + y + " to export!");
-                return;
-            }
-
-            const storeName = typeof globalShopData !== 'undefined' && globalShopData?.shopName ? globalShopData.shopName.replace(/[^a-zA-Z0-9]/g, '') : 'Store';
-            const fileName = `${storeName}_Data_${displayMonth}_${y}.csv`;
- // ✨ Bilkul clean plain text blob taaki koi ajeeb symbol na aaye
-const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-
-
-            const link = document.createElement("a");
-            const url = URL.createObjectURL(blob);
-            
-            link.setAttribute("href", url);
-            link.setAttribute("download", fileName);
-            link.style.visibility = 'hidden';
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            csvContent += `${id},${date},${name},${phone},${items},${advance},${total},${payMode},${payStatus},${delStatus}\n`;
         }
+    });
+
+    if (!hasData) {
+        alert("No orders found for " + displayMonth + " " + y + " to export!");
+        return;
+    }
+
+    const storeName = typeof globalShopData !== 'undefined' && globalShopData?.shopName ? globalShopData.shopName.replace(/[^a-zA-Z0-9]/g, '') : 'Store';
+    const fileName = `${storeName}_Data_${displayMonth}_${y}.csv`;
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute("href", url);
+    link.setAttribute("download", fileName);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 
         // ==========================================
         // 🍎 iOS STYLE ALERT & CONFIRM FUNCTIONS
@@ -10263,46 +10315,43 @@ function trackEvent(eventType) {
                 // ==========================================
         // 📄 SINGLE BILL CSV DOWNLOAD FUNCTION
         // ==========================================
-        function downloadBillCSV(id) {
-            // 1. Bill dhoondho
-            const b = adminBills.find(x => x.id === id);
-            if (!b) {
-                alert("Bill not found!");
-                return;
-            }
+     function downloadBillCSV(id) {
+    const b = adminBills.find(x => x.id === id);
+    if (!b) { alert("Bill not found!"); return; }
 
-            // 2. CSV Headers aur Row data banao
-            let csvContent = "Order ID,Date,Customer Name,Phone,Address,Items Ordered,Discount,Delivery,Grand Total,Payment Mode,Payment Status,Delivery Status\n";
-            
-            let orderId = (b.id || "").substring(0, 8).toUpperCase();
-            let date = b.date || "";
-            let name = (b.customerName || "N/A").replace(/,/g, " ");
-            let phone = b.customerPhone || "N/A";
-            let address = (b.address || "").replace(/,/g, " ").replace(/[\n\r]+/g, " ");
-            let items = (b.items ? b.items.map(i => `${i.qty}x ${i.name} (₹${i.price})`).join(' | ') : "-").replace(/,/g, " ");
-            let discount = b.discount || 0;
-            let delivery = b.delivery || 0;
-            let total = b.grandTotal || 0;
-            let payMode = b.payMode || "-";
-            let payStatus = (b.payStatus || "UNPAID").replace(/,/g, " ");
-            let delStatus = (b.deliveryStatus || "PROCESSING").replace(/,/g, " ");
+    // ✨ FIX: Advance Paid कॉलम जोड़ा गया
+    let csvContent = "Order ID,Date,Customer Name,Phone,Address,Items Ordered,Discount,Delivery,Advance Paid,Grand Total (Pending),Payment Mode,Payment Status,Delivery Status\n";
+    
+    let orderId = (b.id || "").substring(0, 8).toUpperCase();
+    let date = b.date || "";
+    let name = (b.customerName || "N/A").replace(/,/g, " ");
+    let phone = b.customerPhone || "N/A";
+    let address = (b.address || "").replace(/,/g, " ").replace(/[\n\r]+/g, " ");
+    let items = (b.items ? b.items.map(i => `${i.qty}x ${i.name} (₹${i.price})`).join(' | ') : "-").replace(/,/g, " ");
+    let discount = b.discount || 0;
+    let delivery = b.delivery || 0;
+    let advance = b.advance || 0; // ✨ नया वेरिएबल
+    let total = b.grandTotal || 0;
+    let payMode = b.payMode || "-";
+    let payStatus = (b.payStatus || "UNPAID").replace(/,/g, " ");
+    let delStatus = (b.deliveryStatus || "PROCESSING").replace(/,/g, " ");
 
-            csvContent += `${orderId},${date},${name},${phone},${address},${items},${discount},${delivery},${total},${payMode},${payStatus},${delStatus}\n`;
+    csvContent += `${orderId},${date},${name},${phone},${address},${items},${discount},${delivery},${advance},${total},${payMode},${payStatus},${delStatus}\n`;
 
-            // 3. Blob create karke file download trigger karo
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            
-            const safeName = String(b.customerName || "Customer").replace(/[^a-zA-Z0-9]/g, '_');
-            link.setAttribute("href", url);
-            link.setAttribute("download", `Invoice_${safeName}_${orderId}.csv`);
-            link.style.visibility = 'hidden';
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    
+    const safeName = String(b.customerName || "Customer").replace(/[^a-zA-Z0-9]/g, '_');
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Invoice_${safeName}_${orderId}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
                 // =======================================================
         // ✨ NEW SHOPKEEPER WELCOME OFFER LOGIC (DASHBOARD) ✨
         // =======================================================

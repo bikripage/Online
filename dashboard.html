@@ -2388,12 +2388,16 @@ function applyProLocks(shopData) {
             d = dt.toLocaleDateString('en-IN', {day:'2-digit', month:'short'}) + " at " + dt.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
         }
 
-        let itemsHtml = o.items ? o.items.map(i => `
+             let itemsHtml = o.items ? o.items.map(i => {
+            let cleanName = (i.name || "Item").replace(/\s*\([^)]*\)$/, '').trim(); // ✨ FIX
+            return `
             <div class="flex justify-between items-start text-[13px] mb-2.5 last:mb-0">
-                <span class="font-medium text-gray-700 pr-4 leading-snug"><strong class="text-black">${i.qty}x</strong> ${i.name}</span>
+                <span class="font-medium text-gray-700 pr-4 leading-snug"><strong class="text-black">${i.qty}x</strong> ${cleanName}</span>
                 <span class="text-gray-900 font-bold shrink-0">₹${i.price * i.qty}</span>
             </div>
-        `).join('') : '<p class="text-[13px] text-gray-500">Items not found</p>';
+            `;
+        }).join('') : '<p class="text-[13px] text-gray-500">Items not found</p>';
+
 
         let sBg, statusText, statusDot, cardBorder;
         if (o.status === 'pending') {
@@ -3134,8 +3138,12 @@ function applyProLocks(shopData) {
         }
 
       function viewAdminOrderDetails(id) {
-            const b = adminBills.find(x => x.id === id); if(!b) return;
-            let ih = b.items.map(i => `<div class="flex justify-between text-sm text-[#4B5563] mb-1 border-b border-[#E5E7EB] pb-1"><span class="truncate pr-2">${i.qty}x ${i.name}</span><span class="font-semibold text-[#111827]">₹${i.total||(i.qty*i.price)}</span></div>`).join('');
+                     const b = adminBills.find(x => x.id === id); if(!b) return;
+            let ih = b.items.map(i => {
+                let cleanName = (i.name || "Item").replace(/\s*\([^)]*\)$/, '').trim(); // ✨ FIX: Brackets aur unit hamesha ke liye gayab!
+                return `<div class="flex justify-between text-sm text-[#4B5563] mb-1 border-b border-[#E5E7EB] pb-1"><span class="truncate pr-2">${i.qty}x ${cleanName}</span><span class="font-semibold text-[#111827]">₹${i.total||(i.qty*i.price)}</span></div>`;
+            }).join('');
+
             
             let dS = b.deliveryStatus||'Processing'; 
             let advHtml = b.advance > 0 ? `<div class="flex justify-between items-center mt-1 border-t border-[#E5E7EB] pt-1.5"><span class="text-[#6B7280] font-bold text-[10px] uppercase">Advance Paid</span><span class="text-[#D97706] font-bold text-xs">-₹${b.advance}</span></div>` : '';
@@ -3830,13 +3838,24 @@ async function deleteProduct(id) {
             else footerPoweredBy.style.display = 'flex';
         }
 
-        // ITEMS INJECTION (py-1 and text-xs applied here)
+            // ITEMS INJECTION (py-1 and text-xs applied here)
         let iH = ''; let tA = 0;
         if (b.items) b.items.forEach((i, idx) => {
             let t = i.total ? i.total : (i.price * i.qty); tA += t;
-            iH += `<tr class="border-b border-gray-100 last:border-0"><td class="py-1 pr-4 font-bold text-gray-400">${String(idx+1).padStart(2,'0')}</td><td class="py-1 px-4 font-black text-gray-900">${i.name}</td><td class="py-1 px-4 text-center font-bold">${i.qty}</td><td class="py-1 px-4 text-right font-semibold text-gray-600">₹${parseFloat(i.price).toFixed(2)}</td><td class="py-1 pl-4 text-right font-black text-gray-900">₹${parseFloat(t).toFixed(2)}</td></tr>`;
+            
+            // ✨ FIX 1: Clean Name (पुराने बिल से भी ब्रैकेट वाला '(Piece)' या '(Grams)' हटा देगा)
+            let cleanName = (i.name || "Item").replace(/\s*\([^)]*\)$/, '').trim();
+            
+            // ✨ FIX 2: QTY कॉलम में यूनिट दिखाएगा (e.g. 10 Pcs)
+            let displayQty = i.unit ? `${i.qty} ${i.unit}` : i.qty;
+            
+            // ✨ FIX 3: Rate कॉलम में सही यूनिट दिखाएगा (e.g. ₹45.00/Pc)
+            let displayRate = i.rateUnit ? `₹${parseFloat(i.price).toFixed(2)}${i.rateUnit}` : `₹${parseFloat(i.price).toFixed(2)}`;
+
+            iH += `<tr class="border-b border-gray-100 last:border-0"><td class="py-1 pr-4 font-bold text-gray-400">${String(idx+1).padStart(2,'0')}</td><td class="py-1 px-4 font-black text-gray-900">${cleanName}</td><td class="py-1 px-4 text-center font-bold">${displayQty}</td><td class="py-1 px-4 text-right font-semibold text-gray-600">${displayRate}</td><td class="py-1 pl-4 text-right font-black text-gray-900">₹${parseFloat(t).toFixed(2)}</td></tr>`;
         }); 
         document.getElementById('receipt-items').innerHTML = iH;
+
 
           let dC = parseFloat(b.discount)||0; let dL = parseFloat(b.delivery)||0;
         let bAdv = parseFloat(b.advance)||0; 

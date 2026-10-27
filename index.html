@@ -1156,21 +1156,18 @@ async function handleShopSubmit(e) {
             const searchInput = document.getElementById('search-input');
 
                                                     // --- 🍎 SHOP OWNER "WHY SELL ON BikriPage" SECTION (ULTRA PREMIUM 3D PHONE SIMULATOR) 🍎 ---
-                                                          const merchantWhyChooseUsSection = `
+                                                                      const merchantWhyChooseUsSection = `
                 <style>
-                    /* ✨ ULTRA SMOOTH HARDWARE ACCELERATED ANIMATIONS (60fps) ✨ */
-                    @keyframes floatIcon {
-                        0%, 100% { transform: translate3d(0, 0, 0); }
-                        50% { transform: translate3d(0, -10px, 0); }
+                    /* ✨ ULTRA SMOOTH MINIMALIST iOS ANIMATIONS ✨ */
+                    .ios-glass {
+                        background: rgba(255, 255, 255, 0.95);
+                        border: 1px solid rgba(255, 255, 255, 0.9);
+                        box-shadow: 0 12px 40px rgba(0,0,0,0.06);
                     }
-                    .animate-float-1 { animation: floatIcon 4s ease-in-out infinite; will-change: transform; }
-                    .animate-float-2 { animation: floatIcon 4s ease-in-out infinite 1.2s; will-change: transform; }
-                    .animate-float-3 { animation: floatIcon 4s ease-in-out infinite 2.4s; will-change: transform; }
 
-                    /* 🟢 CLAUDE-STYLE SCROLL REVEAL (Left Side Text) */
                     .reveal-item {
                         opacity: 0;
-                        transform: translateY(30px);
+                        transform: translateY(20px);
                         transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
                         will-change: opacity, transform;
                     }
@@ -1179,7 +1176,7 @@ async function handleShopSubmit(e) {
                         transform: translateY(0);
                     }
 
-                    /* 🟢 30-SECOND MASTER SIMULATION LOOP (Right Side Phone) */
+                    /* 🟢 30-SECOND CONNECTED SIMULATION LOOP */
                     .sim-stage {
                         position: absolute;
                         top: 0; left: 0; width: 100%; height: 100%;
@@ -1188,70 +1185,68 @@ async function handleShopSubmit(e) {
                         will-change: opacity, transform;
                     }
                     
-                    /* Stage 1 (0s-5s): Digital Storefront & Share Link */
+                    /* Stage 1 (0-16%): Digital Storefront */
                     .stage-1 { animation: s1 30s infinite cubic-bezier(0.25, 1, 0.5, 1); }
                     @keyframes s1 {
-                        0%, 2% { opacity: 0; transform: translateY(-20px) scale(0.95); }
+                        0%, 2% { opacity: 0; transform: translateY(-10px) scale(0.98); }
                         4%, 15% { opacity: 1; transform: translateY(0) scale(1); }
-                        17%, 100% { opacity: 0; transform: translateY(20px) scale(0.95); }
+                        16%, 100% { opacity: 0; transform: translateY(10px) scale(0.98); }
                     }
 
-                    /* Stage 2 (5s-10s): New Order via App/WhatsApp */
+                    /* Stage 2 (16-33%): Receive Orders Online */
                     .stage-2 { animation: s2 30s infinite cubic-bezier(0.25, 1, 0.5, 1); }
                     @keyframes s2 {
-                        0%, 15% { opacity: 0; transform: translateY(-20px) scale(0.95); }
+                        0%, 15% { opacity: 0; transform: translateY(-10px) scale(0.98); }
                         17%, 31% { opacity: 1; transform: translateY(0) scale(1); }
-                        33%, 100% { opacity: 0; transform: translateY(20px) scale(0.95); }
+                        33%, 100% { opacity: 0; transform: translateY(10px) scale(0.98); }
                     }
 
-                    /* Stage 3 (10s-15s): Smart Billing & Calculator */
+                    /* Stage 3 (33-50%): Calculator Typing -> Smart Bill */
                     .stage-3 { animation: s3 30s infinite cubic-bezier(0.25, 1, 0.5, 1); }
                     @keyframes s3 {
-                        0%, 31% { opacity: 0; transform: translateY(30px) scale(0.95); }
-                        33%, 48% { opacity: 1; transform: translateY(0) scale(1); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
-                        50%, 100% { opacity: 0; transform: translateY(-30px) scale(0.95); }
+                        0%, 31% { opacity: 0; transform: translateY(-10px) scale(0.98); }
+                        33%, 48% { opacity: 1; transform: translateY(0) scale(1); }
+                        50%, 100% { opacity: 0; transform: translateY(10px) scale(0.98); }
                     }
+                    /* Typing Effect Sync */
+                    .calc-view { animation: calcV 30s infinite; }
+                    @keyframes calcV { 0%, 32% { opacity: 0; } 33%, 40% { opacity: 1; transform: scale(1); } 41%, 100% { opacity: 0; transform: scale(0.95); } }
+                    
+                    .type-text { overflow: hidden; white-space: nowrap; border-right: 2px solid #007AFF; animation: typeT 30s infinite steps(10, end); }
+                    @keyframes typeT { 0%, 33% { width: 0; border-color: transparent; } 34%, 39% { width: 100%; border-color: #007AFF; } 40%, 100% { width: 100%; border-color: transparent; } }
+                    
+                    /* Bill Pop-up Sync */
+                    .bill-view { animation: billV 30s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; }
+                    @keyframes billV { 0%, 40% { opacity: 0; transform: translateY(30px) scale(0.9); } 41%, 49% { opacity: 1; transform: translateY(0) scale(1); box-shadow: 0 20px 40px rgba(0,0,0,0.1); } 50%, 100% { opacity: 0; transform: translateY(-20px) scale(0.9); } }
 
-                    /* Stage 4 (15s-20s): WhatsApp Direct Sending */
-                    .stage-4 { animation: s4 30s infinite cubic-bezier(0.25, 1, 0.5, 1); z-index: 60; }
+                    /* Stage 4 (50-66%): WhatsApp Direct Sending */
+                    .stage-4 { animation: s4 30s infinite cubic-bezier(0.25, 1, 0.5, 1); }
                     @keyframes s4 {
-                        0%, 48% { opacity: 0; transform: translateY(30px) scale(0.9); }
-                        50%, 65% { opacity: 1; transform: translateY(0) scale(1); box-shadow: 0 20px 40px rgba(34,197,94,0.15); }
-                        67%, 100% { opacity: 0; transform: translateY(30px) scale(0.9); }
+                        0%, 49% { opacity: 0; transform: translateX(-20px) scale(0.98); }
+                        51%, 65% { opacity: 1; transform: translateX(0) scale(1); }
+                        66%, 100% { opacity: 0; transform: translateX(20px) scale(0.98); }
                     }
 
-                    /* Stage 5 (20s-25s): Dashboard & Bar Chart */
+                    /* Stage 5 (66-83%): Dashboard & Bar Chart */
                     .stage-5 { animation: s5 30s infinite cubic-bezier(0.25, 1, 0.5, 1); }
                     @keyframes s5 {
-                        0%, 65% { opacity: 0; transform: translateY(20px) scale(0.95); }
+                        0%, 65% { opacity: 0; transform: translateY(10px) scale(0.98); }
                         67%, 81% { opacity: 1; transform: translateY(0) scale(1); }
-                        83%, 100% { opacity: 0; transform: translateY(-20px) scale(0.95); }
+                        83%, 100% { opacity: 0; transform: translateY(-10px) scale(0.98); }
                     }
-                    /* Graph Bar Anim */
                     .bar-grow { animation: barGrow 30s infinite ease-out; height: 6px; transform-origin: bottom; }
-                    @keyframes barGrow {
-                        0%, 66% { height: 6px; }
-                        69%, 81% { height: var(--h); }
-                        84%, 100% { height: 6px; }
-                    }
+                    @keyframes barGrow { 0%, 67% { height: 6px; } 70%, 82% { height: var(--h); } 83%, 100% { height: 6px; } }
 
-                    /* Stage 6 (25s-30s): Excel & Smart Report Download */
+                    /* Stage 6 (83-100%): Excel Download & Alert */
                     .stage-6 { animation: s6 30s infinite cubic-bezier(0.25, 1, 0.5, 1); }
                     @keyframes s6 {
-                        0%, 81% { opacity: 0; transform: translateY(20px) scale(0.95); }
-                        83%, 98% { opacity: 1; transform: translateY(0) scale(1); }
-                        100% { opacity: 0; transform: translateY(-20px) scale(0.95); }
+                        0%, 82% { opacity: 0; transform: translateY(10px) scale(0.98); }
+                        84%, 98% { opacity: 1; transform: translateY(0) scale(1); }
+                        100% { opacity: 0; transform: translateY(-10px) scale(0.98); }
                     }
-                    
-                    /* Background Orbs */
-                    @keyframes driftOrb {
-                        0% { transform: translate(0, 0) scale(1); opacity: 0.2; }
-                        33% { transform: translate(30px, -30px) scale(1.1); opacity: 0.4; }
-                        66% { transform: translate(-20px, 20px) scale(0.9); opacity: 0.3; }
-                        100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
-                    }
-                    .bg-orb-1 { animation: driftOrb 12s infinite ease-in-out; }
-                    .bg-orb-2 { animation: driftOrb 15s infinite ease-in-out reverse; }
+                    /* Download Alert Pop-up */
+                    .dl-alert { animation: dlPop 30s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; }
+                    @keyframes dlPop { 0%, 90% { opacity: 0; transform: translateY(-20px) scale(0.9); } 92%, 98% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-20px) scale(0.9); } }
                 </style>
 
                 <div class="relative z-20 w-full max-w-[1200px] mx-auto mt-12 sm:mt-24 px-4 sm:px-6 mb-16">
@@ -1269,219 +1264,188 @@ async function handleShopSubmit(e) {
                         <p class="text-gray-500 mt-3 font-medium text-[14px] sm:text-base max-w-2xl mx-auto px-2">Watch how BikriPage handles everything seamlessly. From digital storefronts to final smart reports.</p>
                     </div>
 
-                    <!-- Main Showcase Container -->
                     <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center justify-center bg-white/70 backdrop-blur-2xl rounded-[24px] sm:rounded-[2.5rem] p-6 sm:p-10 border border-gray-100 shadow-[0_15px_50px_rgba(0,0,0,0.03)]">
                         
                         <!-- 📝 LEFT: Claude-Style Smooth Text Reveal List -->
-                        <div class="w-full lg:w-[45%] flex flex-col gap-5 z-10" id="smooth-steps-container">
-                            
+                        <div class="w-full lg:w-[45%] flex flex-col gap-4 z-10" id="smooth-steps-container">
                             <div class="reveal-item flex items-start gap-4">
                                 <div class="w-12 h-12 rounded-[14px] bg-indigo-50 flex items-center justify-center shrink-0 border border-indigo-100"><i class="fas fa-store text-xl text-indigo-600"></i></div>
-                                <div class="pt-1.5">
-                                    <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">1. Digital Storefront</h4>
-                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Create your online store in seconds. Share the link everywhere to boost sales.</p>
-                                </div>
+                                <div class="pt-1.5"><h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">1. Digital Storefront</h4><p class="text-[13px] text-gray-500 font-medium leading-snug">Create your online store in seconds. Share the link everywhere to boost sales.</p></div>
                             </div>
-
                             <div class="reveal-item flex items-start gap-4">
                                 <div class="w-12 h-12 rounded-[14px] bg-cyan-50 flex items-center justify-center shrink-0 border border-cyan-100"><i class="fas fa-cart-arrow-down text-xl text-cyan-600"></i></div>
-                                <div class="pt-1.5">
-                                    <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">2. Receive Orders Online</h4>
-                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Get direct orders from your store link. Instant alerts on App & WhatsApp.</p>
-                                </div>
+                                <div class="pt-1.5"><h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">2. Receive Orders Online</h4><p class="text-[13px] text-gray-500 font-medium leading-snug">Get direct orders from your store link. Instant alerts on App & WhatsApp.</p></div>
                             </div>
-
                             <div class="reveal-item flex items-start gap-4">
                                 <div class="w-12 h-12 rounded-[14px] bg-blue-50 flex items-center justify-center shrink-0 border border-blue-100"><i class="fas fa-file-invoice-dollar text-xl text-blue-600"></i></div>
-                                <div class="pt-1.5">
-                                    <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">3. Smart Billing</h4>
-                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Auto-calculate prices and generate a professional, branded invoice instantly.</p>
-                                </div>
+                                <div class="pt-1.5"><h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">3. Smart Billing</h4><p class="text-[13px] text-gray-500 font-medium leading-snug">Auto-calculate prices and generate a professional, branded invoice instantly.</p></div>
                             </div>
-
                             <div class="reveal-item flex items-start gap-4">
                                 <div class="w-12 h-12 rounded-[14px] bg-green-50 flex items-center justify-center shrink-0 border border-green-100"><i class="fab fa-whatsapp text-2xl text-green-600"></i></div>
-                                <div class="pt-1.5">
-                                    <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">4. 1-Click WhatsApp</h4>
-                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Send digital bills and secure payment links directly to customers.</p>
-                                </div>
+                                <div class="pt-1.5"><h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">4. 1-Click WhatsApp</h4><p class="text-[13px] text-gray-500 font-medium leading-snug">Send digital bills and order confirmations directly to customers.</p></div>
                             </div>
-
                             <div class="reveal-item flex items-start gap-4">
                                 <div class="w-12 h-12 rounded-[14px] bg-purple-50 flex items-center justify-center shrink-0 border border-purple-100"><i class="fas fa-chart-line text-xl text-purple-600"></i></div>
-                                <div class="pt-1.5">
-                                    <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">5. Auto Calculations</h4>
-                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Real-time tracking of your sales, pending udhar, and net profit.</p>
-                                </div>
+                                <div class="pt-1.5"><h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">5. Auto Calculations</h4><p class="text-[13px] text-gray-500 font-medium leading-snug">Real-time tracking of your sales, pending udhar, and net profit.</p></div>
                             </div>
-
                             <div class="reveal-item flex items-start gap-4">
                                 <div class="w-12 h-12 rounded-[14px] bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100"><i class="fas fa-file-excel text-xl text-emerald-600"></i></div>
-                                <div class="pt-1.5">
-                                    <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">6. Export & Reports</h4>
-                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Download complete Excel data and AI-powered smart business reports.</p>
-                                </div>
+                                <div class="pt-1.5"><h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">6. Export & Reports</h4><p class="text-[13px] text-gray-500 font-medium leading-snug">Download complete Excel data and AI-powered smart business reports.</p></div>
                             </div>
-
                         </div>
 
-                        <!-- 📱 RIGHT: 3D iOS PHONE ANIMATION STAGE (30s Continuous Loop) -->
-                        <div class="w-full lg:w-[45%] h-[420px] sm:h-[500px] bg-[#F9FAFB] rounded-[2rem] sm:rounded-[3rem] border-[6px] border-white shadow-inner relative flex items-center justify-center overflow-hidden">
+                        <!-- 📱 RIGHT: MINIMALIST iOS PHONE MOCKUP -->
+                        <div class="w-full lg:w-[45%] h-[460px] sm:h-[540px] flex items-center justify-center relative">
                             
-                            <!-- Ambient Background -->
-                            <div class="absolute inset-0 opacity-[0.3]" style="background-image: radial-gradient(#CBD5E1 1px, transparent 1px); background-size: 24px 24px;"></div>
-                            <div class="bg-orb-1 absolute top-5 left-5 w-48 h-48 bg-blue-300 rounded-full blur-[70px] mix-blend-multiply"></div>
-                            <div class="bg-orb-2 absolute bottom-5 right-5 w-64 h-64 bg-purple-300 rounded-full blur-[80px] mix-blend-multiply"></div>
-                            
-                            <!-- 📱 THE iPHONE MOCKUP BASE -->
-                            <div class="relative w-[250px] sm:w-[290px] h-[370px] sm:h-[440px] bg-white rounded-[32px] sm:rounded-[44px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border-[8px] border-gray-900 flex flex-col z-20 overflow-hidden ring-1 ring-black/5">
+                            <div class="relative w-[260px] sm:w-[300px] h-[440px] sm:h-[500px] bg-white rounded-[2.5rem] sm:rounded-[3rem] shadow-[0_20px_60px_rgba(0,0,0,0.08)] border-[6px] border-[#F2F2F7] ring-1 ring-gray-200 flex flex-col z-20 overflow-hidden">
                                 
-                                <!-- Notch -->
-                                <div class="absolute top-2 left-1/2 transform -translate-x-1/2 w-20 h-5 bg-gray-900 rounded-full z-50"></div>
+                                <!-- Dynamic Island / Notch (Minimal) -->
+                                <div class="absolute top-2.5 left-1/2 transform -translate-x-1/2 w-20 h-5 bg-black rounded-full z-50 shadow-sm"></div>
                                 
-                                <!-- SIMULATION CONTAINER -->
-                                <div class="w-full h-full relative bg-[#F2F2F7]">
+                                <div class="w-full h-full relative bg-[#F9FAFB]">
                                     
                                     <!-- STAGE 1: Digital Storefront -->
-                                    <div class="sim-stage stage-1 flex flex-col bg-white">
-                                        <div class="h-[120px] w-full bg-gradient-to-r from-indigo-500 to-purple-600 relative shrink-0">
-                                           <div class="absolute -bottom-6 left-4 w-14 h-14 rounded-[14px] border-[3px] border-white bg-white flex items-center justify-center text-indigo-500 shadow-sm"><i class="fas fa-store text-2xl"></i></div>
-                                           <div class="absolute top-6 right-4 bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-full text-white text-[10px] font-bold flex items-center gap-1.5 animate-pulse shadow-sm border border-white/30"><i class="fas fa-share"></i> Share Store</div>
+                                    <div class="sim-stage stage-1 flex flex-col bg-white h-full">
+                                        <div class="h-[140px] w-full bg-gradient-to-r from-indigo-500 to-purple-600 relative shrink-0">
+                                           <!-- Share Button Fixed Position -->
+                                           <div class="absolute top-10 right-3 bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-full text-white text-[10px] font-bold flex items-center gap-1.5 animate-pulse shadow-sm border border-white/30"><i class="fas fa-share"></i> Share Store</div>
+                                           <div class="absolute -bottom-8 left-5 w-16 h-16 rounded-[16px] border-[4px] border-white bg-white flex items-center justify-center text-indigo-500 shadow-sm"><i class="fas fa-store text-3xl"></i></div>
                                         </div>
-                                        <div class="pt-8 px-4 pb-4 border-b border-gray-100 bg-white">
-                                           <h4 class="font-black text-gray-900 text-[18px]">Verma Enterprises</h4>
-                                           <p class="text-[11px] text-gray-500 font-medium mt-0.5">Premium quality daily needs & groceries.</p>
+                                        <div class="pt-10 px-5 pb-4 border-b border-gray-100 bg-white">
+                                           <h4 class="font-black text-gray-900 text-[20px]">Verma Enterprises</h4>
+                                           <p class="text-[12px] text-gray-500 font-medium mt-1">Premium quality daily needs & groceries.</p>
                                         </div>
-                                        <div class="flex gap-2 px-3 pt-3">
-                                           <div class="bg-white p-2 rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 flex-1">
-                                               <div class="h-16 bg-gray-50 rounded-lg mb-2 flex items-center justify-center text-gray-300 border border-gray-100 relative">
-                                                    <i class="fas fa-box text-xl"></i>
-                                                    <span class="absolute top-1 right-1 bg-red-50 text-red-500 text-[7px] font-bold px-1 rounded">10% OFF</span>
+                                        <div class="p-4 grid grid-cols-2 gap-3 bg-[#F9FAFB] flex-1">
+                                           <div class="bg-white p-2.5 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-full">
+                                               <div class="h-20 bg-gray-50 rounded-xl mb-2 flex items-center justify-center text-gray-300 relative">
+                                                    <i class="fas fa-box text-2xl"></i>
+                                                    <span class="absolute top-1 right-1 bg-red-50 text-red-500 text-[8px] font-bold px-1.5 rounded">10% OFF</span>
                                                </div>
-                                               <div class="text-[10px] font-bold text-gray-800 truncate mb-1">Premium Rice</div>
-                                               <div class="text-[12px] font-black text-green-600 mt-auto">₹120/Kg</div>
+                                               <div class="text-[11px] font-bold text-gray-800 truncate mb-1">Premium Rice</div>
+                                               <div class="text-[13px] font-black text-green-600 mt-auto">₹120/Kg</div>
                                            </div>
-                                           <div class="bg-white p-2 rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 flex-1">
-                                               <div class="h-16 bg-gray-50 rounded-lg mb-2 flex items-center justify-center text-gray-300 border border-gray-100">
-                                                    <i class="fas fa-box text-xl"></i>
-                                               </div>
-                                               <div class="text-[10px] font-bold text-gray-800 truncate mb-1">Organic Sugar</div>
-                                               <div class="text-[12px] font-black text-green-600 mt-auto">₹45/Kg</div>
+                                           <div class="bg-white p-2.5 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-full">
+                                               <div class="h-20 bg-gray-50 rounded-xl mb-2 flex items-center justify-center text-gray-300"><i class="fas fa-box text-2xl"></i></div>
+                                               <div class="text-[11px] font-bold text-gray-800 truncate mb-1">Organic Sugar</div>
+                                               <div class="text-[13px] font-black text-green-600 mt-auto">₹45/Kg</div>
                                            </div>
                                         </div>
                                     </div>
 
-                                    <!-- STAGE 2: Receive Orders Online (Notification Drop) -->
-                                    <div class="sim-stage stage-2 flex flex-col items-center pt-16 px-4 bg-gray-900">
-                                        <!-- Mock App Background -->
-                                        <div class="absolute inset-0 bg-gray-900 opacity-90"></div>
-                                        <div class="w-full bg-white/10 backdrop-blur-xl p-4 rounded-[20px] shadow-[0_15px_40px_rgba(0,0,0,0.2)] border border-white/20 flex flex-col gap-3 relative z-10">
+                                    <!-- STAGE 2: Receive Orders Online -->
+                                    <div class="sim-stage stage-2 flex flex-col pt-16 px-4 bg-[#F2F2F7] h-full">
+                                        <div class="w-full bg-white p-4 rounded-[24px] shadow-[0_15px_30px_rgba(0,0,0,0.06)] border border-gray-100 flex flex-col gap-4 relative z-10">
                                             <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 bg-cyan-400 rounded-full flex items-center justify-center text-white shrink-0 shadow-[0_0_15px_rgba(34,211,238,0.5)]"><i class="fas fa-cart-arrow-down animate-bounce text-[16px]"></i></div>
-                                                <div class="flex-1 min-w-0 pt-0.5">
-                                                    <div class="flex justify-between items-center"><span class="text-[9px] font-black text-cyan-300 uppercase tracking-widest">New Online Order</span><span class="text-[9px] text-gray-400">now</span></div>
-                                                    <h4 class="font-black text-white text-[14px] truncate mt-0.5">Satyam Kumar</h4>
+                                                <div class="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-600 shrink-0"><i class="fas fa-cart-arrow-down text-xl"></i></div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="flex justify-between items-center"><span class="text-[10px] font-black text-cyan-500 uppercase tracking-widest">New Online Order</span><span class="text-[10px] text-gray-400">now</span></div>
+                                                    <h4 class="font-black text-gray-900 text-[15px] truncate mt-1">Satyam Kumar</h4>
                                                 </div>
                                             </div>
-                                            <div class="bg-black/20 rounded-xl p-3 border border-white/10">
-                                                <div class="flex justify-between text-[11px] font-semibold text-gray-300 mb-1"><span>2x Premium Rice</span><span>₹240</span></div>
-                                                <div class="flex justify-between text-[11px] font-semibold text-gray-300"><span>1x Organic Sugar</span><span>₹45</span></div>
-                                                <div class="border-t border-white/10 mt-2 pt-2 flex justify-between items-center">
-                                                    <span class="text-[10px] font-bold text-gray-400 uppercase">Total Value</span>
-                                                    <span class="text-[14px] font-black text-green-400">₹285</span>
+                                            <div class="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                                                <div class="flex justify-between text-[12px] font-semibold text-gray-600 mb-1.5"><span>2x Premium Rice</span><span>₹240</span></div>
+                                                <div class="flex justify-between text-[12px] font-semibold text-gray-600"><span>1x Organic Sugar</span><span>₹45</span></div>
+                                                <div class="border-t border-gray-200 mt-2.5 pt-2.5 flex justify-between items-center">
+                                                    <span class="text-[11px] font-bold text-gray-500 uppercase">Total Value</span>
+                                                    <span class="text-[16px] font-black text-green-600">₹285</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    <!-- STAGE 3: Smart Bill Generated (Detailed Invoice) -->
-                                    <div class="sim-stage stage-3 flex flex-col p-4 pt-16 items-center justify-center bg-gray-50">
-                                        <div class="w-full bg-white p-5 rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.08)] border border-gray-200 relative">
-                                            <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-[9px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">Bill Generated</div>
-                                            <div class="flex justify-between items-end border-b border-dashed border-gray-300 pb-3 mb-3 mt-1">
-                                                <div>
-                                                    <span class="font-black text-[11px] text-gray-400 uppercase block mb-1">Digital Invoice</span>
-                                                    <span class="text-[14px] font-black text-gray-800">Satyam</span>
+                                    <!-- STAGE 3: Typing Animation -> Smart Bill -->
+                                    <div class="sim-stage stage-3 flex flex-col h-full bg-[#F2F2F7] relative">
+                                        <!-- Calculator Typing View -->
+                                        <div class="calc-view absolute inset-0 pt-16 px-4">
+                                            <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-3">
+                                                <div class="text-[10px] font-bold text-gray-400 uppercase mb-1">Item Name</div>
+                                                <div class="text-base font-black text-gray-900">Sugar</div>
+                                            </div>
+                                            <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-3">
+                                                <div class="text-[10px] font-bold text-gray-400 uppercase mb-1">Rate (₹)</div>
+                                                <div class="text-base font-black text-gray-900">₹70 / Kg</div>
+                                            </div>
+                                            <div class="bg-blue-50 rounded-2xl p-4 shadow-sm border border-blue-100 mb-3">
+                                                <div class="text-[10px] font-bold text-blue-500 uppercase mb-1">Customer Wants</div>
+                                                <div class="flex gap-1 items-center">
+                                                    <div class="text-2xl font-black text-blue-600 type-text w-[50px]">250</div>
+                                                    <div class="text-base font-bold text-blue-600">Grams</div>
                                                 </div>
-                                                <span class="bg-gray-100 px-2 py-1 rounded text-[9px] font-bold text-gray-500">#ORD-902</span>
                                             </div>
-                                            <div class="flex justify-between text-[12px] font-bold text-gray-700 mb-2">
-                                                <span>2 Kg x Premium Rice</span><span>₹240.00</span>
-                                            </div>
-                                            <div class="flex justify-between text-[9px] font-semibold text-gray-400 mb-4 pl-1">
-                                                <span>Rate: ₹120.00/Kg</span><span></span>
-                                            </div>
-                                            <div class="flex justify-between text-[12px] font-bold text-gray-700 mb-3">
-                                                <span>1 Kg x Organic Sugar</span><span>₹45.00</span>
-                                            </div>
-                                            <div class="flex justify-between items-center bg-green-50 p-3 rounded-xl mt-4 border border-green-100">
-                                                <span class="text-[11px] font-black text-green-700 uppercase tracking-widest">Grand Total</span>
-                                                <span class="text-[18px] font-black text-green-600">₹285.00</span>
+                                        </div>
+
+                                        <!-- Bill View -->
+                                        <div class="bill-view absolute inset-0 pt-14 px-4 flex justify-center">
+                                            <div class="w-full bg-white p-5 rounded-[24px] shadow-xl border border-gray-200 relative h-fit">
+                                                <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-[9px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">Bill Generated</div>
+                                                <div class="flex justify-between items-end border-b border-dashed border-gray-200 pb-3 mb-3 mt-2">
+                                                    <div><span class="font-black text-[11px] text-gray-400 uppercase block mb-1">Invoice</span><span class="text-[15px] font-black text-gray-900">Satyam</span></div>
+                                                    <span class="bg-gray-100 px-2 py-1 rounded text-[10px] font-bold text-gray-500">#ORD-902</span>
+                                                </div>
+                                                <div class="flex justify-between text-[12px] font-bold text-gray-700 mb-1"><span>250 g x Sugar</span><span>₹17.50</span></div>
+                                                <div class="flex justify-between text-[10px] font-semibold text-gray-400 mb-3 pl-1"><span>Rate: ₹70.00/Kg</span><span></span></div>
+                                                <div class="flex justify-between text-[12px] font-bold text-gray-700 mb-3"><span>1 Pcs x Premium Soap</span><span>₹35.00</span></div>
+                                                <div class="flex justify-between items-center bg-green-50 p-3 rounded-xl mt-4 border border-green-100">
+                                                    <span class="text-[11px] font-black text-green-700 uppercase tracking-widest">Grand Total</span>
+                                                    <span class="text-[18px] font-black text-green-600">₹52.50</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    <!-- STAGE 4: 1-Click WhatsApp (Detailed Chat UI) -->
-                                    <div class="sim-stage stage-4 flex flex-col bg-[#E5DDD5]">
-                                        <!-- WA Header -->
-                                        <div class="bg-[#075E54] px-4 py-3 flex items-center gap-3 shadow-md z-10">
-                                            <i class="fas fa-arrow-left text-white/80 text-sm"></i>
+                                    <!-- STAGE 4: Clean WhatsApp Chat -->
+                                    <div class="sim-stage stage-4 flex flex-col bg-[#E5DDD5] h-full">
+                                        <div class="bg-[#075E54] px-4 py-4 flex items-center gap-3 shadow-sm z-10">
+                                            <i class="fas fa-arrow-left text-white/90 text-sm"></i>
                                             <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white"><i class="fas fa-user"></i></div>
-                                            <div class="flex-1"><p class="text-white font-bold text-[13px] leading-tight">Satyam Customer</p><p class="text-white/70 text-[9px]">online</p></div>
+                                            <div class="flex-1"><p class="text-white font-bold text-[14px] leading-tight">Satyam Customer</p><p class="text-white/70 text-[10px]">online</p></div>
                                         </div>
-                                        <!-- WA Chat Body -->
-                                        <div class="flex-1 p-4 flex flex-col justify-end" style="background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: cover;">
-                                            
-                                            <div class="bg-white p-3 rounded-[12px] rounded-tl-sm shadow-sm max-w-[85%] self-start mb-3 relative">
-                                                <p class="text-[11px] text-gray-800">Bhaiya 2 kilo chawal aur 1 kilo chini bhej do.</p>
-                                                <span class="text-[8px] text-gray-400 absolute bottom-1 right-2">10:42 AM</span>
+                                        <div class="flex-1 p-4 flex flex-col justify-end pb-12" style="background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: cover;">
+                                            <div class="bg-white p-3 rounded-[12px] rounded-tl-sm shadow-sm max-w-[85%] self-start mb-4 relative">
+                                                <p class="text-[12px] text-gray-800">Bhaiya saman bhej do.</p>
+                                                <span class="text-[9px] text-gray-400 absolute bottom-1 right-2">10:42 AM</span>
                                             </div>
-
+                                            <!-- Clean Professional Message -->
                                             <div class="bg-[#DCF8C6] p-3 rounded-[12px] rounded-tr-sm shadow-sm max-w-[90%] self-end relative">
-                                                <h4 class="font-black text-gray-900 text-[11px] mb-1"><i class="fas fa-file-invoice text-green-600 mr-1"></i> Digital Bill Generated</h4>
-                                                <p class="text-[10px] text-gray-700 leading-snug mb-1.5">Satyam, your order is ready.<br>Total amount: *₹285*</p>
-                                                <div class="bg-white/60 p-2 rounded mb-2 border border-green-200/50">
-                                                    <p class="text-[9px] text-blue-600 font-bold truncate">🔗 https://pay.bikripage.com/sat...</p>
-                                                </div>
-                                                <p class="text-[10px] text-gray-700 font-bold">Please pay to confirm order.</p>
-                                                <span class="text-[8px] text-gray-500 absolute bottom-1.5 right-2">10:45 AM <i class="fas fa-check-double text-blue-500 ml-0.5"></i></span>
+                                                <h4 class="font-black text-gray-900 text-[12px] mb-1.5"><i class="fas fa-check-circle text-green-600 mr-1"></i> Order Confirmed</h4>
+                                                <p class="text-[11px] text-gray-800 leading-snug mb-2">Satyam, your order is ready.<br>Total: <b>₹52.50</b></p>
+                                                <p class="text-[10px] text-gray-600 font-semibold bg-white/50 p-2 rounded-lg border border-green-200/50">You can track and place future orders in the 'My Orders' section.</p>
+                                                <span class="text-[9px] text-gray-500 absolute bottom-1.5 right-2">10:45 AM <i class="fas fa-check-double text-blue-500 ml-0.5"></i></span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <!-- STAGE 5: Dashboard Sales Update (Detailed Analytics) -->
-                                    <div class="sim-stage stage-5 flex flex-col bg-white">
-                                        <div class="p-4 pt-12 pb-2 border-b border-gray-100 flex justify-between items-center">
-                                            <h4 class="text-[14px] font-black text-gray-800">Business Analytics</h4>
-                                            <span class="bg-gray-100 text-gray-600 text-[9px] font-bold px-2 py-1 rounded-md">Today</span>
+                                    <!-- STAGE 5: Dashboard Analytics -->
+                                    <div class="sim-stage stage-5 flex flex-col bg-white h-full">
+                                        <div class="p-5 pt-12 pb-3 border-b border-gray-100 flex justify-between items-center">
+                                            <h4 class="text-[16px] font-black text-gray-900">Dashboard</h4>
+                                            <span class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-1 rounded-md">Today</span>
                                         </div>
                                         <div class="p-4 flex-1 flex flex-col bg-[#F9FAFB]">
                                             <div class="grid grid-cols-2 gap-3 mb-4">
-                                                <div class="bg-white p-3.5 rounded-xl border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                                                    <p class="text-[9px] font-bold text-gray-400 uppercase flex items-center gap-1"><i class="fas fa-wallet text-green-500"></i> Today's Sale</p>
-                                                    <p class="text-[16px] font-black text-gray-900 mt-1.5">₹5,452</p>
+                                                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                                                    <p class="text-[10px] font-bold text-gray-400 uppercase flex items-center gap-1"><i class="fas fa-wallet text-green-500"></i> Sales</p>
+                                                    <p class="text-[18px] font-black text-gray-900 mt-2">₹5,452</p>
                                                 </div>
-                                                <div class="bg-white p-3.5 rounded-xl border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-                                                    <p class="text-[9px] font-bold text-gray-400 uppercase flex items-center gap-1"><i class="fas fa-clock text-red-500"></i> Pending Udhar</p>
-                                                    <p class="text-[16px] font-black text-gray-900 mt-1.5">₹1,200</p>
+                                                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                                                    <p class="text-[10px] font-bold text-gray-400 uppercase flex items-center gap-1"><i class="fas fa-clock text-red-500"></i> Udhar</p>
+                                                    <p class="text-[18px] font-black text-gray-900 mt-2">₹1,200</p>
                                                 </div>
                                             </div>
-                                            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex-1 flex flex-col relative overflow-hidden">
-                                                <div class="flex justify-between items-center mb-4">
-                                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Revenue Trend</p>
-                                                    <p class="text-[10px] font-bold text-green-500">+12%</p>
+                                            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex-1 flex flex-col relative overflow-hidden">
+                                                <div class="flex justify-between items-center mb-4 z-10">
+                                                    <p class="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Revenue Trend</p>
                                                 </div>
-                                                <div class="flex items-end justify-between h-full w-full gap-2.5 border-b border-gray-100 pb-1 mt-auto z-10">
-                                                    <div class="w-full bg-blue-100 rounded-t-sm bar-grow" style="--h: 30%"></div>
-                                                    <div class="w-full bg-blue-300 rounded-t-sm bar-grow" style="--h: 50%"></div>
-                                                    <div class="w-full bg-blue-400 rounded-t-sm bar-grow" style="--h: 40%"></div>
-                                                    <div class="w-full bg-blue-500 rounded-t-sm bar-grow" style="--h: 70%"></div>
-                                                    <div class="w-full bg-green-500 rounded-t-md bar-grow relative shadow-[0_0_10px_rgba(34,197,94,0.4)]" style="--h: 90%">
-                                                        <div class="absolute -top-5 left-1/2 -translate-x-1/2 w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+                                                <div class="flex items-end justify-between h-full w-full gap-3 border-b border-gray-100 pb-1 mt-auto z-10">
+                                                    <div class="w-full bg-blue-100 rounded-t-md bar-grow" style="--h: 30%"></div>
+                                                    <div class="w-full bg-blue-300 rounded-t-md bar-grow" style="--h: 50%"></div>
+                                                    <div class="w-full bg-blue-400 rounded-t-md bar-grow" style="--h: 40%"></div>
+                                                    <div class="w-full bg-blue-500 rounded-t-md bar-grow" style="--h: 70%"></div>
+                                                    <div class="w-full bg-green-500 rounded-t-lg bar-grow relative shadow-[0_0_15px_rgba(34,197,94,0.4)]" style="--h: 90%">
+                                                        <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
                                                     </div>
                                                 </div>
-                                                <!-- Grid lines behind chart -->
-                                                <div class="absolute inset-0 pt-[3.5rem] pointer-events-none flex flex-col justify-between pb-1 px-4">
+                                                <div class="absolute inset-0 pt-12 pointer-events-none flex flex-col justify-between pb-2 px-5">
                                                     <div class="w-full border-b border-dashed border-gray-100"></div>
                                                     <div class="w-full border-b border-dashed border-gray-100"></div>
                                                     <div class="w-full border-b border-dashed border-gray-100"></div>
@@ -1490,27 +1454,38 @@ async function handleShopSubmit(e) {
                                         </div>
                                     </div>
 
-                                    <!-- STAGE 6: Excel & Smart Report Download -->
-                                    <div class="sim-stage stage-6 flex flex-col p-5 pt-14 bg-white items-center h-full">
-                                        <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-100 text-gray-400">
-                                            <i class="fas fa-file-download text-2xl animate-bounce"></i>
-                                        </div>
-                                        <h4 class="font-black text-gray-900 text-[15px] mb-1 text-center">Exporting Data...</h4>
-                                        <p class="text-[10px] text-gray-500 text-center mb-6">Generating your monthly business reports.</p>
-                                        
-                                        <div class="w-full space-y-3 mt-2">
-                                            <div class="bg-green-50 border border-green-100 p-3 rounded-xl flex items-center gap-3">
-                                                <div class="w-8 h-8 bg-green-500 text-white rounded-lg flex items-center justify-center text-sm"><i class="fas fa-file-excel"></i></div>
-                                                <div class="flex-1">
-                                                    <p class="text-[11px] font-bold text-gray-800">Sales_Data.csv</p>
-                                                    <div class="w-full bg-green-200 h-1.5 rounded-full mt-1.5 overflow-hidden"><div class="bg-green-600 h-full w-[100%] rounded-full"></div></div>
-                                                </div>
+                                    <!-- STAGE 6: Download & Notification Alert -->
+                                    <div class="sim-stage stage-6 flex flex-col bg-[#F9FAFB] h-full relative p-5 pt-16">
+                                        <!-- Download Alert Pop-up -->
+                                        <div class="dl-alert absolute top-12 left-1/2 -translate-x-1/2 w-[85%] bg-gray-900 text-white p-3 rounded-2xl shadow-xl flex items-center gap-3 z-50">
+                                            <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-check"></i></div>
+                                            <div>
+                                                <p class="text-[12px] font-bold">Data Downloaded</p>
+                                                <p class="text-[9px] text-gray-300">Saved to your phone successfully.</p>
                                             </div>
-                                            <div class="bg-purple-50 border border-purple-100 p-3 rounded-xl flex items-center gap-3">
-                                                <div class="w-8 h-8 bg-purple-500 text-white rounded-lg flex items-center justify-center text-sm"><i class="fas fa-robot"></i></div>
-                                                <div class="flex-1">
-                                                    <p class="text-[11px] font-bold text-gray-800">AI_Smart_Report.pdf</p>
-                                                    <div class="w-full bg-purple-200 h-1.5 rounded-full mt-1.5 overflow-hidden"><div class="bg-purple-600 h-full w-[100%] rounded-full"></div></div>
+                                        </div>
+
+                                        <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center mt-6">
+                                            <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4 border border-gray-100 text-gray-400">
+                                                <i class="fas fa-file-download text-3xl animate-bounce"></i>
+                                            </div>
+                                            <h4 class="font-black text-gray-900 text-[16px] mb-1">Exporting Data</h4>
+                                            <p class="text-[11px] text-gray-500 text-center mb-6">Processing business reports...</p>
+                                            
+                                            <div class="w-full space-y-4">
+                                                <div class="bg-green-50/50 border border-green-100 p-3.5 rounded-2xl flex items-center gap-3">
+                                                    <div class="w-10 h-10 bg-green-500 text-white rounded-xl flex items-center justify-center text-lg shadow-sm"><i class="fas fa-file-excel"></i></div>
+                                                    <div class="flex-1">
+                                                        <p class="text-[12px] font-bold text-gray-800">Sales_Data.csv</p>
+                                                        <div class="w-full bg-green-200 h-1.5 rounded-full mt-2 overflow-hidden"><div class="bg-green-600 h-full w-[100%] rounded-full"></div></div>
+                                                    </div>
+                                                </div>
+                                                <div class="bg-purple-50/50 border border-purple-100 p-3.5 rounded-2xl flex items-center gap-3">
+                                                    <div class="w-10 h-10 bg-purple-500 text-white rounded-xl flex items-center justify-center text-lg shadow-sm"><i class="fas fa-robot"></i></div>
+                                                    <div class="flex-1">
+                                                        <p class="text-[12px] font-bold text-gray-800">AI_Smart_Report.pdf</p>
+                                                        <div class="w-full bg-purple-200 h-1.5 rounded-full mt-2 overflow-hidden"><div class="bg-purple-600 h-full w-[100%] rounded-full"></div></div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

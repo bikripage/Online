@@ -3899,30 +3899,28 @@ async function deleteProduct(id) {
             else footerPoweredBy.style.display = 'flex';
         }
 
-                   // ITEMS INJECTION (py-1 and text-xs applied here)
-        let iH = ''; let tA = 0;
-        if (b.items) b.items.forEach((i, idx) => {
-            let t = i.total ? i.total : (i.price * i.qty); tA += t;
-            
-            let cleanName = (i.name || "Item").replace(/\s*\([^)]*\)$/, '').trim();
-            
-            // 🚨 FIX: QTY mein bhi Pcs/Grams lagana hai, chahe naya order ho ya purana.
-            let displayQty = i.qty;
-            
-            if (i.unit) {
-                displayQty = `${i.qty} ${i.unit}`; // Naye orders ke liye
-            } else if (i.name && i.name.includes('(') && i.name.includes(')')) {
-                // Purane orders jinme naam ke sath (Piece) tha
-                let extractedUnit = i.name.match(/\(([^)]+)\)/);
-                if (extractedUnit && extractedUnit[1]) {
-                   displayQty = `${i.qty} ${extractedUnit[1]}`;
-                }
-            }
-            
-            let displayRate = i.rateUnit ? `₹${parseFloat(i.price).toFixed(2)}${i.rateUnit}` : `₹${parseFloat(i.price).toFixed(2)}`;
+                                    // ITEMS INJECTION (Premium Big Font & Less Padding)
+                    let iH = ''; let tA = 0;
+                    if (b.items) b.items.forEach((i, idx) => {
+                        let t = i.total ? parseFloat(i.total) : (parseFloat(i.price) * parseFloat(i.qty || 1)); 
+                        tA += t;
+                        
+                        let cleanName = (i.name || "Item").replace(/\s*\([^)]*\)$/, '').trim();
+                        let qtyDisplay = i.unit ? `${i.qty} ${i.unit}` : i.qty;
+                        
+                        let displayPriceNum = i.originalRate ? i.originalRate : i.price;
+                        let displayRate = i.rateUnit ? `₹${parseFloat(displayPriceNum).toFixed(2)}${i.rateUnit}` : `₹${parseFloat(displayPriceNum).toFixed(2)}`;
 
-            iH += `<tr class="border-b border-gray-100 last:border-0"><td class="py-1 pr-4 font-bold text-gray-400">${String(idx+1).padStart(2,'0')}</td><td class="py-1 px-4 font-black text-gray-900">${cleanName}</td><td class="py-1 px-4 text-center font-bold">${displayQty}</td><td class="py-1 px-4 text-right font-semibold text-gray-600">${displayRate}</td><td class="py-1 pl-4 text-right font-black text-gray-900">₹${parseFloat(t).toFixed(2)}</td></tr>`;
-        }); 
+                        // ✨ Font size bada kiya (13px) aur Padding kam ki (py-1.5)
+                        iH += `<tr class="border-b border-gray-100/50">
+                            <td class="py-1.5 text-[11px] text-gray-500 font-medium">${String(idx + 1).padStart(2, '0')}</td>
+                            <td class="py-1.5 text-[13px] text-gray-900 font-bold leading-tight pr-2">${cleanName}</td>
+                            <td class="py-1.5 text-center text-[12px] text-gray-800 font-bold">${qtyDisplay}</td>
+                            <td class="py-1.5 text-center text-[11px] text-gray-600 font-medium">${displayRate}</td>
+                            <td class="py-1.5 text-right text-[13px] text-gray-900 font-black">₹${t.toFixed(2)}</td>
+                        </tr>`;
+                    });
+
         document.getElementById('receipt-items').innerHTML = iH;
 
 

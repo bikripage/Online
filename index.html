@@ -1156,7 +1156,7 @@ async function handleShopSubmit(e) {
             const searchInput = document.getElementById('search-input');
 
                                                     // --- 🍎 SHOP OWNER "WHY SELL ON BikriPage" SECTION (ULTRA PREMIUM 3D PHONE SIMULATOR) 🍎 ---
-                      const merchantWhyChooseUsSection = `
+                                  const merchantWhyChooseUsSection = `
                 <style>
                     /* ✨ ULTRA SMOOTH HARDWARE ACCELERATED ANIMATIONS ✨ */
                     @keyframes floatIcon {
@@ -1185,63 +1185,78 @@ async function handleShopSubmit(e) {
                         transform: translateY(0);
                     }
 
-                    /* Premium 20-second sequence: animate only compositor-friendly properties */
+                    /* 🟢 2. 20-SECOND SMOOTH LOOP ANIMATION (Right Side Phone) */
+                    /* The master container for all stages */
                     .sim-stage {
+                        position: absolute;
+                        top: 0; left: 0; width: 100%; height: 100%;
                         opacity: 0;
-                        visibility: hidden;
-                        transform: translate3d(0, 12px, 0) scale(.975);
-                        backface-visibility: hidden;
-                        animation-duration: 20s;
-                        animation-iteration-count: infinite;
-                        animation-timing-function: cubic-bezier(.22, 1, .36, 1);
-                        animation-fill-mode: both;
+                        pointer-events: none;
+                        will-change: opacity, transform;
                     }
-                    .stage-1 { animation-name: sim1; }
-                    .stage-2 { animation-name: sim2; }
-                    .stage-3 { animation-name: sim3; }
-                    .stage-4 { animation-name: sim4; }
+                    
+                    /* STAGE 1: Calculator Entry (0s to 5s) */
+                    .stage-calc { animation: simCalc 20s infinite cubic-bezier(0.25, 1, 0.5, 1); }
+                    @keyframes simCalc {
+                        0%, 2% { opacity: 0; transform: translateY(20px) scale(0.95); }
+                        4%, 22% { opacity: 1; transform: translateY(0) scale(1); }
+                        24%, 100% { opacity: 0; transform: translateY(-20px) scale(0.95); }
+                    }
+                    /* Keystroke typing animation inside calculator */
+                    .type-qty { animation: typeAnim 20s infinite steps(3, end); overflow: hidden; white-space: nowrap; border-right: 2px solid #007AFF; }
+                    @keyframes typeAnim {
+                        0%, 8% { width: 0; border-color: transparent; }
+                        9%, 15% { width: 3ch; border-color: #007AFF; }
+                        16%, 100% { width: 3ch; border-color: transparent; }
+                    }
+                    
+                    /* STAGE 2: Bill Generated (5s to 10s) */
+                    .stage-bill { animation: simBill 20s infinite cubic-bezier(0.25, 1, 0.5, 1); }
+                    @keyframes simBill {
+                        0%, 22% { opacity: 0; transform: translateY(30px) scale(0.95); }
+                        25%, 47% { opacity: 1; transform: translateY(0) scale(1); }
+                        50%, 100% { opacity: 0; transform: translateY(-30px) scale(0.95); }
+                    }
+                    
+                    /* STAGE 3: WhatsApp Sent (10s to 15s) */
+                    .stage-wa { animation: simWa 20s infinite cubic-bezier(0.25, 1, 0.5, 1); }
+                    @keyframes simWa {
+                        0%, 47% { opacity: 0; transform: scale(0.9) translateX(-20px); }
+                        50%, 72% { opacity: 1; transform: scale(1) translateX(0); }
+                        75%, 100% { opacity: 0; transform: scale(0.9) translateX(20px); }
+                    }
 
-                    @keyframes sim1 {
-                        0%, 2% { opacity: 0; visibility: hidden; transform: translate3d(0,-12px,0) scale(.975); }
-                        4%, 18% { opacity: 1; visibility: visible; transform: translate3d(0,0,0) scale(1); }
-                        20%, 100% { opacity: 0; visibility: hidden; transform: translate3d(0,10px,0) scale(.985); }
-                    }
-                    @keyframes sim2 {
-                        0%, 18% { opacity: 0; visibility: hidden; transform: translate3d(0,12px,0) scale(.975); }
-                        20%, 48% { opacity: 1; visibility: visible; transform: translate3d(0,0,0) scale(1); }
-                        50%, 100% { opacity: 0; visibility: hidden; transform: translate3d(0,10px,0) scale(.985); }
-                    }
-                    @keyframes sim3 {
-                        0%, 48% { opacity: 0; visibility: hidden; transform: translate3d(0,12px,0) scale(.975); }
-                        50%, 73% { opacity: 1; visibility: visible; transform: translate3d(0,0,0) scale(1); }
-                        75%, 100% { opacity: 0; visibility: hidden; transform: translate3d(0,10px,0) scale(.985); }
-                    }
-                    @keyframes sim4 {
-                        0%, 73% { opacity: 0; visibility: hidden; transform: translate3d(12px,0,0) scale(.975); }
-                        75%, 98% { opacity: 1; visibility: visible; transform: translate3d(0,0,0) scale(1); }
-                        100% { opacity: 0; visibility: hidden; transform: translate3d(8px,0,0) scale(.985); }
+                    /* STAGE 4: Dashboard Stats Updated (15s to 20s) */
+                    .stage-dash { animation: simDash 20s infinite cubic-bezier(0.25, 1, 0.5, 1); }
+                    @keyframes simDash {
+                        0%, 72% { opacity: 0; transform: translateY(20px) scale(0.95); }
+                        75%, 97% { opacity: 1; transform: translateY(0) scale(1); }
+                        99%, 100% { opacity: 0; transform: translateY(-20px) scale(0.95); }
                     }
 
-                    .bar-grow { height: 6px; transform-origin: bottom; animation: barGrow 20s ease-out infinite; }
+                    /* Graph Bars Animation (Inside Stage 4) */
+                    .bar-grow { animation: barGrow 20s infinite ease-out; height: 6px; transform-origin: bottom; }
                     @keyframes barGrow {
-                        0%, 50% { height: 6px; }
-                        53%, 73% { height: var(--h); }
-                        75%, 100% { height: 6px; }
+                        0%, 75% { height: 6px; }
+                        78%, 97% { height: var(--h); }
+                        100% { height: 6px; }
                     }
-
-                    @media (prefers-reduced-motion: reduce) {
-                        .sim-stage, .bar-grow, .animate-float-1, .animate-float-2, .animate-float-3 {
-                            animation: none !important;
-                        }
-                        .sim-stage { opacity: 0; visibility: hidden; transform: none; }
-                        .stage-1 { opacity: 1; visibility: visible; }
+                    
+                    /* Background Orbs */
+                    @keyframes driftOrb {
+                        0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+                        33% { transform: translate(30px, -30px) scale(1.1); opacity: 0.5; }
+                        66% { transform: translate(-20px, 20px) scale(0.9); opacity: 0.4; }
+                        100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
                     }
+                    .bg-orb-1 { animation: driftOrb 12s infinite ease-in-out; }
+                    .bg-orb-2 { animation: driftOrb 15s infinite ease-in-out reverse; }
                 </style>
 
-                <div class="relative z-20 w-full max-w-[1080px] mx-auto mt-7 sm:mt-12 px-4 sm:px-6 mb-8 sm:mb-10">
+                <div class="relative z-20 w-full max-w-[1150px] mx-auto mt-12 sm:mt-24 px-4 sm:px-6 mb-16">
                     
                     <!-- Header -->
-                    <div class="text-center mb-6 sm:mb-9">
+                    <div class="text-center mb-10 sm:mb-16">
                         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-[10px] font-black tracking-widest uppercase mb-4 shadow-sm">
                             <span class="relative flex h-2 w-2">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
@@ -1250,36 +1265,36 @@ async function handleShopSubmit(e) {
                             Live Store Simulation
                         </div>
                         <h3 class="text-[28px] sm:text-4xl md:text-[44px] font-black text-gray-900 tracking-tight leading-tight">The BikriPage Magic</h3>
-                        <p class="text-gray-500 mt-2 sm:mt-3 font-medium text-[13px] sm:text-base max-w-xl mx-auto px-2">Watch how your entire business operates on auto-pilot.</p>
+                        <p class="text-gray-500 mt-2 sm:mt-3 font-medium text-[13px] sm:text-base max-w-xl mx-auto px-2">Watch how your entire business operates on auto-pilot. From fast billing to real-time insights.</p>
                     </div>
 
                     <!-- Main Dashboard Widget -->
-                    <div class="flex flex-col lg:flex-row gap-5 lg:gap-8 items-center justify-center bg-white rounded-[24px] sm:rounded-[2rem] p-3 sm:p-6 border border-gray-100 shadow-[0_12px_35px_rgba(15,23,42,0.06)]">
+                    <div class="flex flex-col lg:flex-row gap-6 lg:gap-10 items-center justify-center bg-white/70 backdrop-blur-2xl rounded-[24px] sm:rounded-[2.5rem] p-4 sm:p-8 border border-gray-100 shadow-[0_15px_50px_rgba(0,0,0,0.04)]">
                         
                         <!-- 📝 LEFT: Claude-Style Smooth Text Reveal List -->
-                        <div class="w-full lg:w-[45%] flex flex-col gap-3 sm:gap-4 z-10" id="smooth-steps-container">
+                        <div class="w-full lg:w-[45%] flex flex-col gap-5 z-10" id="smooth-steps-container">
                             
                             <div class="reveal-item flex items-start gap-4">
-                                <div class="w-12 h-12 rounded-[14px] bg-cyan-50 flex items-center justify-center shrink-0 border border-cyan-100"><i class="fas fa-shopping-cart text-xl text-cyan-600"></i></div>
+                                <div class="w-12 h-12 rounded-[14px] bg-cyan-50 flex items-center justify-center shrink-0 border border-cyan-100"><i class="fas fa-calculator text-xl text-cyan-600"></i></div>
                                 <div class="pt-1.5">
-                                    <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">1. Orders Arrive</h4>
-                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Customers place orders online</p>
-                                </div>
-                            </div>
-
-                            <div class="reveal-item flex items-start gap-4">
-                                <div class="w-12 h-12 rounded-[14px] bg-blue-50 flex items-center justify-center shrink-0 border border-blue-100"><i class="fas fa-bell text-xl text-blue-600"></i></div>
-                                <div class="pt-1.5">
-                                    <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">2. Live Alerts</h4>
-                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Your phone rings instantly</p>
+                                    <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">1. Smart Calculator</h4>
+                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Enter weight & rate, auto-calculates exact price instantly.</p>
                                 </div>
                             </div>
 
                             <div class="reveal-item flex items-start gap-4">
                                 <div class="w-12 h-12 rounded-[14px] bg-indigo-50 flex items-center justify-center shrink-0 border border-indigo-100"><i class="fas fa-file-invoice text-xl text-indigo-600"></i></div>
                                 <div class="pt-1.5">
-                                    <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">3. Bill Generated</h4>
-                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Detailed digital invoice created automatically</p>
+                                    <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">2. 1-Click Billing</h4>
+                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">A professional invoice is generated with precise units.</p>
+                                </div>
+                            </div>
+
+                            <div class="reveal-item flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-[14px] bg-green-50 flex items-center justify-center shrink-0 border border-green-100"><i class="fab fa-whatsapp text-2xl text-green-600"></i></div>
+                                <div class="pt-1.5">
+                                    <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">3. WhatsApp Sharing</h4>
+                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Send the bill and payment link directly to customer.</p>
                                 </div>
                             </div>
 
@@ -1287,104 +1302,124 @@ async function handleShopSubmit(e) {
                                 <div class="w-12 h-12 rounded-[14px] bg-purple-50 flex items-center justify-center shrink-0 border border-purple-100"><i class="fas fa-chart-pie text-xl text-purple-600"></i></div>
                                 <div class="pt-1.5">
                                     <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">4. Auto Calculations</h4>
-                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Sales and profits update in real-time</p>
+                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Sales and profits update in your dashboard in real-time.</p>
                                 </div>
                             </div>
-
-                            <div class="reveal-item flex items-start gap-4">
-                                <div class="w-12 h-12 rounded-[14px] bg-green-50 flex items-center justify-center shrink-0 border border-green-100"><i class="fab fa-whatsapp text-2xl text-green-600"></i></div>
-                                <div class="pt-1.5">
-                                    <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">5. 1-Click Payment Reminder</h4>
-                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Auto payment links & updates sent via WhatsApp</p>
-                                </div>
-                            </div>
-
+                            
                         </div>
 
                         <!-- 📱 RIGHT: 3D iOS PHONE ANIMATION STAGE (20s Loop) -->
-                        <div class="w-full lg:w-[45%] h-[320px] sm:h-[390px] bg-gradient-to-br from-[#F8FAFC] to-[#EEF2FF] rounded-[1.5rem] sm:rounded-[2rem] border border-white shadow-inner relative overflow-hidden flex items-end justify-center isolate">
+                        <div class="w-full lg:w-[45%] h-[400px] sm:h-[480px] bg-[#F9FAFB] rounded-[1.5rem] sm:rounded-[2.5rem] border-[4px] border-white shadow-inner relative overflow-hidden flex items-center justify-center">
+                            
+                            <!-- Ambient Background -->
+                            <div class="absolute inset-0 opacity-[0.3]" style="background-image: radial-gradient(#CBD5E1 1px, transparent 1px); background-size: 24px 24px;"></div>
+                            <div class="bg-orb-1 absolute top-10 left-10 w-48 h-48 bg-blue-300 rounded-full blur-[70px] mix-blend-multiply"></div>
+                            <div class="bg-orb-2 absolute bottom-10 right-10 w-64 h-64 bg-purple-300 rounded-full blur-[80px] mix-blend-multiply"></div>
                             
                             <!-- THE iPHONE MOCKUP BASE -->
-                            <div class="relative w-[210px] sm:w-[238px] h-[285px] sm:h-[335px] bg-gray-900 rounded-t-[32px] sm:rounded-t-[38px] shadow-[0_-14px_35px_rgba(15,23,42,0.18)] border-[6px] border-b-0 border-gray-800 flex flex-col z-20 overflow-hidden translate-y-2 ring-1 ring-white/10">
+                            <div class="relative w-[240px] sm:w-[280px] h-[350px] sm:h-[420px] bg-white rounded-[32px] sm:rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border-[8px] border-gray-900 flex flex-col z-20 overflow-hidden ring-1 ring-black/5">
                                 
                                 <!-- Notch -->
-                                <div class="absolute top-2.5 sm:top-3 left-1/2 transform -translate-x-1/2 w-24 h-6 bg-black rounded-full z-30"></div>
+                                <div class="absolute top-2 left-1/2 transform -translate-x-1/2 w-20 h-5 bg-gray-900 rounded-full z-50"></div>
                                 
-                                <!-- Screen Background -->
-                                <div class="w-full h-full bg-[#F2F2F7] relative pt-14 p-4">
-                                    <div class="w-full h-16 bg-white rounded-[16px] shadow-sm mb-3"></div>
-                                    <div class="flex gap-2 mb-3">
-                                        <div class="w-1/2 h-20 bg-white rounded-[16px] shadow-sm"></div>
-                                        <div class="w-1/2 h-20 bg-white rounded-[16px] shadow-sm"></div>
-                                    </div>
-                                    <div class="w-full h-32 bg-white rounded-[16px] shadow-sm"></div>
-                                </div>
-                                
-                                <!-- 🎬 ANIMATED ELEMENTS (Inside Phone) -->
-                                <div class="absolute inset-0 z-40 flex items-center justify-center">
-
-                                    <!-- STAGE 1: New Order Arrives -->
-                                    <div class="sim-stage stage-1 absolute top-4 w-[92%] bg-white p-3 rounded-[18px] shadow-[0_12px_28px_rgba(15,23,42,0.12)] border border-white flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-blue-500 rounded-[12px] flex items-center justify-center text-white shrink-0"><i class="fas fa-bell animate-pulse"></i></div>
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-[9px] font-black text-blue-500 uppercase tracking-widest mb-0.5">Live Order</p>
-                                            <h4 class="font-black text-gray-900 text-[13px] truncate">Satyam Ordered</h4>
-                                            <p class="text-[11px] text-gray-500 font-bold">2 Items • ₹1,450</p>
+                                <!-- SIMULATION CONTAINER -->
+                                <div class="w-full h-full relative bg-[#F2F2F7]">
+                                    
+                                    <!-- STAGE 1: Smart Calculator Entry -->
+                                    <div class="sim-stage stage-calc flex flex-col p-4 pt-12 h-full">
+                                        <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100 mb-3">
+                                            <div class="text-[9px] font-bold text-gray-400 uppercase mb-1">Item Name</div>
+                                            <div class="text-sm font-black text-gray-800">Sugar</div>
                                         </div>
-                                    </div>
-
-                                    <!-- STAGE 2: Detailed Bill Generation -->
-                                    <div class="sim-stage stage-2 absolute bottom-[20px] w-[92%] bg-white p-4 rounded-[20px] shadow-xl border border-gray-100 flex flex-col gap-2.5">
-                                        <div class="flex justify-between items-center border-b border-dashed border-gray-200 pb-2">
-                                            <span class="font-black text-[10px] text-gray-400 uppercase tracking-widest">Digital Bill</span>
-                                            <span class="bg-gray-100 px-2 py-0.5 rounded text-[9px] font-bold text-gray-500">#ORD-902</span>
-                                        </div>
-                                        <div>
-                                            <div class="flex justify-between text-[11px] font-bold text-gray-600 mb-1"><span>2 Kg x Sugar (₹60)</span><span>₹120</span></div>
-                                            <div class="flex justify-between text-[11px] font-bold text-gray-600"><span>1 Pcs x Oil (₹1330)</span><span>₹1330</span></div>
-                                        </div>
-                                        <div class="flex justify-between items-center bg-green-50 p-2.5 rounded-xl border border-green-100 mt-1">
-                                            <span class="text-[10px] font-black text-green-700 uppercase tracking-widest">Total</span>
-                                            <span class="text-[15px] font-black text-green-600">₹1,450</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- STAGE 3: Auto Calculation Graph -->
-                                    <div class="sim-stage stage-3 absolute w-[92%] bg-white p-4 rounded-[20px] shadow-xl border border-gray-100 flex flex-col">
-                                        <div class="flex justify-between items-start mb-4">
-                                            <div>
-                                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Today's Sale</p>
-                                                <p class="text-xl font-black text-gray-900 leading-none mt-1">₹5,400</p>
+                                        <div class="flex gap-2 mb-3">
+                                            <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100 flex-1">
+                                                <div class="text-[9px] font-bold text-gray-400 uppercase mb-1">Rate (₹)</div>
+                                                <div class="text-sm font-black text-gray-800">₹70 / Kg</div>
                                             </div>
-                                            <div class="w-8 h-8 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center text-xs"><i class="fas fa-chart-pie"></i></div>
                                         </div>
-                                        <div class="flex items-end justify-between h-[70px] w-full gap-2.5 border-b-2 border-gray-100 pb-1">
-                                            <div class="w-full bg-gradient-to-t from-gray-200 to-gray-300 rounded-t-md bar-grow" style="--h: 25px"></div>
-                                            <div class="w-full bg-gradient-to-t from-blue-300 to-blue-500 rounded-t-md bar-grow" style="--h: 40px"></div>
-                                            <div class="w-full bg-gradient-to-t from-green-400 to-green-500 rounded-t-md bar-grow shadow-[0_5px_15px_rgba(34,197,94,0.3)] relative" style="--h: 60px">
-                                                <span class="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-black text-green-700 bg-green-50 px-1 py-0.5 rounded shadow-sm">Now</span>
+                                        <div class="bg-blue-50/50 rounded-xl p-3 shadow-sm border border-blue-100 mb-3">
+                                            <div class="text-[9px] font-bold text-blue-500 uppercase mb-1">Customer Wants</div>
+                                            <div class="flex gap-1 items-center">
+                                                <div class="text-xl font-black text-blue-600 type-qty">250</div>
+                                                <div class="text-sm font-bold text-blue-600">Grams</div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-auto bg-green-50 rounded-xl p-3 flex justify-between items-center border border-green-100">
+                                            <span class="text-[10px] font-bold text-green-700">Total Price</span>
+                                            <span class="text-xl font-black text-green-600">₹17.50</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- STAGE 2: Bill Generated -->
+                                    <div class="sim-stage stage-bill flex flex-col p-4 pt-12 items-center justify-center">
+                                        <div class="w-full bg-white p-4 rounded-xl shadow-[0_15px_30px_rgba(0,0,0,0.08)] border border-gray-100 relative">
+                                            <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-500 text-white text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">Bill Created</div>
+                                            <div class="flex justify-between items-end border-b border-dashed border-gray-200 pb-2 mb-2 mt-2">
+                                                <span class="font-black text-[10px] text-gray-400 uppercase">Store Invoice</span>
+                                                <span class="text-[9px] font-bold text-gray-500">#ORD-902</span>
+                                            </div>
+                                            <div class="flex justify-between text-[11px] font-bold text-gray-800 mb-1">
+                                                <span>250 g x Sugar</span><span>₹17.50</span>
+                                            </div>
+                                            <div class="flex justify-between text-[8px] font-semibold text-gray-400 mb-3">
+                                                <span>Rate: ₹70.00/Kg</span><span></span>
+                                            </div>
+                                            <div class="flex justify-between text-[11px] font-bold text-gray-800 mb-2">
+                                                <span>1 Pcs x Soap</span><span>₹35.00</span>
+                                            </div>
+                                            <div class="flex justify-between items-center bg-gray-50 p-2 rounded-lg mt-3 border border-gray-100">
+                                                <span class="text-[10px] font-black text-gray-600 uppercase tracking-widest">Grand Total</span>
+                                                <span class="text-[14px] font-black text-gray-900">₹52.50</span>
                                             </div>
                                         </div>
                                     </div>
+                                    
+                                    <!-- STAGE 3: WhatsApp Sent (Floating out effect) -->
+                                    <div class="sim-stage stage-wa flex flex-col p-4 items-center justify-center h-full">
+                                        <div class="bg-green-50 w-full p-4 rounded-[18px] border border-green-200 shadow-[0_15px_40px_rgba(34,197,94,0.15)] flex flex-col items-center">
+                                            <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white text-2xl mb-3 shadow-md">
+                                                <i class="fab fa-whatsapp"></i>
+                                            </div>
+                                            <h4 class="font-black text-gray-900 text-[14px] mb-1">Bill Sent Successfully!</h4>
+                                            <p class="text-[10px] text-gray-600 font-medium text-center">Customer received the digital bill and payment link on WhatsApp.</p>
+                                        </div>
+                                    </div>
 
-                                </div>
-                            </div> 
+                                    <!-- STAGE 4: Dashboard Sales Update -->
+                                    <div class="sim-stage stage-dash flex flex-col p-4 pt-12 h-full">
+                                        <h4 class="text-[12px] font-black text-gray-400 uppercase tracking-widest mb-3 px-1">Dashboard</h4>
+                                        <div class="grid grid-cols-2 gap-2 mb-3">
+                                            <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                                                <p class="text-[8px] font-bold text-gray-400 uppercase">Today's Sale</p>
+                                                <p class="text-sm font-black text-green-600 mt-1">₹5,452</p>
+                                            </div>
+                                            <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                                                <p class="text-[8px] font-bold text-gray-400 uppercase">Orders</p>
+                                                <p class="text-sm font-black text-blue-600 mt-1">24</p>
+                                            </div>
+                                        </div>
+                                        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex-1 flex flex-col">
+                                            <p class="text-[9px] font-bold text-gray-400 uppercase mb-4">Revenue Trend</p>
+                                            <div class="flex items-end justify-between h-full w-full gap-2 border-b border-gray-100 pb-1 mt-auto">
+                                                <div class="w-full bg-blue-100 rounded-t-sm bar-grow" style="--h: 30%"></div>
+                                                <div class="w-full bg-blue-300 rounded-t-sm bar-grow" style="--h: 50%"></div>
+                                                <div class="w-full bg-blue-400 rounded-t-sm bar-grow" style="--h: 40%"></div>
+                                                <div class="w-full bg-blue-500 rounded-t-sm bar-grow" style="--h: 70%"></div>
+                                                <div class="w-full bg-green-500 rounded-t-md bar-grow relative shadow-[0_0_10px_rgba(34,197,94,0.4)]" style="--h: 90%">
+                                                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                            <!-- STAGE 4: WhatsApp Pop-Out (Pops OUTSIDE the phone) -->
-                            <div class="sim-stage stage-4 absolute z-[60] bottom-1/2 translate-y-1/2 right-3 sm:right-4 w-[190px] bg-white p-3 rounded-[18px] rounded-bl-sm border border-green-100 shadow-[0_12px_28px_rgba(22,163,74,0.13)] flex items-start gap-3">
-                                <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white text-lg shrink-0 shadow-md">
-                                    <i class="fab fa-whatsapp"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h4 class="font-black text-gray-900 text-[12px] mb-0.5">Payment Link</h4>
-                                    <p class="text-[10px] text-gray-500 font-semibold leading-snug">Hi Satyam, please pay ₹1,450 securely here: 🔗...</p>
                                 </div>
                             </div>
-
+                            
                         </div>
                     </div>
                 </div>
             `;
+
 
 
             if (activeShop) {
@@ -5812,6 +5847,38 @@ function iosConfirm(title, message, btnText) {
         </div>
     </div>
 </div>
+    <script>
+        // ✨ High Performance Scroll Animation Observer ✨
+        document.addEventListener("DOMContentLoaded", () => {
+            const checkAndObserve = () => {
+                const items = document.querySelectorAll('.reveal-item');
+                if(items.length > 0) {
+                    const observerOptions = {
+                        root: null,
+                        rootMargin: '0px 0px -50px 0px', 
+                        threshold: 0.1
+                    };
+
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                entry.target.classList.add('is-visible');
+                                observer.unobserve(entry.target); 
+                            }
+                        });
+                    }, observerOptions);
+
+                    items.forEach((item, index) => {
+                        item.style.transitionDelay = `${index * 0.15}s`; // Stagger effect (Left Text ke liye)
+                        observer.observe(item);
+                    });
+                } else {
+                    setTimeout(checkAndObserve, 500);
+                }
+            };
+            checkAndObserve();
+        });
+    </script>
 
 </body>
 </html> 

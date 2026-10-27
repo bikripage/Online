@@ -2224,8 +2224,21 @@ function applyProLocks(shopData) {
                         return (b.createdAt?.toMillis()||0) - (a.createdAt?.toMillis()||0); 
                     });
                     
+                                   // ✨ FIX: Live Orders में भी "Grams" को "g" में बदलेगा
+                    live = live.map(order => {
+                        if(order.items) {
+                            order.items = order.items.map(item => {
+                                if(item.unit) item.unit = item.unit.replace(/Grams?/gi, 'g').replace(/Pieces?/gi, 'Pcs').replace(/Liters?/gi, 'Ltr');
+                                if(item.name) item.name = item.name.replace(/Grams?/gi, 'g').replace(/Pieces?/gi, 'Pcs');
+                                return item;
+                            });
+                        }
+                        return order;
+                    });
+                    
                     window.globalLiveOrders = live;
                     window.filterLiveOrders();
+
 
                     const badge = document.getElementById('live-orders-badge');
                     if(badge) {
@@ -2293,8 +2306,22 @@ function applyProLocks(shopData) {
             try { const snap = await shopRef.collection('products').orderBy('timestamp', 'desc').get();
             storeProducts = []; snap.forEach(doc => storeProducts.push({ id: doc.id, ...doc.data() })); renderAdminProducts(); } catch(e){}
 
-            try { const snap = await shopRef.collection('bills').orderBy('timestamp', 'desc').get();
-            adminBills = []; snap.forEach(doc => adminBills.push({ id: doc.id, ...doc.data() })); } catch(e){}
+                        try { 
+                const snap = await shopRef.collection('bills').orderBy('timestamp', 'desc').get();
+                adminBills = []; 
+                snap.forEach(doc => {
+                    let data = doc.data();
+                    // ✨ FIX: पुराने "Grams" और "Piece" को अपने आप "g" और "Pcs" में बदल देगा
+                    if(data.items) {
+                        data.items = data.items.map(item => {
+                            if(item.unit) item.unit = item.unit.replace(/Grams?/gi, 'g').replace(/Pieces?/gi, 'Pcs').replace(/Liters?/gi, 'Ltr');
+                            if(item.name) item.name = item.name.replace(/Grams?/gi, 'g').replace(/Pieces?/gi, 'Pcs');
+                            return item;
+                        });
+                    }
+                    adminBills.push({ id: doc.id, ...data }); 
+                }); 
+            } catch(e){}
 
             try { const snap = await shopRef.collection('customers').get();
             allCustomersMap = {};

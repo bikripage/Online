@@ -3019,21 +3019,26 @@ function applyProLocks(shopData) {
 
         function removeDraftItem(id) { draftBillItems = draftBillItems.filter(i => i.id !== id); renderDraftBill(); }
 
-            function renderDraftBill() {
+              function renderDraftBill() {
             const tb = document.getElementById('draft-bill-items-list'); const em = document.getElementById('draft-bill-empty'); const tot = document.getElementById('draft-bill-total');
             let itemTot = 0;
             if(draftBillItems.length === 0) { tb.innerHTML = ''; em.style.display='block'; tot.innerText='₹0'; return; }
             em.style.display='none';
-                     tb.innerHTML = draftBillItems.map(i => { 
+            
+            tb.innerHTML = draftBillItems.map(i => { 
                 itemTot += i.total; 
-                
-                // ✨ QTY और PRICE में Unit लगाना
                 let qtyDisplay = i.unit ? `${i.qty} ${i.unit}` : i.qty; 
-                let priceDisplay = i.rateUnit ? `₹${i.price}${i.rateUnit}` : `₹${i.price}`;
+                // ✨ यहीं पर असली रेट (₹70/Kg) UI में दिखेगा
+                let priceDisplay = i.rateUnit ? `₹${parseFloat(i.price).toFixed(2)}${i.rateUnit}` : `₹${parseFloat(i.price).toFixed(2)}`;
                 
-                return `<tr><td class="py-3 pl-4 text-[#111827] font-semibold">${i.name}</td><td class="py-3 text-center text-[#111827] font-bold">${qtyDisplay}</td><td class="py-3 text-right text-[#6B7280]">${priceDisplay}</td><td class="py-3 text-right pr-4 text-[#16A34A] font-bold">₹${i.total}</td><td class="py-3 text-center"><i class="fas fa-times text-[#DC2626] cursor-pointer" onclick="removeDraftItem('${i.id}')"></i></td></tr>`; 
+                return `<tr>
+                    <td class="py-3 pl-4 text-[#111827] font-semibold">${i.name}</td>
+                    <td class="py-3 text-center text-[#111827] font-bold">${qtyDisplay}</td>
+                    <td class="py-3 text-right text-[#6B7280]">${priceDisplay}</td>
+                    <td class="py-3 text-right pr-4 text-[#16A34A] font-bold">₹${i.total}</td>
+                    <td class="py-3 text-center"><i class="fas fa-times text-[#DC2626] cursor-pointer" onclick="removeDraftItem('${i.id}')"></i></td>
+                </tr>`; 
             }).join('');
-
             
             let disc = parseInt(document.getElementById('bill-discount').value)||0; 
             let del = parseInt(document.getElementById('bill-delivery').value)||0;
@@ -3041,7 +3046,8 @@ function applyProLocks(shopData) {
             
             let gt = Math.max(0, itemTot - disc + del - adv); 
             tot.innerText = `₹${gt}`;
-        } // <-- YAHAN BRACKET GAYAB THA, AB THEEK HAI!
+        }
+
 
         async function saveBillProcess(isSend) {
             const n = document.getElementById('bill-cust-name').value.trim(); const p = document.getElementById('bill-cust-phone').value.trim();
@@ -11552,7 +11558,7 @@ async function saveNewAppPassword() {
 
 // Call loadAppSecurityDetails jab page load ho jaye
 setTimeout(loadAppSecurityDetails, 2500);
-        // ✨ SMART CALCULATOR TO DASHBOARD CONNECTION ✨
+              // ✨ SMART CALCULATOR TO DASHBOARD CONNECTION ✨
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -11560,40 +11566,35 @@ setTimeout(loadAppSecurityDetails, 2500);
                     let smartDraft = localStorage.getItem('BikriPage_SmartDraft');
                     if (smartDraft) {
                         let parsedDraft = JSON.parse(smartDraft);
-                        
-                        // 1. Bill Modal Open Karo
                         openCreateBillModal();
                         
-                                               // 2. Draft Items set karo (✨ FIX: Smart Qty & Price Calculation)
                         draftBillItems = parsedDraft.map(item => {
-                            // Text में से नंबर (Quantity) निकालो (e.g. "10 Pcs" -> 10)
                             let parsedQty = parseFloat(item.displayDesc) || 1;
-                            
-                            // 1 पीस/ग्राम का रेट निकालो
-                            let unitPrice = item.price / parsedQty;
-                            
-                            // Text में से नंबर हटा कर सिर्फ यूनिट का नाम रखो (e.g. "Pcs")
                             let unitName = item.displayDesc.replace(/[0-9.]+\s*/, '').trim();
+                            
+                            // ✨ YAHI MAIN FIX HAI (0.07 ki jagah 70 yahan set hoga)
+                            let displayPrice = item.originalRate ? item.originalRate : (item.price / parsedQty);
+                            let rateUnitStr = item.originalRateUnit ? `/${item.originalRateUnit}` : '';
 
                             return {
                                 id: 'smart_' + item.id,
-                                name: item.name + (unitName ? ` (${unitName})` : ''),
-                                price: parseFloat(unitPrice.toFixed(2)),
-                                qty: parsedQty, 
-                                total: item.price
+                                name: item.name.replace(/\s*\([^)]*\)$/, '').trim(), // Clean name (Sugar)
+                                price: displayPrice,   // Asli Rate (70)
+                                qty: parsedQty,        // 500
+                                unit: unitName,        // Grams
+                                rateUnit: rateUnitStr, // /Kg
+                                total: item.price      // 35
                             };
                         });
-
-                        // 3. Render karo aur Storage saaf karo
+                        
                         renderDraftBill();
                         localStorage.removeItem('BikriPage_SmartDraft');
-                        
-                        // 4. URL se action hata do taaki refresh karne par wapas pop-up na aaye
                         window.history.replaceState(null, '', window.location.pathname + '?shop=' + currentShopId);
                     }
                 }
-            }, 1500); // Wait for shop data to load first
+            }, 1500);
         });
+
         // ==========================================
         // ✨ iOS BILLING CHOICE MODAL LOGIC ✨
         // ==========================================

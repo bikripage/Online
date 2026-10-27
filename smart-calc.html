@@ -222,7 +222,6 @@
             window.location.href = `dashboard.html?shop=${shopId}`;
         }
 
-        // --- History / Quick Save Logic (WITH DELETE) ---
         function renderHistoryChips() {
             const container = document.getElementById('recent-items-container');
             if (savedHistory.length === 0) {
@@ -234,7 +233,6 @@
             savedHistory.forEach((item, index) => {
                 let shortUnit = item.rateKey === 'kg' ? 'Kg' : (item.rateKey === 'liter' ? 'Ltr' : item.rateKey);
                 
-                // Chip Design - Click to Apply, Cross to Delete
                 html += `
                 <div class="shrink-0 flex items-center bg-blue-50 border border-blue-200 rounded-full pr-1 overflow-hidden group">
                     <button onclick="applyHistoryItem(${index})" class="text-blue-700 pl-3 pr-2 py-1.5 text-xs font-bold hover:bg-blue-100 transition whitespace-nowrap">
@@ -252,7 +250,7 @@
             let item = savedHistory[index];
             document.getElementById('calc-name').value = item.name;
             document.getElementById('calc-rate').value = item.rate;
-            selectUnit(item.rateKey, true); // Auto set unit
+            selectUnit(item.rateKey, true);
             document.getElementById('calc-qty').focus();
         }
 
@@ -260,12 +258,11 @@
             if (!name) return;
             savedHistory = savedHistory.filter(i => i.name.toLowerCase() !== name.toLowerCase());
             savedHistory.unshift({ name, rate, rateKey });
-            if (savedHistory.length > 8) savedHistory.pop(); // Max 8 items
+            if (savedHistory.length > 8) savedHistory.pop(); 
             localStorage.setItem('SmartCalc_History', JSON.stringify(savedHistory));
             renderHistoryChips();
         }
 
-        // ✨ iOS Style Confirm Modal For History Delete
         let historyIndexToDelete = -1;
 
         function promptDeleteHistory(index) {
@@ -301,7 +298,6 @@
                 historyIndexToDelete = -1;
             }
         }
-        // ---------------------------------
 
         function openPicker(type) {
             activePickerType = type;
@@ -401,15 +397,20 @@
             let qty = document.getElementById('calc-qty').value;
             let reqLabel = document.getElementById('display-req-unit').innerText;
 
+            // ✨ FIX: Rate unit (Jaise Kg, Ltr) nikalna
+            let rateUnitLabel = unitData[currentRateKey].label.replace('Per ', '');
+
             let item = {
                 id: Date.now(),
                 name: name,
                 displayDesc: `${qty} ${reqLabel}`, 
-                price: parseFloat(currentCalculatedPrice.toFixed(2))
+                price: parseFloat(currentCalculatedPrice.toFixed(2)),
+                originalRate: parseFloat(rate),             // ✨ Dashboard ko asli rate bhejna
+                originalRateUnit: rateUnitLabel // ✨ Dashboard ko rate ki unit bhejna
             };
 
             cart.push(item);
-            saveToHistory(name, rate, currentRateKey); // Auto-save for next time
+            saveToHistory(name, rate, currentRateKey); 
             
             document.getElementById('calc-qty').value = ''; 
             autoCalculate();
@@ -444,10 +445,10 @@
                 <li class="bg-white border border-gray-100 rounded-[14px] p-3 flex justify-between items-center shadow-sm">
                     <div class="min-w-0 pr-3">
                         <p class="text-[13px] font-bold text-gray-900 truncate">${item.name}</p>
-                        <p class="text-[10px] font-semibold text-gray-500 mt-0.5">${item.displayDesc}</p>
+                        <p class="text-[10px] font-semibold text-gray-500 mt-0.5">${item.displayDesc} <span class="text-blue-500 font-bold ml-1">(₹${item.originalRate}/${item.originalRateUnit})</span></p>
                     </div>
                     <div class="flex items-center gap-3 shrink-0">
-                        <span class="font-black text-gray-800 text-[15px]">₹${item.price.replace ? item.price : item.price.toFixed(2).replace(/\.00$/, '')}</span>
+                        <span class="font-black text-gray-800 text-[15px]">₹${item.price.toFixed(2).replace(/\.00$/, '')}</span>
                         <button onclick="removeCartItem(${item.id})" class="w-8 h-8 bg-red-50 text-red-500 rounded-[10px] flex items-center justify-center hover:bg-red-100 transition">
                             <i class="fas fa-times text-xs"></i>
                         </button>

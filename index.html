@@ -1156,7 +1156,7 @@ async function handleShopSubmit(e) {
             const searchInput = document.getElementById('search-input');
 
                                                     // --- 🍎 SHOP OWNER "WHY SELL ON BikriPage" SECTION (ULTRA PREMIUM 3D PHONE SIMULATOR) 🍎 ---
-                                                          const merchantWhyChooseUsSection = `
+                                                                      const merchantWhyChooseUsSection = `
                 <style>
                     /* ✨ WORLD-CLASS HARDWARE ACCELERATED ANIMATIONS ✨ */
                     .ios-glass {
@@ -1192,11 +1192,11 @@ async function handleShopSubmit(e) {
                     .stage-1 { animation: s1 30s infinite cubic-bezier(0.25, 1, 0.5, 1); }
                     @keyframes s1 {
                         0%, 2% { opacity: 0; transform: scale(0.95); }
-                        4%, 14% { opacity: 1; transform: scale(1); }
+                        4%, 15% { opacity: 1; transform: scale(1); }
                         16%, 100% { opacity: 0; transform: scale(1.05); }
                     }
 
-                    /* Stage 2 (16-33%): Receive Orders Online (Notification Drop) */
+                    /* Stage 2 (16-33%): Push Notification & Recent Orders */
                     .stage-2 { animation: s2 30s infinite cubic-bezier(0.25, 1, 0.5, 1); }
                     @keyframes s2 {
                         0%, 15% { opacity: 0; transform: scale(0.95); }
@@ -1206,7 +1206,7 @@ async function handleShopSubmit(e) {
                     .notif-drop { animation: nDrop 30s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; }
                     @keyframes nDrop {
                         0%, 18% { opacity: 0; transform: translateY(-40px) scale(0.9); }
-                        20%, 30% { opacity: 1; transform: translateY(0) scale(1); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+                        20%, 30% { opacity: 1; transform: translateY(0) scale(1); box-shadow: 0 15px 30px rgba(0,0,0,0.12); }
                         31%, 100% { opacity: 0; transform: translateY(-20px) scale(0.9); }
                     }
 
@@ -1217,26 +1217,21 @@ async function handleShopSubmit(e) {
                         34%, 48% { opacity: 1; transform: scale(1); }
                         50%, 100% { opacity: 0; transform: scale(1.05); }
                     }
-                    /* Typing Effect Sync */
-                    .calc-view { animation: calcV 30s infinite; }
-                    @keyframes calcV { 0%, 32% { opacity: 0; transform: translateY(20px); } 34%, 41% { opacity: 1; transform: translateY(0); } 42%, 100% { opacity: 0; transform: translateY(-20px); } }
-                    
                     .type-text { overflow: hidden; white-space: nowrap; border-right: 2px solid #007AFF; animation: typeT 30s infinite steps(10, end); }
-                    @keyframes typeT { 0%, 34% { width: 0; border-color: transparent; } 35%, 40% { width: 100%; border-color: #007AFF; } 41%, 100% { width: 100%; border-color: transparent; } }
-                    
-                    /* Bill Pop-up Sync */
-                    .bill-view { animation: billV 30s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; transform: translateY(40px); }
-                    @keyframes billV { 0%, 41% { opacity: 0; transform: translateY(40px); } 43%, 49% { opacity: 1; transform: translateY(0); } 50%, 100% { opacity: 0; transform: translateY(-20px); } }
+                    @keyframes typeT { 0%, 34% { width: 0; border-color: transparent; } 35%, 39% { width: 100%; border-color: #007AFF; } 40%, 100% { width: 100%; border-color: transparent; } }
+                    .calc-ui { animation: calcAnim 30s infinite cubic-bezier(0.25, 1, 0.5, 1); }
+                    @keyframes calcAnim { 0%, 40% { opacity: 1; transform: translateY(0); } 42%, 100% { opacity: 0; transform: translateY(-40px); } }
+                    .bill-ui { animation: billAnim 30s infinite cubic-bezier(0.25, 1, 0.5, 1); opacity: 0; transform: translateY(40px); }
+                    @keyframes billAnim { 0%, 41% { opacity: 0; transform: translateY(40px); } 43%, 100% { opacity: 1; transform: translateY(0); } }
 
-                    /* Stage 4 (50-66%): WhatsApp Chat */
+                    /* Stage 4 (50-66%): Clean WhatsApp Chat */
                     .stage-4 { animation: s4 30s infinite cubic-bezier(0.25, 1, 0.5, 1); background: #E5DDD5; }
                     @keyframes s4 {
                         0%, 49% { opacity: 0; transform: scale(0.95); }
                         51%, 64% { opacity: 1; transform: scale(1); }
                         66%, 100% { opacity: 0; transform: scale(1.05); }
                     }
-                    /* Chat Bubble Slide In */
-                    .chat-bubble { animation: chatIn 30s infinite cubic-bezier(0.34, 1.56, 0.64, 1); transform-origin: top right; }
+                    .chat-bubble { animation: chatIn 30s infinite cubic-bezier(0.34, 1.56, 0.64, 1); transform-origin: bottom right; opacity: 0; }
                     @keyframes chatIn { 0%, 52% { opacity: 0; transform: scale(0.5) translateY(20px); } 54%, 100% { opacity: 1; transform: scale(1) translateY(0); } }
 
                     /* Stage 5 (66-83%): Dashboard Calculations */
@@ -1249,27 +1244,23 @@ async function handleShopSubmit(e) {
                     .bar-grow { animation: barGrow 30s infinite ease-out; height: 6px; transform-origin: bottom; }
                     @keyframes barGrow { 0%, 68% { height: 6px; } 71%, 82% { height: var(--h); } 83%, 100% { height: 6px; } }
 
-                    /* Stage 6 (83-100%): Export & Centered Alert */
+                    /* Stage 6 (83-100%): Export Data & Centered Alert */
                     .stage-6 { animation: s6 30s infinite cubic-bezier(0.25, 1, 0.5, 1); }
                     @keyframes s6 {
                         0%, 82% { opacity: 0; transform: scale(0.95); }
                         84%, 98% { opacity: 1; transform: scale(1); }
                         100% { opacity: 0; transform: scale(1.05); }
                     }
-                    /* iOS Style Centered Alert */
+                    .bar-progress { animation: barFill 30s infinite ease-in-out; width: 0%; }
+                    @keyframes barFill { 0%, 85% { width: 0%; } 89%, 100% { width: 100%; } }
+                    
+                    /* The Final Centered iOS Alert */
                     .center-alert { animation: centerPop 30s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; }
-                    @keyframes centerPop { 0%, 90% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } 92%, 97% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 99%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } }
+                    @keyframes centerPop { 0%, 91% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } 93%, 97% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 99%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } }
                     
                     /* Dynamic Ambient Glow */
-                    @keyframes glowShift {
-                        0%, 100% { background-position: 0% 50%; }
-                        50% { background-position: 100% 50%; }
-                    }
-                    .ambient-bg {
-                        background: linear-gradient(-45deg, #e0e7ff, #f3e8ff, #dcfce7, #fce7f3);
-                        background-size: 400% 400%;
-                        animation: glowShift 15s ease infinite;
-                    }
+                    @keyframes glowShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+                    .ambient-bg { background: linear-gradient(-45deg, #e0e7ff, #f3e8ff, #dcfce7, #fce7f3); background-size: 400% 400%; animation: glowShift 15s ease infinite; }
                 </style>
 
                 <div class="relative z-20 w-full max-w-[1200px] mx-auto mt-12 sm:mt-24 px-4 sm:px-6 mb-16 overflow-hidden">
@@ -1290,7 +1281,7 @@ async function handleShopSubmit(e) {
                     <!-- Main Showcase Container -->
                     <div class="flex flex-col lg:flex-row gap-8 lg:gap-16 items-center justify-center p-2 sm:p-6 relative">
                         
-                        <!-- 📝 LEFT: Claude-Style Smooth Text Reveal List -->
+                        <!-- 📝 LEFT: Smooth Text Reveal List -->
                         <div class="w-full lg:w-[45%] flex flex-col gap-4 sm:gap-5 z-10" id="smooth-steps-container">
                             
                             <div class="reveal-item flex items-start gap-4 p-3 sm:p-4 rounded-2xl hover:bg-white hover:shadow-lg transition-all border border-transparent hover:border-gray-100">
@@ -1343,38 +1334,38 @@ async function handleShopSubmit(e) {
 
                         </div>
 
-                        <!-- 📱 RIGHT: 3D PREMIUM iOS PHONE MOCKUP (Solid Mobile-First Frame) -->
+                        <!-- 📱 RIGHT: 3D PREMIUM iOS PHONE MOCKUP -->
                         <div class="w-full lg:w-[45%] flex items-center justify-center relative py-6">
                             
                             <!-- Soft Ambient Background Glow -->
-                            <div class="absolute inset-0 ambient-bg rounded-full blur-[80px] opacity-60 z-0 pointer-events-none"></div>
+                            <div class="absolute inset-0 ambient-bg rounded-full blur-[80px] opacity-60 z-0"></div>
                             
-                            <!-- 📱 SOLID MOBILE FRAME WITH OUTLINE -->
-                            <div class="relative w-[260px] h-[540px] sm:w-[300px] sm:h-[600px] bg-gray-900 rounded-[3rem] p-[8px] shadow-[0_25px_60px_rgba(0,0,0,0.25)] ring-4 ring-gray-200/50 z-20 flex flex-col box-border overflow-hidden">
+                            <!-- 📱 SOLID MOBILE FRAME -->
+                            <div class="relative w-[280px] h-[580px] sm:w-[320px] sm:h-[640px] bg-gray-900 rounded-[3rem] shadow-[0_25px_60px_rgba(0,0,0,0.25)] border-[8px] border-gray-900 flex flex-col z-20 overflow-hidden ring-4 ring-gray-100/50">
                                 
-                                <!-- INNER SCREEN (Real clipping area) -->
-                                <div class="w-full h-full bg-white rounded-[2.5rem] relative overflow-hidden flex flex-col">
-                                    
-                                    <!-- Apple Style Dynamic Island / Notch -->
-                                    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-[110px] h-[26px] bg-gray-900 rounded-b-[20px] z-[100] shadow-sm flex items-center justify-end px-3">
-                                        <div class="w-2 h-2 rounded-full bg-green-500/30 flex items-center justify-center"><div class="w-1 h-1 bg-green-500 rounded-full"></div></div>
-                                    </div>
+                                <!-- Apple Style Dynamic Island / Notch -->
+                                <div class="absolute top-2 left-1/2 transform -translate-x-1/2 w-[100px] h-[26px] bg-black rounded-full z-[100] shadow-sm flex items-center justify-end px-3">
+                                    <div class="w-2 h-2 rounded-full bg-green-500/30 flex items-center justify-center"><div class="w-1 h-1 bg-green-500 rounded-full"></div></div>
+                                </div>
+                                
+                                <!-- SIMULATION SCREEN CONTAINER -->
+                                <div class="w-full h-full relative bg-white overflow-hidden">
                                     
                                     <!-- STAGE 1: Digital Storefront -->
-                                    <div class="sim-stage stage-1">
-                                        <div class="h-[140px] w-full bg-gradient-to-r from-indigo-500 to-purple-600 relative shrink-0">
-                                           <!-- Share Button Safely placed below notch -->
-                                           <div class="absolute top-9 right-4 bg-white/25 backdrop-blur-md px-3 py-1.5 rounded-full text-white text-[10px] font-bold flex items-center gap-1.5 shadow-sm border border-white/40"><i class="fas fa-share"></i> Share</div>
-                                           <div class="absolute -bottom-8 left-5 w-16 h-16 rounded-[16px] border-[4px] border-white bg-white flex items-center justify-center text-indigo-500 shadow-md"><i class="fas fa-store text-3xl"></i></div>
+                                    <div class="sim-stage stage-1 flex flex-col bg-white">
+                                        <div class="h-[150px] w-full bg-gradient-to-r from-indigo-500 to-purple-600 relative shrink-0">
+                                           <!-- Share Button safely placed below notch -->
+                                           <div class="absolute top-[48px] right-4 bg-white/25 backdrop-blur-md px-3 py-1.5 rounded-full text-white text-[11px] font-bold flex items-center gap-1.5 shadow-sm border border-white/40"><i class="fas fa-share"></i> Share</div>
+                                           <div class="absolute -bottom-8 left-5 w-20 h-20 rounded-[18px] border-[4px] border-white bg-white flex items-center justify-center text-indigo-500 shadow-md"><i class="fas fa-store text-4xl"></i></div>
                                         </div>
                                         <div class="pt-10 px-5 pb-4 border-b border-gray-100 bg-white">
                                            <h4 class="font-black text-gray-900 text-[20px]">Verma Enterprises</h4>
-                                           <p class="text-[11px] text-gray-500 font-medium mt-1">Premium quality daily needs & groceries.</p>
+                                           <p class="text-[12px] text-gray-500 font-medium mt-1">Premium quality daily needs & groceries.</p>
                                         </div>
                                         <div class="p-4 grid grid-cols-2 gap-3 bg-[#F9FAFB] flex-1">
                                            <!-- Product Card -->
                                            <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[130px]">
-                                               <div class="h-16 bg-gray-50 rounded-xl mb-2 flex items-center justify-center text-gray-300 relative">
+                                               <div class="h-20 bg-gray-50 rounded-xl mb-2 flex items-center justify-center text-gray-300 relative">
                                                     <i class="fas fa-box text-xl"></i>
                                                     <span class="absolute top-1 right-1 bg-red-50 text-red-600 text-[8px] font-bold px-1.5 py-0.5 rounded shadow-sm">10% OFF</span>
                                                </div>
@@ -1382,36 +1373,35 @@ async function handleShopSubmit(e) {
                                                <div class="text-[13px] font-black text-green-600 mt-auto">₹120/Kg</div>
                                            </div>
                                            <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[130px]">
-                                               <div class="h-16 bg-gray-50 rounded-xl mb-2 flex items-center justify-center text-gray-300"><i class="fas fa-box text-xl"></i></div>
+                                               <div class="h-20 bg-gray-50 rounded-xl mb-2 flex items-center justify-center text-gray-300"><i class="fas fa-box text-xl"></i></div>
                                                <div class="text-[11px] font-bold text-gray-800 truncate mb-1">Organic Sugar</div>
                                                <div class="text-[13px] font-black text-green-600 mt-auto">₹45/Kg</div>
                                            </div>
                                         </div>
                                     </div>
 
-                                    <!-- STAGE 2: Receive Orders Online (Notification Drop) -->
+                                    <!-- STAGE 2: Receive Orders Online (Notification Drop over History) -->
                                     <div class="sim-stage stage-2 bg-[#F2F2F7]">
-                                        <!-- Background Faded Content (Old Orders) -->
-                                        <div class="absolute inset-0 pt-16 px-4">
-                                            <h4 class="font-bold text-gray-800 text-[13px] mb-3">Recent Orders</h4>
-                                            <div class="bg-white p-3 rounded-[16px] shadow-sm mb-3 opacity-40"><div class="h-4 w-1/2 bg-gray-200 rounded mb-2"></div><div class="h-3 w-1/3 bg-gray-100 rounded"></div></div>
-                                            <div class="bg-white p-3 rounded-[16px] shadow-sm mb-3 opacity-30"><div class="h-4 w-1/2 bg-gray-200 rounded mb-2"></div><div class="h-3 w-1/3 bg-gray-100 rounded"></div></div>
+                                        <!-- Background Faded Content (Old Orders History) -->
+                                        <div class="absolute inset-0 pt-[60px] px-4">
+                                            <h4 class="font-bold text-gray-800 text-[14px] mb-3">Recent Orders</h4>
+                                            <div class="bg-white p-4 rounded-[18px] shadow-sm mb-3 opacity-40">
+                                                <div class="flex justify-between items-center mb-2"><div class="h-3 w-1/3 bg-gray-200 rounded"></div><div class="h-3 w-1/5 bg-gray-200 rounded"></div></div>
+                                                <div class="h-2 w-1/2 bg-gray-100 rounded"></div>
+                                            </div>
+                                            <div class="bg-white p-4 rounded-[18px] shadow-sm mb-3 opacity-30">
+                                                <div class="flex justify-between items-center mb-2"><div class="h-3 w-1/3 bg-gray-200 rounded"></div><div class="h-3 w-1/5 bg-gray-200 rounded"></div></div>
+                                                <div class="h-2 w-1/2 bg-gray-100 rounded"></div>
+                                            </div>
                                         </div>
                                         
-                                        <!-- Dropping Notification -->
-                                        <div class="notif-drop absolute top-10 left-3 right-3 bg-white/95 backdrop-blur-xl p-4 rounded-[20px] shadow-[0_20px_40px_rgba(0,0,0,0.12)] border border-gray-100 z-50 flex items-start gap-3">
-                                            <div class="w-10 h-10 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-600 shrink-0"><i class="fas fa-cart-arrow-down text-lg"></i></div>
+                                        <!-- Real iOS Style Dropping Notification -->
+                                        <div class="notif-drop absolute top-6 left-1/2 -translate-x-1/2 w-[92%] bg-white/95 backdrop-blur-xl p-3.5 rounded-[22px] shadow-[0_15px_40px_rgba(0,0,0,0.12)] border border-gray-100/50 z-50 flex items-center gap-3.5">
+                                            <div class="w-11 h-11 bg-gradient-to-tr from-cyan-400 to-blue-500 rounded-[12px] flex items-center justify-center text-white shrink-0 shadow-sm"><i class="fas fa-store text-lg"></i></div>
                                             <div class="flex-1 min-w-0">
-                                                <div class="flex justify-between items-center mb-0.5"><span class="text-[9px] font-black text-cyan-500 uppercase tracking-widest">New Online Order</span><span class="text-[9px] text-gray-400">now</span></div>
-                                                <h4 class="font-black text-gray-900 text-[14px] truncate mt-1">Satyam Kumar</h4>
-                                                <div class="bg-gray-50 rounded-lg p-2 mt-2 border border-gray-100">
-                                                    <div class="flex justify-between text-[11px] font-semibold text-gray-600 mb-1"><span>2 Kg x Premium Rice</span><span>₹240</span></div>
-                                                    <div class="flex justify-between text-[11px] font-semibold text-gray-600"><span>1 Kg x Organic Sugar</span><span>₹45</span></div>
-                                                    <div class="border-t border-gray-200 mt-2 pt-1 flex justify-between items-center">
-                                                        <span class="text-[10px] font-bold text-gray-500 uppercase">Total Value</span>
-                                                        <span class="text-[14px] font-black text-green-600">₹285</span>
-                                                    </div>
-                                                </div>
+                                                <div class="flex justify-between items-center mb-1"><span class="text-[10px] font-bold text-gray-900 tracking-wide">BikriPage</span><span class="text-[9px] text-gray-400">now</span></div>
+                                                <h4 class="font-black text-gray-800 text-[12px] truncate leading-tight">New Order: Satyam Kumar</h4>
+                                                <p class="text-[11px] text-gray-500 font-medium truncate">Total Amount: ₹285.00</p>
                                             </div>
                                         </div>
                                     </div>
@@ -1419,17 +1409,17 @@ async function handleShopSubmit(e) {
                                     <!-- STAGE 3: Typing Animation -> Smart Bill -->
                                     <div class="sim-stage stage-3 bg-[#F2F2F7] relative">
                                         <!-- Calculator Typing View -->
-                                        <div class="calc-view absolute inset-0 pt-16 px-4">
-                                            <h3 class="font-black text-[16px] text-gray-900 mb-4 px-1">Smart Calculator</h3>
-                                            <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-3">
+                                        <div class="calc-ui absolute inset-0 pt-[50px] px-4">
+                                            <h3 class="font-black text-[18px] text-gray-900 mb-4 px-1">Smart Calculator</h3>
+                                            <div class="bg-white rounded-[16px] p-4 shadow-sm border border-gray-100 mb-3">
                                                 <div class="text-[10px] font-bold text-gray-400 uppercase mb-1">Item Name</div>
                                                 <div class="text-[15px] font-black text-gray-900">Sugar</div>
                                             </div>
-                                            <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-3">
+                                            <div class="bg-white rounded-[16px] p-4 shadow-sm border border-gray-100 mb-3">
                                                 <div class="text-[10px] font-bold text-gray-400 uppercase mb-1">Rate (₹)</div>
                                                 <div class="text-[15px] font-black text-gray-900">₹70 / Kg</div>
                                             </div>
-                                            <div class="bg-blue-50 rounded-2xl p-4 shadow-sm border border-blue-100">
+                                            <div class="bg-blue-50/70 rounded-[16px] p-4 shadow-sm border border-blue-100">
                                                 <div class="text-[10px] font-bold text-blue-500 uppercase mb-1">Customer Wants</div>
                                                 <div class="flex gap-2 items-center">
                                                     <div class="text-[26px] font-black text-blue-600 type-text w-[55px] h-8 flex items-center leading-none">250</div>
@@ -1439,36 +1429,37 @@ async function handleShopSubmit(e) {
                                         </div>
 
                                         <!-- Bill View (Slides up seamlessly) -->
-                                        <div class="bill-view absolute inset-0 pt-14 px-4 flex justify-center bg-[#F2F2F7]">
+                                        <div class="bill-ui absolute inset-0 pt-[50px] px-4 flex justify-center bg-[#F2F2F7]">
                                             <div class="w-full bg-white p-5 rounded-[24px] shadow-2xl border border-gray-200 relative h-fit mt-4">
-                                                <div class="flex justify-between items-end border-b border-dashed border-gray-200 pb-3 mb-4">
-                                                    <div><span class="font-black text-[10px] text-gray-400 uppercase block mb-1">Digital Invoice</span><span class="text-[16px] font-black text-gray-900">Satyam</span></div>
-                                                    <span class="bg-gray-100 px-2 py-1 rounded text-[10px] font-bold text-gray-500">#ORD-902</span>
+                                                <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-sm">Bill Generated</div>
+                                                <div class="flex justify-between items-end border-b border-dashed border-gray-200 pb-3 mb-4 mt-2">
+                                                    <div><span class="font-black text-[11px] text-gray-400 uppercase block mb-1">Digital Invoice</span><span class="text-[16px] font-black text-gray-900">Satyam</span></div>
+                                                    <span class="bg-gray-100 px-2.5 py-1 rounded text-[10px] font-bold text-gray-500">#ORD-902</span>
                                                 </div>
                                                 <div class="flex justify-between text-[12px] font-bold text-gray-700 mb-1"><span>250 g x Sugar</span><span>₹17.50</span></div>
                                                 <div class="flex justify-between text-[10px] font-semibold text-gray-400 mb-4 pl-1"><span>Rate: ₹70.00/Kg</span><span></span></div>
                                                 <div class="flex justify-between text-[12px] font-bold text-gray-700 mb-4"><span>1 Pcs x Premium Soap</span><span>₹35.00</span></div>
                                                 <div class="flex justify-between items-center bg-green-50 p-4 rounded-xl mt-4 border border-green-100">
-                                                    <span class="text-[11px] font-black text-green-700 uppercase tracking-widest">Grand Total</span>
-                                                    <span class="text-[18px] font-black text-green-600">₹52.50</span>
+                                                    <span class="text-[12px] font-black text-green-700 uppercase tracking-widest">Grand Total</span>
+                                                    <span class="text-[20px] font-black text-green-600">₹52.50</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    <!-- STAGE 4: Clean WhatsApp Chat -->
-                                    <div class="sim-stage stage-4 bg-[#E5DDD5]">
-                                        <!-- WA Header (Padded below notch!) -->
-                                        <div class="bg-[#075E54] px-4 pt-10 pb-3 flex items-center gap-3 shadow-md z-10 relative">
-                                            <i class="fas fa-arrow-left text-white/90 text-[14px]"></i>
+                                    <!-- STAGE 4: Clean WhatsApp Chat (No incoming message) -->
+                                    <div class="sim-stage stage-4 flex flex-col bg-[#E5DDD5]">
+                                        <!-- WA Header (Safe from notch) -->
+                                        <div class="bg-[#075E54] px-4 pt-11 pb-3 flex items-center gap-3 shadow-md z-10 relative">
+                                            <i class="fas fa-arrow-left text-white/90 text-[15px]"></i>
                                             <div class="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center text-white text-[15px]"><i class="fas fa-user"></i></div>
-                                            <div class="flex-1"><p class="text-white font-bold text-[14px] leading-tight">Satyam Customer</p><p class="text-white/70 text-[10px] mt-0.5">online</p></div>
+                                            <div class="flex-1"><p class="text-white font-bold text-[14px] leading-tight">Satyam</p><p class="text-white/70 text-[10px] mt-0.5">online</p></div>
                                         </div>
                                         <!-- Chat Body -->
-                                        <div class="flex-1 h-full p-4 flex flex-col justify-end pb-12" style="background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: cover;">
-                                            <!-- The requested clean Professional Message -->
+                                        <div class="flex-1 h-full p-4 flex flex-col justify-end pb-8" style="background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: cover;">
+                                            <!-- The requested clean Professional Sent Message Only -->
                                             <div class="chat-bubble bg-[#DCF8C6] p-4 rounded-[16px] rounded-tr-sm shadow-sm max-w-[92%] self-end relative mb-2">
-                                                <h4 class="font-black text-gray-900 text-[13px] mb-2"><i class="fas fa-check-circle text-green-600 mr-1"></i> Order Confirmed!</h4>
+                                                <h4 class="font-black text-gray-900 text-[13px] mb-2"><i class="fas fa-check-circle text-green-600 mr-1.5"></i> Order Confirmed!</h4>
                                                 <p class="text-[12px] text-gray-800 leading-snug mb-3">Satyam, your order is ready.<br>Total Amount: <b>₹52.50</b></p>
                                                 <div class="bg-white/60 p-2.5 rounded-lg border border-green-200/50">
                                                     <p class="text-[10px] text-gray-700 font-semibold leading-relaxed">You can track and place future orders in the <span class="font-bold text-blue-600">My Orders</span> section.</p>
@@ -1480,25 +1471,25 @@ async function handleShopSubmit(e) {
 
                                     <!-- STAGE 5: Dashboard Analytics -->
                                     <div class="sim-stage stage-5 flex flex-col bg-white h-full">
-                                        <div class="p-5 pt-12 pb-3 border-b border-gray-100 flex justify-between items-center bg-white">
-                                            <h4 class="text-[16px] font-black text-gray-900">Dashboard</h4>
-                                            <span class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2.5 py-1 rounded-md">Today</span>
+                                        <div class="p-5 pt-[50px] pb-3 border-b border-gray-100 flex justify-between items-center bg-white">
+                                            <h4 class="text-[18px] font-black text-gray-900">Dashboard</h4>
+                                            <span class="bg-gray-100 text-gray-600 text-[11px] font-bold px-2.5 py-1 rounded-md">Today</span>
                                         </div>
                                         <div class="p-4 flex-1 flex flex-col bg-[#F9FAFB]">
                                             <div class="grid grid-cols-2 gap-3 mb-5">
                                                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                                                    <p class="text-[9px] font-bold text-gray-400 uppercase flex items-center gap-1.5"><i class="fas fa-wallet text-green-500"></i> Sales</p>
-                                                    <p class="text-[18px] font-black text-gray-900 mt-2">₹5,452</p>
+                                                    <p class="text-[10px] font-bold text-gray-400 uppercase flex items-center gap-1.5"><i class="fas fa-wallet text-green-500"></i> Sales</p>
+                                                    <p class="text-[20px] font-black text-gray-900 mt-2">₹5,452</p>
                                                 </div>
                                                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                                                    <p class="text-[9px] font-bold text-gray-400 uppercase flex items-center gap-1.5"><i class="fas fa-clock text-red-500"></i> Udhar</p>
-                                                    <p class="text-[18px] font-black text-gray-900 mt-2">₹1,200</p>
+                                                    <p class="text-[10px] font-bold text-gray-400 uppercase flex items-center gap-1.5"><i class="fas fa-clock text-red-500"></i> Udhar</p>
+                                                    <p class="text-[20px] font-black text-gray-900 mt-2">₹1,200</p>
                                                 </div>
                                             </div>
                                             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex-1 flex flex-col relative overflow-hidden">
                                                 <div class="flex justify-between items-center mb-5 z-10">
-                                                    <p class="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Revenue Trend</p>
-                                                    <p class="text-[11px] font-bold text-green-500 bg-green-50 px-2 py-0.5 rounded">+12%</p>
+                                                    <p class="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Revenue Trend</p>
+                                                    <p class="text-[12px] font-bold text-green-500 bg-green-50 px-2 py-0.5 rounded">+12%</p>
                                                 </div>
                                                 <div class="flex items-end justify-between h-full w-full gap-3 border-b border-gray-100 pb-1 mt-auto z-10">
                                                     <div class="w-full bg-blue-100 rounded-t-md bar-grow" style="--h: 30%"></div>
@@ -1519,27 +1510,42 @@ async function handleShopSubmit(e) {
                                         </div>
                                     </div>
 
-                                    <!-- STAGE 6: Excel & Smart Report Center Alert -->
-                                    <div class="sim-stage stage-6 flex flex-col items-center justify-center bg-[#F9FAFB] relative px-4">
-                                        <!-- iOS Style Centered Download Alert -->
-                                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[160px] h-[160px] bg-[#1c1c1e]/90 backdrop-blur-xl rounded-[24px] flex flex-col items-center justify-center text-white shadow-2xl z-[100] center-alert">
-                                            <i class="fas fa-check-circle text-4xl text-green-400 mb-3"></i>
-                                            <h4 class="font-bold text-[14px]">Downloaded</h4>
-                                            <p class="text-[10px] text-gray-300 mt-1">Saved to Files</p>
-                                        </div>
+                                    <!-- STAGE 6: Excel Export & Centered Alert -->
+                                    <div class="sim-stage stage-6 bg-[#F9FAFB] relative flex flex-col items-center justify-center p-4">
                                         
-                                        <!-- Background content getting exported -->
-                                        <div class="bg-white p-6 rounded-[24px] shadow-sm border border-gray-100 flex flex-col items-center w-full max-w-[240px]">
-                                            <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-5 border border-gray-100 text-gray-400">
-                                                <i class="fas fa-file-download text-3xl animate-bounce"></i>
+                                        <!-- Visible Progress Box -->
+                                        <div class="bg-white p-5 rounded-[24px] shadow-sm border border-gray-100 flex flex-col items-center w-full max-w-[240px]">
+                                            <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-4 border border-gray-100 text-gray-400">
+                                                <i class="fas fa-file-download text-2xl animate-bounce"></i>
                                             </div>
-                                            <h4 class="font-black text-gray-900 text-[16px] mb-1.5 text-center">Exporting Data</h4>
-                                            <p class="text-[11px] text-gray-500 text-center mb-8">Processing business reports...</p>
-                                            <div class="w-full space-y-4 opacity-50">
-                                                <div class="bg-green-50 border border-green-100 p-3 rounded-xl flex items-center gap-3"><div class="w-8 h-8 bg-green-500 text-white rounded-lg flex items-center justify-center text-sm"><i class="fas fa-file-excel"></i></div></div>
-                                                <div class="bg-purple-50 border border-purple-100 p-3 rounded-xl flex items-center gap-3"><div class="w-8 h-8 bg-purple-500 text-white rounded-lg flex items-center justify-center text-sm"><i class="fas fa-robot"></i></div></div>
+                                            <h4 class="font-black text-gray-900 text-[16px] mb-1.5 text-center w-full">Exporting Data</h4>
+                                            <p class="text-[11px] text-gray-500 text-center mb-6 w-full">Processing business reports...</p>
+                                            
+                                            <div class="w-full space-y-4">
+                                                <div class="bg-green-50 border border-green-100 p-3 rounded-[14px] flex items-center gap-3 w-full">
+                                                    <div class="w-9 h-9 bg-green-500 text-white rounded-lg flex items-center justify-center text-sm shrink-0"><i class="fas fa-file-excel"></i></div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="text-[11px] font-bold text-gray-800 truncate">Sales_Data.csv</p>
+                                                        <div class="w-full bg-green-200 h-1.5 rounded-full mt-1.5 overflow-hidden"><div class="bg-green-500 h-full w-[100%] rounded-full bar-progress"></div></div>
+                                                    </div>
+                                                </div>
+                                                <div class="bg-purple-50 border border-purple-100 p-3 rounded-[14px] flex items-center gap-3 w-full">
+                                                    <div class="w-9 h-9 bg-purple-500 text-white rounded-lg flex items-center justify-center text-sm shrink-0"><i class="fas fa-robot"></i></div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="text-[11px] font-bold text-gray-800 truncate">Smart_Report.pdf</p>
+                                                        <div class="w-full bg-purple-200 h-1.5 rounded-full mt-1.5 overflow-hidden"><div class="bg-purple-500 h-full w-[100%] rounded-full bar-progress"></div></div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
+
+                                        <!-- The Final Centered iOS Alert (Only appears at the very end!) -->
+                                        <div class="center-alert absolute top-1/2 left-1/2 w-[160px] bg-[#1c1c1e]/95 backdrop-blur-2xl rounded-[20px] flex flex-col items-center justify-center text-white shadow-2xl z-[100] p-5">
+                                            <i class="fas fa-check-circle text-[38px] text-green-400 mb-3"></i>
+                                            <h4 class="font-bold text-[14px] text-center w-full">Downloaded</h4>
+                                            <p class="text-[10px] text-gray-300 mt-1 text-center w-full font-medium">Saved to Files</p>
+                                        </div>
+
                                     </div>
 
                                 </div> <!-- End Inner Screen -->

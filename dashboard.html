@@ -11623,7 +11623,7 @@ setTimeout(loadAppSecurityDetails, 2500);
                 document.body.style.overflow = 'auto'; // Background scroll wapas enable
             }, 300);
         }
-        // ✨ SMART CALCULATOR TO DASHBOARD CONNECTION ✨
+              // ✨ SMART CALCULATOR TO DASHBOARD CONNECTION ✨
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -11637,12 +11637,14 @@ setTimeout(loadAppSecurityDetails, 2500);
                         draftBillItems = parsedDraft.map(item => {
                             let parsedQty = parseFloat(item.displayDesc) || 1;
                             let unitName = item.displayDesc.replace(/[0-9.]+\s*/, '').trim();
+                            
+                            // ✨ यहीं पर ₹70 और /Kg सेट हो रहा है 
                             let displayPrice = item.originalRate ? item.originalRate : (item.price / parsedQty);
                             let rateUnitStr = item.originalRateUnit ? `/${item.originalRateUnit}` : '';
 
                             return {
                                 id: 'smart_' + item.id,
-                                name: item.name, // साफ नाम
+                                name: item.name, 
                                 price: parseFloat(displayPrice).toFixed(2),
                                 qty: parsedQty, 
                                 unit: unitName, 

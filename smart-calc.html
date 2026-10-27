@@ -386,7 +386,7 @@
             document.getElementById('calc-formula').innerText = formulaText || "0 x 0";
         }
 
-        function addCalculatedItem() {
+                function addCalculatedItem() {
             if (currentCalculatedPrice <= 0) {
                 alert("Please enter a valid rate and quantity.");
                 return;
@@ -397,7 +397,7 @@
             let qty = document.getElementById('calc-qty').value;
             let reqLabel = document.getElementById('display-req-unit').innerText;
 
-            // ✨ FIX: Rate unit (Jaise Kg, Ltr) nikalna
+            // ✨ यहाँ से Asli Rate और Unit जा रहा है
             let rateUnitLabel = unitData[currentRateKey].label.replace('Per ', '');
 
             let item = {
@@ -405,8 +405,8 @@
                 name: name,
                 displayDesc: `${qty} ${reqLabel}`, 
                 price: parseFloat(currentCalculatedPrice.toFixed(2)),
-                originalRate: parseFloat(rate),             // ✨ Dashboard ko asli rate bhejna
-                originalRateUnit: rateUnitLabel // ✨ Dashboard ko rate ki unit bhejna
+                originalRate: parseFloat(rate),             // ✨ Dashboard को असली रेट भेजना
+                originalRateUnit: rateUnitLabel // ✨ Dashboard को रेट की यूनिट भेजना
             };
 
             cart.push(item);

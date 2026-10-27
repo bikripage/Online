@@ -193,16 +193,17 @@
 
     <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
-        // Data Configuration
+              // Data Configuration
         const unitData = {
-            'kg': { label: 'Per Kg', icon: 'fas fa-balance-scale', subUnits: [{val: 'kg', label: 'Kilo (Kg)'}, {val: 'g', label: 'Grams (g)'}] },
-            'liter': { label: 'Per Liter', icon: 'fas fa-tint', subUnits: [{val: 'liter', label: 'Liter (L)'}, {val: 'ml', label: 'Milli (ML)'}] },
-            'meter': { label: 'Per Meter', icon: 'fas fa-ruler', subUnits: [{val: 'meter', label: 'Meter (m)'}, {val: 'cm', label: 'Centimeter (cm)'}] },
-            'dozen': { label: 'Per Dozen', icon: 'fas fa-egg', subUnits: [{val: 'dozen', label: 'Dozen'}, {val: 'pc', label: 'Pieces (Pcs)'}] },
-            'pc': { label: 'Per Piece', icon: 'fas fa-cube', subUnits: [{val: 'pc', label: 'Piece (Pcs)'}] },
+            'kg': { label: 'Per Kg', icon: 'fas fa-balance-scale', subUnits: [{val: 'kg', label: 'Kg (Kilo)'}, {val: 'g', label: 'g (Grams)'}] },
+            'liter': { label: 'Per Liter', icon: 'fas fa-tint', subUnits: [{val: 'liter', label: 'Ltr (Liter)'}, {val: 'ml', label: 'ML (Milli)'}] },
+            'meter': { label: 'Per Meter', icon: 'fas fa-ruler', subUnits: [{val: 'meter', label: 'Meter (m)'}, {val: 'cm', label: 'cm (Centimeter)'}] },
+            'dozen': { label: 'Per Dozen', icon: 'fas fa-egg', subUnits: [{val: 'dozen', label: 'Dozen'}, {val: 'pc', label: 'Pcs (Pieces)'}] },
+            'pc': { label: 'Per Piece', icon: 'fas fa-cube', subUnits: [{val: 'pc', label: 'Pcs (Piece)'}] },
             'box': { label: 'Per Box', icon: 'fas fa-boxes', subUnits: [{val: 'box', label: 'Box'}] },
             'packet': { label: 'Per Packet', icon: 'fas fa-box-open', subUnits: [{val: 'packet', label: 'Packet'}] }
         };
+
 
         // State Variables
         let currentRateKey = 'kg';

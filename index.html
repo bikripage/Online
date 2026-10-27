@@ -1185,58 +1185,63 @@ async function handleShopSubmit(e) {
                         transform: translateY(0);
                     }
 
-                    /* 🟢 2. 20-SECOND SMOOTH LOOP ANIMATION (Right Side Phone) */
+                    /* Premium 20-second sequence: animate only compositor-friendly properties */
                     .sim-stage {
                         opacity: 0;
-                        transform: translateY(20px) scale(0.95);
-                        will-change: opacity, transform;
+                        visibility: hidden;
+                        transform: translate3d(0, 12px, 0) scale(.975);
+                        backface-visibility: hidden;
+                        animation-duration: 20s;
+                        animation-iteration-count: infinite;
+                        animation-timing-function: cubic-bezier(.22, 1, .36, 1);
+                        animation-fill-mode: both;
                     }
-                    
-                    /* Stage 1: Order Arrival (0s - 4s) */
-                    .stage-1 { animation: sim1 20s infinite cubic-bezier(0.25, 1, 0.5, 1); }
+                    .stage-1 { animation-name: sim1; }
+                    .stage-2 { animation-name: sim2; }
+                    .stage-3 { animation-name: sim3; }
+                    .stage-4 { animation-name: sim4; }
+
                     @keyframes sim1 {
-                        0%, 2% { opacity: 0; transform: translateY(-20px) scale(0.95); }
-                        4%, 18% { opacity: 1; transform: translateY(0) scale(1); }
-                        20%, 100% { opacity: 0; transform: translateY(20px) scale(0.95); }
+                        0%, 2% { opacity: 0; visibility: hidden; transform: translate3d(0,-12px,0) scale(.975); }
+                        4%, 18% { opacity: 1; visibility: visible; transform: translate3d(0,0,0) scale(1); }
+                        20%, 100% { opacity: 0; visibility: hidden; transform: translate3d(0,10px,0) scale(.985); }
                     }
-
-                    /* Stage 2: Bill Generation (4s - 10s) */
-                    .stage-2 { animation: sim2 20s infinite cubic-bezier(0.25, 1, 0.5, 1); }
                     @keyframes sim2 {
-                        0%, 18% { opacity: 0; transform: translateY(30px) scale(0.95); }
-                        20%, 48% { opacity: 1; transform: translateY(0) scale(1); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
-                        50%, 100% { opacity: 0; transform: translateY(30px) scale(0.95); }
+                        0%, 18% { opacity: 0; visibility: hidden; transform: translate3d(0,12px,0) scale(.975); }
+                        20%, 48% { opacity: 1; visibility: visible; transform: translate3d(0,0,0) scale(1); }
+                        50%, 100% { opacity: 0; visibility: hidden; transform: translate3d(0,10px,0) scale(.985); }
                     }
-
-                    /* Stage 3: Auto-Calculation Bar Chart (10s - 15s) */
-                    .stage-3 { animation: sim3 20s infinite cubic-bezier(0.25, 1, 0.5, 1); }
                     @keyframes sim3 {
-                        0%, 48% { opacity: 0; transform: translateY(20px) scale(0.95); }
-                        50%, 73% { opacity: 1; transform: translateY(0) scale(1); }
-                        75%, 100% { opacity: 0; transform: translateY(20px) scale(0.95); }
+                        0%, 48% { opacity: 0; visibility: hidden; transform: translate3d(0,12px,0) scale(.975); }
+                        50%, 73% { opacity: 1; visibility: visible; transform: translate3d(0,0,0) scale(1); }
+                        75%, 100% { opacity: 0; visibility: hidden; transform: translate3d(0,10px,0) scale(.985); }
                     }
-
-                    /* Stage 4: WhatsApp Reminder Sent (15s - 20s) */
-                    .stage-4 { animation: sim4 20s infinite cubic-bezier(0.25, 1, 0.5, 1); }
                     @keyframes sim4 {
-                        0%, 73% { opacity: 0; transform: translateX(30px) scale(0.9); }
-                        75%, 98% { opacity: 1; transform: translateX(0) scale(1); box-shadow: 0 20px 40px rgba(34,197,94,0.2); }
-                        100% { opacity: 0; transform: translateX(30px) scale(0.9); }
+                        0%, 73% { opacity: 0; visibility: hidden; transform: translate3d(12px,0,0) scale(.975); }
+                        75%, 98% { opacity: 1; visibility: visible; transform: translate3d(0,0,0) scale(1); }
+                        100% { opacity: 0; visibility: hidden; transform: translate3d(8px,0,0) scale(.985); }
                     }
 
-                    /* Chart Bar Growing Animation (Inside Stage 3) */
-                    .bar-grow { animation: barGrow 20s infinite ease-out; height: 6px; transform-origin: bottom; }
+                    .bar-grow { height: 6px; transform-origin: bottom; animation: barGrow 20s ease-out infinite; }
                     @keyframes barGrow {
                         0%, 50% { height: 6px; }
                         53%, 73% { height: var(--h); }
                         75%, 100% { height: 6px; }
                     }
+
+                    @media (prefers-reduced-motion: reduce) {
+                        .sim-stage, .bar-grow, .animate-float-1, .animate-float-2, .animate-float-3 {
+                            animation: none !important;
+                        }
+                        .sim-stage { opacity: 0; visibility: hidden; transform: none; }
+                        .stage-1 { opacity: 1; visibility: visible; }
+                    }
                 </style>
 
-                <div class="relative z-20 w-full max-w-[1150px] mx-auto mt-12 sm:mt-24 px-4 sm:px-6 mb-16">
+                <div class="relative z-20 w-full max-w-[1080px] mx-auto mt-7 sm:mt-12 px-4 sm:px-6 mb-8 sm:mb-10">
                     
                     <!-- Header -->
-                    <div class="text-center mb-10 sm:mb-16">
+                    <div class="text-center mb-6 sm:mb-9">
                         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-[10px] font-black tracking-widest uppercase mb-4 shadow-sm">
                             <span class="relative flex h-2 w-2">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
@@ -1249,10 +1254,10 @@ async function handleShopSubmit(e) {
                     </div>
 
                     <!-- Main Dashboard Widget -->
-                    <div class="flex flex-col lg:flex-row gap-6 lg:gap-10 items-center justify-center bg-white/70 backdrop-blur-2xl rounded-[24px] sm:rounded-[2.5rem] p-4 sm:p-8 border border-gray-100 shadow-[0_15px_50px_rgba(0,0,0,0.04)]">
+                    <div class="flex flex-col lg:flex-row gap-5 lg:gap-8 items-center justify-center bg-white rounded-[24px] sm:rounded-[2rem] p-3 sm:p-6 border border-gray-100 shadow-[0_12px_35px_rgba(15,23,42,0.06)]">
                         
                         <!-- 📝 LEFT: Claude-Style Smooth Text Reveal List -->
-                        <div class="w-full lg:w-[45%] flex flex-col gap-5 z-10" id="smooth-steps-container">
+                        <div class="w-full lg:w-[45%] flex flex-col gap-3 sm:gap-4 z-10" id="smooth-steps-container">
                             
                             <div class="reveal-item flex items-start gap-4">
                                 <div class="w-12 h-12 rounded-[14px] bg-cyan-50 flex items-center justify-center shrink-0 border border-cyan-100"><i class="fas fa-shopping-cart text-xl text-cyan-600"></i></div>
@@ -1297,10 +1302,10 @@ async function handleShopSubmit(e) {
                         </div>
 
                         <!-- 📱 RIGHT: 3D iOS PHONE ANIMATION STAGE (20s Loop) -->
-                        <div class="w-full lg:w-[45%] h-[400px] sm:h-[480px] bg-[#F9FAFB] rounded-[1.5rem] sm:rounded-[2.5rem] border-[4px] border-white shadow-inner relative overflow-hidden flex items-end justify-center">
+                        <div class="w-full lg:w-[45%] h-[320px] sm:h-[390px] bg-gradient-to-br from-[#F8FAFC] to-[#EEF2FF] rounded-[1.5rem] sm:rounded-[2rem] border border-white shadow-inner relative overflow-hidden flex items-end justify-center isolate">
                             
                             <!-- THE iPHONE MOCKUP BASE -->
-                            <div class="relative w-[230px] sm:w-[270px] h-[330px] sm:h-[380px] bg-gray-900 rounded-t-[36px] sm:rounded-t-[44px] shadow-[0_-20px_50px_rgba(0,0,0,0.2)] border-[6px] sm:border-[8px] border-b-0 border-gray-800 flex flex-col z-20 overflow-hidden transform translate-y-2 ring-1 ring-white/10">
+                            <div class="relative w-[210px] sm:w-[238px] h-[285px] sm:h-[335px] bg-gray-900 rounded-t-[32px] sm:rounded-t-[38px] shadow-[0_-14px_35px_rgba(15,23,42,0.18)] border-[6px] border-b-0 border-gray-800 flex flex-col z-20 overflow-hidden translate-y-2 ring-1 ring-white/10">
                                 
                                 <!-- Notch -->
                                 <div class="absolute top-2.5 sm:top-3 left-1/2 transform -translate-x-1/2 w-24 h-6 bg-black rounded-full z-30"></div>
@@ -1319,7 +1324,7 @@ async function handleShopSubmit(e) {
                                 <div class="absolute inset-0 z-40 flex items-center justify-center">
 
                                     <!-- STAGE 1: New Order Arrives -->
-                                    <div class="sim-stage stage-1 absolute top-4 w-[92%] bg-white/95 backdrop-blur-md p-3.5 rounded-[20px] shadow-lg flex items-center gap-3">
+                                    <div class="sim-stage stage-1 absolute top-4 w-[92%] bg-white p-3 rounded-[18px] shadow-[0_12px_28px_rgba(15,23,42,0.12)] border border-white flex items-center gap-3">
                                         <div class="w-10 h-10 bg-blue-500 rounded-[12px] flex items-center justify-center text-white shrink-0"><i class="fas fa-bell animate-pulse"></i></div>
                                         <div class="flex-1 min-w-0">
                                             <p class="text-[9px] font-black text-blue-500 uppercase tracking-widest mb-0.5">Live Order</p>
@@ -1366,7 +1371,7 @@ async function handleShopSubmit(e) {
                             </div> 
 
                             <!-- STAGE 4: WhatsApp Pop-Out (Pops OUTSIDE the phone) -->
-                            <div class="sim-stage stage-4 absolute z-[60] bottom-1/2 translate-y-1/2 right-4 sm:-right-8 w-[200px] bg-white p-3.5 rounded-[20px] rounded-bl-sm border-2 border-green-100 flex items-start gap-3">
+                            <div class="sim-stage stage-4 absolute z-[60] bottom-1/2 translate-y-1/2 right-3 sm:right-4 w-[190px] bg-white p-3 rounded-[18px] rounded-bl-sm border border-green-100 shadow-[0_12px_28px_rgba(22,163,74,0.13)] flex items-start gap-3">
                                 <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white text-lg shrink-0 shadow-md">
                                     <i class="fab fa-whatsapp"></i>
                                 </div>

@@ -3899,7 +3899,7 @@ async function deleteProduct(id) {
             else footerPoweredBy.style.display = 'flex';
         }
 
-                                    // ITEMS INJECTION (Premium Big Font & Less Padding)
+                                                        // ITEMS INJECTION (Premium Big Font, Less Padding & ALIGNMENT FIXED)
                     let iH = ''; let tA = 0;
                     if (b.items) b.items.forEach((i, idx) => {
                         let t = i.total ? parseFloat(i.total) : (parseFloat(i.price) * parseFloat(i.qty || 1)); 
@@ -3911,12 +3911,12 @@ async function deleteProduct(id) {
                         let displayPriceNum = i.originalRate ? i.originalRate : i.price;
                         let displayRate = i.rateUnit ? `₹${parseFloat(displayPriceNum).toFixed(2)}${i.rateUnit}` : `₹${parseFloat(displayPriceNum).toFixed(2)}`;
 
-                        // ✨ Font size bada kiya (13px) aur Padding kam ki (py-1.5)
+                        // ✨ FIX: 4th कॉलम (Rate) को text-center से text-right कर दिया है
                         iH += `<tr class="border-b border-gray-100/50">
                             <td class="py-1.5 text-[11px] text-gray-500 font-medium">${String(idx + 1).padStart(2, '0')}</td>
                             <td class="py-1.5 text-[13px] text-gray-900 font-bold leading-tight pr-2">${cleanName}</td>
                             <td class="py-1.5 text-center text-[12px] text-gray-800 font-bold">${qtyDisplay}</td>
-                            <td class="py-1.5 text-center text-[11px] text-gray-600 font-medium">${displayRate}</td>
+                            <td class="py-1.5 text-right text-[12px] text-gray-600 font-medium">${displayRate}</td>
                             <td class="py-1.5 text-right text-[13px] text-gray-900 font-black">₹${t.toFixed(2)}</td>
                         </tr>`;
                     });

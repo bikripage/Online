@@ -3118,22 +3118,43 @@ function applyProLocks(shopData) {
                     if(b) { b.recovered += (iTot-disc); await db.collection('shops').doc(currentShopId).collection('materialTracker').doc(tId).update({recovered: b.recovered}); renderMaterialBatches(); }
                 }
                 closeCreateBillModal(); renderAdminBills(); processCustomerData();
-                if(isSend) {
-                    let pStatusTxt = nb.payStatus === 'Paid' ? 'Paid ✅' : (nb.payStatus === 'Advance' ? 'Partial Paid ⏳' : 'Pending ❌');
-                    let m = `*${globalShopData.shopName.toUpperCase()}*%0A%0A*ORDER INVOICE*%0AName: ${n}%0APhone: ${p}%0ADate: ${dateStr}%0A%0A*SUMMARY*%0A`;
-                    draftBillItems.forEach(i => m += `${i.qty}x ${i.name} = ₹${i.total}%0A`);
-                    m += `%0A`; 
-                    if(disc>0) m+=`Discount: -₹${disc}%0A`; 
-                    if(del>0) m+=`Delivery: +₹${del}%0A`;
-                    if(adv>0) m+=`Advance Paid: -₹${adv}%0A`; 
-                    m += `*GRAND TOTAL (Pending): ₹${gt}*%0A%0AStatus: ${pStatusTxt}%0AMode: ${nb.payMode}%0A%0AThank you!`;
-
-                    window.open(`https://wa.me/91${p}?text=${m}`, '_blank');
+                                if(isSend) {
+                    // बिल इमेज ऑटो डाउनलोड
+                    downloadBillImage(nb.id);
+                    
+                    // नया हिंदी मैसेज
+                    let msg = getWhatsAppBillMessage();
+                    
+                    setTimeout(() => {
+                        window.open(`https://wa.me/91${p}?text=${msg}`, '_blank');
+                    }, 500);
               } else iosAlert("Success", "✅ Bill Saved Successfully!");
 
             } catch(e) { alert("Error: " + e.message); }
             finally { btn.innerHTML = orig; btn.disabled = false; }
         }
+// ऑटोमैटिक मैसेज बनाने और बिल डाउनलोड करके WhatsApp पर भेजने का नया फंक्शन
+function getWhatsAppBillMessage() {
+    const shopName = globalShopData.shopName || "स्टोर";
+    const mapLink = globalShopData.googleMapLink || "";
+    
+    let msg = `नमस्ते,\n*${shopName}* से खरीदारी करने के लिए आपका बहुत-बहुत धन्यवाद। आपकी खरीदारी का बिल इस मैसेज के साथ भेजा जा रहा है।\n\nहमें उम्मीद है कि आप हमारे उत्पाद से पूरी तरह संतुष्ट होंगे।\n\nअगर आपको हमारी सर्विस और प्रोडक्ट पसंद आया हो, तो कृपया अपना कीमती समय निकालकर हमें गूगल पर रेटिंग और रिव्यू जरूर दें। आपका फीडबैक हमारे बिजनेस को बेहतर बनाने में बहुत मदद करेगा।\n\nगूगल रिव्यू लिंक: ${mapLink}\n\nधन्यवाद,\n*${shopName}*`;
+    
+    return encodeURIComponent(msg);
+}
+
+function sendWhatsAppBill(billId, phone) {
+    // 1. बिल इमेज ऑटो डाउनलोड करें
+    downloadBillImage(billId);
+    
+    // 2. नया मैसेज लाएं
+    let m = getWhatsAppBillMessage();
+    
+    // 3. थोड़ा सा रुक कर WhatsApp खोलें (ताकि डाउनलोड शुरू हो सके)
+    setTimeout(() => {
+        window.open(`https://wa.me/91${phone}?text=${m}`, '_blank');
+    }, 500);
+}
 
         function saveBillOnly(e) { e.preventDefault(); saveBillProcess(false); }
         function saveAndSendBill(e) { e.preventDefault(); saveBillProcess(true); }
@@ -3176,7 +3197,8 @@ function applyProLocks(shopData) {
                     </div>
                     <div class="flex gap-2 mt-2 pt-3 border-t border-[#E5E7EB] w-full">
                         <button onclick="event.stopPropagation(); downloadBillImage('${b.id}')" class="bg-[#F7F7F9] text-[#111827] w-9 h-8 rounded-[8px] flex items-center justify-center hover:bg-[#E5E7EB] transition"><i class="fas fa-download text-xs"></i></button>
-                        ${b.customerPhone && b.customerPhone !== 'N/A' ? `<button onclick="event.stopPropagation(); window.open('https://wa.me/91${b.customerPhone}', '_blank')" class="bg-[#DCFCE7] text-[#16A34A] w-9 h-8 rounded-[8px] flex items-center justify-center hover:bg-[#16A34A] hover:text-white transition"><i class="fab fa-whatsapp text-sm"></i></button>` : `<div class="w-9 h-8"></div>`}
+                        ${b.customerPhone && b.customerPhone !== 'N/A' ? `<button onclick="event.stopPropagation(); sendWhatsAppBill('${b.id}', '${b.customerPhone}')" class="bg-[#DCFCE7] text-[#16A34A] w-9 h-8 rounded-[8px] flex items-center justify-center hover:bg-[#16A34A] hover:text-white transition"><i class="fab fa-whatsapp text-sm"></i></button>` : `<div class="w-9 h-8"></div>`}
+
                         <button onclick="event.stopPropagation(); downloadBillCSV('${b.id}')" class="flex-1 bg-[#E0E7FF] text-[#2563EB] h-8 rounded-[8px] flex items-center justify-center text-[11px] font-bold hover:bg-[#2563EB] hover:text-white transition"><i class="fas fa-file-csv mr-1"></i> CSV</button>
                         <button onclick="event.stopPropagation(); deleteBill('${b.id}')" class="bg-[#FEF2F2] text-[#DC2626] w-9 h-8 rounded-[8px] flex items-center justify-center hover:bg-[#DC2626] hover:text-white transition"><i class="fas fa-trash-alt text-xs"></i></button>
                     </div>

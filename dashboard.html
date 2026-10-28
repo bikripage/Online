@@ -3175,32 +3175,33 @@ function toggleNewBillDateField() {
             } catch(e) { alert("Error: " + e.message); }
             finally { btn.innerHTML = orig; btn.disabled = false; }
         }
-// Status के हिसाब से अलग-अलग मैसेज बनाने का नया फंक्शन
+// Status के हिसाब से सही मैसेज बनाने का अपडेटेड फंक्शन
 function getWhatsAppBillMessage(bill) {
     const shopName = globalShopData.shopName || "स्टोर";
     const mapLink = globalShopData.googleMapLink || "";
     const status = bill.deliveryStatus || "Processing";
     let introMsg = "";
     
-    // Status चेक करके मैसेज बदलना
+    // Status चेक करके मैसेज बदलना (अब इसमें बिल अटैच होने का जिक्र नहीं है)
     if (status === 'Delivered') {
-        introMsg = `आपका ऑर्डर सफलतापूर्वक डिलीवर हो चुका है। आपकी खरीदारी का बिल इस मैसेज के साथ है।\n\nहमें उम्मीद है कि आप हमारे उत्पाद से पूरी तरह संतुष्ट होंगे!`;
+        introMsg = `आपका ऑर्डर सफलतापूर्वक डिलीवर हो चुका है। खरीदारी के लिए धन्यवाद!\n\nहमें उम्मीद है कि आप हमारे उत्पाद से पूरी तरह संतुष्ट होंगे।`;
     } else if (status === 'Processing') {
-        introMsg = `आपका ऑर्डर कन्फर्म हो गया है और अभी तैयार (Processing) किया जा रहा है। आपकी खरीदारी का बिल (रसीद) इस मैसेज के साथ है।`;
+        introMsg = `आपका ऑर्डर कन्फर्म हो गया है और अभी तैयार (Processing) किया जा रहा है।`;
     } else if (status === 'Cancelled') {
-        introMsg = `किसी कारणवश आपका ऑर्डर कैंसिल कर दिया गया है। असुविधा के लिए हमें खेद है। आपके कैंसिल किए गए ऑर्डर का विवरण (बिल) इस मैसेज के साथ है।`;
+        introMsg = `किसी कारणवश आपका ऑर्डर कैंसिल कर दिया गया है। असुविधा के लिए हमें खेद है। किसी भी जानकारी के लिए आप हमसे संपर्क कर सकते हैं।`;
     } else if (status.includes('Delivery by')) {
-        // अगर 'Pick Date' से कोई डेट चुनी गई हो
         let dateStr = status.replace('Delivery by ', '');
-        introMsg = `आपका ऑर्डर कन्फर्म हो गया है और इसे *${dateStr}* तक डिलीवर कर दिया जाएगा। आपकी खरीदारी का बिल इस मैसेज के साथ है।`;
+        introMsg = `आपका ऑर्डर कन्फर्म हो गया है और इसे *${dateStr}* तक डिलीवर कर दिया जाएगा।`;
     } else {
-        introMsg = `आपके ऑर्डर का वर्तमान स्टेटस: *${status}* है। आपकी रसीद इस मैसेज के साथ है।`;
+        introMsg = `आपके ऑर्डर का वर्तमान स्टेटस: *${status}* है।`;
     }
     
     let msg = `नमस्ते ${bill.customerName},\n*${shopName}* से जुड़ने के लिए बहुत-बहुत धन्यवाद।\n\n${introMsg}\n\nअगर आपको हमारी सर्विस पसंद आई हो, तो कृपया अपना कीमती समय निकालकर हमें गूगल पर 5-स्टार रेटिंग जरूर दें।\n\nगूगल रिव्यू लिंक: ${mapLink}\n\nधन्यवाद,\n*${shopName}*`;
     
     return encodeURIComponent(msg);
 }
+
+
 
 // WhatsApp पर Redirect करने का फंक्शन
 function sendWhatsAppBill(billId) {

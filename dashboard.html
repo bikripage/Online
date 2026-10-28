@@ -1450,10 +1450,24 @@
                 </div>
 
                 
-                <div class="mb-6">
-                    <label class="text-[10px] text-[#A855F7] font-bold uppercase tracking-wider mb-1 block"><i class="fas fa-layer-group"></i> Link to Tracker</label>
-                    <select id="bill-tracker-select" class="w-full bg-white border border-[#E9D5FF] rounded-[12px] px-3 py-2 text-[#111827] text-sm font-semibold outline-none cursor-pointer shadow-sm"></select>
+                                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <!-- नया Delivery Status ड्रॉपडाउन -->
+                    <div>
+                        <label class="text-[11px] text-[#6B7280] font-bold uppercase tracking-wider mb-1.5 block">Delivery Status</label>
+                        <select id="bill-delivery-status" class="w-full bg-[#F7F7F9] border border-[#E5E7EB] rounded-[12px] px-3 py-2.5 text-[#111827] text-sm font-semibold outline-none transition cursor-pointer">
+                            <option value="Processing">Processing</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    
+                    <!-- आपका पुराना Link to Tracker -->
+                    <div>
+                        <label class="text-[10px] text-[#A855F7] font-bold uppercase tracking-wider mb-1.5 block"><i class="fas fa-layer-group"></i> Link to Tracker</label>
+                        <select id="bill-tracker-select" class="w-full bg-white border border-[#E9D5FF] rounded-[12px] px-3 py-2.5 text-[#111827] text-sm font-semibold outline-none cursor-pointer shadow-sm"></select>
+                    </div>
                 </div>
+
 
                 <div class="bg-[#F7F7F9] rounded-[16px] p-4 flex justify-between items-end border border-[#E5E7EB]">
                     <span class="text-sm text-[#6B7280] font-bold uppercase tracking-wider">Grand Total</span>
@@ -3001,7 +3015,9 @@ function applyProLocks(shopData) {
         }
 
         function openCreateBillModal() {
-            draftBillItems = []; document.getElementById('bill-cust-name').value=''; document.getElementById('bill-cust-phone').value='';
+            draftBillItems = []; document.getElementById('bill-cust-name').value='';
+            document.getElementById('bill-delivery-status').value='Processing';
+             document.getElementById('bill-cust-phone').value='';
             document.getElementById('bill-qty-input').value='1'; document.getElementById('bill-pay-status').value='Paid';
                         // ✨ NAYA: Reset advance field
             document.getElementById('bill-discount').value='0'; 
@@ -3103,7 +3119,8 @@ function applyProLocks(shopData) {
                 grandTotal: gt, 
                 payStatus: document.getElementById('bill-pay-status').value, 
                 payMode: document.getElementById('bill-pay-mode').value, 
-                deliveryStatus: 'Processing', 
+                deliveryStatus: document.getElementById('bill-delivery-status').value,
+                 
                 timestamp: firebase.firestore.FieldValue.serverTimestamp() 
             };
 
@@ -3131,22 +3148,43 @@ function applyProLocks(shopData) {
             } catch(e) { alert("Error: " + e.message); }
             finally { btn.innerHTML = orig; btn.disabled = false; }
         }
-// ऑटोमैटिक मैसेज बनाने और बिल डाउनलोड करके WhatsApp पर भेजने का नया फंक्शन
-// Auto-message banane ka function
-function getWhatsAppBillMessage() {
+// Status के हिसाब से अलग-अलग मैसेज बनाने का नया फंक्शन
+function getWhatsAppBillMessage(bill) {
     const shopName = globalShopData.shopName || "स्टोर";
     const mapLink = globalShopData.googleMapLink || "";
+    const status = bill.deliveryStatus || "Processing";
+    let introMsg = "";
     
-    let msg = `नमस्ते,\n*${shopName}* से खरीदारी करने के लिए आपका बहुत-बहुत धन्यवाद। आपकी खरीदारी का बिल इस मैसेज के साथ भेजा जा रहा है।\n\nहमें उम्मीद है कि आप हमारे उत्पाद से पूरी तरह संतुष्ट होंगे।\n\nअगर आपको हमारी सर्विस और प्रोडक्ट पसंद आया हो, तो कृपया अपना कीमती समय निकालकर हमें गूगल पर रेटिंग और रिव्यू जरूर दें। आपका फीडबैक हमारे बिजनेस को बेहतर बनाने में बहुत मदद करेगा।\n\nगूगल रिव्यू लिंक: ${mapLink}\n\nधन्यवाद,\n*${shopName}*`;
+    // Status चेक करके मैसेज बदलना
+    if (status === 'Delivered') {
+        introMsg = `आपका ऑर्डर सफलतापूर्वक डिलीवर हो चुका है। आपकी खरीदारी का बिल इस मैसेज के साथ है।\n\nहमें उम्मीद है कि आप हमारे उत्पाद से पूरी तरह संतुष्ट होंगे!`;
+    } else if (status === 'Processing') {
+        introMsg = `आपका ऑर्डर कन्फर्म हो गया है और अभी तैयार (Processing) किया जा रहा है। आपकी खरीदारी का बिल (रसीद) इस मैसेज के साथ है।`;
+    } else if (status === 'Cancelled') {
+        introMsg = `किसी कारणवश आपका ऑर्डर कैंसिल कर दिया गया है। असुविधा के लिए हमें खेद है। आपके कैंसिल किए गए ऑर्डर का विवरण (बिल) इस मैसेज के साथ है।`;
+    } else if (status.includes('Delivery by')) {
+        // अगर 'Pick Date' से कोई डेट चुनी गई हो
+        let dateStr = status.replace('Delivery by ', '');
+        introMsg = `आपका ऑर्डर कन्फर्म हो गया है और इसे *${dateStr}* तक डिलीवर कर दिया जाएगा। आपकी खरीदारी का बिल इस मैसेज के साथ है।`;
+    } else {
+        introMsg = `आपके ऑर्डर का वर्तमान स्टेटस: *${status}* है। आपकी रसीद इस मैसेज के साथ है।`;
+    }
+    
+    let msg = `नमस्ते ${bill.customerName},\n*${shopName}* से जुड़ने के लिए बहुत-बहुत धन्यवाद।\n\n${introMsg}\n\nअगर आपको हमारी सर्विस पसंद आई हो, तो कृपया अपना कीमती समय निकालकर हमें गूगल पर 5-स्टार रेटिंग जरूर दें।\n\nगूगल रिव्यू लिंक: ${mapLink}\n\nधन्यवाद,\n*${shopName}*`;
     
     return encodeURIComponent(msg);
 }
 
-// Sirf WhatsApp par redirect karne ka function (No Download)
-function sendWhatsAppBill(phone) {
-    let m = getWhatsAppBillMessage();
-    window.open(`https://wa.me/91${phone}?text=${m}`, '_blank');
+// WhatsApp पर Redirect करने का फंक्शन
+function sendWhatsAppBill(billId) {
+    // Bill ID से पूरा बिल डेटा निकालना
+    let b = adminBills.find(x => x.id === billId);
+    if(!b) return;
+    
+    let m = getWhatsAppBillMessage(b);
+    window.open(`https://wa.me/91${b.customerPhone}?text=${m}`, '_blank');
 }
+
 
 
         function saveBillOnly(e) { e.preventDefault(); saveBillProcess(false); }
@@ -3190,7 +3228,7 @@ function sendWhatsAppBill(phone) {
                     </div>
                     <div class="flex gap-2 mt-2 pt-3 border-t border-[#E5E7EB] w-full">
                         <button onclick="event.stopPropagation(); downloadBillImage('${b.id}')" class="bg-[#F7F7F9] text-[#111827] w-9 h-8 rounded-[8px] flex items-center justify-center hover:bg-[#E5E7EB] transition"><i class="fas fa-download text-xs"></i></button>
-                        ${b.customerPhone && b.customerPhone !== 'N/A' ? `<button onclick="event.stopPropagation(); sendWhatsAppBill('${b.customerPhone}')" class="bg-[#DCFCE7] text-[#16A34A] w-9 h-8 rounded-[8px] flex items-center justify-center hover:bg-[#16A34A] hover:text-white transition"><i class="fab fa-whatsapp text-sm"></i></button>` : `<div class="w-9 h-8"></div>`}
+                        ${b.customerPhone && b.customerPhone !== 'N/A' ? `<button onclick="event.stopPropagation(); sendWhatsAppBill('${b.id}')" class="bg-[#DCFCE7] text-[#16A34A] w-9 h-8 rounded-[8px] flex items-center justify-center hover:bg-[#16A34A] hover:text-white transition"><i class="fab fa-whatsapp text-sm"></i></button>` : `<div class="w-9 h-8"></div>`}
 
 
                         <button onclick="event.stopPropagation(); downloadBillCSV('${b.id}')" class="flex-1 bg-[#E0E7FF] text-[#2563EB] h-8 rounded-[8px] flex items-center justify-center text-[11px] font-bold hover:bg-[#2563EB] hover:text-white transition"><i class="fas fa-file-csv mr-1"></i> CSV</button>

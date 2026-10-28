@@ -1452,14 +1452,17 @@
                 
                                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <!-- नया Delivery Status ड्रॉपडाउन -->
-                    <div>
+                                        <div class="relative">
                         <label class="text-[11px] text-[#6B7280] font-bold uppercase tracking-wider mb-1.5 block">Delivery Status</label>
-                        <select id="bill-delivery-status" class="w-full bg-[#F7F7F9] border border-[#E5E7EB] rounded-[12px] px-3 py-2.5 text-[#111827] text-sm font-semibold outline-none transition cursor-pointer">
+                        <select id="bill-delivery-status" onchange="toggleNewBillDateField()" class="w-full bg-[#F7F7F9] border border-[#E5E7EB] rounded-[12px] px-3 py-2.5 text-[#111827] text-sm font-semibold outline-none transition cursor-pointer">
                             <option value="Processing">Processing</option>
                             <option value="Delivered">Delivered</option>
-                            <option value="Cancelled">Cancelled</option>
+                            <option value="Custom">Pick Date...</option>
                         </select>
+                        <!-- तारीख चुनने का बॉक्स (जो छुप कर रहेगा और Pick Date चुनने पर दिखेगा) -->
+                        <input type="date" id="bill-delivery-date" class="hidden w-full mt-2 bg-white border border-[#E5E7EB] rounded-[12px] px-3 py-2.5 text-[#111827] text-sm font-semibold outline-none transition">
                     </div>
+
                     
                     <!-- आपका पुराना Link to Tracker -->
                     <div>
@@ -3017,6 +3020,10 @@ function applyProLocks(shopData) {
         function openCreateBillModal() {
             draftBillItems = []; document.getElementById('bill-cust-name').value='';
             document.getElementById('bill-delivery-status').value='Processing';
+                        document.getElementById('bill-delivery-date').value = '';
+            document.getElementById('bill-delivery-date').classList.add('hidden');
+            document.getElementById('bill-delivery-date').classList.remove('block');
+            
              document.getElementById('bill-cust-phone').value='';
             document.getElementById('bill-qty-input').value='1'; document.getElementById('bill-pay-status').value='Paid';
                         // ✨ NAYA: Reset advance field
@@ -3039,6 +3046,18 @@ function applyProLocks(shopData) {
             const stat = document.getElementById('bill-pay-status').value; const md = document.getElementById('bill-pay-mode');
             if (stat === 'Unpaid') { md.value = 'None'; md.disabled = true; } else { if(md.value === 'None') md.value = 'UPI (Online)'; md.disabled = false; }
         }
+function toggleNewBillDateField() {
+    let s = document.getElementById('bill-delivery-status');
+    let d = document.getElementById('bill-delivery-date');
+    if(s.value === 'Custom') {
+        d.classList.remove('hidden');
+        d.classList.add('block');
+    } else {
+        d.classList.add('hidden');
+        d.classList.remove('block');
+        d.value = ''; 
+    }
+}
 
         function showCustomerSuggestions() {
             const nInp = document.getElementById('bill-cust-name').value.toLowerCase(); const pInp = document.getElementById('bill-cust-phone').value;
@@ -3107,7 +3126,14 @@ function applyProLocks(shopData) {
             let iTot = draftBillItems.reduce((s, i) => s + i.total, 0); 
             let gt = Math.max(0, iTot - disc + del - adv);
             const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-            
+                        // कस्टम डिलीवरी डेट चेक करना
+            let dStatus = document.getElementById('bill-delivery-status').value;
+            if(dStatus === 'Custom') {
+                let dDate = document.getElementById('bill-delivery-date').value;
+                if(!dDate) return alert("Please select a delivery date!"); // अगर तारीख नहीं चुनी तो रोक देगा
+                dStatus = `Delivery by ` + new Date(dDate).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+            }
+
             let nb = { 
                 date: dateStr, 
                 customerName: n, 
@@ -3119,7 +3145,8 @@ function applyProLocks(shopData) {
                 grandTotal: gt, 
                 payStatus: document.getElementById('bill-pay-status').value, 
                 payMode: document.getElementById('bill-pay-mode').value, 
-                deliveryStatus: document.getElementById('bill-delivery-status').value,
+                deliveryStatus: dStatus,
+
                  
                 timestamp: firebase.firestore.FieldValue.serverTimestamp() 
             };

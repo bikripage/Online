@@ -1461,14 +1461,12 @@
                 </div>
             </div>
 
-            <div class="p-4 border-t border-[#E5E7EB] bg-white shrink-0 flex gap-3">
-                <button onclick="saveBillOnly(event)" class="w-1/3 bg-[#F7F7F9] hover:bg-[#E5E7EB] text-[#111827] font-bold py-3.5 rounded-[12px] transition text-sm flex justify-center items-center">
-                    Save Only
-                </button>
-                <button onclick="saveAndSendBill(event)" class="w-2/3 bg-[#16A34A] hover:bg-[#15803D] text-white font-bold py-3.5 rounded-[12px] transition text-sm flex justify-center items-center gap-2 shadow-md">
-                    Save & Send <i class="fab fa-whatsapp text-lg"></i>
+                        <div class="p-4 border-t border-[#E5E7EB] bg-white shrink-0">
+                <button onclick="saveBillOnly(event)" class="w-full bg-[#16A34A] hover:bg-[#15803D] text-white font-bold py-3.5 rounded-[12px] transition text-sm flex justify-center items-center shadow-md">
+                    Save
                 </button>
             </div>
+
         </div>
     </div>
 
@@ -3134,6 +3132,7 @@ function applyProLocks(shopData) {
             finally { btn.innerHTML = orig; btn.disabled = false; }
         }
 // ऑटोमैटिक मैसेज बनाने और बिल डाउनलोड करके WhatsApp पर भेजने का नया फंक्शन
+// Auto-message banane ka function
 function getWhatsAppBillMessage() {
     const shopName = globalShopData.shopName || "स्टोर";
     const mapLink = globalShopData.googleMapLink || "";
@@ -3143,18 +3142,12 @@ function getWhatsAppBillMessage() {
     return encodeURIComponent(msg);
 }
 
-function sendWhatsAppBill(billId, phone) {
-    // 1. बिल इमेज ऑटो डाउनलोड करें
-    downloadBillImage(billId);
-    
-    // 2. नया मैसेज लाएं
+// Sirf WhatsApp par redirect karne ka function (No Download)
+function sendWhatsAppBill(phone) {
     let m = getWhatsAppBillMessage();
-    
-    // 3. थोड़ा सा रुक कर WhatsApp खोलें (ताकि डाउनलोड शुरू हो सके)
-    setTimeout(() => {
-        window.open(`https://wa.me/91${phone}?text=${m}`, '_blank');
-    }, 500);
+    window.open(`https://wa.me/91${phone}?text=${m}`, '_blank');
 }
+
 
         function saveBillOnly(e) { e.preventDefault(); saveBillProcess(false); }
         function saveAndSendBill(e) { e.preventDefault(); saveBillProcess(true); }
@@ -3197,7 +3190,8 @@ function sendWhatsAppBill(billId, phone) {
                     </div>
                     <div class="flex gap-2 mt-2 pt-3 border-t border-[#E5E7EB] w-full">
                         <button onclick="event.stopPropagation(); downloadBillImage('${b.id}')" class="bg-[#F7F7F9] text-[#111827] w-9 h-8 rounded-[8px] flex items-center justify-center hover:bg-[#E5E7EB] transition"><i class="fas fa-download text-xs"></i></button>
-                        ${b.customerPhone && b.customerPhone !== 'N/A' ? `<button onclick="event.stopPropagation(); sendWhatsAppBill('${b.id}', '${b.customerPhone}')" class="bg-[#DCFCE7] text-[#16A34A] w-9 h-8 rounded-[8px] flex items-center justify-center hover:bg-[#16A34A] hover:text-white transition"><i class="fab fa-whatsapp text-sm"></i></button>` : `<div class="w-9 h-8"></div>`}
+                        ${b.customerPhone && b.customerPhone !== 'N/A' ? `<button onclick="event.stopPropagation(); sendWhatsAppBill('${b.customerPhone}')" class="bg-[#DCFCE7] text-[#16A34A] w-9 h-8 rounded-[8px] flex items-center justify-center hover:bg-[#16A34A] hover:text-white transition"><i class="fab fa-whatsapp text-sm"></i></button>` : `<div class="w-9 h-8"></div>`}
+
 
                         <button onclick="event.stopPropagation(); downloadBillCSV('${b.id}')" class="flex-1 bg-[#E0E7FF] text-[#2563EB] h-8 rounded-[8px] flex items-center justify-center text-[11px] font-bold hover:bg-[#2563EB] hover:text-white transition"><i class="fas fa-file-csv mr-1"></i> CSV</button>
                         <button onclick="event.stopPropagation(); deleteBill('${b.id}')" class="bg-[#FEF2F2] text-[#DC2626] w-9 h-8 rounded-[8px] flex items-center justify-center hover:bg-[#DC2626] hover:text-white transition"><i class="fas fa-trash-alt text-xs"></i></button>

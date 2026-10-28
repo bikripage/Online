@@ -200,13 +200,19 @@
 
 <!-- ✨ GOOGLE ONLY LOGIN MODAL ✨ -->
 <div id="auth-modal" class="fixed inset-0 bg-[#111827]/60 backdrop-blur-md z-[70] hidden flex items-center justify-center p-4 transition-opacity duration-300 opacity-0">
-    <div class="bg-white rounded-[24px] shadow-2xl w-full max-w-sm p-6 sm:p-8 text-center transform scale-95 transition-transform duration-300 relative" id="auth-modal-content">
+        <div class="bg-white rounded-[24px] shadow-2xl w-full max-w-sm p-6 sm:p-8 text-center transform scale-95 transition-transform duration-300 relative" id="auth-modal-content">
         
+        <!-- ✨ NAYA: Cross (X) Button ✨ -->
+        <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 bg-gray-50 hover:bg-gray-100 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 transition active:scale-90 z-10">
+            <i class="fas fa-times"></i>
+        </button>
+
         <!-- STEP 1 (GOOGLE LOGIN SCREEN) -->
         <div id="auth-step-login" class="transition-all">
             
-            <h3 class="text-2xl font-bold text-[#111827] mb-1">Welcome to BikriPage</h3>
-            <p class="text-[13px] text-[#6B7280] mb-8">Securely log in to continue</p>
+            <h3 class="text-2xl font-bold text-[#111827] mb-1">Login to continue</h3>
+            <p class="text-[13px] text-[#6B7280] mb-8">Securely log in as a shop owner</p>
+
 
             <button type="button" onclick="loginWithGoogle(event)" class="w-full flex items-center justify-center gap-3 bg-white border border-[#E5E7EB] hover:bg-[#F7F7F9] text-[#111827] font-semibold h-[56px] rounded-[16px] shadow-sm transition-all active:scale-[0.98]">
                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google"> Continue with Google
@@ -889,7 +895,7 @@
  // ✨ GLOBAL AUTH VARIABLE ✨
 let authTemp = { email: '', name: '', photoURL: '', uid: '' };
 
-// ✨ 1. SECURE GOOGLE LOGIN LOGIC ✨
+// ✨ 1. SECURE GOOGLE LOGIN LOGIC (ONLY FOR SHOPKEEPERS) ✨
 function loginWithGoogle(event) {
     const btn = event ? event.currentTarget : null;
     const originalHtml = btn ? btn.innerHTML : '';
@@ -899,7 +905,7 @@ function loginWithGoogle(event) {
         const user = result.user;
         const email = user.email;
         
-                // 1. SECURE SUPER ADMIN CHECK (Database se check karega)
+        // 1. SECURE SUPER ADMIN CHECK
         const adminSnap = await db.collection('admins').doc(email).get();
         if (adminSnap.exists) {
             localStorage.setItem('BikriPage_super_admin', 'true');
@@ -907,31 +913,7 @@ function loginWithGoogle(event) {
             return;
         }
 
-        
-                        const custSnap = await db.collection('customers').doc(email).get();
-                if (custSnap.exists) {
-                    const custData = custSnap.data();
-                    localStorage.setItem('BikriPage_customer_name', custData.name);
-                    localStorage.setItem('BikriPage_customer_phone', email); 
-                    if (custData.profileImage) localStorage.setItem('BikriPage_profile_img', custData.profileImage);
-                    
-                    // ✨ NAYA LOGIC: Login hote hi turant saari delivery details database se nikal kar browser mein daal do ✨
-                    if (custData.savedAddress) {
-                        localStorage.setItem('BikriPage_saved_name', custData.savedName || custData.name);
-                        localStorage.setItem('BikriPage_saved_phone', custData.savedPhone || '');
-                        localStorage.setItem('BikriPage_saved_landmark', custData.savedLandmark || '');
-                        localStorage.setItem('BikriPage_saved_address', custData.savedAddress || '');
-                        if (custData.savedLat) localStorage.setItem('BikriPage_saved_lat', custData.savedLat);
-                        if (custData.savedLng) localStorage.setItem('BikriPage_saved_lng', custData.savedLng);
-                    }
-                    
-                    closeAuthModal();
-                    updateUIBasedOnLogin();
-                    updateCartBadge();
-                    return;
-                }
-
-        
+        // 2. CHECK IF SHOP ALREADY EXISTS
         const shopSnap = await db.collection('shops').where('email', '==', email).get();
         if (!shopSnap.empty) {
             const shopData = shopSnap.docs[0].data();
@@ -944,12 +926,13 @@ function loginWithGoogle(event) {
             return;
         }
 
+        // 3. NEW SHOPKEEPER -> Direct to Shop Setup (Role selection skipped)
         authTemp.name = user.displayName || "Google User";
         authTemp.email = email; 
         authTemp.photoURL = user.photoURL || '';
         authTemp.uid = user.uid;
         
-        showStep('auth-step-2'); 
+        showStep('auth-step-shop'); 
 
     }).catch((error) => {
         console.error(error);
@@ -960,43 +943,7 @@ function loginWithGoogle(event) {
     });
 }
 
-// ✨ 2. CREATE CUSTOMER LOGIC ✨
-async function selectRole(role) {
-    if (role === 'customer') {
-        try {
-            // 🔥 Purani shop ya purane customer ka bacha hua address/landmark turant mitao!
-            localStorage.removeItem('BikriPage_active_shop');
-            localStorage.removeItem('BikriPage_owner_name');
-            localStorage.removeItem('BikriPage_saved_name');
-            localStorage.removeItem('BikriPage_saved_phone');
-            localStorage.removeItem('BikriPage_saved_landmark');
-            localStorage.removeItem('BikriPage_saved_address');
-            localStorage.removeItem('BikriPage_saved_lat');
-            localStorage.removeItem('BikriPage_saved_lng');
 
-            await db.collection('customers').doc(authTemp.email).set({
-                name: authTemp.name,
-                email: authTemp.email,
-                phone: authTemp.email, 
-                profileImage: authTemp.photoURL,
-                uid: authTemp.uid,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            localStorage.setItem('BikriPage_customer_name', authTemp.name);
-            localStorage.setItem('BikriPage_customer_phone', authTemp.email);
-            localStorage.setItem('BikriPage_profile_img', authTemp.photoURL);
-            
-            closeAuthModal(); 
-            updateUIBasedOnLogin();
-            updateCartBadge();
-        } catch (error) { 
-            alert("Database Error: " + error.message); 
-        }
-    } else {
-        showStep('auth-step-shop');
-    }
-}
 
 
 // ✨ 3. CREATE SHOP LOGIC ✨
@@ -1145,18 +1092,16 @@ async function handleShopSubmit(e) {
             );
         }
 
-        // --- ✨ UI UPDATER (WITH PREMIUM STORE ICONS & RATING) ✨ ---
+                        // --- ✨ UI UPDATER (WITH PREMIUM STORE ICONS & RATING) ✨ ---
         function updateUIBasedOnLogin() {
             const activeShop = localStorage.getItem('BikriPage_active_shop');
             const shopOwnerName = localStorage.getItem('BikriPage_owner_name');
-            const customerName = localStorage.getItem('BikriPage_customer_name');
-            const customerPhone = localStorage.getItem('BikriPage_customer_phone') || '';
             const authContainer = document.getElementById('auth-container');
             const heroContent = document.getElementById('hero-content');
-            const searchInput = document.getElementById('search-input');
+            const searchInput = document.getElementById('top-search-input');
 
-                                                    // --- 🍎 SHOP OWNER "WHY SELL ON BikriPage" SECTION (ULTRA PREMIUM 3D PHONE SIMULATOR) 🍎 ---
-                                                          const merchantWhyChooseUsSection = `
+            // --- 🍎 SHOP OWNER "WHY SELL ON BikriPage" SECTION (ULTRA PREMIUM 3D PHONE SIMULATOR) ---
+            const merchantWhyChooseUsSection = `
                 <style>
                     /* ✨ WORLD-CLASS HARDWARE ACCELERATED ANIMATIONS ✨ */
                     .ios-glass { background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(255, 255, 255, 0.9); box-shadow: 0 12px 40px rgba(0,0,0,0.06); }
@@ -1164,7 +1109,6 @@ async function handleShopSubmit(e) {
                     /* 🟢 30-SECOND SEAMLESS LOOP MASTER ANIMATION */
                     .sim-stage { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; will-change: opacity, transform; display: flex; flex-direction: column; background: #F9FAFB; }
                     
-                    /* STAGES (16.6% each for 6 steps = 30 seconds) */
                     .stage-1 { animation: s1 30s infinite cubic-bezier(0.25, 1, 0.5, 1); }
                     @keyframes s1 { 0%, 2% { opacity: 0; transform: scale(0.95); } 3%, 15% { opacity: 1; transform: scale(1); } 16.5%, 100% { opacity: 0; transform: scale(1.05); } }
 
@@ -1197,13 +1141,11 @@ async function handleShopSubmit(e) {
                     .bar-progress { animation: barFill 30s infinite ease-in-out; width: 0%; }
                     @keyframes barFill { 0%, 85% { width: 0%; } 89%, 100% { width: 100%; } }
                     
-                    /* ✨ BLUR OVERLAY & DOWNLOAD ALERT ✨ */
                     .blur-overlay { animation: blurFade 30s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; backdrop-filter: blur(8px); }
                     @keyframes blurFade { 0%, 91% { opacity: 0; } 92%, 98% { opacity: 1; } 99%, 100% { opacity: 0; } }
                     .center-alert { animation: centerPop 30s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; }
                     @keyframes centerPop { 0%, 91% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } 93%, 97% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 99%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } }
                     
-                    /* 🟢 SYNCED ICONS (Side Pills) - Compact on Mobile, Detailed on Desktop */
                     .step-pill { transition: all 0.4s; opacity: 0.4; transform: translateX(10px); filter: grayscale(1); border: 2px solid transparent; }
                     .sp-1 { animation: sp1 30s infinite; } @keyframes sp1 { 0%, 2% { opacity:0.4; transform:translateX(10px); filter:grayscale(1); border-color:transparent; background:transparent; } 3%, 15% { opacity:1; transform:translateX(0); filter:grayscale(0); border-color:#818CF8; background:white; box-shadow:0 10px 25px rgba(0,0,0,0.08); } 16.5%, 100% { opacity:0.4; transform:translateX(10px); filter:grayscale(1); border-color:transparent; background:transparent; } }
                     .sp-2 { animation: sp2 30s infinite; } @keyframes sp2 { 0%, 15% { opacity:0.4; transform:translateX(10px); filter:grayscale(1); } 17%, 32% { opacity:1; transform:translateX(0); filter:grayscale(0); border-color:#22D3EE; background:white; box-shadow:0 10px 25px rgba(0,0,0,0.08); } 33.3%, 100% { opacity:0.4; transform:translateX(10px); filter:grayscale(1); } }
@@ -1218,7 +1160,6 @@ async function handleShopSubmit(e) {
 
                 <div class="relative z-20 w-full max-w-[900px] mx-auto mt-8 sm:mt-16 px-4 mb-16 overflow-hidden">
                     
-                    <!-- Title Section -->
                     <div class="text-center mb-10 sm:mb-12">
                         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gray-900 text-white text-[10px] sm:text-[11px] font-black tracking-widest uppercase mb-4 shadow-xl">
                             <span class="relative flex h-2 w-2">
@@ -1231,24 +1172,18 @@ async function handleShopSubmit(e) {
                         <p class="text-gray-500 mt-3 font-medium text-[14px] sm:text-[16px] max-w-xl mx-auto">See how BikriPage handles your entire shop seamlessly. From digital storefronts to final smart reports.</p>
                     </div>
 
-                    <!-- 🚀 NEW COMPACT LAYOUT: Phone + Floating Icons -->
                     <div class="flex flex-row items-center justify-center gap-2 sm:gap-10 bg-white/70 backdrop-blur-2xl rounded-[24px] sm:rounded-[3rem] p-3 sm:p-10 border border-gray-100 shadow-[0_15px_50px_rgba(0,0,0,0.03)] relative">
                         
-                        <!-- 📱 CENTER: 3D PREMIUM iOS PHONE MOCKUP -->
                         <div class="relative w-[210px] h-[460px] sm:w-[320px] sm:h-[640px] shrink-0 bg-gray-900 rounded-[2rem] sm:rounded-[3.5rem] shadow-[0_25px_60px_rgba(0,0,0,0.25)] border-[6px] sm:border-[8px] border-gray-900 flex flex-col z-20 overflow-hidden ring-4 ring-gray-100/50">
                             
-                            <!-- Apple Style Dynamic Island / Notch -->
                             <div class="absolute top-1.5 sm:top-2 left-1/2 transform -translate-x-1/2 w-[70px] sm:w-[100px] h-[20px] sm:h-[26px] bg-black rounded-full z-[100] shadow-sm flex items-center justify-end px-2 sm:px-3">
                                 <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500/30 flex items-center justify-center"><div class="w-1 h-1 bg-green-500 rounded-full"></div></div>
                             </div>
                             
-                            <!-- SIMULATION SCREEN CONTAINER -->
                             <div class="w-full h-full relative bg-white rounded-[1.5rem] sm:rounded-[3rem] overflow-hidden flex flex-col">
                                 
-                                <!-- STAGE 1: Digital Storefront -->
                                 <div class="sim-stage stage-1">
                                     <div class="h-[100px] sm:h-[160px] w-full bg-gradient-to-r from-indigo-500 to-purple-600 relative shrink-0">
-                                       <!-- Share Button Safely placed below notch -->
                                        <div class="absolute top-9 sm:top-12 right-2 sm:right-4 bg-white/25 backdrop-blur-md px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-white text-[8px] sm:text-[10px] font-bold flex items-center gap-1 shadow-sm border border-white/40"><i class="fas fa-share"></i> Share</div>
                                        <div class="absolute -bottom-6 sm:-bottom-8 left-4 sm:left-5 w-12 h-12 sm:w-16 sm:h-16 rounded-[12px] sm:rounded-[18px] border-[3px] sm:border-[4px] border-white bg-white flex items-center justify-center text-indigo-500 shadow-md"><i class="fas fa-store text-xl sm:text-3xl"></i></div>
                                     </div>
@@ -1273,22 +1208,15 @@ async function handleShopSubmit(e) {
                                     </div>
                                 </div>
 
-                                <!-- STAGE 2: Receive Orders Online (Notification Drop) -->
                                 <div class="sim-stage stage-2 bg-[#F2F2F7]">
-                                    <!-- Background Faded Content (Old Orders History) -->
                                     <div class="absolute inset-0 pt-14 sm:pt-20 px-3 sm:px-4">
                                         <h4 class="font-bold text-gray-800 text-[11px] sm:text-[14px] mb-2 sm:mb-3">Recent Orders</h4>
                                         <div class="bg-white p-3 sm:p-4 rounded-[14px] sm:rounded-[18px] shadow-sm mb-3 opacity-40">
                                             <div class="flex justify-between items-center mb-2"><div class="h-2 sm:h-3 w-1/3 bg-gray-200 rounded"></div><div class="h-2 sm:h-3 w-1/5 bg-gray-200 rounded"></div></div>
                                             <div class="h-1.5 sm:h-2 w-1/2 bg-gray-100 rounded"></div>
                                         </div>
-                                        <div class="bg-white p-3 sm:p-4 rounded-[14px] sm:rounded-[18px] shadow-sm mb-3 opacity-30">
-                                            <div class="flex justify-between items-center mb-2"><div class="h-2 sm:h-3 w-1/3 bg-gray-200 rounded"></div><div class="h-2 sm:h-3 w-1/5 bg-gray-200 rounded"></div></div>
-                                            <div class="h-1.5 sm:h-2 w-1/2 bg-gray-100 rounded"></div>
-                                        </div>
                                     </div>
                                     
-                                    <!-- ✨ FIX: Real iOS Style Dropping Notification (Center Aligned via MX-AUTO) ✨ -->
                                     <div class="notif-drop absolute top-8 sm:top-12 left-0 right-0 mx-auto w-[92%] bg-white/95 backdrop-blur-xl p-3 sm:p-4 rounded-[18px] sm:rounded-[22px] shadow-[0_15px_40px_rgba(0,0,0,0.12)] border border-gray-100/50 z-50 flex flex-col gap-1.5 sm:gap-2">
                                         <div class="flex items-center gap-2 sm:gap-2.5">
                                             <div class="w-8 h-8 sm:w-11 sm:h-11 bg-gradient-to-tr from-cyan-400 to-blue-500 rounded-[10px] sm:rounded-[12px] flex items-center justify-center text-white shrink-0 shadow-sm"><i class="fas fa-cart-arrow-down text-[12px] sm:text-[16px]"></i></div>
@@ -1297,7 +1225,6 @@ async function handleShopSubmit(e) {
                                                 <h4 class="font-black text-gray-900 text-[11px] sm:text-[14px] truncate leading-tight">New Order: Satyam Kumar</h4>
                                             </div>
                                         </div>
-                                        <!-- Detailed Order Details inside notification -->
                                         <div class="bg-gray-50 rounded-lg sm:rounded-xl p-2 sm:p-3 border border-gray-100 mt-1">
                                             <div class="flex justify-between text-[9px] sm:text-[11px] font-semibold text-gray-600 mb-1"><span>2 Kg x Premium Rice</span><span>₹240</span></div>
                                             <div class="flex justify-between text-[9px] sm:text-[11px] font-semibold text-gray-600"><span>1 Kg x Organic Sugar</span><span>₹45</span></div>
@@ -1309,9 +1236,7 @@ async function handleShopSubmit(e) {
                                     </div>
                                 </div>
                                 
-                                <!-- STAGE 3: Typing Animation -> Smart Bill -->
                                 <div class="sim-stage stage-3 bg-[#F2F2F7] relative">
-                                    <!-- Calculator Typing View -->
                                     <div class="calc-ui absolute inset-0 pt-10 sm:pt-[50px] px-3 sm:px-4">
                                         <h3 class="font-black text-[13px] sm:text-[18px] text-gray-900 mb-2 sm:mb-4 px-1">Smart Calculator</h3>
                                         <div class="bg-white rounded-xl sm:rounded-[16px] p-3 sm:p-4 shadow-sm border border-gray-100 mb-2 sm:mb-3">
@@ -1331,7 +1256,6 @@ async function handleShopSubmit(e) {
                                         </div>
                                     </div>
 
-                                    <!-- Bill View (Slides up seamlessly) -->
                                     <div class="bill-ui absolute inset-0 pt-10 sm:pt-[50px] px-3 sm:px-4 flex justify-center bg-[#F2F2F7]">
                                         <div class="w-full bg-white p-4 sm:p-5 rounded-2xl sm:rounded-[24px] shadow-2xl border border-gray-200 relative h-fit mt-2 sm:mt-4">
                                             <div class="absolute -top-2.5 sm:-top-3 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-[7px] sm:text-[10px] font-bold px-3 sm:px-4 py-1 sm:py-1.5 rounded-full uppercase tracking-wider shadow-sm whitespace-nowrap">Bill Generated</div>
@@ -1350,17 +1274,13 @@ async function handleShopSubmit(e) {
                                     </div>
                                 </div>
                                 
-                                <!-- STAGE 4: Clean WhatsApp Chat (No incoming message) -->
                                 <div class="sim-stage stage-4 flex flex-col bg-[#E5DDD5]">
-                                    <!-- WA Header (Padded below notch!) -->
                                     <div class="bg-[#075E54] px-3 sm:px-4 pt-9 sm:pt-11 pb-2 sm:pb-3 flex items-center gap-2.5 sm:gap-3 shadow-md z-10 relative">
                                         <i class="fas fa-arrow-left text-white/90 text-[12px] sm:text-[15px]"></i>
                                         <div class="w-7 h-7 sm:w-9 h-9 bg-white/20 rounded-full flex items-center justify-center text-white text-[12px] sm:text-[15px]"><i class="fas fa-user"></i></div>
                                         <div class="flex-1"><p class="text-white font-bold text-[12px] sm:text-[14px] leading-tight">Satyam Customer</p><p class="text-white/70 text-[8px] sm:text-[10px] mt-0.5">online</p></div>
                                     </div>
-                                    <!-- Chat Body -->
                                     <div class="flex-1 h-full p-3 sm:p-4 flex flex-col justify-end pb-8 sm:pb-12" style="background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: cover;">
-                                        <!-- Clean Professional Sent Message Only -->
                                         <div class="chat-bubble bg-[#DCF8C6] p-3 sm:p-4 rounded-[14px] sm:rounded-[16px] rounded-tr-sm shadow-sm max-w-[92%] self-end relative mb-2">
                                             <h4 class="font-black text-gray-900 text-[11px] sm:text-[13px] mb-1 sm:mb-2"><i class="fas fa-check-circle text-green-600 mr-1 sm:mr-1.5"></i> Order Confirmed!</h4>
                                             <p class="text-[10px] sm:text-[12px] text-gray-800 leading-snug mb-2 sm:mb-3">Satyam, your order is ready.<br>Total Amount: <b>₹52.50</b></p>
@@ -1372,7 +1292,6 @@ async function handleShopSubmit(e) {
                                     </div>
                                 </div>
 
-                                <!-- STAGE 5: Dashboard Analytics -->
                                 <div class="sim-stage stage-5 flex flex-col bg-white h-full">
                                     <div class="p-4 sm:p-5 pt-10 sm:pt-[50px] pb-2 sm:pb-3 border-b border-gray-100 flex justify-between items-center bg-white">
                                         <h4 class="text-[14px] sm:text-[18px] font-black text-gray-900">Dashboard</h4>
@@ -1403,27 +1322,16 @@ async function handleShopSubmit(e) {
                                                     <div class="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full animate-ping"></div>
                                                 </div>
                                             </div>
-                                            <!-- Grid lines behind chart -->
-                                            <div class="absolute inset-0 pt-[3.5rem] sm:pt-[4.5rem] pointer-events-none flex flex-col justify-between pb-2 px-4 sm:px-5">
-                                                <div class="w-full border-b border-dashed border-gray-100"></div>
-                                                <div class="w-full border-b border-dashed border-gray-100"></div>
-                                                <div class="w-full border-b border-dashed border-gray-100"></div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- STAGE 6: Excel Export & Centered Alert -->
                                 <div class="sim-stage stage-6 bg-[#F9FAFB] relative flex flex-col items-center justify-center p-4">
-                                    
-                                    <!-- Visible Progress Box -->
                                     <div class="bg-white p-4 sm:p-5 rounded-[20px] sm:rounded-[24px] shadow-sm border border-gray-100 flex flex-col items-center w-full max-w-[200px] sm:max-w-[240px] z-10">
                                         <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gray-50 rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4 border border-gray-100 text-gray-400">
                                             <i class="fas fa-file-download text-xl sm:text-2xl animate-bounce"></i>
                                         </div>
                                         <h4 class="font-black text-gray-900 text-[13px] sm:text-[16px] mb-1 sm:mb-1.5 text-center w-full">Exporting Data</h4>
-                                        <p class="text-[8px] sm:text-[11px] text-gray-500 text-center mb-4 sm:mb-6 w-full">Processing business reports...</p>
-                                        
                                         <div class="w-full space-y-3 sm:space-y-4">
                                             <div class="bg-green-50 border border-green-100 p-2 sm:p-3 rounded-lg sm:rounded-[14px] flex items-center gap-2 sm:gap-3 w-full">
                                                 <div class="w-7 h-7 sm:w-9 sm:h-9 bg-green-500 text-white rounded-md sm:rounded-lg flex items-center justify-center text-[10px] sm:text-sm shrink-0"><i class="fas fa-file-excel"></i></div>
@@ -1432,32 +1340,18 @@ async function handleShopSubmit(e) {
                                                     <div class="w-full bg-green-200 h-1 sm:h-1.5 rounded-full mt-1 sm:mt-1.5 overflow-hidden"><div class="bg-green-500 h-full w-[100%] rounded-full bar-progress"></div></div>
                                                 </div>
                                             </div>
-                                            <div class="bg-purple-50 border border-purple-100 p-2 sm:p-3 rounded-lg sm:rounded-[14px] flex items-center gap-2 sm:gap-3 w-full">
-                                                <div class="w-7 h-7 sm:w-9 sm:h-9 bg-purple-500 text-white rounded-md sm:rounded-lg flex items-center justify-center text-[10px] sm:text-sm shrink-0"><i class="fas fa-robot"></i></div>
-                                                <div class="flex-1 min-w-0">
-                                                    <p class="text-[9px] sm:text-[11px] font-bold text-gray-800 truncate">Smart_Report.pdf</p>
-                                                    <div class="w-full bg-purple-200 h-1 sm:h-1.5 rounded-full mt-1 sm:mt-1.5 overflow-hidden"><div class="bg-purple-500 h-full w-[100%] rounded-full bar-progress"></div></div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
-
-                                    <!-- ✨ FIX: Full Background Blur Overlay (Appears ONLY during alert) ✨ -->
                                     <div class="blur-overlay absolute inset-0 z-40 bg-white/40 rounded-[2rem] sm:rounded-[3rem]"></div>
-
-                                    <!-- The Final Centered iOS Alert -->
                                     <div class="center-alert absolute top-1/2 left-1/2 w-[120px] sm:w-[160px] bg-[#1c1c1e]/90 backdrop-blur-2xl rounded-[16px] sm:rounded-[24px] flex flex-col items-center justify-center text-white shadow-2xl z-[100] p-4 sm:p-5">
                                         <i class="fas fa-check-circle text-[28px] sm:text-[38px] text-green-400 mb-2 sm:mb-3"></i>
                                         <h4 class="font-bold text-[11px] sm:text-[14px] text-center w-full">Downloaded</h4>
-                                        <p class="text-[8px] sm:text-[10px] text-gray-300 mt-1 text-center w-full font-medium">Saved to Files</p>
                                     </div>
-
                                 </div>
 
-                            </div> <!-- End Inner Screen -->
-                        </div> <!-- End Mobile Frame -->
+                            </div>
+                        </div>
 
-                        <!-- 📱 RIGHT (Mobile-only layout): 6 Compact Icons directly beside the phone -->
                         <div class="flex flex-col gap-2 sm:gap-4 w-[110px] sm:w-[320px] z-10 shrink-0">
                             <div class="step-pill sp-1 bg-white p-2 sm:p-4 rounded-xl sm:rounded-2xl border-2 flex items-center gap-3">
                                 <div class="w-8 h-8 sm:w-12 sm:h-12 bg-indigo-50 text-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0"><i class="fas fa-store text-sm sm:text-xl"></i></div>
@@ -1479,7 +1373,7 @@ async function handleShopSubmit(e) {
                                 <div class="hidden sm:block"><h4 class="font-bold text-gray-900 text-[15px]">WhatsApp Link</h4><p class="text-xs text-gray-500 mt-0.5">1-click sharing.</p></div>
                                 <div class="sm:hidden font-bold text-[9px] text-gray-800 leading-tight">WhatsApp</div>
                             </div>
-                            <div class="step-pill sp-5 bg-white p-2 sm:p-4 rounded-xl sm:rounded-2xl border-2 flex items-center gap-3">
+                            <div class="step-pill sp-5 bg-law-600 p-2 sm:p-4 rounded-xl sm:rounded-2xl border-2 flex items-center gap-3">
                                 <div class="w-8 h-8 sm:w-12 sm:h-12 bg-purple-50 text-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0"><i class="fas fa-chart-line text-sm sm:text-xl"></i></div>
                                 <div class="hidden sm:block"><h4 class="font-bold text-gray-900 text-[15px]">Calculations</h4><p class="text-xs text-gray-500 mt-0.5">Real-time stats.</p></div>
                                 <div class="sm:hidden font-bold text-[9px] text-gray-800 leading-tight">Calculations</div>
@@ -1495,33 +1389,98 @@ async function handleShopSubmit(e) {
                 </div>
             `;
 
+            let dashboardBtn = activeShop
+                ? `<a href="dashboard.html?shop=${activeShop}" class="w-full sm:w-auto px-8 h-[54px] rounded-2xl bg-[#1D1D1F] hover:bg-black text-white flex items-center justify-center text-[16px] font-semibold active:scale-95 transition-all shadow-[0_8px_20px_rgba(0,0,0,0.15)] gap-2">Open Dashboard</a>`
+                : `<button onclick="openAuthModal()" class="w-full sm:w-auto px-8 h-[54px] rounded-2xl bg-[#1D1D1F] hover:bg-black text-white flex items-center justify-center text-[16px] font-semibold active:scale-95 transition-all shadow-[0_8px_20px_rgba(0,0,0,0.15)] gap-2">Open Dashboard</button>`;
 
+            let storeBtn = activeShop
+                ? `<a href="store.html?shop=${activeShop}" class="w-full sm:w-auto px-7 h-[54px] rounded-2xl bg-white border border-gray-200/80 text-[#1D1D1F] flex items-center justify-center text-[16px] font-semibold hover:bg-gray-50 active:scale-95 transition-all shadow-sm gap-2">Visit My Store <i class="fas fa-arrow-right text-[12px] opacity-60"></i></a>`
+                : `<button onclick="openAuthModal()" class="w-full sm:w-auto px-7 h-[54px] rounded-2xl bg-white border border-gray-200/80 text-[#1D1D1F] flex items-center justify-center text-[16px] font-semibold hover:bg-gray-50 active:scale-95 transition-all shadow-sm gap-2">Visit My Store <i class="fas fa-arrow-right text-[12px] opacity-60"></i></button>`;
 
+            if (heroContent) {
+                heroContent.innerHTML = `
+                <style>
+                    @keyframes floatIcon { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -10px, 0); } }
+                    .animate-float-1 { animation: floatIcon 4s ease-in-out infinite; will-change: transform; }
+                    .animate-float-2 { animation: floatIcon 4s ease-in-out infinite 1.2s; will-change: transform; }
+                    .animate-float-3 { animation: floatIcon 4s ease-in-out infinite 2.4s; will-change: transform; }
+                    .ios-glass { background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(255, 255, 255, 0.9); box-shadow: 0 12px 40px rgba(0,0,0,0.06); }
+                </style>
+                <div class="w-full bg-[#F5F5F7] text-[#1D1D1F] font-sans selection:bg-blue-200 overflow-hidden relative border-b border-gray-200">
+                    <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-200 blur-[80px] opacity-30 pointer-events-none" style="transform: translateZ(0);"></div>
+                    <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-200 blur-[80px] opacity-30 pointer-events-none" style="transform: translateZ(0);"></div>
+                    <section class="relative z-10 px-6 pt-16 pb-20 md:pt-28 md:pb-28 max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-8">
+                        <div class="flex-1 text-center md:text-left flex flex-col items-center md:items-start z-20">
+                            <div class="inline-flex items-center gap-1.5 px-3 py-1 mb-6 rounded-full bg-blue-50/80 border border-blue-100/50 text-[11px] font-black tracking-widest text-blue-600 uppercase shadow-sm">
+                                <i class="fas fa-crown text-[10px]"></i> Merchant Hub
+                            </div>
+                            <h1 class="text-[42px] sm:text-5xl md:text-[64px] leading-[1.05] tracking-tight font-black text-[#1D1D1F] mb-5">
+                                Your Store.<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-[#0071E3] to-[#5E5CE6]">Smarter.</span>
+                            </h1>
+                            <p class="text-[16px] md:text-[19px] leading-[1.5] text-[#86868B] max-w-[340px] md:max-w-[460px] mb-10 font-medium">
+                                Everything you need to manage your store, orders, billing, and insights—beautifully integrated in one place.
+                            </p>
+                            <div class="flex flex-wrap flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                                ${dashboardBtn}
+                                ${storeBtn}
+                                <button onclick="openVideoModal()" class="w-full sm:w-auto px-7 h-[54px] rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 text-blue-600 flex items-center justify-center text-[16px] font-bold hover:shadow-md active:scale-95 transition-all gap-2">
+                                    <i class="fas fa-play-circle text-xl"></i> What Is BikriPage?
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex-1 w-full max-w-md relative flex justify-center items-center mt-4 md:mt-0 z-20">
+                            <div class="relative w-full aspect-square md:h-[420px] flex items-center justify-center">
+                                <div class="w-32 h-32 md:w-40 md:h-40 rounded-full bg-white ios-glass flex items-center justify-center z-10 relative">
+                                    <div class="absolute inset-0 rounded-full border border-white/60"></div>
+                                    <i class="fas fa-store text-5xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-indigo-500"></i>
+                                </div>
+                                <div class="absolute top-[5%] left-[8%] md:top-8 md:left-4 flex flex-col items-center gap-2 animate-float-1 z-20">
+                                    <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-white ios-glass flex items-center justify-center text-[#0071E3] shadow-[0_15px_30px_rgba(0,113,227,0.15)]"><i class="fas fa-box text-xl md:text-2xl"></i></div>
+                                    <span class="text-[11px] font-bold text-gray-700 bg-white/90 px-2.5 py-1 rounded-full shadow-sm border border-gray-100">Orders</span>
+                                </div>
+                                <div class="absolute top-[15%] right-[5%] md:top-16 md:-right-2 flex flex-col items-center gap-2 animate-float-2 z-20">
+                                    <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-white ios-glass flex items-center justify-center text-[#5E5CE6] shadow-[0_15px_30px_rgba(94,92,230,0.15)]"><i class="fas fa-file-invoice text-xl md:text-2xl"></i></div>
+                                    <span class="text-[11px] font-bold text-gray-700 bg-white/90 px-2.5 py-1 rounded-full shadow-sm border border-gray-100">Billing</span>
+                                </div>
+                                <div class="absolute bottom-[5%] left-[25%] md:bottom-8 md:left-1/2 md:-translate-x-1/2 flex flex-col items-center gap-2 animate-float-3 z-20">
+                                    <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-white ios-glass flex items-center justify-center text-[#FF9500] shadow-[0_15px_30px_rgba(255,149,0,0.15)]"><i class="fas fa-chart-pie text-xl md:text-2xl"></i></div>
+                                    <span class="text-[11px] font-bold text-gray-700 bg-white/90 px-2.5 py-1 rounded-full shadow-sm border border-gray-100">Insights</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <div class="relative z-20 bg-white rounded-t-[3rem] shadow-[0_-10px_40px_rgba(0,0,0,0.03)] border-t border-gray-100 pb-10">
+                        ${merchantWhyChooseUsSection}
+                    </div>
+                </div>`;
+            }
+
+            const title = document.getElementById('section-title');
+            const subtitle = document.getElementById('section-subtitle');
+            if (title) title.innerText = "Live Local Shops";
+            if (subtitle) subtitle.innerText = "Other businesses on BikriPage.";
+            if (searchInput) searchInput.placeholder = "Search shops...";
+
+            const filtersBox = document.getElementById('shopkeeper-filters-hide');
+            if (filtersBox) filtersBox.classList.add('hidden');
 
             if (activeShop) {
-                // 🔹 SHOP OWNER
-                const filtersBox = document.getElementById('shopkeeper-filters-hide');
-                if (filtersBox) filtersBox.classList.add('hidden');
-
-                if (searchInput) searchInput.placeholder = "Search shops...";
-                
                 const pricingSec = document.getElementById('merchant-upgrade-plans');
                 if(pricingSec) {
                     pricingSec.classList.remove('hidden');
                     db.collection('shops').doc(activeShop).get().then(doc => {
                         if(doc.exists) {
-                                                        const bType = doc.data().businessType || 'Retailer';
+                            const bType = doc.data().businessType || 'Retailer';
                             const pStatus = checkActivePlan(doc.data());
                             updateDynamicPricing(bType);
-                            updatePlanUI(pStatus.plan); // Expired hone par wapas Upgrade options aayenge
-
+                            updatePlanUI(pStatus.plan); 
                         }
                     });
                 }
 
                 const initials = getInitials(shopOwnerName || 'My Store');
                 const savedImg = localStorage.getItem('BikriPage_profile_img'); 
-
+                
                 authContainer.innerHTML = `
                     <button onclick="toggleProfileModal()" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition shadow-sm border border-gray-200 active:scale-95 focus:outline-none font-semibold text-[13px] tracking-wide relative overflow-hidden">
                         <span id="nav-initials" style="${savedImg ? 'display:none;' : ''}">${initials}</span>
@@ -1538,320 +1497,10 @@ async function handleShopSubmit(e) {
                         </div>
                     </div>
                 `;
-
-                 heroContent.innerHTML = `
-<style>
-    /* ✨ OPTIMIZED: Hardware Acceleration for 60fps Smooth Scrolling */
-    @keyframes floatIcon {
-        0%, 100% { transform: translate3d(0, 0, 0); }
-        50% { transform: translate3d(0, -10px, 0); }
-    }
-    .animate-float-1 { animation: floatIcon 4s ease-in-out infinite; will-change: transform; }
-    .animate-float-2 { animation: floatIcon 4s ease-in-out infinite 1.2s; will-change: transform; }
-    .animate-float-3 { animation: floatIcon 4s ease-in-out infinite 2.4s; will-change: transform; }
-    
-    /* ✨ OPTIMIZED: Removed heavy backdrop-filter which was causing scroll lag */
-    .ios-glass {
-        background: rgba(255, 255, 255, 0.95);
-        border: 1px solid rgba(255, 255, 255, 0.9);
-        box-shadow: 0 12px 40px rgba(0,0,0,0.06);
-    }
-</style>
-
-<div class="w-full bg-[#F5F5F7] text-[#1D1D1F] font-sans selection:bg-blue-200 overflow-hidden relative border-b border-gray-200">
-    
-    <!-- 🎨 Premium Background Blurs (GPU Optimized with translateZ) -->
-    <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-200 blur-[80px] opacity-30 pointer-events-none" style="transform: translateZ(0);"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-200 blur-[80px] opacity-30 pointer-events-none" style="transform: translateZ(0);"></div>
-
-    <section class="relative z-10 px-6 pt-16 pb-20 md:pt-28 md:pb-28 max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-8">
-        
-        <!-- 📝 LEFT: Text Content -->
-        <div class="flex-1 text-center md:text-left flex flex-col items-center md:items-start z-20">
-            
-            <div class="inline-flex items-center gap-1.5 px-3 py-1 mb-6 rounded-full bg-blue-50/80 border border-blue-100/50 text-[11px] font-black tracking-widest text-blue-600 uppercase shadow-sm">
-                <i class="fas fa-crown text-[10px]"></i> Merchant Hub
-            </div>
-
-            <h1 class="text-[42px] sm:text-5xl md:text-[64px] leading-[1.05] tracking-tight font-black text-[#1D1D1F] mb-5">
-                Your Store.<br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#0071E3] to-[#5E5CE6]">Smarter.</span>
-            </h1>
-
-            <p class="text-[16px] md:text-[19px] leading-[1.5] text-[#86868B] max-w-[340px] md:max-w-[460px] mb-10 font-medium">
-                Everything you need to manage your store, orders, billing, and insights—beautifully integrated in one place.
-            </p>
-
-            <!-- 🔘 Apple Style Buttons -->
-            <div class="flex flex-wrap flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-                <a href="dashboard.html?shop=${activeShop}" class="w-full sm:w-auto px-8 h-[54px] rounded-2xl bg-[#1D1D1F] hover:bg-black text-white flex items-center justify-center text-[16px] font-semibold active:scale-95 transition-all shadow-[0_8px_20px_rgba(0,0,0,0.15)] gap-2">
-                    Open Dashboard
-                </a>
-
-                <a href="store.html?shop=${activeShop}" class="w-full sm:w-auto px-7 h-[54px] rounded-2xl bg-white border border-gray-200/80 text-[#1D1D1F] flex items-center justify-center text-[16px] font-semibold hover:bg-gray-50 active:scale-95 transition-all shadow-sm gap-2">
-                    Visit My Store <i class="fas fa-arrow-right text-[12px] opacity-60"></i>
-                </a>
-                
-                <button onclick="openVideoModal()" class="w-full sm:w-auto px-7 h-[54px] rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 text-blue-600 flex items-center justify-center text-[16px] font-bold hover:shadow-md active:scale-95 transition-all gap-2">
-                    <i class="fas fa-play-circle text-xl"></i> What Is BikriPage?
-                </button>
-            </div>
-
-        </div>
-
-        <!-- 🖼️ RIGHT: Floating iOS Bento Layout -->
-        <div class="flex-1 w-full max-w-md relative flex justify-center items-center mt-4 md:mt-0 z-20">
-            <div class="relative w-full aspect-square md:h-[420px] flex items-center justify-center">
-                
-                <!-- Main Center Icon (Store) -->
-                <div class="w-32 h-32 md:w-40 md:h-40 rounded-full bg-white ios-glass flex items-center justify-center z-10 relative">
-                    <div class="absolute inset-0 rounded-full border border-white/60"></div>
-                    <i class="fas fa-store text-5xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-indigo-500"></i>
-                </div>
-
-                <!-- Floating Icon 1: Orders -->
-                <div class="absolute top-[5%] left-[8%] md:top-8 md:left-4 flex flex-col items-center gap-2 animate-float-1 z-20">
-                    <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-white ios-glass flex items-center justify-center text-[#0071E3] shadow-[0_15px_30px_rgba(0,113,227,0.15)]">
-                        <i class="fas fa-box text-xl md:text-2xl"></i>
-                    </div>
-                    <span class="text-[11px] font-bold text-gray-700 bg-white/90 px-2.5 py-1 rounded-full shadow-sm border border-gray-100">Orders</span>
-                </div>
-
-                <!-- Floating Icon 2: Billing -->
-                <div class="absolute top-[15%] right-[5%] md:top-16 md:-right-2 flex flex-col items-center gap-2 animate-float-2 z-20">
-                    <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-white ios-glass flex items-center justify-center text-[#5E5CE6] shadow-[0_15px_30px_rgba(94,92,230,0.15)]">
-                        <i class="fas fa-file-invoice text-xl md:text-2xl"></i>
-                    </div>
-                    <span class="text-[11px] font-bold text-gray-700 bg-white/90 px-2.5 py-1 rounded-full shadow-sm border border-gray-100">Billing</span>
-                </div>
-
-                <!-- Floating Icon 3: Insights -->
-                <div class="absolute bottom-[5%] left-[25%] md:bottom-8 md:left-1/2 md:-translate-x-1/2 flex flex-col items-center gap-2 animate-float-3 z-20">
-                    <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-white ios-glass flex items-center justify-center text-[#FF9500] shadow-[0_15px_30px_rgba(255,149,0,0.15)]">
-                        <i class="fas fa-chart-pie text-xl md:text-2xl"></i>
-                    </div>
-                    <span class="text-[11px] font-bold text-gray-700 bg-white/90 px-2.5 py-1 rounded-full shadow-sm border border-gray-100">Insights</span>
-                </div>
-
-            </div>
-        </div>
-
-    </section>
-
-    <!-- OTHER SECTIONS -->
-    <div class="relative z-20 bg-white rounded-t-[3rem] shadow-[0_-10px_40px_rgba(0,0,0,0.03)] border-t border-gray-100 pb-10">
-        ${merchantWhyChooseUsSection}
-    </div>
-
-</div>
-`;
-
-
-                document.getElementById('section-title').innerText = "Live Local Shops";
-                document.getElementById('section-subtitle').innerText = "Other businesses on BikriPage.";
-                if (searchInput) searchInput.placeholder = "Search shops...";
                 fetchLiveShops();
-                loadHomeBanners();
-                return true;
-
-            } else if (customerName) {
-                // 🔹 CUSTOMER LOGIC
-                
-                const initials = getInitials(customerName);
-                const savedImg = localStorage.getItem('BikriPage_profile_img'); 
-                
-                authContainer.innerHTML = `
-                    <button onclick="toggleProfileModal()" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition shadow-sm border border-gray-200 active:scale-95 focus:outline-none font-semibold text-[13px] tracking-wide relative overflow-hidden">
-                        <span id="nav-initials" style="${savedImg ? 'display:none;' : ''}">${initials}</span>
-                        <img id="nav-profile-img" src="${savedImg || ''}" class="absolute inset-0 w-full h-full object-cover ${savedImg ? '' : 'hidden'}">
-                    </button>
-                    <div id="profile-dropdown-menu" class="hidden absolute right-0 top-12 mt-2 w-56 sm:w-64 bg-white/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden z-50 transform origin-top-right transition-all">
-                        <div class="p-5 bg-gray-50/50 border-b border-gray-100">
-                            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Customer Profile</p>
-                            <h4 class="font-black text-gray-900 text-lg leading-tight truncate">${customerName}</h4>
-                            ${customerPhone ? `<p class="text-xs text-gray-500 mt-1.5 font-medium flex items-center gap-1.5"><i class="fas fa-phone-alt text-gray-400"></i> +91 ${customerPhone}</p>` : ''}
-                        </div>
-                        <div class="p-2">
-                            <button onclick="showLogoutModal()" class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-2xl font-bold text-sm transition-all"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                        </div>
-                    </div>
-                `;
-const premiumCustomerHero = `
-<style>
-    /* Premium Animations & Effects */
-    @keyframes ambient-drift {
-        0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-        33% { transform: translate(30px, -50px) scale(1.1); opacity: 0.6; }
-        66% { transform: translate(-20px, 20px) scale(0.9); opacity: 0.5; }
-        100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-    }
-    @keyframes fade-up-smooth {
-        0% { opacity: 0; transform: translateY(30px) scale(0.95); }
-        100% { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    @keyframes shimmer-sweep {
-        0% { transform: translateX(-150%) skewX(-15deg); }
-        100% { transform: translateX(200%) skewX(-15deg); }
-    }
-    .animate-ambient-1 { animation: ambient-drift 12s infinite cubic-bezier(0.4, 0, 0.2, 1); }
-    .animate-ambient-2 { animation: ambient-drift 15s infinite cubic-bezier(0.4, 0, 0.2, 1) reverse; }
-    .animate-shimmer { animation: shimmer-sweep 3.5s infinite cubic-bezier(0.4, 0, 0.2, 1); }
-    
-    .premium-glass-panel {
-        background: rgba(255, 255, 255, 0.75);
-        backdrop-filter: blur(24px) saturate(180%);
-        -webkit-backdrop-filter: blur(24px) saturate(180%);
-        border-top: 1px solid rgba(255, 255, 255, 0.8);
-        border-left: 1px solid rgba(255, 255, 255, 0.5);
-        box-shadow: 0 30px 60px rgba(0,0,0,0.08), 0 0 0 1px rgba(255,255,255,0.4) inset;
-    }
-
-    .stagger-item {
-        opacity: 0;
-        animation: fade-up-smooth 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-</style>
-
-<!-- 🎨 PREMIUM ANIMATED AMBIENT BACKGROUND & ENHANCED SLIDER -->
-<div class="w-full px-4 sm:px-6 lg:px-8 pt-6 pb-16 bg-[#F5F5F9] relative z-0 flex justify-center overflow-hidden">
-    
-    <!-- ✨ Floating Ambient Orbs -->
-    <div class="absolute top-[-10%] left-[-10%] w-[70vw] h-[70vw] max-w-[600px] max-h-[600px] rounded-full bg-gradient-to-tr from-blue-300 to-purple-300 blur-[90px] animate-ambient-1 pointer-events-none"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] max-w-[500px] max-h-[500px] rounded-full bg-gradient-to-bl from-pink-300 to-orange-200 blur-[80px] animate-ambient-2 pointer-events-none"></div>
-
-    <!-- 🖼️ 3D Shadow Slider Container (BADA SIZE ALREADY APPLIED HERE) -->
-    <div class="relative w-full max-w-5xl aspect-[16/8.5] sm:aspect-[21/7.5] rounded-[24px] sm:rounded-[36px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.15)] bg-gray-900 group z-10 border border-white/80 transform hover:scale-[1.01] hover:shadow-[0_30px_60px_rgba(0,0,0,0.22)] transition-all duration-700 ease-out cursor-pointer">
-        
-        <div id="promo-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth" style="-ms-overflow-style: none; scrollbar-width: none;">
-            <!-- Database se banners yahan aayenge -->
-        </div>
-        
-        <!-- Premium Vignette/Gradient overlay for depth and text readability -->
-        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/30 pointer-events-none z-10 transition-opacity duration-500"></div>
-        
-        <!-- ✨ Shimmer Sweep Effect (Shines on Hover) -->
-        <div class="absolute top-0 left-0 w-1/3 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent z-10 pointer-events-none animate-shimmer opacity-0 group-hover:opacity-100 transition-opacity duration-500 mix-blend-overlay"></div>
-
-           <!-- 🔴 Floating Glass Badge (Top Right - Fixed Overlap) -->
-        <div class="absolute top-3 right-3 sm:top-5 sm:right-5 z-20 pointer-events-none fade-in-up delay-100">
-            <span class="bg-black/50 backdrop-blur-md border border-white/20 text-white text-[9px] sm:text-[10px] font-bold uppercase tracking-widest px-2.5 py-1.5 rounded-full shadow-md flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_5px_rgba(239,68,68,0.8)]"></span> Live Deals
-            </span>
-        </div>
-
-        <!-- ◀️ ▶️ Custom Navigation Arrows (Desktop Only, Appears on Hover) -->
-        <button onclick="event.stopPropagation(); document.getElementById('promo-slider').scrollBy({left: -350, behavior: 'smooth'})" class="absolute left-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all duration-500 hover:bg-white/30 hover:scale-110 hidden sm:flex shadow-lg active:scale-95">
-            <i class="fas fa-chevron-left text-sm ml-[-2px]"></i>
-        </button>
-        <button onclick="event.stopPropagation(); document.getElementById('promo-slider').scrollBy({left: 350, behavior: 'smooth'})" class="absolute right-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-500 hover:bg-white/30 hover:scale-110 hidden sm:flex shadow-lg active:scale-95">
-            <i class="fas fa-chevron-right text-sm mr-[-2px]"></i>
-        </button>
-
-        <!-- ⚪ SLIDER DOTS (Sleek & Pushed Down) -->
-        <div class="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 bg-black/40 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-full flex gap-2 shadow-sm transition-transform duration-300 group-hover:scale-105">
-            <div id="promo-slider-dots" class="flex justify-center gap-1.5 items-center pointer-events-none">
-                <!-- Dots generated by JS -->
-            </div>
-        </div>
-
-    </div>
-</div>
-
-<!-- 🛍️ PREMIUM GLASSMORPHISM BENTO GRID CATEGORIES -->
-<div class="w-full px-4 sm:px-6 lg:px-8 relative z-20 flex justify-center -mt-12 sm:-mt-16 mb-4">
-    <div class="w-full max-w-5xl premium-glass-panel rounded-[2rem] sm:rounded-[2.5rem] px-5 sm:px-8 pt-8 pb-10">
-        
-        <div class="flex items-center justify-between mb-8 px-1 stagger-item" style="animation-delay: 0.1s;">
-            <h3 class="text-[20px] sm:text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
-                Explore Categories <span class="text-xl opacity-80"></span>
-            </h3>
-        </div>
-        
-        <!-- Category Grid with Staggered Animations -->
-        <div class="grid grid-cols-4 md:grid-cols-8 gap-y-8 gap-x-3 sm:gap-x-4">
-            
-            <!-- 1: Grocery -->
-            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.15s;">
-                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-blue-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(26,115,232,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
-                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/29327f40e9c4d26b.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-blue-600 text-center tracking-tight transition-colors">Grocery</span>
-            </div>
-            
-            <!-- 2: Mobiles -->
-            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.2s;">
-                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-red-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(217,48,37,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
-                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/22fddf3c7da4c4f4.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-red-500 text-center tracking-tight transition-colors">Mobiles</span>
-            </div>
-            
-            <!-- 3: Fashion -->
-            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.25s;">
-                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-purple-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(161,66,244,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
-                     <img src="https://rukminim2.flixcart.com/fk-p-flap/128/128/image/0d75b34f7d8fbcb3.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-purple-600 text-center tracking-tight transition-colors">Fashion</span>
-            </div>
-            
-            <!-- 4: Electronics -->
-            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.3s;">
-                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-cyan-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(24,160,251,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
-                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/69c6589653afdb9a.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-cyan-600 text-center tracking-tight transition-colors">Electronics</span>
-            </div>
-            
-            <!-- 5: Home -->
-            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.35s;">
-                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-yellow-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(244,180,0,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
-                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/ee162bad964c46ae.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-yellow-600 text-center tracking-tight transition-colors">Home</span>
-            </div>
-            
-            <!-- 6: Appliances -->
-            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.4s;">
-                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-green-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(52,168,83,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
-                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/0ff199d1bd27eb98.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-green-600 text-center tracking-tight transition-colors">Appliances</span>
-            </div>
-            
-            <!-- 7: Beauty -->
-            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.45s;">
-                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-pink-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(233,30,99,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
-                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/dff3f7adcf3a90c6.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-pink-600 text-center tracking-tight transition-colors">Beauty</span>
-            </div>
-
-            <!-- 8: Offers -->
-            <div onclick="switchMarketTab('services')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.5s;">
-                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-orange-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(255,109,0,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
-                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/f15c02bfeb02d15d.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-orange-600 text-center tracking-tight transition-colors">Offers</span>
-            </div>
-            
-        </div>
-    </div>
-</div>
-`;
-
-
-heroContent.innerHTML = premiumCustomerHero;
-
-
-                document.getElementById('section-title').innerText = "Trending Products";
-                document.getElementById('section-subtitle').innerText = "Explore and buy directly from your local stores.";
-                if (searchInput) searchInput.placeholder = "Search products, services, or shops...";
-                fetchGlobalProducts(); 
-                loadHomeBanners();
                 return true;
 
             } else {
-                // 🔹 GUEST LOGIC
                 const pricingSec = document.getElementById('merchant-upgrade-plans');
                 if(pricingSec) pricingSec.classList.add('hidden');
 
@@ -1860,178 +1509,12 @@ heroContent.innerHTML = premiumCustomerHero;
                         <i class="fas fa-user text-sm"></i>
                     </button>
                 `;
-                
-             const premiumCustomerHero = `
-<style>
-    /* Premium Animations & Effects */
-    @keyframes ambient-drift {
-        0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-        33% { transform: translate(30px, -50px) scale(1.1); opacity: 0.6; }
-        66% { transform: translate(-20px, 20px) scale(0.9); opacity: 0.5; }
-        100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-    }
-    @keyframes fade-up-smooth {
-        0% { opacity: 0; transform: translateY(30px) scale(0.95); }
-        100% { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    @keyframes shimmer-sweep {
-        0% { transform: translateX(-150%) skewX(-15deg); }
-        100% { transform: translateX(200%) skewX(-15deg); }
-    }
-    .animate-ambient-1 { animation: ambient-drift 12s infinite cubic-bezier(0.4, 0, 0.2, 1); }
-    .animate-ambient-2 { animation: ambient-drift 15s infinite cubic-bezier(0.4, 0, 0.2, 1) reverse; }
-    .animate-shimmer { animation: shimmer-sweep 3.5s infinite cubic-bezier(0.4, 0, 0.2, 1); }
-    
-    .premium-glass-panel {
-        background: rgba(255, 255, 255, 0.75);
-        backdrop-filter: blur(24px) saturate(180%);
-        -webkit-backdrop-filter: blur(24px) saturate(180%);
-        border-top: 1px solid rgba(255, 255, 255, 0.8);
-        border-left: 1px solid rgba(255, 255, 255, 0.5);
-        box-shadow: 0 30px 60px rgba(0,0,0,0.08), 0 0 0 1px rgba(255,255,255,0.4) inset;
-    }
-
-    .stagger-item {
-        opacity: 0;
-        animation: fade-up-smooth 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-</style>
-
-<!-- 🎨 PREMIUM ANIMATED AMBIENT BACKGROUND & ENHANCED SLIDER -->
-<div class="w-full px-4 sm:px-6 lg:px-8 pt-6 pb-16 bg-[#F5F5F9] relative z-0 flex justify-center overflow-hidden">
-    
-    <!-- ✨ Floating Ambient Orbs -->
-    <div class="absolute top-[-10%] left-[-10%] w-[70vw] h-[70vw] max-w-[600px] max-h-[600px] rounded-full bg-gradient-to-tr from-blue-300 to-purple-300 blur-[90px] animate-ambient-1 pointer-events-none"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] max-w-[500px] max-h-[500px] rounded-full bg-gradient-to-bl from-pink-300 to-orange-200 blur-[80px] animate-ambient-2 pointer-events-none"></div>
-
-    <!-- 🖼️ 3D Shadow Slider Container (BADA SIZE ALREADY APPLIED HERE) -->
-    <div class="relative w-full max-w-5xl aspect-[16/8.5] sm:aspect-[21/7.5] rounded-[24px] sm:rounded-[36px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.15)] bg-gray-900 group z-10 border border-white/80 transform hover:scale-[1.01] hover:shadow-[0_30px_60px_rgba(0,0,0,0.22)] transition-all duration-700 ease-out cursor-pointer">
-        
-        <div id="promo-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth" style="-ms-overflow-style: none; scrollbar-width: none;">
-            <!-- Database se banners yahan aayenge -->
-        </div>
-        
-        <!-- Premium Vignette/Gradient overlay for depth and text readability -->
-        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/30 pointer-events-none z-10 transition-opacity duration-500"></div>
-        
-        <!-- ✨ Shimmer Sweep Effect (Shines on Hover) -->
-        <div class="absolute top-0 left-0 w-1/3 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent z-10 pointer-events-none animate-shimmer opacity-0 group-hover:opacity-100 transition-opacity duration-500 mix-blend-overlay"></div>
-
-             <!-- 🔴 Floating Glass Badge (Top Right - Fixed Overlap) -->
-        <div class="absolute top-3 right-3 sm:top-5 sm:right-5 z-20 pointer-events-none fade-in-up delay-100">
-            <span class="bg-black/50 backdrop-blur-md border border-white/20 text-white text-[9px] sm:text-[10px] font-bold uppercase tracking-widest px-2.5 py-1.5 rounded-full shadow-md flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_5px_rgba(239,68,68,0.8)]"></span> Live Deals
-            </span>
-        </div>
-
-        <!-- ◀️ ▶️ Custom Navigation Arrows (Desktop Only, Appears on Hover) -->
-        <button onclick="event.stopPropagation(); document.getElementById('promo-slider').scrollBy({left: -350, behavior: 'smooth'})" class="absolute left-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all duration-500 hover:bg-white/30 hover:scale-110 hidden sm:flex shadow-lg active:scale-95">
-            <i class="fas fa-chevron-left text-sm ml-[-2px]"></i>
-        </button>
-        <button onclick="event.stopPropagation(); document.getElementById('promo-slider').scrollBy({left: 350, behavior: 'smooth'})" class="absolute right-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-500 hover:bg-white/30 hover:scale-110 hidden sm:flex shadow-lg active:scale-95">
-            <i class="fas fa-chevron-right text-sm mr-[-2px]"></i>
-        </button>
-
-        <!-- ⚪ SLIDER DOTS (Sleek & Pushed Down) -->
-        <div class="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 bg-black/40 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-full flex gap-2 shadow-sm transition-transform duration-300 group-hover:scale-105">
-            <div id="promo-slider-dots" class="flex justify-center gap-1.5 items-center pointer-events-none">
-                <!-- Dots generated by JS -->
-            </div>
-        </div>
-
-    </div>
-</div>
-
-<!-- 🛍️ PREMIUM GLASSMORPHISM BENTO GRID CATEGORIES -->
-<div class="w-full px-4 sm:px-6 lg:px-8 relative z-20 flex justify-center -mt-12 sm:-mt-16 mb-4">
-    <div class="w-full max-w-5xl premium-glass-panel rounded-[2rem] sm:rounded-[2.5rem] px-5 sm:px-8 pt-8 pb-10">
-        
-        <div class="flex items-center justify-between mb-8 px-1 stagger-item" style="animation-delay: 0.1s;">
-            <h3 class="text-[20px] sm:text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
-                Explore Categories <span class="text-xl opacity-80">✨</span>
-            </h3>
-        </div>
-        
-        <!-- Category Grid with Staggered Animations -->
-        <div class="grid grid-cols-4 md:grid-cols-8 gap-y-8 gap-x-3 sm:gap-x-4">
-            
-            <!-- 1: Grocery -->
-            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.15s;">
-                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-blue-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(26,115,232,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
-                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/29327f40e9c4d26b.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-blue-600 text-center tracking-tight transition-colors">Grocery</span>
-            </div>
-            
-            <!-- 2: Mobiles -->
-            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.2s;">
-                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-red-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(217,48,37,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
-                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/22fddf3c7da4c4f4.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-red-500 text-center tracking-tight transition-colors">Mobiles</span>
-            </div>
-            
-            <!-- 3: Fashion -->
-            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.25s;">
-                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-purple-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(161,66,244,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
-                     <img src="https://rukminim2.flixcart.com/fk-p-flap/128/128/image/0d75b34f7d8fbcb3.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-purple-600 text-center tracking-tight transition-colors">Fashion</span>
-            </div>
-            
-            <!-- 4: Electronics -->
-            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.3s;">
-                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-cyan-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(24,160,251,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
-                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/69c6589653afdb9a.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-cyan-600 text-center tracking-tight transition-colors">Electronics</span>
-            </div>
-            
-            <!-- 5: Home -->
-            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.35s;">
-                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-yellow-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(244,180,0,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
-                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/ee162bad964c46ae.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-yellow-600 text-center tracking-tight transition-colors">Home</span>
-            </div>
-            
-            <!-- 6: Appliances -->
-            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.4s;">
-                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-green-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(52,168,83,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
-                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/0ff199d1bd27eb98.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-green-600 text-center tracking-tight transition-colors">Appliances</span>
-            </div>
-            
-            <!-- 7: Beauty -->
-            <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.45s;">
-                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-pink-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(233,30,99,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
-                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/dff3f7adcf3a90c6.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-pink-600 text-center tracking-tight transition-colors">Beauty</span>
-            </div>
-
-            <!-- 8: Offers -->
-            <div onclick="switchMarketTab('services')" class="flex flex-col items-center gap-3 cursor-pointer group stagger-item" style="animation-delay: 0.5s;">
-                <div class="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] bg-white/80 group-hover:bg-orange-50 rounded-[20px] sm:rounded-[24px] flex items-center justify-center relative shadow-[0_4px_20px_rgba(0,0,0,0.05)] group-hover:shadow-[0_15px_30px_rgba(255,109,0,0.2)] border border-white group-hover:-translate-y-2 transition-all duration-500 ease-out">
-                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/f15c02bfeb02d15d.png?q=100" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-lg group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <span class="text-[12px] sm:text-sm font-bold text-gray-600 group-hover:text-orange-600 text-center tracking-tight transition-colors">Offers</span>
-            </div>
-            
-        </div>
-    </div>
-</div>
-`;
-
-
-heroContent.innerHTML = premiumCustomerHero;
-
-
-loadHomeBanners();
+                fetchLiveShops();
                 return false;
             }
         }
+
+
 
                                             // ===============================================
         // 1. REPLACED: fetchLiveShops()
@@ -2769,7 +2252,8 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
     }
 }
 
-           async function checkoutCartInApp() {
+      // ✨ CART CHECKOUT (NO LOGIN REQUIRED) ✨
+async function checkoutCartInApp() {
     let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
     if(cart.length === 0) { alert("Cart is empty!"); return; }
     
@@ -2780,7 +2264,12 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
     if(!custName || !custWhatsApp) { alert("Please enter your name and WhatsApp number!"); return; }
     if(!address) { alert("Please enter delivery address!"); return; }
 
-    const accountId = localStorage.getItem('BikriPage_customer_phone');
+    // ✨ NAYA: Save for next time
+    localStorage.setItem('BikriPage_saved_name', custName);
+    localStorage.setItem('BikriPage_saved_phone', custWhatsApp);
+    localStorage.setItem('BikriPage_saved_address', address);
+    localStorage.setItem('BikriPage_saved_lat', document.getElementById('cart-lat').value || '');
+    localStorage.setItem('BikriPage_saved_lng', document.getElementById('cart-lng').value || '');
 
     const btn = document.getElementById('cart-main-btn');
     const origHTML = btn.innerHTML;
@@ -2802,7 +2291,7 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
             const targetShopId = orderData.items[0].shopId || '';
             
             await db.collection('orders').add({
-                customerId: accountId, 
+                customerId: custWhatsApp, // ✨ WhatsApp number hi ID hai
                 customerName: custName,
                 customerPhone: custWhatsApp, 
                 customerAddress: address,
@@ -2818,10 +2307,7 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-         // ✨ NAYA LOGIC: Order place hote hi Notification function call hoga ✨
-await sendAlertToShop(targetShopId, custName, orderData.total);
-
-
+            await sendAlertToShop(targetShopId, custName, orderData.total);
         }
 
         localStorage.setItem(getCartKey(), JSON.stringify([]));
@@ -2836,6 +2322,7 @@ await sendAlertToShop(targetShopId, custName, orderData.total);
         btn.disabled = false; 
     }
 }
+
 
         function checkoutCartWhatsApp() {
             let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
@@ -2954,24 +2441,20 @@ await sendAlertToShop(targetShopId, custName, orderData.total);
             }, 500); 
         }
 
-                     // ✨ IN-APP PLACE ORDER (No WhatsApp Redirect) ✨
-           // ✨ IN-APP PLACE ORDER (FIXED FOR MY ORDERS) ✨
-        async function submitOrder(e) {
+           // ✨ IN-APP PLACE ORDER (NO LOGIN REQUIRED) ✨
+async function submitOrder(e) {
     e.preventDefault();
     
-    // ✨ NAYA: Firebase Auth Check ✨
-    const user = firebase.auth().currentUser;
-    if (!user) {
-        alert("Please log in to place an order!");
-        return;
-    }
-    const verifiedAccountId = user.email;
-
     const qty = document.getElementById('order-qty').value;
     const custName = document.getElementById('order-cust-name').value.trim();
     const custWhatsApp = document.getElementById('order-cust-phone').value.trim(); 
     const address = document.getElementById('order-address').value.trim();
     
+    if(!custName || !custWhatsApp || !address) {
+        alert("Please fill all details!");
+        return;
+    }
+
     const total = parseInt(currentOrder.itemPrice) * parseInt(qty);
     const phone = currentOrder.shopPhone || '9876543210';
     
@@ -2980,9 +2463,16 @@ await sendAlertToShop(targetShopId, custName, orderData.total);
     btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Placing...`;
     btn.disabled = true;
 
+    // ✨ NAYA: Customer details save kar lo taaki next time auto-fill ho jaye
+    localStorage.setItem('BikriPage_saved_name', custName);
+    localStorage.setItem('BikriPage_saved_phone', custWhatsApp);
+    localStorage.setItem('BikriPage_saved_address', address);
+    localStorage.setItem('BikriPage_saved_lat', document.getElementById('order-lat').value || '');
+    localStorage.setItem('BikriPage_saved_lng', document.getElementById('order-lng').value || '');
+
     try {
         await db.collection('orders').add({
-            customerId: verifiedAccountId, // ✨ LocalStorage की जगह ये यूज़ होगा ✨
+            customerId: custWhatsApp, // ✨ WhatsApp number hi ID hai
             customerName: custName,
             customerPhone: custWhatsApp, 
             customerAddress: address,
@@ -3010,6 +2500,7 @@ await sendAlertToShop(targetShopId, custName, orderData.total);
         btn.disabled = false;
     }
 }
+
 
         // ✨ MANUAL WHATSAPP ORDER LOGIC ✨
         function orderViaWhatsApp() {
@@ -5452,23 +4943,23 @@ const videoModal = document.getElementById('video-tutorial-modal');
             }
         }
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            // 1. Sabse pehle database se banners fetch karo taaki refresh ki zarurat na pade
+                window.addEventListener('DOMContentLoaded', async () => {
+            // 1. Sabse pehle database se banners fetch karo
             await loadHomeBanners();
             
             // 2. Fir UI aur Login status check karo
             const isLoggedIn = updateUIBasedOnLogin();
             updateCartBadge();
             
-            // ✨ NAYA: Background mein customer ki saved details mangwa lo ✨
+            // 3. Background mein customer ki saved details mangwa lo
             if(isLoggedIn) {
                 prefetchCustomerDetails();
             }
             
-            if (!isLoggedIn) {
-                setTimeout(openAuthModal, 500); 
-            }
+            // ✨ NAYA: Yahan se forced login popup hata diya gaya hai! ✨
+            // Ab koi bhi guest user asani se items dekh aur order kar sakta hai.
         });
+
 
 
         // 🌟 DYNAMIC BANNERS FETCHER FUNCTION FOR HOME PAGE 🌟

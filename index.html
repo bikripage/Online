@@ -133,119 +133,6 @@
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
 
-
-<!-- BikriPage Premium Minimal UI Refresh: presentation-only overrides -->
-<style id="bikripage-premium-refresh">
-:root{
-  --bp-ink:#10284f;--bp-ink-2:#1b3766;--bp-orange:#f47721;
-  --bp-muted:#687386;--bp-line:#e7eaf0;--bp-paper:#f7f8fa;
-  --bp-radius:22px;--bp-ease:cubic-bezier(.2,.8,.2,1);
-}
-html{scroll-padding-top:84px;scroll-behavior:smooth}
-body{background:var(--bp-paper)!important;color:#172033!important;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif!important;-webkit-font-smoothing:antialiased}
-button,a,input,textarea{ -webkit-tap-highlight-color:transparent}
-button{transition:background-color .2s ease,border-color .2s ease,transform .2s var(--bp-ease),box-shadow .2s ease}
-button:active{transform:scale(.975)}
-/* Quiet, compact sticky header */
-body>header,header.fixed{background:rgba(255,255,255,.92)!important;border-bottom:1px solid rgba(16,40,79,.08)!important;box-shadow:0 4px 20px rgba(16,40,79,.035)!important;backdrop-filter:blur(20px) saturate(160%)!important;-webkit-backdrop-filter:blur(20px) saturate(160%)!important;min-height:66px}
-header h1{color:var(--bp-ink)!important;letter-spacing:-.045em!important}
-header button{box-shadow:none!important}
-header #auth-container button,header button[onclick="toggleCartModal()"]{background:#f5f7fa!important;border:1px solid #e8ebf1!important;color:var(--bp-ink)!important}
-header button[onclick="toggleSidebar()"]{color:var(--bp-ink)!important}
-/* Main content and hero spacing */
-main{padding-top:68px!important}
-#hero-content{gap:0!important}
-#hero-content .premium-glass-panel{background:rgba(255,255,255,.96)!important;border:1px solid #edf0f4!important;box-shadow:0 8px 28px rgba(16,40,79,.035)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-#hero-content .premium-glass-panel{border-radius:24px!important}
-#hero-content .premium-glass-panel h3{font-size:clamp(18px,2.4vw,23px)!important;letter-spacing:-.035em!important;color:var(--bp-ink)!important}
-#hero-content .premium-glass-panel .grid{row-gap:20px!important;column-gap:10px!important}
-#hero-content .premium-glass-panel .grid>div{gap:8px!important}
-#hero-content .premium-glass-panel .grid>div>div{width:clamp(54px,7vw,76px)!important;height:clamp(54px,7vw,76px)!important;border-radius:18px!important;background:#f7f8fa!important;border:1px solid #eef0f4!important;box-shadow:none!important}
-#hero-content .premium-glass-panel .grid img{filter:none!important;object-fit:contain!important}
-#hero-content .premium-glass-panel .grid span{font-size:12px!important;font-weight:650!important;color:#4b5565!important}
-#hero-content .premium-glass-panel .grid>div:hover>div{transform:translateY(-2px)!important;box-shadow:0 8px 18px rgba(16,40,79,.08)!important}
-#hero-content .premium-glass-panel .grid>div:hover span{color:var(--bp-orange)!important}
-/* Promo carousel: shorter, cinematic, not oversized */
-#hero-content #promo-slider{scrollbar-width:none}
-#hero-content #promo-slider>div{border-radius:22px!important}
-#hero-content #promo-slider img{object-fit:cover}
-#hero-content .group:has(#promo-slider){border-radius:22px!important;box-shadow:0 12px 30px rgba(16,40,79,.09)!important}
-#hero-content .premium-glass-panel{margin-top:-22px!important;position:relative!important;z-index:25!important}
-#hero-content .w-full.px-4.sm\:px-6.lg\:px-8{margin-top:-22px!important;margin-bottom:16px!important;padding-left:16px!important;padding-right:16px!important}
-/* Marketplace shell */
-#marketplace{background:transparent!important;border-radius:0!important;box-shadow:none!important;margin-top:0!important;padding:20px 16px 84px!important}
-#marketplace>.max-w-5xl{max-width:1180px!important}
-#section-title{font-size:clamp(21px,3vw,30px)!important;font-weight:760!important;letter-spacing:-.045em!important;color:var(--bp-ink)!important}
-#section-subtitle{color:#737d8d!important;font-size:13px!important;font-weight:450!important;white-space:normal!important}
-#marketplace .mb-5.flex{margin-bottom:16px!important}
-#marketplace button[onclick="findNearbyShops(this)"]{border:1px solid #e5e9f0!important;background:#fff!important;border-radius:14px!important;box-shadow:none!important;color:var(--bp-ink)!important}
-#filter-search-container{margin-bottom:18px!important}
-#filter-search-container .sticky{top:66px!important;background:rgba(247,248,250,.96)!important;padding-bottom:10px!important}
-#top-search-input{padding-top:13px!important;padding-bottom:13px!important;font-size:14px!important}
-#filter-search-container .relative.flex-1{border-radius:15px!important;background:#fff!important;border:1px solid #e3e7ee!important;box-shadow:0 1px 2px rgba(16,40,79,.025)!important}
-#filter-search-container button[onclick="openSmartFilter()"]{background:#fff!important;border:1px solid #e3e7ee!important;border-radius:14px!important;box-shadow:none!important;color:var(--bp-ink)!important}
-.market-tab{padding:9px 16px!important;border:1px solid #e4e8ef!important;box-shadow:none!important;font-size:12px!important}
-#tab-all.market-tab,#filter-search-container .market-tab.bg-gray-900{background:var(--bp-ink)!important;border-color:var(--bp-ink)!important;color:#fff!important}
-#filter-search-container .market-tab:not(.bg-gray-900){background:#fff!important;color:#566174!important}
-/* Product tiles */
-#dynamic-grid{gap:12px!important;align-items:stretch}
-#dynamic-grid>div:not(.col-span-full){min-width:0!important;margin:0!important;border:1px solid #e7eaf0!important;border-radius:18px!important;background:#fff!important;box-shadow:0 2px 8px rgba(16,40,79,.025)!important;padding-bottom:10px!important;overflow:hidden!important;transition:transform .22s var(--bp-ease),box-shadow .22s ease,border-color .22s ease!important}
-#dynamic-grid>div:not(.col-span-full):hover{transform:translateY(-3px)!important;border-color:#d9e0eb!important;box-shadow:0 12px 28px rgba(16,40,79,.08)!important}
-#dynamic-grid>div>div:first-child{padding:7px!important}
-#dynamic-grid>div>div:first-child>div{border:0!important;border-radius:13px!important;background:#f5f6f8!important}
-#dynamic-grid img{transition:transform .35s var(--bp-ease)!important}
-#dynamic-grid>div:hover img{transform:scale(1.025)}
-#dynamic-grid .text-gray-900{color:var(--bp-ink)!important}
-#dynamic-grid button{border-radius:10px!important;box-shadow:none!important;font-weight:650!important}
-#dynamic-grid button[class*="bg-purple"],#dynamic-grid a[class*="bg-purple"]{background:var(--bp-ink)!important;color:white!important}
-#dynamic-grid button[class*="bg-blue"],#dynamic-grid a[class*="bg-blue"]{background:var(--bp-ink)!important;color:white!important}
-#dynamic-grid .text-green-600,#dynamic-grid .text-green-500{color:#13845b!important}
-/* Modals retain their existing behavior, with a calmer visual language */
-#auth-modal-content,#order-modal-content,#cart-modal-content,#order-success-content{border-radius:24px!important;box-shadow:0 24px 70px rgba(12,24,44,.18)!important}
-#product-details-page{background:#f5f6f8!important}
-#product-details-page .bg-purple-600,#product-details-page .from-purple-600{background-color:var(--bp-ink)!important}
-#product-details-page .text-purple-600{color:var(--bp-ink)!important}
-#product-details-page .bg-purple-50{background:#f0f3f8!important}
-input:focus,textarea:focus{border-color:#91a7c8!important;box-shadow:0 0 0 3px rgba(30,64,110,.08)!important}
-/* Less motion for accessibility */
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
-@media(max-width:640px){
-  main{padding-top:62px!important}
-  header.fixed{min-height:60px;padding-top:9px!important;padding-bottom:9px!important}
-  header h1{font-size:20px!important}
-  #hero-content .premium-glass-panel{padding:22px 14px 24px!important;border-radius:23px!important}
-  #hero-content .premium-glass-panel h3{margin-bottom:18px!important;font-size:19px!important}
-  #hero-content .premium-glass-panel .grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;row-gap:17px!important;column-gap:5px!important}
-  #hero-content .premium-glass-panel .grid>div>div{width:56px!important;height:56px!important;border-radius:17px!important}
-  #hero-content .premium-glass-panel .grid img{width:34px!important;height:34px!important}
-  #hero-content .premium-glass-panel .grid span{font-size:11px!important;line-height:1.2!important}
-  #hero-content .w-full.px-4.sm\:px-6.lg\:px-8{padding-left:14px!important;padding-right:14px!important;margin-top:-16px!important}
-  #hero-content #promo-slider{min-height:0!important}
-  #hero-content .group:has(#promo-slider){height:clamp(150px,48vw,225px)!important;min-height:0!important}
-  #marketplace{padding:18px 13px 92px!important}
-  #section-title{font-size:21px!important}
-  #section-subtitle{font-size:12px!important;line-height:1.45!important}
-  #marketplace .mb-5.flex{align-items:center!important}
-  #filter-search-container .sticky{top:59px!important}
-  #dynamic-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
-  #dynamic-grid>div:not(.col-span-full){border-radius:15px!important}
-  #dynamic-grid>div>div:first-child{padding:6px!important}
-  #dynamic-grid>div>div:first-child>div{border-radius:11px!important}
-  #dynamic-grid .text-\[14px\]{font-size:14px!important}
-  #merchant-upgrade-plans{padding-top:42px!important}
-}
-/* Compact mobile dock */
-#bp-mobile-dock{display:none}
-@media(max-width:640px){
-  #bp-mobile-dock{position:fixed;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));left:12px;right:12px;bottom:calc(9px + env(safe-area-inset-bottom));z-index:48;padding:7px 5px;background:rgba(255,255,255,.94);border:1px solid rgba(220,225,233,.9);border-radius:20px;box-shadow:0 8px 30px rgba(16,40,79,.12);backdrop-filter:blur(22px) saturate(170%);-webkit-backdrop-filter:blur(22px) saturate(170%)}
-  #bp-mobile-dock button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:46px;border:0;background:transparent;color:#788296;font-size:10px;font-weight:650}
-  #bp-mobile-dock button i{font-size:17px}
-  #bp-mobile-dock button:first-child{color:var(--bp-ink)}
-  #bp-mobile-dock button:focus-visible{outline:2px solid var(--bp-orange);outline-offset:2px;border-radius:10px}
-  footer{padding-bottom:78px!important}
-}
-</style>
-
 </head>
 <body class="font-sans text-gray-800 overflow-x-hidden flex flex-col min-h-screen">
 
@@ -1269,230 +1156,346 @@ async function handleShopSubmit(e) {
             const searchInput = document.getElementById('search-input');
 
                                                     // --- 🍎 SHOP OWNER "WHY SELL ON BikriPage" SECTION (ULTRA PREMIUM 3D PHONE SIMULATOR) 🍎 ---
-                      const merchantWhyChooseUsSection = `
+                                                          const merchantWhyChooseUsSection = `
                 <style>
-                    /* ✨ ULTRA SMOOTH HARDWARE ACCELERATED ANIMATIONS ✨ */
-                    @keyframes floatIcon {
-                        0%, 100% { transform: translate3d(0, 0, 0); }
-                        50% { transform: translate3d(0, -10px, 0); }
-                    }
-                    .animate-float-1 { animation: floatIcon 4s ease-in-out infinite; will-change: transform; }
-                    .animate-float-2 { animation: floatIcon 4s ease-in-out infinite 1.2s; will-change: transform; }
-                    .animate-float-3 { animation: floatIcon 4s ease-in-out infinite 2.4s; will-change: transform; }
+                    /* ✨ WORLD-CLASS HARDWARE ACCELERATED ANIMATIONS ✨ */
+                    .ios-glass { background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(255, 255, 255, 0.9); box-shadow: 0 12px 40px rgba(0,0,0,0.06); }
+
+                    /* 🟢 30-SECOND SEAMLESS LOOP MASTER ANIMATION */
+                    .sim-stage { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; will-change: opacity, transform; display: flex; flex-direction: column; background: #F9FAFB; }
                     
-                    .ios-glass {
-                        background: rgba(255, 255, 255, 0.95);
-                        border: 1px solid rgba(255, 255, 255, 0.9);
-                        box-shadow: 0 12px 40px rgba(0,0,0,0.06);
-                    }
+                    /* STAGES (16.6% each for 6 steps = 30 seconds) */
+                    .stage-1 { animation: s1 30s infinite cubic-bezier(0.25, 1, 0.5, 1); }
+                    @keyframes s1 { 0%, 2% { opacity: 0; transform: scale(0.95); } 3%, 15% { opacity: 1; transform: scale(1); } 16.5%, 100% { opacity: 0; transform: scale(1.05); } }
 
-                    /* 🟢 1. CLAUDE-STYLE SCROLL REVEAL (Left Side Text) */
-                    .reveal-item {
-                        opacity: 0;
-                        transform: translateY(30px);
-                        transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-                        will-change: opacity, transform;
-                    }
-                    .reveal-item.is-visible {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
+                    .stage-2 { animation: s2 30s infinite cubic-bezier(0.25, 1, 0.5, 1); }
+                    @keyframes s2 { 0%, 15% { opacity: 0; transform: scale(0.95); } 17%, 32% { opacity: 1; transform: scale(1); } 33.3%, 100% { opacity: 0; transform: scale(1.05); } }
+                    .notif-drop { animation: nDrop 30s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; }
+                    @keyframes nDrop { 0%, 18% { opacity: 0; transform: translateY(-40px) scale(0.9); } 20%, 31% { opacity: 1; transform: translateY(0) scale(1); box-shadow: 0 15px 30px rgba(0,0,0,0.12); } 32%, 100% { opacity: 0; transform: translateY(-20px) scale(0.9); } }
 
-                    /* 🟢 2. 20-SECOND SMOOTH LOOP ANIMATION (Right Side Phone) */
-                    .sim-stage {
-                        opacity: 0;
-                        transform: translateY(20px) scale(0.95);
-                        will-change: opacity, transform;
-                    }
+                    .stage-3 { animation: s3 30s infinite cubic-bezier(0.25, 1, 0.5, 1); }
+                    @keyframes s3 { 0%, 32.5% { opacity: 0; transform: scale(0.95); } 34%, 48.5% { opacity: 1; transform: scale(1); } 50%, 100% { opacity: 0; transform: scale(1.05); } }
+                    .type-text { overflow: hidden; white-space: nowrap; border-right: 2px solid #007AFF; animation: typeT 30s infinite steps(10, end); }
+                    @keyframes typeT { 0%, 34% { width: 0; border-color: transparent; } 35%, 39% { width: 100%; border-color: #007AFF; } 40%, 100% { width: 100%; border-color: transparent; } }
+                    .calc-ui { animation: calcAnim 30s infinite cubic-bezier(0.25, 1, 0.5, 1); }
+                    @keyframes calcAnim { 0%, 40% { opacity: 1; transform: translateY(0); } 42%, 100% { opacity: 0; transform: translateY(-40px); } }
+                    .bill-ui { animation: billAnim 30s infinite cubic-bezier(0.25, 1, 0.5, 1); opacity: 0; transform: translateY(40px); }
+                    @keyframes billAnim { 0%, 41% { opacity: 0; transform: translateY(40px); } 43%, 100% { opacity: 1; transform: translateY(0); } }
+
+                    .stage-4 { animation: s4 30s infinite cubic-bezier(0.25, 1, 0.5, 1); background: #E5DDD5; }
+                    @keyframes s4 { 0%, 49% { opacity: 0; transform: scale(0.95); } 51%, 65% { opacity: 1; transform: scale(1); } 66.6%, 100% { opacity: 0; transform: scale(1.05); } }
+                    .chat-bubble { animation: chatIn 30s infinite cubic-bezier(0.34, 1.56, 0.64, 1); transform-origin: bottom right; opacity: 0; }
+                    @keyframes chatIn { 0%, 52% { opacity: 0; transform: scale(0.5) translateY(20px); } 54%, 100% { opacity: 1; transform: scale(1) translateY(0); } }
+
+                    .stage-5 { animation: s5 30s infinite cubic-bezier(0.25, 1, 0.5, 1); }
+                    @keyframes s5 { 0%, 65.5% { opacity: 0; transform: scale(0.95); } 67.5%, 82% { opacity: 1; transform: scale(1); } 83.3%, 100% { opacity: 0; transform: scale(1.05); } }
+                    .bar-grow { animation: barGrow 30s infinite ease-out; height: 6px; transform-origin: bottom; }
+                    @keyframes barGrow { 0%, 68% { height: 6px; } 71%, 82% { height: var(--h); } 83%, 100% { height: 6px; } }
+
+                    .stage-6 { animation: s6 30s infinite cubic-bezier(0.25, 1, 0.5, 1); }
+                    @keyframes s6 { 0%, 82.5% { opacity: 0; transform: scale(0.95); } 84%, 98.5% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.05); } }
+                    .bar-progress { animation: barFill 30s infinite ease-in-out; width: 0%; }
+                    @keyframes barFill { 0%, 85% { width: 0%; } 89%, 100% { width: 100%; } }
                     
-                    /* Stage 1: Order Arrival (0s - 4s) */
-                    .stage-1 { animation: sim1 20s infinite cubic-bezier(0.25, 1, 0.5, 1); }
-                    @keyframes sim1 {
-                        0%, 2% { opacity: 0; transform: translateY(-20px) scale(0.95); }
-                        4%, 18% { opacity: 1; transform: translateY(0) scale(1); }
-                        20%, 100% { opacity: 0; transform: translateY(20px) scale(0.95); }
-                    }
+                    /* ✨ BLUR OVERLAY & DOWNLOAD ALERT ✨ */
+                    .blur-overlay { animation: blurFade 30s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; backdrop-filter: blur(8px); }
+                    @keyframes blurFade { 0%, 91% { opacity: 0; } 92%, 98% { opacity: 1; } 99%, 100% { opacity: 0; } }
+                    .center-alert { animation: centerPop 30s infinite cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; }
+                    @keyframes centerPop { 0%, 91% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } 93%, 97% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 99%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } }
+                    
+                    /* 🟢 SYNCED ICONS (Side Pills) - Compact on Mobile, Detailed on Desktop */
+                    .step-pill { transition: all 0.4s; opacity: 0.4; transform: translateX(10px); filter: grayscale(1); border: 2px solid transparent; }
+                    .sp-1 { animation: sp1 30s infinite; } @keyframes sp1 { 0%, 2% { opacity:0.4; transform:translateX(10px); filter:grayscale(1); border-color:transparent; background:transparent; } 3%, 15% { opacity:1; transform:translateX(0); filter:grayscale(0); border-color:#818CF8; background:white; box-shadow:0 10px 25px rgba(0,0,0,0.08); } 16.5%, 100% { opacity:0.4; transform:translateX(10px); filter:grayscale(1); border-color:transparent; background:transparent; } }
+                    .sp-2 { animation: sp2 30s infinite; } @keyframes sp2 { 0%, 15% { opacity:0.4; transform:translateX(10px); filter:grayscale(1); } 17%, 32% { opacity:1; transform:translateX(0); filter:grayscale(0); border-color:#22D3EE; background:white; box-shadow:0 10px 25px rgba(0,0,0,0.08); } 33.3%, 100% { opacity:0.4; transform:translateX(10px); filter:grayscale(1); } }
+                    .sp-3 { animation: sp3 30s infinite; } @keyframes sp3 { 0%, 32.5% { opacity:0.4; transform:translateX(10px); filter:grayscale(1); } 34%, 48.5% { opacity:1; transform:translateX(0); filter:grayscale(0); border-color:#3B82F6; background:white; box-shadow:0 10px 25px rgba(0,0,0,0.08); } 50%, 100% { opacity:0.4; transform:translateX(10px); filter:grayscale(1); } }
+                    .sp-4 { animation: sp4 30s infinite; } @keyframes sp4 { 0%, 49% { opacity:0.4; transform:translateX(10px); filter:grayscale(1); } 51%, 65% { opacity:1; transform:translateX(0); filter:grayscale(0); border-color:#22C55E; background:white; box-shadow:0 10px 25px rgba(0,0,0,0.08); } 66.6%, 100% { opacity:0.4; transform:translateX(10px); filter:grayscale(1); } }
+                    .sp-5 { animation: sp5 30s infinite; } @keyframes sp5 { 0%, 65.5% { opacity:0.4; transform:translateX(10px); filter:grayscale(1); } 67.5%, 82% { opacity:1; transform:translateX(0); filter:grayscale(0); border-color:#A855F7; background:white; box-shadow:0 10px 25px rgba(0,0,0,0.08); } 83.3%, 100% { opacity:0.4; transform:translateX(10px); filter:grayscale(1); } }
+                    .sp-6 { animation: sp6 30s infinite; } @keyframes sp6 { 0%, 82.5% { opacity:0.4; transform:translateX(10px); filter:grayscale(1); } 84%, 98.5% { opacity:1; transform:translateX(0); filter:grayscale(0); border-color:#10B981; background:white; box-shadow:0 10px 25px rgba(0,0,0,0.08); } 100% { opacity:0.4; transform:translateX(10px); filter:grayscale(1); } }
 
-                    /* Stage 2: Bill Generation (4s - 10s) */
-                    .stage-2 { animation: sim2 20s infinite cubic-bezier(0.25, 1, 0.5, 1); }
-                    @keyframes sim2 {
-                        0%, 18% { opacity: 0; transform: translateY(30px) scale(0.95); }
-                        20%, 48% { opacity: 1; transform: translateY(0) scale(1); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
-                        50%, 100% { opacity: 0; transform: translateY(30px) scale(0.95); }
-                    }
-
-                    /* Stage 3: Auto-Calculation Bar Chart (10s - 15s) */
-                    .stage-3 { animation: sim3 20s infinite cubic-bezier(0.25, 1, 0.5, 1); }
-                    @keyframes sim3 {
-                        0%, 48% { opacity: 0; transform: translateY(20px) scale(0.95); }
-                        50%, 73% { opacity: 1; transform: translateY(0) scale(1); }
-                        75%, 100% { opacity: 0; transform: translateY(20px) scale(0.95); }
-                    }
-
-                    /* Stage 4: WhatsApp Reminder Sent (15s - 20s) */
-                    .stage-4 { animation: sim4 20s infinite cubic-bezier(0.25, 1, 0.5, 1); }
-                    @keyframes sim4 {
-                        0%, 73% { opacity: 0; transform: translateX(30px) scale(0.9); }
-                        75%, 98% { opacity: 1; transform: translateX(0) scale(1); box-shadow: 0 20px 40px rgba(34,197,94,0.2); }
-                        100% { opacity: 0; transform: translateX(30px) scale(0.9); }
-                    }
-
-                    /* Chart Bar Growing Animation (Inside Stage 3) */
-                    .bar-grow { animation: barGrow 20s infinite ease-out; height: 6px; transform-origin: bottom; }
-                    @keyframes barGrow {
-                        0%, 50% { height: 6px; }
-                        53%, 73% { height: var(--h); }
-                        75%, 100% { height: 6px; }
-                    }
+                    @keyframes glowShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+                    .ambient-bg { background: linear-gradient(-45deg, #e0e7ff, #f3e8ff, #dcfce7, #fce7f3); background-size: 400% 400%; animation: glowShift 15s ease infinite; }
                 </style>
 
-                <div class="relative z-20 w-full max-w-[1150px] mx-auto mt-12 sm:mt-24 px-4 sm:px-6 mb-16">
+                <div class="relative z-20 w-full max-w-[900px] mx-auto mt-8 sm:mt-16 px-4 mb-16 overflow-hidden">
                     
-                    <!-- Header -->
-                    <div class="text-center mb-10 sm:mb-16">
-                        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-[10px] font-black tracking-widest uppercase mb-4 shadow-sm">
+                    <!-- Title Section -->
+                    <div class="text-center mb-10 sm:mb-12">
+                        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gray-900 text-white text-[10px] sm:text-[11px] font-black tracking-widest uppercase mb-4 shadow-xl">
                             <span class="relative flex h-2 w-2">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                             </span>
-                            Live Store Simulation
+                            Live Product Tour
                         </div>
-                        <h3 class="text-[28px] sm:text-4xl md:text-[44px] font-black text-gray-900 tracking-tight leading-tight">The BikriPage Magic</h3>
-                        <p class="text-gray-500 mt-2 sm:mt-3 font-medium text-[13px] sm:text-base max-w-xl mx-auto px-2">Watch how your entire business operates on auto-pilot.</p>
+                        <h3 class="text-[30px] sm:text-[44px] font-black text-gray-900 tracking-tight leading-[1.1]">Your Business, Fully Automated.</h3>
+                        <p class="text-gray-500 mt-3 font-medium text-[14px] sm:text-[16px] max-w-xl mx-auto">See how BikriPage handles your entire shop seamlessly. From digital storefronts to final smart reports.</p>
                     </div>
 
-                    <!-- Main Dashboard Widget -->
-                    <div class="flex flex-col lg:flex-row gap-6 lg:gap-10 items-center justify-center bg-white/70 backdrop-blur-2xl rounded-[24px] sm:rounded-[2.5rem] p-4 sm:p-8 border border-gray-100 shadow-[0_15px_50px_rgba(0,0,0,0.04)]">
+                    <!-- 🚀 NEW COMPACT LAYOUT: Phone + Floating Icons -->
+                    <div class="flex flex-row items-center justify-center gap-2 sm:gap-10 bg-white/70 backdrop-blur-2xl rounded-[24px] sm:rounded-[3rem] p-3 sm:p-10 border border-gray-100 shadow-[0_15px_50px_rgba(0,0,0,0.03)] relative">
                         
-                        <!-- 📝 LEFT: Claude-Style Smooth Text Reveal List -->
-                        <div class="w-full lg:w-[45%] flex flex-col gap-5 z-10" id="smooth-steps-container">
+                        <!-- 📱 CENTER: 3D PREMIUM iOS PHONE MOCKUP -->
+                        <div class="relative w-[210px] h-[460px] sm:w-[320px] sm:h-[640px] shrink-0 bg-gray-900 rounded-[2rem] sm:rounded-[3.5rem] shadow-[0_25px_60px_rgba(0,0,0,0.25)] border-[6px] sm:border-[8px] border-gray-900 flex flex-col z-20 overflow-hidden ring-4 ring-gray-100/50">
                             
-                            <div class="reveal-item flex items-start gap-4">
-                                <div class="w-12 h-12 rounded-[14px] bg-cyan-50 flex items-center justify-center shrink-0 border border-cyan-100"><i class="fas fa-shopping-cart text-xl text-cyan-600"></i></div>
-                                <div class="pt-1.5">
-                                    <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">1. Orders Arrive</h4>
-                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Customers place orders online</p>
-                                </div>
+                            <!-- Apple Style Dynamic Island / Notch -->
+                            <div class="absolute top-1.5 sm:top-2 left-1/2 transform -translate-x-1/2 w-[70px] sm:w-[100px] h-[20px] sm:h-[26px] bg-black rounded-full z-[100] shadow-sm flex items-center justify-end px-2 sm:px-3">
+                                <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500/30 flex items-center justify-center"><div class="w-1 h-1 bg-green-500 rounded-full"></div></div>
                             </div>
-
-                            <div class="reveal-item flex items-start gap-4">
-                                <div class="w-12 h-12 rounded-[14px] bg-blue-50 flex items-center justify-center shrink-0 border border-blue-100"><i class="fas fa-bell text-xl text-blue-600"></i></div>
-                                <div class="pt-1.5">
-                                    <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">2. Live Alerts</h4>
-                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Your phone rings instantly</p>
-                                </div>
-                            </div>
-
-                            <div class="reveal-item flex items-start gap-4">
-                                <div class="w-12 h-12 rounded-[14px] bg-indigo-50 flex items-center justify-center shrink-0 border border-indigo-100"><i class="fas fa-file-invoice text-xl text-indigo-600"></i></div>
-                                <div class="pt-1.5">
-                                    <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">3. Bill Generated</h4>
-                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Detailed digital invoice created automatically</p>
-                                </div>
-                            </div>
-
-                            <div class="reveal-item flex items-start gap-4">
-                                <div class="w-12 h-12 rounded-[14px] bg-purple-50 flex items-center justify-center shrink-0 border border-purple-100"><i class="fas fa-chart-pie text-xl text-purple-600"></i></div>
-                                <div class="pt-1.5">
-                                    <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">4. Auto Calculations</h4>
-                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Sales and profits update in real-time</p>
-                                </div>
-                            </div>
-
-                            <div class="reveal-item flex items-start gap-4">
-                                <div class="w-12 h-12 rounded-[14px] bg-green-50 flex items-center justify-center shrink-0 border border-green-100"><i class="fab fa-whatsapp text-2xl text-green-600"></i></div>
-                                <div class="pt-1.5">
-                                    <h4 class="text-[16px] font-black text-gray-900 leading-none mb-1.5">5. 1-Click Payment Reminder</h4>
-                                    <p class="text-[13px] text-gray-500 font-medium leading-snug">Auto payment links & updates sent via WhatsApp</p>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <!-- 📱 RIGHT: 3D iOS PHONE ANIMATION STAGE (20s Loop) -->
-                        <div class="w-full lg:w-[45%] h-[400px] sm:h-[480px] bg-[#F9FAFB] rounded-[1.5rem] sm:rounded-[2.5rem] border-[4px] border-white shadow-inner relative overflow-hidden flex items-end justify-center">
                             
-                            <!-- THE iPHONE MOCKUP BASE -->
-                            <div class="relative w-[230px] sm:w-[270px] h-[330px] sm:h-[380px] bg-gray-900 rounded-t-[36px] sm:rounded-t-[44px] shadow-[0_-20px_50px_rgba(0,0,0,0.2)] border-[6px] sm:border-[8px] border-b-0 border-gray-800 flex flex-col z-20 overflow-hidden transform translate-y-2 ring-1 ring-white/10">
+                            <!-- SIMULATION SCREEN CONTAINER -->
+                            <div class="w-full h-full relative bg-white rounded-[1.5rem] sm:rounded-[3rem] overflow-hidden flex flex-col">
                                 
-                                <!-- Notch -->
-                                <div class="absolute top-2.5 sm:top-3 left-1/2 transform -translate-x-1/2 w-24 h-6 bg-black rounded-full z-30"></div>
-                                
-                                <!-- Screen Background -->
-                                <div class="w-full h-full bg-[#F2F2F7] relative pt-14 p-4">
-                                    <div class="w-full h-16 bg-white rounded-[16px] shadow-sm mb-3"></div>
-                                    <div class="flex gap-2 mb-3">
-                                        <div class="w-1/2 h-20 bg-white rounded-[16px] shadow-sm"></div>
-                                        <div class="w-1/2 h-20 bg-white rounded-[16px] shadow-sm"></div>
+                                <!-- STAGE 1: Digital Storefront -->
+                                <div class="sim-stage stage-1">
+                                    <div class="h-[100px] sm:h-[160px] w-full bg-gradient-to-r from-indigo-500 to-purple-600 relative shrink-0">
+                                       <!-- Share Button Safely placed below notch -->
+                                       <div class="absolute top-9 sm:top-12 right-2 sm:right-4 bg-white/25 backdrop-blur-md px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-white text-[8px] sm:text-[10px] font-bold flex items-center gap-1 shadow-sm border border-white/40"><i class="fas fa-share"></i> Share</div>
+                                       <div class="absolute -bottom-6 sm:-bottom-8 left-4 sm:left-5 w-12 h-12 sm:w-16 sm:h-16 rounded-[12px] sm:rounded-[18px] border-[3px] sm:border-[4px] border-white bg-white flex items-center justify-center text-indigo-500 shadow-md"><i class="fas fa-store text-xl sm:text-3xl"></i></div>
                                     </div>
-                                    <div class="w-full h-32 bg-white rounded-[16px] shadow-sm"></div>
+                                    <div class="pt-8 sm:pt-10 px-4 sm:px-5 pb-3 sm:pb-4 border-b border-gray-100 bg-white">
+                                       <h4 class="font-black text-gray-900 text-[14px] sm:text-[20px]">Verma Enterprises</h4>
+                                       <p class="text-[9px] sm:text-[12px] text-gray-500 font-medium mt-0.5">Premium quality daily needs & groceries.</p>
+                                    </div>
+                                    <div class="p-2 sm:p-4 grid grid-cols-2 gap-2 sm:gap-3 bg-[#F9FAFB] flex-1">
+                                       <div class="bg-white p-2 sm:p-3 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[100px] sm:h-[130px]">
+                                           <div class="h-12 sm:h-20 bg-gray-50 rounded-lg sm:rounded-xl mb-1.5 sm:mb-2 flex items-center justify-center text-gray-300 relative">
+                                                <i class="fas fa-box text-sm sm:text-xl"></i>
+                                                <span class="absolute top-1 right-1 bg-red-50 text-red-600 text-[6px] sm:text-[8px] font-bold px-1 rounded shadow-sm">10% OFF</span>
+                                           </div>
+                                           <div class="text-[9px] sm:text-[11px] font-bold text-gray-800 truncate mb-1">Premium Rice</div>
+                                           <div class="text-[11px] sm:text-[13px] font-black text-green-600 mt-auto">₹120/Kg</div>
+                                       </div>
+                                       <div class="bg-white p-2 sm:p-3 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[100px] sm:h-[130px]">
+                                           <div class="h-12 sm:h-20 bg-gray-50 rounded-lg sm:rounded-xl mb-1.5 sm:mb-2 flex items-center justify-center text-gray-300"><i class="fas fa-box text-sm sm:text-xl"></i></div>
+                                           <div class="text-[9px] sm:text-[11px] font-bold text-gray-800 truncate mb-1">Organic Sugar</div>
+                                           <div class="text-[11px] sm:text-[13px] font-black text-green-600 mt-auto">₹45/Kg</div>
+                                       </div>
+                                    </div>
                                 </div>
-                                
-                                <!-- 🎬 ANIMATED ELEMENTS (Inside Phone) -->
-                                <div class="absolute inset-0 z-40 flex items-center justify-center">
 
-                                    <!-- STAGE 1: New Order Arrives -->
-                                    <div class="sim-stage stage-1 absolute top-4 w-[92%] bg-white/95 backdrop-blur-md p-3.5 rounded-[20px] shadow-lg flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-blue-500 rounded-[12px] flex items-center justify-center text-white shrink-0"><i class="fas fa-bell animate-pulse"></i></div>
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-[9px] font-black text-blue-500 uppercase tracking-widest mb-0.5">Live Order</p>
-                                            <h4 class="font-black text-gray-900 text-[13px] truncate">Satyam Ordered</h4>
-                                            <p class="text-[11px] text-gray-500 font-bold">2 Items • ₹1,450</p>
+                                <!-- STAGE 2: Receive Orders Online (Notification Drop) -->
+                                <div class="sim-stage stage-2 bg-[#F2F2F7]">
+                                    <!-- Background Faded Content (Old Orders History) -->
+                                    <div class="absolute inset-0 pt-14 sm:pt-20 px-3 sm:px-4">
+                                        <h4 class="font-bold text-gray-800 text-[11px] sm:text-[14px] mb-2 sm:mb-3">Recent Orders</h4>
+                                        <div class="bg-white p-3 sm:p-4 rounded-[14px] sm:rounded-[18px] shadow-sm mb-3 opacity-40">
+                                            <div class="flex justify-between items-center mb-2"><div class="h-2 sm:h-3 w-1/3 bg-gray-200 rounded"></div><div class="h-2 sm:h-3 w-1/5 bg-gray-200 rounded"></div></div>
+                                            <div class="h-1.5 sm:h-2 w-1/2 bg-gray-100 rounded"></div>
+                                        </div>
+                                        <div class="bg-white p-3 sm:p-4 rounded-[14px] sm:rounded-[18px] shadow-sm mb-3 opacity-30">
+                                            <div class="flex justify-between items-center mb-2"><div class="h-2 sm:h-3 w-1/3 bg-gray-200 rounded"></div><div class="h-2 sm:h-3 w-1/5 bg-gray-200 rounded"></div></div>
+                                            <div class="h-1.5 sm:h-2 w-1/2 bg-gray-100 rounded"></div>
                                         </div>
                                     </div>
-
-                                    <!-- STAGE 2: Detailed Bill Generation -->
-                                    <div class="sim-stage stage-2 absolute bottom-[20px] w-[92%] bg-white p-4 rounded-[20px] shadow-xl border border-gray-100 flex flex-col gap-2.5">
-                                        <div class="flex justify-between items-center border-b border-dashed border-gray-200 pb-2">
-                                            <span class="font-black text-[10px] text-gray-400 uppercase tracking-widest">Digital Bill</span>
-                                            <span class="bg-gray-100 px-2 py-0.5 rounded text-[9px] font-bold text-gray-500">#ORD-902</span>
-                                        </div>
-                                        <div>
-                                            <div class="flex justify-between text-[11px] font-bold text-gray-600 mb-1"><span>2 Kg x Sugar (₹60)</span><span>₹120</span></div>
-                                            <div class="flex justify-between text-[11px] font-bold text-gray-600"><span>1 Pcs x Oil (₹1330)</span><span>₹1330</span></div>
-                                        </div>
-                                        <div class="flex justify-between items-center bg-green-50 p-2.5 rounded-xl border border-green-100 mt-1">
-                                            <span class="text-[10px] font-black text-green-700 uppercase tracking-widest">Total</span>
-                                            <span class="text-[15px] font-black text-green-600">₹1,450</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- STAGE 3: Auto Calculation Graph -->
-                                    <div class="sim-stage stage-3 absolute w-[92%] bg-white p-4 rounded-[20px] shadow-xl border border-gray-100 flex flex-col">
-                                        <div class="flex justify-between items-start mb-4">
-                                            <div>
-                                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Today's Sale</p>
-                                                <p class="text-xl font-black text-gray-900 leading-none mt-1">₹5,400</p>
+                                    
+                                    <!-- ✨ FIX: Real iOS Style Dropping Notification (Center Aligned via MX-AUTO) ✨ -->
+                                    <div class="notif-drop absolute top-8 sm:top-12 left-0 right-0 mx-auto w-[92%] bg-white/95 backdrop-blur-xl p-3 sm:p-4 rounded-[18px] sm:rounded-[22px] shadow-[0_15px_40px_rgba(0,0,0,0.12)] border border-gray-100/50 z-50 flex flex-col gap-1.5 sm:gap-2">
+                                        <div class="flex items-center gap-2 sm:gap-2.5">
+                                            <div class="w-8 h-8 sm:w-11 sm:h-11 bg-gradient-to-tr from-cyan-400 to-blue-500 rounded-[10px] sm:rounded-[12px] flex items-center justify-center text-white shrink-0 shadow-sm"><i class="fas fa-cart-arrow-down text-[12px] sm:text-[16px]"></i></div>
+                                            <div class="flex-1 min-w-0 pt-0.5">
+                                                <div class="flex justify-between items-center mb-0.5"><span class="text-[7px] sm:text-[9px] font-bold text-gray-400 tracking-wide uppercase">BikriPage</span><span class="text-[7px] sm:text-[9px] text-gray-400">now</span></div>
+                                                <h4 class="font-black text-gray-900 text-[11px] sm:text-[14px] truncate leading-tight">New Order: Satyam Kumar</h4>
                                             </div>
-                                            <div class="w-8 h-8 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center text-xs"><i class="fas fa-chart-pie"></i></div>
                                         </div>
-                                        <div class="flex items-end justify-between h-[70px] w-full gap-2.5 border-b-2 border-gray-100 pb-1">
-                                            <div class="w-full bg-gradient-to-t from-gray-200 to-gray-300 rounded-t-md bar-grow" style="--h: 25px"></div>
-                                            <div class="w-full bg-gradient-to-t from-blue-300 to-blue-500 rounded-t-md bar-grow" style="--h: 40px"></div>
-                                            <div class="w-full bg-gradient-to-t from-green-400 to-green-500 rounded-t-md bar-grow shadow-[0_5px_15px_rgba(34,197,94,0.3)] relative" style="--h: 60px">
-                                                <span class="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-black text-green-700 bg-green-50 px-1 py-0.5 rounded shadow-sm">Now</span>
+                                        <!-- Detailed Order Details inside notification -->
+                                        <div class="bg-gray-50 rounded-lg sm:rounded-xl p-2 sm:p-3 border border-gray-100 mt-1">
+                                            <div class="flex justify-between text-[9px] sm:text-[11px] font-semibold text-gray-600 mb-1"><span>2 Kg x Premium Rice</span><span>₹240</span></div>
+                                            <div class="flex justify-between text-[9px] sm:text-[11px] font-semibold text-gray-600"><span>1 Kg x Organic Sugar</span><span>₹45</span></div>
+                                            <div class="border-t border-gray-200 mt-1.5 sm:mt-2 pt-1.5 flex justify-between items-center">
+                                                <span class="text-[8px] sm:text-[10px] font-bold text-gray-400 uppercase">Total Value</span>
+                                                <span class="text-[11px] sm:text-[13px] font-black text-green-600">₹285</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- STAGE 3: Typing Animation -> Smart Bill -->
+                                <div class="sim-stage stage-3 bg-[#F2F2F7] relative">
+                                    <!-- Calculator Typing View -->
+                                    <div class="calc-ui absolute inset-0 pt-10 sm:pt-[50px] px-3 sm:px-4">
+                                        <h3 class="font-black text-[13px] sm:text-[18px] text-gray-900 mb-2 sm:mb-4 px-1">Smart Calculator</h3>
+                                        <div class="bg-white rounded-xl sm:rounded-[16px] p-3 sm:p-4 shadow-sm border border-gray-100 mb-2 sm:mb-3">
+                                            <div class="text-[8px] sm:text-[10px] font-bold text-gray-400 uppercase mb-0.5 sm:mb-1">Item Name</div>
+                                            <div class="text-[12px] sm:text-[15px] font-black text-gray-900">Sugar</div>
+                                        </div>
+                                        <div class="bg-white rounded-xl sm:rounded-[16px] p-3 sm:p-4 shadow-sm border border-gray-100 mb-2 sm:mb-3">
+                                            <div class="text-[8px] sm:text-[10px] font-bold text-gray-400 uppercase mb-0.5 sm:mb-1">Rate (₹)</div>
+                                            <div class="text-[12px] sm:text-[15px] font-black text-gray-900">₹70 / Kg</div>
+                                        </div>
+                                        <div class="bg-blue-50/70 rounded-xl sm:rounded-[16px] p-3 sm:p-4 shadow-sm border border-blue-100">
+                                            <div class="text-[8px] sm:text-[10px] font-bold text-blue-500 uppercase mb-1">Customer Wants</div>
+                                            <div class="flex gap-1 sm:gap-2 items-center">
+                                                <div class="text-[18px] sm:text-[26px] font-black text-blue-600 type-text w-[35px] sm:w-[55px] h-6 sm:h-8 flex items-center leading-none">250</div>
+                                                <div class="text-[11px] sm:text-[15px] font-bold text-blue-600">Grams</div>
                                             </div>
                                         </div>
                                     </div>
 
+                                    <!-- Bill View (Slides up seamlessly) -->
+                                    <div class="bill-ui absolute inset-0 pt-10 sm:pt-[50px] px-3 sm:px-4 flex justify-center bg-[#F2F2F7]">
+                                        <div class="w-full bg-white p-4 sm:p-5 rounded-2xl sm:rounded-[24px] shadow-2xl border border-gray-200 relative h-fit mt-2 sm:mt-4">
+                                            <div class="absolute -top-2.5 sm:-top-3 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-[7px] sm:text-[10px] font-bold px-3 sm:px-4 py-1 sm:py-1.5 rounded-full uppercase tracking-wider shadow-sm whitespace-nowrap">Bill Generated</div>
+                                            <div class="flex justify-between items-end border-b border-dashed border-gray-200 pb-2 sm:pb-3 mb-2 sm:mb-4 mt-1 sm:mt-2">
+                                                <div><span class="font-black text-[8px] sm:text-[11px] text-gray-400 uppercase block mb-0.5 sm:mb-1">Digital Invoice</span><span class="text-[13px] sm:text-[16px] font-black text-gray-900">Satyam</span></div>
+                                                <span class="bg-gray-100 px-2 sm:px-2.5 py-1 rounded text-[8px] sm:text-[10px] font-bold text-gray-500">#ORD-902</span>
+                                            </div>
+                                            <div class="flex justify-between text-[10px] sm:text-[12px] font-bold text-gray-700 mb-1"><span>250 g x Sugar</span><span>₹17.50</span></div>
+                                            <div class="flex justify-between text-[8px] sm:text-[10px] font-semibold text-gray-400 mb-2 sm:mb-4 pl-1"><span>Rate: ₹70.00/Kg</span><span></span></div>
+                                            <div class="flex justify-between text-[10px] sm:text-[12px] font-bold text-gray-700 mb-2 sm:mb-4"><span>1 Pcs x Premium Soap</span><span>₹35.00</span></div>
+                                            <div class="flex justify-between items-center bg-green-50 p-2 sm:p-4 rounded-lg sm:rounded-xl mt-2 sm:mt-4 border border-green-100">
+                                                <span class="text-[9px] sm:text-[12px] font-black text-green-700 uppercase tracking-widest">Grand Total</span>
+                                                <span class="text-[14px] sm:text-[20px] font-black text-green-600">₹52.50</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div> 
+                                
+                                <!-- STAGE 4: Clean WhatsApp Chat (No incoming message) -->
+                                <div class="sim-stage stage-4 flex flex-col bg-[#E5DDD5]">
+                                    <!-- WA Header (Padded below notch!) -->
+                                    <div class="bg-[#075E54] px-3 sm:px-4 pt-9 sm:pt-11 pb-2 sm:pb-3 flex items-center gap-2.5 sm:gap-3 shadow-md z-10 relative">
+                                        <i class="fas fa-arrow-left text-white/90 text-[12px] sm:text-[15px]"></i>
+                                        <div class="w-7 h-7 sm:w-9 h-9 bg-white/20 rounded-full flex items-center justify-center text-white text-[12px] sm:text-[15px]"><i class="fas fa-user"></i></div>
+                                        <div class="flex-1"><p class="text-white font-bold text-[12px] sm:text-[14px] leading-tight">Satyam Customer</p><p class="text-white/70 text-[8px] sm:text-[10px] mt-0.5">online</p></div>
+                                    </div>
+                                    <!-- Chat Body -->
+                                    <div class="flex-1 h-full p-3 sm:p-4 flex flex-col justify-end pb-8 sm:pb-12" style="background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: cover;">
+                                        <!-- Clean Professional Sent Message Only -->
+                                        <div class="chat-bubble bg-[#DCF8C6] p-3 sm:p-4 rounded-[14px] sm:rounded-[16px] rounded-tr-sm shadow-sm max-w-[92%] self-end relative mb-2">
+                                            <h4 class="font-black text-gray-900 text-[11px] sm:text-[13px] mb-1 sm:mb-2"><i class="fas fa-check-circle text-green-600 mr-1 sm:mr-1.5"></i> Order Confirmed!</h4>
+                                            <p class="text-[10px] sm:text-[12px] text-gray-800 leading-snug mb-2 sm:mb-3">Satyam, your order is ready.<br>Total Amount: <b>₹52.50</b></p>
+                                            <div class="bg-white/60 p-2 sm:p-2.5 rounded-lg border border-green-200/50">
+                                                <p class="text-[8px] sm:text-[10px] text-gray-700 font-semibold leading-relaxed">You can track and place future orders in the <span class="font-bold text-blue-600">My Orders</span> section.</p>
+                                            </div>
+                                            <span class="text-[7px] sm:text-[9px] text-gray-500 absolute bottom-1 sm:bottom-1.5 right-2 sm:right-2.5">10:45 AM <i class="fas fa-check-double text-blue-500 ml-0.5"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
 
-                            <!-- STAGE 4: WhatsApp Pop-Out (Pops OUTSIDE the phone) -->
-                            <div class="sim-stage stage-4 absolute z-[60] bottom-1/2 translate-y-1/2 right-4 sm:-right-8 w-[200px] bg-white p-3.5 rounded-[20px] rounded-bl-sm border-2 border-green-100 flex items-start gap-3">
-                                <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white text-lg shrink-0 shadow-md">
-                                    <i class="fab fa-whatsapp"></i>
+                                <!-- STAGE 5: Dashboard Analytics -->
+                                <div class="sim-stage stage-5 flex flex-col bg-white h-full">
+                                    <div class="p-4 sm:p-5 pt-10 sm:pt-[50px] pb-2 sm:pb-3 border-b border-gray-100 flex justify-between items-center bg-white">
+                                        <h4 class="text-[14px] sm:text-[18px] font-black text-gray-900">Dashboard</h4>
+                                        <span class="bg-gray-100 text-gray-600 text-[9px] sm:text-[11px] font-bold px-2 sm:px-2.5 py-1 rounded-md">Today</span>
+                                    </div>
+                                    <div class="p-3 sm:p-4 flex-1 flex flex-col bg-[#F9FAFB]">
+                                        <div class="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-5">
+                                            <div class="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100">
+                                                <p class="text-[8px] sm:text-[10px] font-bold text-gray-400 uppercase flex items-center gap-1 sm:gap-1.5"><i class="fas fa-wallet text-green-500"></i> Sales</p>
+                                                <p class="text-[14px] sm:text-[20px] font-black text-gray-900 mt-1 sm:mt-2">₹5,452</p>
+                                            </div>
+                                            <div class="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100">
+                                                <p class="text-[8px] sm:text-[10px] font-bold text-gray-400 uppercase flex items-center gap-1 sm:gap-1.5"><i class="fas fa-clock text-red-500"></i> Udhar</p>
+                                                <p class="text-[14px] sm:text-[20px] font-black text-gray-900 mt-1 sm:mt-2">₹1,200</p>
+                                            </div>
+                                        </div>
+                                        <div class="bg-white p-3 sm:p-5 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 flex-1 flex flex-col relative overflow-hidden">
+                                            <div class="flex justify-between items-center mb-3 sm:mb-5 z-10">
+                                                <p class="text-[9px] sm:text-[12px] font-bold text-gray-500 uppercase tracking-widest">Revenue Trend</p>
+                                                <p class="text-[9px] sm:text-[12px] font-bold text-green-500 bg-green-50 px-1.5 sm:px-2 py-0.5 rounded">+12%</p>
+                                            </div>
+                                            <div class="flex items-end justify-between h-full w-full gap-2 sm:gap-3 border-b border-gray-100 pb-1 mt-auto z-10">
+                                                <div class="w-full bg-blue-100 rounded-t-sm bar-grow" style="--h: 30%"></div>
+                                                <div class="w-full bg-blue-300 rounded-t-sm bar-grow" style="--h: 50%"></div>
+                                                <div class="w-full bg-blue-400 rounded-t-sm bar-grow" style="--h: 40%"></div>
+                                                <div class="w-full bg-blue-500 rounded-t-sm bar-grow" style="--h: 70%"></div>
+                                                <div class="w-full bg-green-500 rounded-t-md sm:rounded-t-lg bar-grow relative shadow-[0_0_15px_rgba(34,197,94,0.4)]" style="--h: 90%">
+                                                    <div class="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full animate-ping"></div>
+                                                </div>
+                                            </div>
+                                            <!-- Grid lines behind chart -->
+                                            <div class="absolute inset-0 pt-[3.5rem] sm:pt-[4.5rem] pointer-events-none flex flex-col justify-between pb-2 px-4 sm:px-5">
+                                                <div class="w-full border-b border-dashed border-gray-100"></div>
+                                                <div class="w-full border-b border-dashed border-gray-100"></div>
+                                                <div class="w-full border-b border-dashed border-gray-100"></div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="flex-1">
-                                    <h4 class="font-black text-gray-900 text-[12px] mb-0.5">Payment Link</h4>
-                                    <p class="text-[10px] text-gray-500 font-semibold leading-snug">Hi Satyam, please pay ₹1,450 securely here: 🔗...</p>
+
+                                <!-- STAGE 6: Excel Export & Centered Alert -->
+                                <div class="sim-stage stage-6 bg-[#F9FAFB] relative flex flex-col items-center justify-center p-4">
+                                    
+                                    <!-- Visible Progress Box -->
+                                    <div class="bg-white p-4 sm:p-5 rounded-[20px] sm:rounded-[24px] shadow-sm border border-gray-100 flex flex-col items-center w-full max-w-[200px] sm:max-w-[240px] z-10">
+                                        <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gray-50 rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4 border border-gray-100 text-gray-400">
+                                            <i class="fas fa-file-download text-xl sm:text-2xl animate-bounce"></i>
+                                        </div>
+                                        <h4 class="font-black text-gray-900 text-[13px] sm:text-[16px] mb-1 sm:mb-1.5 text-center w-full">Exporting Data</h4>
+                                        <p class="text-[8px] sm:text-[11px] text-gray-500 text-center mb-4 sm:mb-6 w-full">Processing business reports...</p>
+                                        
+                                        <div class="w-full space-y-3 sm:space-y-4">
+                                            <div class="bg-green-50 border border-green-100 p-2 sm:p-3 rounded-lg sm:rounded-[14px] flex items-center gap-2 sm:gap-3 w-full">
+                                                <div class="w-7 h-7 sm:w-9 sm:h-9 bg-green-500 text-white rounded-md sm:rounded-lg flex items-center justify-center text-[10px] sm:text-sm shrink-0"><i class="fas fa-file-excel"></i></div>
+                                                <div class="flex-1 min-w-0">
+                                                    <p class="text-[9px] sm:text-[11px] font-bold text-gray-800 truncate">Sales_Data.csv</p>
+                                                    <div class="w-full bg-green-200 h-1 sm:h-1.5 rounded-full mt-1 sm:mt-1.5 overflow-hidden"><div class="bg-green-500 h-full w-[100%] rounded-full bar-progress"></div></div>
+                                                </div>
+                                            </div>
+                                            <div class="bg-purple-50 border border-purple-100 p-2 sm:p-3 rounded-lg sm:rounded-[14px] flex items-center gap-2 sm:gap-3 w-full">
+                                                <div class="w-7 h-7 sm:w-9 sm:h-9 bg-purple-500 text-white rounded-md sm:rounded-lg flex items-center justify-center text-[10px] sm:text-sm shrink-0"><i class="fas fa-robot"></i></div>
+                                                <div class="flex-1 min-w-0">
+                                                    <p class="text-[9px] sm:text-[11px] font-bold text-gray-800 truncate">Smart_Report.pdf</p>
+                                                    <div class="w-full bg-purple-200 h-1 sm:h-1.5 rounded-full mt-1 sm:mt-1.5 overflow-hidden"><div class="bg-purple-500 h-full w-[100%] rounded-full bar-progress"></div></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- ✨ FIX: Full Background Blur Overlay (Appears ONLY during alert) ✨ -->
+                                    <div class="blur-overlay absolute inset-0 z-40 bg-white/40 rounded-[2rem] sm:rounded-[3rem]"></div>
+
+                                    <!-- The Final Centered iOS Alert -->
+                                    <div class="center-alert absolute top-1/2 left-1/2 w-[120px] sm:w-[160px] bg-[#1c1c1e]/90 backdrop-blur-2xl rounded-[16px] sm:rounded-[24px] flex flex-col items-center justify-center text-white shadow-2xl z-[100] p-4 sm:p-5">
+                                        <i class="fas fa-check-circle text-[28px] sm:text-[38px] text-green-400 mb-2 sm:mb-3"></i>
+                                        <h4 class="font-bold text-[11px] sm:text-[14px] text-center w-full">Downloaded</h4>
+                                        <p class="text-[8px] sm:text-[10px] text-gray-300 mt-1 text-center w-full font-medium">Saved to Files</p>
+                                    </div>
+
                                 </div>
+
+                            </div> <!-- End Inner Screen -->
+                        </div> <!-- End Mobile Frame -->
+
+                        <!-- 📱 RIGHT (Mobile-only layout): 6 Compact Icons directly beside the phone -->
+                        <div class="flex flex-col gap-2 sm:gap-4 w-[110px] sm:w-[320px] z-10 shrink-0">
+                            <div class="step-pill sp-1 bg-white p-2 sm:p-4 rounded-xl sm:rounded-2xl border-2 flex items-center gap-3">
+                                <div class="w-8 h-8 sm:w-12 sm:h-12 bg-indigo-50 text-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0"><i class="fas fa-store text-sm sm:text-xl"></i></div>
+                                <div class="hidden sm:block"><h4 class="font-bold text-gray-900 text-[15px]">Digital Storefront</h4><p class="text-xs text-gray-500 mt-0.5">Share store link.</p></div>
+                                <div class="sm:hidden font-bold text-[9px] text-gray-800 leading-tight">Storefront</div>
                             </div>
-
+                            <div class="step-pill sp-2 bg-white p-2 sm:p-4 rounded-xl sm:rounded-2xl border-2 flex items-center gap-3">
+                                <div class="w-8 h-8 sm:w-12 sm:h-12 bg-cyan-50 text-cyan-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0"><i class="fas fa-cart-arrow-down text-sm sm:text-xl"></i></div>
+                                <div class="hidden sm:block"><h4 class="font-bold text-gray-900 text-[15px]">Online Orders</h4><p class="text-xs text-gray-500 mt-0.5">Receive directly.</p></div>
+                                <div class="sm:hidden font-bold text-[9px] text-gray-800 leading-tight">Online Orders</div>
+                            </div>
+                            <div class="step-pill sp-3 bg-white p-2 sm:p-4 rounded-xl sm:rounded-2xl border-2 flex items-center gap-3">
+                                <div class="w-8 h-8 sm:w-12 sm:h-12 bg-blue-50 text-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0"><i class="fas fa-file-invoice-dollar text-sm sm:text-xl"></i></div>
+                                <div class="hidden sm:block"><h4 class="font-bold text-gray-900 text-[15px]">Smart Billing</h4><p class="text-xs text-gray-500 mt-0.5">Auto-calculate.</p></div>
+                                <div class="sm:hidden font-bold text-[9px] text-gray-800 leading-tight">Smart Billing</div>
+                            </div>
+                            <div class="step-pill sp-4 bg-white p-2 sm:p-4 rounded-xl sm:rounded-2xl border-2 flex items-center gap-3">
+                                <div class="w-8 h-8 sm:w-12 sm:h-12 bg-green-50 text-green-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0"><i class="fab fa-whatsapp text-base sm:text-2xl"></i></div>
+                                <div class="hidden sm:block"><h4 class="font-bold text-gray-900 text-[15px]">WhatsApp Link</h4><p class="text-xs text-gray-500 mt-0.5">1-click sharing.</p></div>
+                                <div class="sm:hidden font-bold text-[9px] text-gray-800 leading-tight">WhatsApp</div>
+                            </div>
+                            <div class="step-pill sp-5 bg-white p-2 sm:p-4 rounded-xl sm:rounded-2xl border-2 flex items-center gap-3">
+                                <div class="w-8 h-8 sm:w-12 sm:h-12 bg-purple-50 text-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0"><i class="fas fa-chart-line text-sm sm:text-xl"></i></div>
+                                <div class="hidden sm:block"><h4 class="font-bold text-gray-900 text-[15px]">Calculations</h4><p class="text-xs text-gray-500 mt-0.5">Real-time stats.</p></div>
+                                <div class="sm:hidden font-bold text-[9px] text-gray-800 leading-tight">Calculations</div>
+                            </div>
+                            <div class="step-pill sp-6 bg-white p-2 sm:p-4 rounded-xl sm:rounded-2xl border-2 flex items-center gap-3">
+                                <div class="w-8 h-8 sm:w-12 sm:h-12 bg-emerald-50 text-emerald-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0"><i class="fas fa-file-excel text-sm sm:text-xl"></i></div>
+                                <div class="hidden sm:block"><h4 class="font-bold text-gray-900 text-[15px]">Export Data</h4><p class="text-xs text-gray-500 mt-0.5">Download info.</p></div>
+                                <div class="sm:hidden font-bold text-[9px] text-gray-800 leading-tight">Export Data</div>
+                            </div>
                         </div>
+
                     </div>
                 </div>
             `;
+
+
 
 
             if (activeShop) {
@@ -5920,23 +5923,69 @@ function iosConfirm(title, message, btnText) {
         </div>
     </div>
 </div>
+   
+   
 
-
-<!-- Premium mobile navigation dock -->
-<nav id="bp-mobile-dock" aria-label="Quick navigation">
-  <button type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Home">
-    <i class="fas fa-house"></i><span>Home</span>
-  </button>
-  <button type="button" onclick="document.getElementById('hero-content')?.scrollIntoView({behavior:'smooth',block:'start'})" aria-label="Categories">
-    <i class="fas fa-grid-2"></i><span>Categories</span>
-  </button>
-  <button type="button" onclick="window.location.href='my-orders.html'" aria-label="My Orders">
-    <i class="fas fa-bag-shopping"></i><span>Orders</span>
-  </button>
-  <button type="button" onclick="checkAuthAndOpenModal()" aria-label="Account">
-    <i class="far fa-user"></i><span>Account</span>
-  </button>
-</nav>
+<!-- BikriPage Premium Color Refresh: iOS-inspired, richer brand colors -->
+<style id="bikripage-premium-color-refresh">
+:root{--bp-navy:#142b55;--bp-blue:#315de8;--bp-orange:#ff781f;--bp-purple:#7656e8;--bp-ink:#172033;--bp-muted:#727b8c;--bp-line:rgba(20,43,85,.09);--bp-surface:#fff;--bp-bg:#f5f7fc;--bp-shadow:0 12px 34px rgba(25,43,83,.075)}
+html{scroll-behavior:smooth} body{background:var(--bp-bg)!important;color:var(--bp-ink);-webkit-font-smoothing:antialiased}
+::selection{background:#dce6ff;color:var(--bp-navy)}
+/* Crisp, glassy but restrained top bar */
+header.fixed{background:rgba(255,255,255,.91)!important;border-bottom:1px solid rgba(20,43,85,.08)!important;box-shadow:0 4px 22px rgba(20,43,85,.055)!important;backdrop-filter:blur(24px) saturate(1.5)!important;-webkit-backdrop-filter:blur(24px) saturate(1.5)!important}
+header button,header a{transition:transform .2s ease,background .2s ease,color .2s ease}header button:active,header a:active{transform:scale(.96)}
+/* Hero gains richer brand color without overpowering the content */
+#hero-content{isolation:isolate}
+#hero-content img{border-radius:24px!important}
+#hero-content section,#hero-content [class*="rounded-"]{overflow:hidden}
+#hero-content [class*="bg-gradient"]{background-image:linear-gradient(125deg,#172f62 0%,#315de8 52%,#7857e8 100%)!important}
+#hero-content [class*="text-orange"],#hero-content [class*="text-\[#F"]{color:var(--bp-orange)!important}
+/* Category and market areas */
+main section.bg-gray-50,main section.bg-white{background-color:transparent}
+#hero-content+*{border-radius:28px}
+#section-title{color:var(--bp-navy)!important;letter-spacing:-.045em!important;font-weight:850!important}
+#section-subtitle{color:#70798b!important;letter-spacing:-.01em}
+#filter-search-container .sticky{background:rgba(245,247,252,.94)!important;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+#filter-search-container input{color:var(--bp-ink)!important}
+#filter-search-container .relative.flex-1{border:1px solid rgba(20,43,85,.09)!important;border-radius:17px!important;background:#fff!important;box-shadow:0 4px 16px rgba(20,43,85,.045)!important;transition:border-color .2s,box-shadow .2s}
+#filter-search-container .relative.flex-1:focus-within{border-color:rgba(49,93,232,.42)!important;box-shadow:0 0 0 4px rgba(49,93,232,.09)!important}
+#filter-search-container button[onclick*="Filter"],#filter-search-container button[onclick*="filter"]{border-radius:15px!important}
+#shopkeeper-filters-hide{gap:8px!important}
+#shopkeeper-filters-hide .market-tab{border:1px solid transparent!important;border-radius:999px!important;padding:10px 17px!important;transition:all .2s ease!important}
+#shopkeeper-filters-hide .market-tab:hover{background:#e9efff!important;color:var(--bp-blue)!important}
+#shopkeeper-filters-hide .market-tab.bg-gray-900,#shopkeeper-filters-hide .market-tab[class*="bg-[#172"]{background:linear-gradient(120deg,var(--bp-navy),#315de8)!important;color:white!important;box-shadow:0 5px 14px rgba(49,93,232,.2)!important}
+/* Product tiles: clean white, premium borders, subtle colorful accents */
+#dynamic-grid{gap:13px!important}
+#dynamic-grid>div:not(.col-span-full){background:#fff!important;border:1px solid rgba(20,43,85,.075)!important;border-radius:21px!important;overflow:hidden!important;box-shadow:0 5px 20px rgba(25,43,83,.045)!important;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease!important}
+#dynamic-grid>div:not(.col-span-full):hover{transform:translateY(-3px);box-shadow:0 13px 28px rgba(25,43,83,.095)!important;border-color:rgba(49,93,232,.18)!important}
+#dynamic-grid>div:not(.col-span-full) img{transition:transform .35s ease}
+#dynamic-grid>div:not(.col-span-full):hover img{transform:scale(1.025)}
+#dynamic-grid button{transition:transform .18s ease,filter .18s ease,box-shadow .18s ease!important}
+#dynamic-grid button:active{transform:scale(.97)!important}
+#dynamic-grid button[class*="bg-purple"],#dynamic-grid button[class*="bg-violet"],#dynamic-grid button[class*="bg-blue-600"],#dynamic-grid button[class*="bg-[#765"]{background:linear-gradient(115deg,#315de8,#7656e8)!important;color:#fff!important;border:0!important;box-shadow:0 5px 12px rgba(92,83,220,.19)!important}
+#dynamic-grid button[class*="bg-orange"],#dynamic-grid [class*="text-orange"]{color:#e85f12}
+#dynamic-grid [class*="bg-red"]{background:#fff0ed!important;color:#d94c36!important;border:1px solid #ffe0d9!important}
+/* Buttons throughout: rich color only where action matters */
+button[class*="bg-purple-600"],button[class*="bg-violet-600"],button[class*="bg-blue-600"]{box-shadow:0 6px 16px rgba(49,93,232,.17)}
+input,select,textarea{accent-color:var(--bp-blue)}
+input:focus,select:focus,textarea:focus{outline-color:rgba(49,93,232,.35)}
+/* Modals remain soft, modern and legible */
+#smart-filter-content,#product-details-page>div,#auth-modal>div{border-color:rgba(20,43,85,.09)!important}
+/* Native-feeling scrollbars */
+.custom-scrollbar::-webkit-scrollbar{height:4px;width:4px}.custom-scrollbar::-webkit-scrollbar-thumb{background:#c8d2e8;border-radius:99px}
+/* Responsive tuning */
+@media(max-width:640px){
+ main{padding-top:64px!important}
+ #hero-content img{border-radius:20px!important}
+ #section-title{font-size:25px!important}
+ #section-subtitle{font-size:13px!important}
+ #filter-search-container{margin-bottom:17px!important}
+ #dynamic-grid{gap:10px!important}
+ #dynamic-grid>div:not(.col-span-full){border-radius:17px!important}
+ #shopkeeper-filters-hide .market-tab{padding:9px 14px!important;font-size:12px!important}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
 
 </body>
 </html> 

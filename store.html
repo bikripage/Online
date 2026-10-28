@@ -551,20 +551,11 @@
     <!-- ✨ JAVASCRIPT LOGIC ✨ -->
     <!-- ============================================== -->
     <script>
-        // Purana code delete karke ye dalo:
-function checkCustomerAuth() {
-    // ✨ NAYA: Sirf LocalStorage nahi, asli Google Auth check karega
-    const user = firebase.auth().currentUser;
-    
-    if (!user) {
-        showIOSAlert("Session Expired", "Please log in securely with Google to place orders.", "Log In", function() {
-            localStorage.setItem('BikriPage_return_url', window.location.href);
-            window.location.href = "index.html?action=login";
-        });
-        return false; 
-    }
+    function checkCustomerAuth() {
+    // ✨ NAYA: Ab bina login ke sabko order karne ki permission hai (Guest allowed)
     return true; 
 }
+
 
         let globalShopPhone = "";
         let globalShopName = "";
@@ -1417,7 +1408,8 @@ function checkCustomerAuth() {
         
     if (!custPhone) { 
         // Default alert ki jagah naya premium alert
-        showIOSAlert("Login Required", "Please log in as a customer to follow stores!", "Log In", function() {
+        showIOSAlert("Login Required", "Please log in securely with Google to follow stores.", "Log In", function() {
+
             localStorage.setItem('BikriPage_return_url', window.location.href);
             window.location.href = "index.html?action=login";
         });
@@ -1529,29 +1521,26 @@ function checkCustomerAuth() {
         }
 
         function setFormRating(val) { userRating = val; document.getElementById('star-input-container').innerHTML = renderStarsInput(val); }
+// ✨ NAYA REVIEW SYSTEM (NO LOGIN) ✨
 async function checkUserReview() {
     const customerPhone = localStorage.getItem('BikriPage_customer_phone');
-    // ✨ FIX: Customer aur Shopkeeper dono ka naam check karega ✨
-    const customerName = localStorage.getItem('BikriPage_customer_name') || localStorage.getItem('BikriPage_owner_name');
     const formContainer = document.getElementById('review-form-container');
     const myReviewContainer = document.getElementById('my-review-container');
     
-    if (!customerName || !customerPhone) {
-        formContainer.innerHTML = `
-            <div class="flex flex-col items-center justify-center text-center py-8 bg-[#F7F7F9] rounded-[20px] border border-[#E5E7EB] mb-2 w-full">
-                <div class="w-12 h-12 bg-white text-[#9CA3AF] rounded-full flex items-center justify-center text-xl mb-3 shadow-sm border border-[#E5E7EB]">
-                    <i class="fas fa-lock"></i>
-                </div>
-                <p class="text-sm font-bold text-[#6B7280] mb-4">Log in to explore shops and share your experience. </p>
-                <button onclick="goToCustomerLogin()" class="mx-auto bg-[#111827] text-white font-bold py-3 px-8 rounded-xl text-sm active:scale-95 transition shadow-md">
-                    Login / Sign Up
-                </button>
+    if (!customerPhone) {
+        // ✨ Bina login wale ko lock ki jagah sidha "Write a Review" ka option dikhega
+        myReviewContainer.innerHTML = `
+            <div class="flex items-center justify-between mb-2.5">
+                <span class="font-black text-gray-900 text-sm">Your Review</span>
+                <button onclick="showReviewForm(false)" class="text-purple-600 bg-white hover:bg-purple-100 shadow-sm px-4 py-1.5 rounded-full transition active:scale-90 border border-purple-100 font-bold text-xs"><i class="fas fa-pencil-alt text-[11px] mr-1"></i> Write a Review</button>
             </div>
+            <p class="text-xs text-gray-500 font-medium">Be the first to share your experience!</p>
         `;
-        formContainer.classList.remove('hidden'); 
-        myReviewContainer.classList.add('hidden'); 
+        myReviewContainer.classList.remove('hidden'); 
+        formContainer.classList.add('hidden'); 
         return;
     }
+    
     try {
         const doc = await db.collection('shops').doc(currentShopId).collection('reviews').doc(customerPhone).get();
         if (doc.exists) {
@@ -1559,9 +1548,7 @@ async function checkUserReview() {
             userRating = data.rating; 
             currentUserReviewText = data.text || ""; 
             let starsHtml = ''; 
-            for(let i=1; i<=5; i++) { 
-                starsHtml += i <= data.rating ? `<i class="fas fa-star text-yellow-400 text-sm"></i> ` : `<i class="far fa-star text-gray-300 text-sm"></i> `; 
-            }
+            for(let i=1; i<=5; i++) { starsHtml += i <= data.rating ? `<i class="fas fa-star text-yellow-400 text-sm"></i> ` : `<i class="far fa-star text-gray-300 text-sm"></i> `; }
             
             myReviewContainer.innerHTML = `
                 <div class="flex items-center justify-between mb-2.5">
@@ -1578,47 +1565,56 @@ async function checkUserReview() {
     } catch (e) { console.error(e); }
 }
 
-        function showReviewForm(isUpdate = false) {
-            const formContainer = document.getElementById('review-form-container');
-            const myReviewContainer = document.getElementById('my-review-container');
-            if(!isUpdate) userRating = 0;
-            formContainer.innerHTML = `
-                <div class="bg-white border border-gray-100 rounded-[20px] p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
-                    <div class="flex justify-between items-center mb-4"><h4 class="font-black text-gray-900 text-[15px] tracking-tight">${isUpdate ? 'Edit your review' : 'Write a review'}</h4>${isUpdate ? `<button onclick="cancelEdit()" class="text-gray-400 hover:text-gray-600 w-6 h-6 flex items-center justify-center bg-gray-50 rounded-full"><i class="fas fa-times text-[10px]"></i></button>` : ''}</div>
-                    <div id="star-input-container" class="flex gap-2 mb-4">${renderStarsInput(userRating)}</div>
-                    <textarea id="review-text-input" rows="3" placeholder="How was your experience?" class="w-full bg-[#F7F7F9] focus:bg-white focus:border-gray-300 border border-transparent rounded-[14px] p-4 outline-none text-[13px] font-semibold transition resize-none mb-4 placeholder-gray-400"></textarea>
-                    <button onclick="submitStoreReview()" id="submit-review-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-3.5 rounded-[14px] text-sm transition active:scale-95 flex justify-center items-center gap-2">${isUpdate ? 'Update Review' : 'Submit Review'}</button>
-                </div>
-            `;
-            document.getElementById('review-text-input').value = isUpdate ? currentUserReviewText : "";
-            formContainer.classList.remove('hidden'); myReviewContainer.classList.add('hidden');
-        }
+function showReviewForm(isUpdate = false) {
+    const formContainer = document.getElementById('review-form-container');
+    const myReviewContainer = document.getElementById('my-review-container');
+    if(!isUpdate) userRating = 0;
 
-        function cancelEdit() { document.getElementById('review-form-container').classList.add('hidden'); document.getElementById('my-review-container').classList.remove('hidden'); }
+    const savedName = localStorage.getItem('BikriPage_saved_name') || "";
+    const savedPhone = localStorage.getItem('BikriPage_customer_phone') || "";
 
-     async function submitStoreReview() {
-    // ✨ NAYA: Firebase Auth से असली यूज़र चेक करो ✨
-    const user = firebase.auth().currentUser;
-    if (!user) {
-        alert("Please log in to submit a review!");
-        return;
-    }
-    const verifiedUserEmail = user.email; // ये 100% असली ID है
+    formContainer.innerHTML = `
+        <div class="bg-white border border-gray-100 rounded-[20px] p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+            <div class="flex justify-between items-center mb-4"><h4 class="font-black text-gray-900 text-[15px] tracking-tight">${isUpdate ? 'Edit your review' : 'Write a review'}</h4>${isUpdate ? `<button onclick="cancelEdit()" class="text-gray-400 hover:text-gray-600 w-6 h-6 flex items-center justify-center bg-gray-50 rounded-full"><i class="fas fa-times text-[10px]"></i></button>` : ''}</div>
+            
+            <div class="flex gap-2 mb-3">
+                <input type="text" id="review-cust-name" value="${savedName}" placeholder="Your Name" class="w-full bg-[#F7F7F9] border border-transparent rounded-[10px] px-3 py-2 outline-none text-[12px] font-semibold focus:border-blue-500">
+                <input type="tel" id="review-cust-phone" value="${savedPhone}" placeholder="WhatsApp No." ${savedPhone ? 'readonly' : ''} class="w-full bg-[#F7F7F9] border border-transparent rounded-[10px] px-3 py-2 outline-none text-[12px] font-semibold focus:border-blue-500 ${savedPhone ? 'opacity-70' : ''}">
+            </div>
 
-    const customerName = localStorage.getItem('BikriPage_customer_name') || localStorage.getItem('BikriPage_owner_name') || "Customer";
-    
+            <div id="star-input-container" class="flex gap-2 mb-4">${renderStarsInput(userRating)}</div>
+            <textarea id="review-text-input" rows="3" placeholder="How was your experience?" class="w-full bg-[#F7F7F9] focus:bg-white focus:border-gray-300 border border-transparent rounded-[14px] p-4 outline-none text-[13px] font-semibold transition resize-none mb-4 placeholder-gray-400"></textarea>
+            <button onclick="submitStoreReview()" id="submit-review-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-3.5 rounded-[14px] text-sm transition active:scale-95 flex justify-center items-center gap-2">${isUpdate ? 'Update Review' : 'Submit Review'}</button>
+        </div>
+    `;
+    document.getElementById('review-text-input').value = isUpdate ? currentUserReviewText : "";
+    formContainer.classList.remove('hidden'); myReviewContainer.classList.add('hidden');
+}
+
+async function submitStoreReview() {
     if (userRating === 0) { alert("Please select a star rating first!"); return; }
     
+    const nameInput = document.getElementById('review-cust-name').value.trim();
+    const phoneInput = document.getElementById('review-cust-phone').value.trim();
     const text = document.getElementById('review-text-input').value.trim();
+
+    if (!nameInput || !phoneInput || phoneInput.length < 10) {
+        alert("Please enter your name and a valid WhatsApp number!");
+        return;
+    }
+
+    // ✨ Guest customer details save karna ✨
+    localStorage.setItem('BikriPage_saved_name', nameInput);
+    localStorage.setItem('BikriPage_customer_phone', phoneInput);
+
     const btn = document.getElementById('submit-review-btn');
     const origHtml = btn.innerHTML;
     btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Saving...`; 
     btn.disabled = true;
     
     try {
-        // ✨ LocalStorage की जगह verifiedUserEmail इस्तेमाल करो ✨
-        await db.collection('shops').doc(currentShopId).collection('reviews').doc(verifiedUserEmail).set({ 
-            customerName: customerName, 
+        await db.collection('shops').doc(currentShopId).collection('reviews').doc(phoneInput).set({ 
+            customerName: nameInput, 
             rating: userRating, 
             text: text, 
             timestamp: firebase.firestore.FieldValue.serverTimestamp() 
@@ -1635,6 +1631,7 @@ async function checkUserReview() {
     btn.innerHTML = origHtml;
     btn.disabled = false;
 }
+
 
 
         async function loadReviews(isLoadMore = false) {
@@ -1920,32 +1917,32 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
             console.log("Push sent via Proxy:", data);
         }
 
-    } catch (error) {
-        alert("❌ Notification Error: " + error.message);
-        console.error("Notification fail:", error);
+      } catch (error) {
+        // alert("❌ Notification Error: " + error.message); // इसे बंद कर दिया है ताकि कस्टमर को एरर न दिखे
+        console.log("Push Notification skipped.");
     }
 }
 
 
 
-       async function checkoutCartInApp() {
+// ✨ CART CHECKOUT (NO LOGIN REQUIRED) ✨
+async function checkoutCartInApp() {
     let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
     if(cart.length === 0) { alert("Cart is empty!"); return; }
     
-    // ✨ NAYA: Firebase Auth Check ✨
-    const user = firebase.auth().currentUser;
-    if (!user) {
-        alert("Session expired! Please log in again.");
-        return;
-    }
-    const verifiedAccountId = user.email;
-
     let address = document.getElementById('cart-address').value.trim();
     let custName = document.getElementById('cart-cust-name').value.trim();
     let custWhatsApp = document.getElementById('cart-cust-phone').value.trim();
     
     if(!custName || !custWhatsApp) { alert("Please enter your name and WhatsApp number!"); return; }
     if(!address) { alert("Please enter delivery address!"); return; }
+
+    // ✨ NAYA: Save for next time
+    localStorage.setItem('BikriPage_saved_name', custName);
+    localStorage.setItem('BikriPage_saved_phone', custWhatsApp);
+    localStorage.setItem('BikriPage_saved_address', address);
+    localStorage.setItem('BikriPage_saved_lat', document.getElementById('cart-lat').value || '');
+    localStorage.setItem('BikriPage_saved_lng', document.getElementById('cart-lng').value || '');
 
     const btn = document.getElementById('cart-main-btn');
     const origHTML = btn.innerHTML;
@@ -1959,21 +1956,24 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
         ordersByShop[item.shopPhone].total += (item.price * item.qty);
     });
 
-    try {
+        try {
         const shopPhones = Object.keys(ordersByShop);
+        let totalCartAmount = 0;
+        
         for (let i = 0; i < shopPhones.length; i++) {
-            const phone = shopPhones[i];
-            const orderData = ordersByShop[phone];
+            const phoneStr = shopPhones[i];
+            const orderData = ordersByShop[phoneStr];
             const targetShopId = orderData.items[0].shopId || '';
+            totalCartAmount += orderData.total;
             
             await db.collection('orders').add({
-                customerId: verifiedAccountId, // ✨ LocalStorage की जगह असली ID ✨
+                customerId: custWhatsApp,
                 customerName: custName,
                 customerPhone: custWhatsApp, 
                 customerAddress: address,
                 lat: document.getElementById('cart-lat').value || null,
                 lng: document.getElementById('cart-lng').value || null,
-                shopPhone: phone,
+                shopPhone: phoneStr,
                 shopId: targetShopId, 
                 shopName: orderData.shopName,
                 items: orderData.items,
@@ -1984,6 +1984,15 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
             });
 
             await sendAlertToShop(targetShopId, custName, orderData.total);
+            
+                // ✨ NAYA: Shop ke naam se special/error characters () hatane ka logic
+            const cleanShopName = (orderData.shopName || 'Store').replace(/[^\w\s\u0900-\u097F]/gi, ' ').trim();
+            // ✨ NAYA: Professional Hindi Message (Cart ke liye)
+            const waMsg = `🛒 *CART ORDER PLACED*\n\nनमस्ते ${cleanShopName},\nमैंने अभी आपकी वेबसाइट (कार्ट) से ₹${orderData.total} का एक नया ऑर्डर प्लेस किया है। कृपया इसे कन्फर्म करें।\n\n👤 *Customer Name:* ${custName}\n\nधन्यवाद!`;
+            
+            setTimeout(() => {
+                window.open(`https://wa.me/91${phoneStr}?text=${encodeURIComponent(waMsg)}`, '_blank');
+            }, i * 1000);
         }
 
         localStorage.setItem(getCartKey(), JSON.stringify([]));
@@ -1991,7 +2000,8 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
         toggleCartModal();
         showOrderSuccessModal(); 
         
-    } catch (error) { 
+    }
+ catch (error) { 
         console.error("Cart Order Error:", error);
         alert("Error placing order: " + error.message); 
     } finally { 
@@ -2107,22 +2117,20 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
             setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 500); 
         }
 
-    async function submitOrder(e) {
+ // ✨ IN-APP PLACE ORDER (NO LOGIN REQUIRED) ✨
+async function submitOrder(e) {
     e.preventDefault();
     
-    // ✨ NAYA: Firebase Auth Check ✨
-    const user = firebase.auth().currentUser;
-    if (!user) {
-        alert("Session expired! Please log in again.");
-        return;
-    }
-    const verifiedAccountId = user.email;
-
     const qty = document.getElementById('order-qty').value;
     const custName = document.getElementById('order-cust-name').value.trim();
     const custWhatsApp = document.getElementById('order-cust-phone').value.trim(); 
     const address = document.getElementById('order-address').value.trim();
     
+    if(!custName || !custWhatsApp || !address) {
+        alert("Please fill all details!");
+        return;
+    }
+
     const total = parseInt(currentOrder.itemPrice) * parseInt(qty);
     const phone = currentOrder.shopPhone || '9876543210';
     
@@ -2131,9 +2139,16 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
     btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Placing...`;
     btn.disabled = true;
 
-    try {
-        await db.collection('orders').add({
-            customerId: verifiedAccountId, // ✨ LocalStorage की जगह असली ID ✨
+    // ✨ NAYA: Customer details save kar lo taaki next time auto-fill ho jaye
+    localStorage.setItem('BikriPage_saved_name', custName);
+    localStorage.setItem('BikriPage_saved_phone', custWhatsApp);
+    localStorage.setItem('BikriPage_saved_address', address);
+    localStorage.setItem('BikriPage_saved_lat', document.getElementById('order-lat').value || '');
+    localStorage.setItem('BikriPage_saved_lng', document.getElementById('order-lng').value || '');
+
+        try {
+        const newOrderRef = await db.collection('orders').add({
+            customerId: custWhatsApp,
             customerName: custName,
             customerPhone: custWhatsApp, 
             customerAddress: address,
@@ -2149,12 +2164,21 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
+      // ✨ NAYA: Shop ke naam se special/error characters () hatane ka logic
+        const cleanShopName = (currentOrder.shopName || 'Store').replace(/[^\w\s\u0900-\u097F]/gi, ' ').trim();
+               // ✨ NAYA: Professional Hindi Message (Emoji fix ke sath)
+        const waMessage = `📦 *NEW ORDER PLACED*\n\nनमस्ते ${cleanShopName},\nमैंने अभी आपकी वेबसाइट से एक नया ऑर्डर प्लेस किया है। कृपया मेरी डिटेल्स चेक करके इसे कन्फर्म करें।\n\n👤 *Customer Name:* ${custName}\n💰 *Total Amount:* ₹${total}\n\nधन्यवाद!`;
+        
+        window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(waMessage)}`, '_blank');
+
         await sendAlertToShop(currentOrder.shopId, custName, total);
 
         closeOrderModal();
         showOrderSuccessModal(); 
         
-    } catch (error) {
+    }
+
+    catch (error) {
         console.error("Order Error:", error);
         alert("Error placing order: " + error.message);
     } finally {
@@ -2162,6 +2186,7 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
         btn.disabled = false;
     }
 }
+
 
         function orderViaWhatsApp() {
             const qty = document.getElementById('order-qty').value;
@@ -2851,6 +2876,10 @@ function applySmartFilters() {
     
     productCards.forEach(card => grid.appendChild(card));
     closeSmartFilter();
+}
+function cancelEdit() {
+    document.getElementById('review-form-container').classList.add('hidden');
+    document.getElementById('my-review-container').classList.remove('hidden');
 }
 
     </script>

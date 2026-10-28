@@ -85,24 +85,32 @@
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+                document.addEventListener('DOMContentLoaded', () => {
+            // सिस्टम खुद चेक करेगा कि इस फोन से कोई ऑर्डर हुआ है या नहीं
             const custPhone = localStorage.getItem('BikriPage_customer_phone');
             const container = document.getElementById('orders-container');
 
-            // Clear instructions for Shop Owners vs Customers
             if (!custPhone) {
                 container.innerHTML = `
-                    <div class="text-center py-16 px-6 animate-slide-up mt-10">
-                        <div class="w-24 h-24 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl"><i class="fas fa-user-lock"></i></div>
-                        <h3 class="font-bold text-gray-900 text-[22px] tracking-tight mb-2">Customer Login Required</h3>
-                        <p class="text-gray-500 text-[15px] mb-8 leading-relaxed">You need to log in <b>as a Customer</b> to view your purchases.<br><span class="text-xs text-gray-400 mt-2 block">(Note: Shop Owners must go to their Dashboard to see store orders)</span></p>
-                        <a href="index.html" class="inline-block w-full bg-blue-500 hover:bg-blue-600 text-white py-3.5 rounded-2xl font-semibold text-[17px] active:scale-95 transition-transform shadow-sm">Go to Home</a>
+                    <div class="bg-white rounded-3xl p-7 shadow-[0_15px_40px_rgba(0,0,0,0.06)] border border-gray-100 animate-slide-up mt-8 text-center">
+                        <div class="w-16 h-16 bg-gray-50 text-gray-400 rounded-[18px] flex items-center justify-center mx-auto mb-5 text-2xl shadow-sm border border-gray-100">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <h3 class="font-black text-gray-900 text-[20px] tracking-tight mb-2">No Orders Found</h3>
+                        <p class="text-gray-500 text-[13px] mb-6 leading-relaxed font-medium">You haven't placed any orders from this device yet. Start shopping to see your history here.</p>
+                        
+                        <a href="index.html" class="inline-block w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 rounded-xl active:scale-95 transition-all text-[15px] shadow-[0_8px_20px_rgba(0,0,0,0.15)]">
+                            Start Shopping
+                        </a>
                     </div>`;
                 return;
             }
 
+            // अगर इसी फोन से ऑर्डर हुआ है, तो सीधा लिस्ट दिखा देगा
             fetchMyOrders(custPhone);
         });
+
+        // (पुराना savePhoneAndTrack वाला फंक्शन अब मिटा दें, उसकी जरूरत नहीं है)
 
         async function fetchMyOrders(phone) {
             const container = document.getElementById('orders-container');

@@ -17,11 +17,10 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-    <!-- ✨ WebRTC PeerJS Library (Receiver) ✨ -->
+    <!-- WebRTC PeerJS Library (Receiver) -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
     <script>
-        // REPLACE WITH YOUR FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyCWquftO39vqj83ZtYqtF_sDfkHVNpjd3k",
             authDomain: "bikripage-3aba6.firebaseapp.com",
@@ -37,80 +36,58 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { background-color: #F2F2F7; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E5EA; border-radius: 10px; }
-        
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
-        
         .ios-shadow { box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08); }
         .modal-bg { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); }
-
         .toggle-checkbox:checked { right: 0; border-color: #34C759; }
         .toggle-checkbox:checked + .toggle-label { background-color: #34C759; }
         .toggle-checkbox:checked + .toggle-label:after { transform: translateX(100%); border-color: white; }
     </style>
 </head>
-<body class="text-gray-900 h-screen flex flex-col overflow-hidden relative">
+<body class="text-gray-900 h-screen flex flex-col overflow-hidden relative" onclick="unlockAudio()">
 
-    <audio id="notifySound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+    <!-- ✨ UPDATED: Premium Announcement Sound ✨ -->
+    <audio id="notifySound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
-    <!-- ✨ 1. SECURE LOGIN SCREEN ✨ -->
+    <!-- SECURE LOGIN SCREEN -->
     <div id="loginScreen" class="absolute inset-0 z-[100] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-5">
         <div class="bg-white p-8 md:p-10 rounded-[32px] ios-shadow w-full max-w-md border border-white animate-slide-up">
-            
-            <a href="index.html" class="absolute top-6 left-6 w-10 h-10 bg-gray-50 hover:bg-gray-100 rounded-full flex items-center justify-center text-gray-600 transition-colors">
-                <i class="fas fa-arrow-left"></i>
-            </a>
-
-            <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[20px] flex items-center justify-center text-white shadow-lg shadow-blue-500/30 mx-auto mb-6 mt-4">
-                <i class="fas fa-print text-2xl"></i>
-            </div>
+            <a href="index.html" class="absolute top-6 left-6 w-10 h-10 bg-gray-50 hover:bg-gray-100 rounded-full flex items-center justify-center text-gray-600 transition-colors"><i class="fas fa-arrow-left"></i></a>
+            <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[20px] flex items-center justify-center text-white shadow-lg shadow-blue-500/30 mx-auto mb-6 mt-4"><i class="fas fa-print text-2xl"></i></div>
             <h2 class="text-2xl font-black text-center text-gray-900 tracking-tight mb-2">Smart Print Desk</h2>
             <p class="text-sm text-center text-gray-500 font-medium mb-8">Login with your BikriPage Shop ID & App Password.</p>
-            
             <form id="loginForm" class="space-y-5">
                 <div>
                     <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Shop ID</label>
                     <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <i class="fas fa-store text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
-                        </div>
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fas fa-store text-gray-400 group-focus-within:text-blue-500 transition-colors"></i></div>
                         <input type="text" id="loginShopId" placeholder="e.g. netajijhadustore-3581" required class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl pl-11 pr-4 py-4 text-sm font-bold text-gray-900 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all">
                     </div>
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">App Password</label>
                     <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <i class="fas fa-key text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
-                        </div>
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fas fa-key text-gray-400 group-focus-within:text-blue-500 transition-colors"></i></div>
                         <input type="password" id="loginPassword" placeholder="••••••••" required class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl pl-11 pr-4 py-4 text-sm font-bold text-gray-900 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all">
                     </div>
                 </div>
-                <button type="submit" id="loginBtn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-2xl shadow-lg shadow-gray-900/20 active:scale-[0.98] transition-all mt-4 flex items-center justify-center gap-2">
-                    Secure Login <i class="fas fa-arrow-right"></i>
-                </button>
+                <button type="submit" id="loginBtn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-2xl shadow-lg shadow-gray-900/20 active:scale-[0.98] transition-all mt-4 flex items-center justify-center gap-2">Secure Login <i class="fas fa-arrow-right"></i></button>
             </form>
         </div>
     </div>
 
-    <!-- ✨ 2. DASHBOARD HEADER ✨ -->
+    <!-- DASHBOARD HEADER -->
     <div id="mainDashboard" class="hidden flex-col h-full w-full">
         <header class="bg-white/80 backdrop-blur-xl sticky top-0 z-40 px-4 md:px-5 py-3.5 flex items-center justify-between border-b border-gray-200/60 shadow-sm">
             <div class="flex items-center gap-3">
-                <a href="index.html" class="w-9 h-9 md:w-10 md:h-10 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center text-gray-700 transition-colors shadow-sm border border-gray-200 shrink-0">
-                    <i class="fas fa-arrow-left"></i>
-                </a>
-
-                <div class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-600/20 shrink-0">
-                    <i class="fas fa-print text-sm"></i>
-                </div>
+                <a href="index.html" class="w-9 h-9 md:w-10 md:h-10 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center text-gray-700 transition-colors shadow-sm border border-gray-200 shrink-0"><i class="fas fa-arrow-left"></i></a>
+                <div class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-600/20 shrink-0"><i class="fas fa-print text-sm"></i></div>
                 <div class="flex flex-col justify-center">
                     <h1 class="font-bold text-[15px] md:text-[17px] tracking-tight leading-none mb-1">Live Print Desk</h1>
                     <p class="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none" id="shopIdDisplay">ID: NULL</p>
@@ -119,27 +96,18 @@
             
             <div class="flex items-center gap-2 md:gap-3">
                 <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-full border border-green-100 text-[11px] font-bold uppercase tracking-wider mr-1">
-                    <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                    Active
+                    <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>Active
                 </div>
-                <!-- QR CODE ICON -->
-                <button onclick="openQrModal()" class="w-9 h-9 md:w-10 md:h-10 bg-indigo-50 hover:bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 transition-colors shadow-inner border border-indigo-100">
-                    <i class="fas fa-qrcode text-[15px] md:text-lg"></i>
-                </button>
-                <!-- SETTINGS GEAR ICON -->
-                <button onclick="openSettings()" class="w-9 h-9 md:w-10 md:h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-700 transition-colors shadow-inner border border-gray-200">
-                    <i class="fas fa-cog text-[15px] md:text-lg"></i>
-                </button>
+                <button onclick="openQrModal()" class="w-9 h-9 md:w-10 md:h-10 bg-indigo-50 hover:bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 transition-colors shadow-inner border border-indigo-100"><i class="fas fa-qrcode text-[15px] md:text-lg"></i></button>
+                <button onclick="openSettings()" class="w-9 h-9 md:w-10 md:h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-700 transition-colors shadow-inner border border-gray-200"><i class="fas fa-cog text-[15px] md:text-lg"></i></button>
             </div>
         </header>
 
-        <!-- ✨ 3. DASHBOARD CONTENT ✨ -->
+        <!-- DASHBOARD CONTENT -->
         <main class="flex-1 p-5 overflow-y-auto custom-scrollbar w-full max-w-7xl mx-auto">
             <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center gap-2 text-gray-800">
-                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
-                        <i class="fas fa-clock text-sm"></i>
-                    </div>
+                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center"><i class="fas fa-clock text-sm"></i></div>
                     <h2 class="text-lg font-bold tracking-tight">Pending Jobs <span class="text-gray-400 ml-1 text-base">(<span id="jobCount">0</span>)</span></h2>
                 </div>
                 <button onclick="toggleSound()" id="soundBtn" class="flex items-center gap-2 bg-white px-4 py-2 rounded-xl text-[12px] font-bold text-gray-600 hover:text-gray-900 border border-gray-200 shadow-sm active:scale-95 transition-all">
@@ -148,9 +116,7 @@
             </div>
 
             <div id="emptyState" class="hidden flex flex-col items-center justify-center py-24 px-4 text-center animate-fade-in">
-                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-5 border border-gray-200">
-                    <i class="fas fa-inbox text-3xl text-gray-300"></i>
-                </div>
+                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-5 border border-gray-200"><i class="fas fa-inbox text-3xl text-gray-300"></i></div>
                 <h3 class="text-xl font-bold text-gray-800 tracking-tight">No Pending Prints</h3>
                 <p class="text-[13px] text-gray-500 font-medium mt-1">New requests from customers will appear here.</p>
             </div>
@@ -159,20 +125,15 @@
         </main>
     </div>
 
-    <!-- ✨ 4. ADVANCED SETTINGS MODAL ✨ -->
+    <!-- ADVANCED SETTINGS MODAL -->
     <div id="settingsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-bg p-4 opacity-0 transition-opacity">
         <div class="bg-white rounded-[24px] w-full max-w-md shadow-2xl scale-95 transition-transform overflow-hidden flex flex-col" id="settingsModalContent">
-            
             <div class="p-5 flex items-center justify-between border-b border-gray-100 bg-gray-50/50">
-                <div class="flex items-center gap-3">
-                    <i class="fas fa-sliders-h text-blue-600 text-xl"></i>
-                    <h3 class="font-bold text-gray-900 text-lg tracking-tight">System Settings</h3>
-                </div>
+                <div class="flex items-center gap-3"><i class="fas fa-sliders-h text-blue-600 text-xl"></i><h3 class="font-bold text-gray-900 text-lg tracking-tight">System Settings</h3></div>
                 <button onclick="closeSettings()" class="w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center text-gray-600 active:scale-90 transition-colors"><i class="fas fa-times"></i></button>
             </div>
             
             <div class="p-5 space-y-6 overflow-y-auto max-h-[70vh] custom-scrollbar">
-                
                 <div>
                     <h4 class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3">Workflow Permissions</h4>
                     <div class="bg-gray-50 border border-gray-200 rounded-2xl p-2 space-y-1">
@@ -214,10 +175,7 @@
                 </div>
 
                 <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
-                    <div>
-                        <p class="text-sm font-bold text-gray-800">Store Status</p>
-                        <p class="text-[11px] text-gray-500 font-medium mt-0.5">Accepting new print orders</p>
-                    </div>
+                    <div><p class="text-sm font-bold text-gray-800">Store Status</p><p class="text-[11px] text-gray-500 font-medium mt-0.5">Accepting new print orders</p></div>
                     <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
                         <input type="checkbox" id="storeStatusToggle" checked class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 z-10 transition-transform duration-200 ease-in-out"/>
                         <label for="storeStatusToggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer transition-colors duration-200 ease-in-out"></label>
@@ -226,41 +184,26 @@
             </div>
             
             <div class="p-5 border-t border-gray-100 bg-white flex flex-col gap-3">
-                <button onclick="saveSettings()" id="saveSettingsBtn" class="w-full bg-gray-900 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-gray-900/20 active:scale-95 transition-all">
-                    Save Preferences
-                </button>
-                <button onclick="logout()" class="w-full bg-red-50 text-red-600 hover:bg-red-100 font-bold py-3.5 rounded-xl border border-red-100 active:scale-95 transition-all">
-                    <i class="fas fa-sign-out-alt mr-2"></i> Log Out
-                </button>
+                <button onclick="saveSettings()" id="saveSettingsBtn" class="w-full bg-gray-900 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-gray-900/20 active:scale-95 transition-all">Save Preferences</button>
+                <button onclick="logout()" class="w-full bg-red-50 text-red-600 hover:bg-red-100 font-bold py-3.5 rounded-xl border border-red-100 active:scale-95 transition-all"><i class="fas fa-sign-out-alt mr-2"></i> Log Out</button>
             </div>
         </div>
     </div>
 
-    <!-- ✨ 5. QR CODE SHARE & DOWNLOAD MODAL ✨ -->
+    <!-- QR CODE SHARE & DOWNLOAD MODAL -->
     <div id="qrModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-bg p-4 opacity-0 transition-opacity">
         <div class="bg-white rounded-[24px] w-full max-w-sm shadow-2xl scale-95 transition-transform overflow-hidden flex flex-col" id="qrModalContent">
-            
             <div class="p-4 flex items-center justify-between border-b border-gray-100 bg-white">
                 <h3 class="font-bold text-gray-900 tracking-tight">Print & Share QR Code</h3>
                 <button onclick="closeQrModal()" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 active:scale-90 transition-colors"><i class="fas fa-times"></i></button>
             </div>
-            
             <div class="p-6 flex flex-col items-center bg-gray-50/50">
                 <p class="text-[11px] text-gray-500 font-bold uppercase tracking-wider mb-4 text-center">Customers will scan this to upload files.</p>
-                
-                <!-- QR Code Box -->
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 mb-5 flex items-center justify-center min-h-[200px]" id="qrcodeContainer">
-                    <!-- QR Code Generated Here -->
-                </div>
-
-                <!-- Customer Link Input -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 mb-5 flex items-center justify-center min-h-[200px]" id="qrcodeContainer"></div>
                 <div class="w-full relative group mb-5">
                     <input type="text" id="customerLinkInput" readonly class="w-full bg-white border border-gray-200 rounded-xl pl-4 pr-12 py-3 text-xs font-medium text-gray-600 outline-none">
-                    <button onclick="copyCustomerLink()" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">
-                        <i class="fas fa-copy"></i>
-                    </button>
+                    <button onclick="copyCustomerLink()" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"><i class="fas fa-copy"></i></button>
                 </div>
-
                 <button onclick="downloadQR()" class="w-full bg-indigo-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 active:scale-95 transition-all flex items-center justify-center gap-2">
                     <i class="fas fa-download"></i> Download QR Image
                 </button>
@@ -268,19 +211,19 @@
         </div>
     </div>
 
-    <!-- TOAST -->
     <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-5 py-3 rounded-full text-sm font-medium shadow-xl transition-all duration-300 opacity-0 pointer-events-none z-[100] flex items-center gap-2 min-w-max">
         <i class="fas fa-info-circle text-blue-400"></i> <span id="toast-msg">Message</span>
     </div>
 
-    <!-- ✨ JS LOGIC ✨ -->
+    <!-- JS LOGIC -->
     <script>
         const $ = s => document.querySelector(s);
         let shopId = '';
-        let soundEnabled = false;
+        // ✨ Load Audio State From Storage so it never auto-turns off ✨
+        let soundEnabled = localStorage.getItem('smartPrintAudioEnabled') === 'true'; 
         let isInitialLoad = true;
+        let audioUnlocked = false; // Internal flag for browser interaction
         
-        // ✨ NEW: State arrays to combine Firebase Jobs + WebRTC Direct Jobs ✨
         let unsubscribeLiveSync = null;
         let fbJobs = [];
         let rtcJobs = [];
@@ -296,8 +239,32 @@
             window._toastTimer = setTimeout(() => t.classList.add('opacity-0', 'translate-y-[-20px]'), 3000);
         }
 
+        // ✨ Audio Unlocker for Browser Compliance ✨
+        function unlockAudio() {
+            if (!audioUnlocked && soundEnabled) {
+                const audio = document.getElementById('notifySound');
+                audio.play().then(() => {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    audioUnlocked = true;
+                }).catch(e => console.log("Audio unlock failed until more interaction.", e));
+            }
+        }
+
+        function updateSoundButtonUI() {
+            const btn = $('#soundBtn');
+            if (soundEnabled) {
+                btn.innerHTML = `<i class="fas fa-volume-up text-green-500"></i> Alerts ON`;
+                btn.classList.add('bg-green-50', 'border-green-300');
+            } else {
+                btn.innerHTML = `<i class="fas fa-volume-mute text-gray-400"></i> Alerts OFF`;
+                btn.classList.remove('bg-green-50', 'border-green-300');
+            }
+        }
+
         // --- 1. AUTO-LOGIN & SECURE LOGIN LOGIC ---
         window.onload = () => {
+            updateSoundButtonUI(); // Set button UI on load
             const savedShopId = localStorage.getItem('smartPrintShopId');
             const savedPwd = localStorage.getItem('smartPrintPwd');
             if (savedShopId && savedPwd) {
@@ -341,7 +308,6 @@
                 
                 if(!isAutoLogin) toast('Logged in successfully', 'success');
                 
-                // Initialize both Firebase Sync and WebRTC Receiver
                 startLiveSync();
 
                 if (shopData.printSettings) {
@@ -374,7 +340,7 @@
         function startLiveSync() {
             if(unsubscribeLiveSync) unsubscribeLiveSync();
 
-            // 1. Firebase Cloud Sync
+            // 1. Firebase Cloud Sync (For Normal API files)
             unsubscribeLiveSync = db.collection('printJobs')
                 .where('shopId', '==', shopId)
                 .where('status', 'in', ['pending-review', 'processing'])
@@ -382,11 +348,11 @@
                     fbJobs = [];
                     snapshot.forEach(doc => fbJobs.push({ id: doc.id, ...doc.data() }));
                     
-                    updateJobsUI(); // Re-render grid
+                    updateJobsUI();
 
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === "added" && !isInitialLoad && soundEnabled) {
-                            document.getElementById('notifySound').play().catch(e => {});
+                            playAnnouncementSound();
                         }
                     });
                     isInitialLoad = false;
@@ -404,12 +370,10 @@
                     conn.on('data', async (data) => {
                         if(data.type === 'new_print_job') {
                             
-                            // Play sound if alerts are ON
                             if(soundEnabled) {
-                                document.getElementById('notifySound').play().catch(e => {});
+                                playAnnouncementSound();
                             }
                             
-                            // Convert incoming ArrayBuffer files to Local Blob URLs
                             const parsedFiles = data.files.map(f => {
                                 const blob = new Blob([f.data], { type: f.fileType });
                                 return {
@@ -419,15 +383,14 @@
                                 };
                             });
                             
-                            // Create a mock Job Object that matches Firebase structure
                             const newRtcJob = {
-                                id: 'L' + String(Date.now()).slice(-5), // L + 5 digits = 6 char length
+                                id: 'L' + String(Date.now()).slice(-5), 
                                 createdAt: { toDate: () => new Date(data.timestamp) },
                                 customerNote: data.settings.colorMode + ' | ' + data.settings.printSide,
                                 copies: data.settings.copies,
                                 paper: data.settings.paperSize,
                                 files: parsedFiles,
-                                isLocalWrtc: true // Flag to identify local files
+                                isLocalWrtc: true
                             };
                             
                             rtcJobs.push(newRtcJob);
@@ -446,19 +409,23 @@
             }
         }
 
-        // Helper function to safely get time for sorting
+        // ✨ Reliable Play Sound Function ✨
+        function playAnnouncementSound() {
+            const audio = document.getElementById('notifySound');
+            audio.currentTime = 0; // Rewind to start
+            audio.play().catch(e => {
+                console.log("Audio was blocked by browser. User needs to interact first.", e);
+            });
+        }
+
         function getJobTime(job) {
             if(job.createdAt && typeof job.createdAt.toMillis === 'function') return job.createdAt.toMillis();
             if(job.createdAt && typeof job.createdAt.toDate === 'function') return job.createdAt.toDate().getTime();
             return 0;
         }
 
-        // Unified rendering function
         function updateJobsUI() {
-            // Combine both Firebase Jobs and Local WebRTC Jobs
             const combinedJobs = [...fbJobs, ...rtcJobs];
-            
-            // Sort by newest first
             combinedJobs.sort((a, b) => getJobTime(b) - getJobTime(a));
             
             renderJobs(combinedJobs);
@@ -473,7 +440,6 @@
             }
         }
 
-        // Exact original HTML structure rendered here
         function renderJobs(jobs) {
             $('#jobsGrid').innerHTML = jobs.map((job, index) => {
                 const colorMode = (job.customerNote || "").includes('Color') ? 'Color' : 'B&W';
@@ -503,7 +469,6 @@
                     `;
                 }).join('');
 
-                // Custom badge for Direct Transfer jobs
                 const sourceBadge = job.isLocalWrtc 
                     ? `<span class="absolute -top-3 -right-3 bg-indigo-600 text-white text-[9px] font-bold px-4 py-1 rounded-bl-xl uppercase shadow-md rotate-12">Direct PC</span>` 
                     : '';
@@ -558,7 +523,6 @@
         async function markAsDone(jobId) {
             if(!confirm("Print complete? This will mark the order as Done.")) return;
             
-            // Checking if it's a Direct PC (WebRTC) job
             if (jobId.startsWith('L')) {
                 rtcJobs = rtcJobs.filter(j => j.id !== jobId);
                 updateJobsUI();
@@ -566,7 +530,6 @@
                 return;
             }
             
-            // Otherwise, it's a Firebase Job
             try {
                 await db.collection('printJobs').doc(jobId).update({
                     status: 'completed',
@@ -579,26 +542,26 @@
             }
         }
 
-        // --- 3. AUDIO ALERTS TOGGLE LOGIC ---
+        // --- 3. ✨ AUDIO ALERTS PERSISTENT TOGGLE ✨ ---
         function toggleSound() {
             soundEnabled = !soundEnabled; 
-            const btn = $('#soundBtn');
+            localStorage.setItem('smartPrintAudioEnabled', soundEnabled); // Store preference permanently
             
             if (soundEnabled) {
+                // Try playing and unlocking immediately
                 const audio = document.getElementById('notifySound');
                 audio.play().then(() => {
                     audio.pause(); 
                     audio.currentTime = 0; 
-                }).catch(e => console.log("Sound block", e));
+                    audioUnlocked = true;
+                }).catch(e => console.log("Sound block during manual toggle", e));
                 
-                btn.innerHTML = `<i class="fas fa-volume-up text-green-500"></i> Alerts ON`;
-                btn.classList.add('bg-green-50', 'border-green-300');
                 toast("Sound alerts activated! 🔔", "success");
             } else {
-                btn.innerHTML = `<i class="fas fa-volume-mute text-gray-400"></i> Alerts OFF`;
-                btn.classList.remove('bg-green-50', 'border-green-300');
                 toast("Sound alerts muted.", "info");
             }
+            
+            updateSoundButtonUI();
         }
 
         // --- 4. ADVANCED SETTINGS MODAL ---
@@ -636,7 +599,7 @@
             }
         }
 
-        // --- 5. ✨ FIXED QR CODE GENERATION & DOWNLOAD ✨ ---
+        // --- 5. QR CODE SHARE & DOWNLOAD ---
         function getCustomerUrl() {
             let baseUrl = window.location.origin + window.location.pathname.replace(/cyber-owner\.html$/, 'cyber-customer.html');
             if(!baseUrl.includes('cyber-customer.html')) {

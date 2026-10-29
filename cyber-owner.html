@@ -14,7 +14,7 @@
     <!-- QR Code Generator Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-    <!-- Firebase SDKs (v8) - Removed broken Auth SDK -->
+    <!-- Firebase SDKs (v8) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
@@ -192,7 +192,7 @@
         <i class="fas fa-info-circle text-blue-400"></i> <span id="toast-msg">Message</span>
     </div>
 
-    <!-- CORE ENGINE JS (Fixed Login, Fixed Encryption & Sync) -->
+    <!-- CORE ENGINE JS -->
     <script>
         const $ = s => document.querySelector(s);
         const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -207,7 +207,6 @@
         let fbJobs = [], rtcJobs = [], metaCache = {};
         let currentSettings = { workflow: 'manual', privacy: 'immediate', isOnline: true };
         
-        // E2EE Key variable
         window.shopPrivKey = null; 
 
         function toast(msg, type='info'){
@@ -233,7 +232,7 @@
         function toggleSound() { soundEnabled = !soundEnabled; localStorage.setItem('smartPrintAudioEnabled', soundEnabled); updateSoundButtonUI(); unlockAudio(); }
         function playAnnouncementSound() { if(soundEnabled){ const a = document.getElementById('notifySound'); a.currentTime = 0; a.play().catch(() => {}); } }
 
-        // ---------- FIXED CRYPTOGRAPHY (NO FIREBASE AUTH REQUIRED) ----------
+        // ---------- KEY MANAGEMENT (E2EE) ----------
         const idbOpen = () => new Promise((res, rej) => { const r = indexedDB.open('sp-keys', 1); r.onupgradeneeded = () => r.result.createObjectStore('k'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
         const idbGet = async k => { const d = await idbOpen(); return new Promise((res, rej) => { const q = d.transaction('k').objectStore('k').get(k); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); };
         const idbSet = async (k, v) => { const d = await idbOpen(); return new Promise((res, rej) => { const t = d.transaction('k', 'readwrite'); t.objectStore('k').put(v, k); t.oncomplete = res; t.onerror = () => rej(t.error); }); };
@@ -250,19 +249,16 @@
 
             const snap = await db.collection('shopSecrets').doc(sid).get();
             if (snap.exists) {
-                // Key exists, decrypt it with the entered shop password
                 const d = snap.data();
                 try {
                     const pk8 = await crypto.subtle.decrypt({name:'AES-GCM', iv: unb64(d.iv)}, await deriveKey(pwd, unb64(d.salt)), unb64(d.wrappedKey));
                     window.shopPrivKey = await crypto.subtle.importKey('pkcs8', pk8, {name:'RSA-OAEP', hash:'SHA-256'}, false, ['decrypt']);
                     await idbSet('priv:' + sid, window.shopPrivKey);
-                } catch(e) { throw new Error("Key decryption failed."); }
+                } catch(e) { throw new Error("Key decryption failed. Check password."); }
             } else {
-                // First time login - generate keys securely
                 const kp = await crypto.subtle.generateKey({name:'RSA-OAEP', modulusLength:2048, publicExponent:new Uint8Array([1,0,1]), hash:'SHA-256'}, true, ['encrypt','decrypt']);
                 const pub = await crypto.subtle.exportKey('jwk', kp.publicKey);
                 const pk8 = await crypto.subtle.exportKey('pkcs8', kp.privateKey);
-
                 const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
                 const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv}, await deriveKey(pwd, salt), pk8);
 
@@ -283,18 +279,42 @@
             return { name: String(o.name || 'Document').slice(0,120), type: OK_TYPES.includes(o.type) ? o.type : null, pages: Number(o.pages) || 1 };
         }
         
+        // ✨ THE BIG FIX: MULTI-LAYER CORS PROXY ✨
         async function getDecryptedBlobUrl(f) {
             const meta = await getMeta(f);
             if(!meta.type) throw new Error('Unsupported file type.');
-            let r; try { r = await fetch(f.url); } catch(e) { throw new Error('Could not download file (blocked).'); }
-            if(!r.ok) throw new Error('File expired on server.');
+            
+            let r; 
+            try { 
+                // Attempt 1: Direct fetch (works locally sometimes)
+                r = await fetch(f.url); 
+            } catch(e1) { 
+                try {
+                    // Attempt 2: CORS Proxy Fallback
+                    r = await fetch('https://corsproxy.io/?' + encodeURIComponent(f.url));
+                } catch(e2) {
+                    try {
+                        // Attempt 3: AllOrigins Raw Fallback
+                        r = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(f.url));
+                    } catch(e3) {
+                        throw new Error('Browser is blocking the download (CORS Policy).');
+                    }
+                }
+            }
+
+            if(!r || !r.ok) throw new Error('File expired on server.');
+            
             const buf = new Uint8Array(await r.arrayBuffer());
-            let pt; try { pt = await crypto.subtle.decrypt({name:'AES-GCM', iv: buf.slice(0,12)}, await aesOf(f), buf.slice(12)); }
-            catch(e) { throw new Error('File corrupted.'); }
+            let pt; 
+            try { 
+                pt = await crypto.subtle.decrypt({name:'AES-GCM', iv: buf.slice(0,12)}, await aesOf(f), buf.slice(12)); 
+            } catch(e) { 
+                throw new Error('File corrupted or wrong key.'); 
+            }
             return URL.createObjectURL(new Blob([pt], { type: meta.type }));
         }
 
-        // ---------- FIXED SIMPLE LOGIN (NO AUTH NEEDED) ----------
+        // ---------- SIMPLE LOGIN FLOW ----------
         $('#loginForm').addEventListener('submit', async e => {
             e.preventDefault();
             const btn = $('#loginBtn'); btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Authenticating...`; btn.disabled = true;
@@ -310,7 +330,6 @@
             const shopData = docRef.data();
             if(shopData.appPassword !== pwd && shopData.password !== pwd) throw new Error("Incorrect Password!");
 
-            // Initialize Crypto Keys securely using DB Password
             await initE2EE(sid, pwd);
 
             shopId = sid;
@@ -363,17 +382,16 @@
                 jobObj.files.forEach(f => silentPrintDocument(f.url));
             } else {
                 for (const f of (jobObj.files || [])) {
-                    try { const url = await getDecryptedBlobUrl(f); silentPrintDocument(url); } 
-                    catch(e) { toast(e.message, 'error'); }
+                    const url = await getDecryptedBlobUrl(f); 
+                    silentPrintDocument(url); 
                 }
             }
         }
 
-        // ---------- HYBRID SYNC (FIREBASE E2EE + WEBRTC) ----------
+        // ---------- HYBRID SYNC ----------
         function startLiveSync() {
             if(unsubscribeLiveSync) unsubscribeLiveSync();
 
-            // 1. Firebase Sync
             unsubscribeLiveSync = db.collection('printJobs')
                 .where('shopId', '==', shopId)
                 .where('status', 'in', ['pending-review', 'processing', 'rejected'])
@@ -383,7 +401,7 @@
                     
                     if(currentSettings.workflow === 'manual') fbJobs = tempJobs;
                     
-                    updateJobsUI(); loadMetas(); // Trigger decryption of names
+                    updateJobsUI(); loadMetas(); 
 
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === "added" && !isInitialLoad) {
@@ -394,7 +412,6 @@
                     isInitialLoad = false;
                 });
 
-            // 2. WebRTC Sync
             if(!window.peerInstance) {
                 window.peerInstance = new Peer('bikripage-print-' + shopId);
                 window.peerInstance.on('connection', (conn) => {
@@ -429,16 +446,21 @@
             if(tasks.length) Promise.all(tasks).then(() => { if(changed) updateJobsUI(); });
         }
 
-        function handleNewJobReceived(jobObj, isDirectWrtc) {
+        async function handleNewJobReceived(jobObj, isDirectWrtc) {
             playAnnouncementSound();
             
             if (currentSettings.workflow === 'auto' && jobObj.status !== 'rejected') {
-                toast("Auto-Accept ON: Printing...", "success");
-                triggerJobPrint(jobObj);
+                toast("Auto-Accept ON: Printing...", "info");
                 
                 if(isDirectWrtc) rtcJobs.push(jobObj); else fbJobs.push(jobObj);
                 updateJobsUI();
-                setTimeout(() => markAsDone(jobObj.id, true, 'completed'), 3000); 
+                
+                try {
+                    await triggerJobPrint(jobObj);
+                    setTimeout(() => markAsDone(jobObj.id, true, 'completed'), 1500); 
+                } catch (e) {
+                    toast("Auto-print failed. Accept manually.", "error");
+                }
             } else {
                 if(isDirectWrtc) rtcJobs.push(jobObj);
                 updateJobsUI();
@@ -471,9 +493,14 @@
             if(btn) btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Printing...`;
 
             const jobObj = fbJobs.find(j => j.id === jobId) || rtcJobs.find(j => j.id === jobId);
-            if(jobObj) await triggerJobPrint(jobObj);
-            
-            setTimeout(() => markAsDone(jobId, false, 'completed'), 1000);
+            if(jobObj) {
+                try {
+                    await triggerJobPrint(jobObj);
+                    setTimeout(() => markAsDone(jobId, false, 'completed'), 1000);
+                } catch (e) {
+                    if(btn) btn.innerHTML = `<i class="fas fa-check-circle text-green-400"></i> Accept & Print`;
+                }
+            }
         }
 
         window.cancelJob = function(jobId) {
@@ -487,7 +514,7 @@
 
         window.dismissJob = function(jobId) {
             if (jobId.startsWith('L')) { rtcJobs = rtcJobs.filter(j => j.id !== jobId); updateJobsUI(); return; }
-            markAsDone(jobId, true, 'deleted'); // Hard delete
+            markAsDone(jobId, true, 'deleted'); 
         }
 
         window.previewEncryptedFile = async function(jobId, fileIndex) {
@@ -604,6 +631,7 @@
             if (jobId.startsWith('L')) {
                 const job = rtcJobs.find(j => j.id === jobId);
                 if (targetStatus === 'rejected') { if(job) job.status = 'rejected'; }
+                else if (targetStatus === 'deleted') { rtcJobs = rtcJobs.filter(j => j.id !== jobId); }
                 else { rtcJobs = rtcJobs.filter(j => j.id !== jobId); } 
                 updateJobsUI();
                 return;
@@ -630,7 +658,7 @@
             const privacy = document.querySelector('input[name="privacyMode"]:checked').value;
             currentSettings = { workflow, privacy, isOnline: true };
             try {
-                await db.collection('shops').doc(shopId).set({ printSettings: { workflow, privacy, isOnline: true } }, { merge: true });
+                await db.collection('shopSecrets').doc(shopId).set({ printSettings: { workflow, privacy, isOnline: true } }, { merge: true });
                 toast("Preferences saved!", "success"); closeSettings();
             } catch(e) { toast("Applied locally.", "success"); closeSettings(); } finally { btn.innerHTML = `Save Preferences`; renderJobs(fbJobs.concat(rtcJobs)); }
         }
@@ -647,11 +675,11 @@
             $('#qrModal').classList.remove('hidden'); setTimeout(() => { $('#qrModal').classList.remove('opacity-0'); $('#qrModalContent').classList.remove('scale-95'); }, 10);
         }
         function closeQrModal() { $('#qrModal').classList.add('opacity-0'); $('#qrModalContent').classList.add('scale-95'); setTimeout(() => $('#qrModal').classList.add('hidden'), 300); }
-        function copyCustomerLink() { const c = $('#customerLinkInput'); c.select(); navigator.clipboard.writeText(c.value).then(() => toast('Copied!', 'success')).catch(() => toast('Copy failed', 'error')); }
+        function copyCustomerLink() { const c = document.getElementById("customerLinkInput"); c.select(); navigator.clipboard.writeText(c.value); toast("Copied!", "success"); }
         function downloadQR() {
-            const c = $('#qrcodeContainer'); const img = c.querySelector('img'); const canvas = c.querySelector('canvas');
-            const dataUrl = img && img.src ? img.src : (canvas ? canvas.toDataURL('image/png') : '');
-            if(dataUrl) { const a = document.createElement('a'); a.href = dataUrl; a.download = `QR_${shopId}.png`; document.body.appendChild(a); a.click(); a.remove(); }
+            const c = document.getElementById('qrcodeContainer'); const img = c.querySelector('img'); const canvas = c.querySelector('canvas');
+            let dataUrl = img && img.src ? img.src : (canvas ? canvas.toDataURL("image/png") : '');
+            if (dataUrl) { const a = document.createElement('a'); a.href = dataUrl; a.download = `QR_${shopId}.png`; document.body.appendChild(a); a.click(); document.body.removeChild(a); } 
         }
     </script>
 </body>

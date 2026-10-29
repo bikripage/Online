@@ -17,7 +17,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-    <!-- WebRTC PeerJS Library (Receiver) -->
+    <!-- WebRTC PeerJS Library -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
     <script>
@@ -36,19 +36,15 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { background-color: #F2F2F7; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E5EA; border-radius: 10px; }
-        
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
-        
         .ios-shadow { box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08); }
         .modal-bg { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); }
-        
         .toggle-checkbox:checked { right: 0; border-color: #34C759; }
         .toggle-checkbox:checked + .toggle-label { background-color: #34C759; }
         .toggle-checkbox:checked + .toggle-label:after { transform: translateX(100%); border-color: white; }
@@ -145,14 +141,14 @@
                             <input type="radio" name="workflowMode" value="manual" checked class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
                             <div>
                                 <p class="text-sm font-bold text-gray-800">Review Every Request</p>
-                                <p class="text-[11px] text-gray-500 font-medium leading-tight mt-0.5">Check files manually before marking as printed.</p>
+                                <p class="text-[11px] text-gray-500 font-medium leading-tight mt-0.5">Check files manually before printing.</p>
                             </div>
                         </label>
                         <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-white transition-colors border border-transparent">
                             <input type="radio" name="workflowMode" value="auto" class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
                             <div>
                                 <p class="text-sm font-bold text-gray-800">Auto-Accept (Fast Mode)</p>
-                                <p class="text-[11px] text-gray-500 font-medium leading-tight mt-0.5">Directly accept all orders automatically.</p>
+                                <p class="text-[11px] text-gray-500 font-medium leading-tight mt-0.5">Directly print all orders automatically.</p>
                             </div>
                         </label>
                     </div>
@@ -165,24 +161,16 @@
                             <input type="radio" name="privacyMode" value="immediate" checked class="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500">
                             <div>
                                 <p class="text-sm font-bold text-gray-800">Delete Immediately</p>
-                                <p class="text-[11px] text-gray-500 font-medium leading-tight mt-0.5">Files deleted from server once marked as printed.</p>
+                                <p class="text-[11px] text-gray-500 font-medium leading-tight mt-0.5">Files deleted once marked as printed.</p>
                             </div>
                         </label>
                         <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-white transition-colors border border-transparent">
                             <input type="radio" name="privacyMode" value="24hours" class="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500">
                             <div>
                                 <p class="text-sm font-bold text-gray-800">Keep for 24 Hours</p>
-                                <p class="text-[11px] text-gray-500 font-medium leading-tight mt-0.5">Allow re-printing for one day before deletion.</p>
+                                <p class="text-[11px] text-gray-500 font-medium leading-tight mt-0.5">Allow re-printing for one day.</p>
                             </div>
                         </label>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
-                    <div><p class="text-sm font-bold text-gray-800">Store Status</p><p class="text-[11px] text-gray-500 font-medium mt-0.5">Accepting new print orders</p></div>
-                    <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
-                        <input type="checkbox" id="storeStatusToggle" checked class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 z-10 transition-transform duration-200 ease-in-out"/>
-                        <label for="storeStatusToggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer transition-colors duration-200 ease-in-out"></label>
                     </div>
                 </div>
             </div>
@@ -194,7 +182,7 @@
         </div>
     </div>
 
-    <!-- QR CODE SHARE & DOWNLOAD MODAL -->
+    <!-- QR CODE MODAL -->
     <div id="qrModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-bg p-4 opacity-0 transition-opacity">
         <div class="bg-white rounded-[24px] w-full max-w-sm shadow-2xl scale-95 transition-transform overflow-hidden flex flex-col" id="qrModalContent">
             <div class="p-4 flex items-center justify-between border-b border-gray-100 bg-white">
@@ -202,7 +190,7 @@
                 <button onclick="closeQrModal()" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 active:scale-90 transition-colors"><i class="fas fa-times"></i></button>
             </div>
             <div class="p-6 flex flex-col items-center bg-gray-50/50">
-                <p class="text-[11px] text-gray-500 font-bold uppercase tracking-wider mb-4 text-center">Customers will scan this to upload files.</p>
+                <p class="text-[11px] text-gray-500 font-bold uppercase tracking-wider mb-4 text-center">Customers scan this to upload files.</p>
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 mb-5 flex items-center justify-center min-h-[200px]" id="qrcodeContainer"></div>
                 <div class="w-full relative group mb-5">
                     <input type="text" id="customerLinkInput" readonly class="w-full bg-white border border-gray-200 rounded-xl pl-4 pr-12 py-3 text-xs font-medium text-gray-600 outline-none">
@@ -232,11 +220,7 @@
         let fbJobs = [];
         let rtcJobs = [];
 
-        let currentSettings = {
-            workflow: 'manual',
-            privacy: 'immediate',
-            isOnline: true
-        };
+        let currentSettings = { workflow: 'manual', privacy: 'immediate', isOnline: true };
 
         function toast(msg, type='info'){
             const t = $('#toast'); $('#toast-msg').textContent = msg;
@@ -252,11 +236,7 @@
         function unlockAudio() {
             if (!audioUnlocked && soundEnabled) {
                 const audio = document.getElementById('notifySound');
-                audio.play().then(() => {
-                    audio.pause();
-                    audio.currentTime = 0;
-                    audioUnlocked = true;
-                }).catch(e => {});
+                audio.play().then(() => { audio.pause(); audio.currentTime = 0; audioUnlocked = true; }).catch(e => {});
             }
         }
 
@@ -296,9 +276,8 @@
             try {
                 const docRef = await db.collection('shops').doc(sid).get();
                 if(!docRef.exists) throw new Error("Shop ID not found.");
-                
                 const shopData = docRef.data();
-                if(shopData.appPassword !== pwd && shopData.password !== pwd) { throw new Error("Incorrect Password!"); }
+                if(shopData.appPassword !== pwd && shopData.password !== pwd) throw new Error("Incorrect Password!");
 
                 shopId = sid;
                 localStorage.setItem('smartPrintShopId', sid);
@@ -306,8 +285,7 @@
 
                 $('#shopIdDisplay').textContent = `ID: ${shopId}`;
                 $('#loginScreen').classList.add('hidden');
-                $('#mainDashboard').classList.remove('hidden');
-                $('#mainDashboard').classList.add('flex');
+                $('#mainDashboard').classList.remove('hidden'); $('#mainDashboard').classList.add('flex');
                 
                 if(!isAutoLogin) toast('Logged in successfully', 'success');
                 
@@ -315,14 +293,12 @@
                     currentSettings = shopData.printSettings;
                     document.querySelector(`input[name="workflowMode"][value="${currentSettings.workflow}"]`).checked = true;
                     document.querySelector(`input[name="privacyMode"][value="${currentSettings.privacy}"]`).checked = true;
-                    $('#storeStatusToggle').checked = currentSettings.isOnline;
                 }
                 
                 startLiveSync();
             } catch (err) {
-                localStorage.removeItem('smartPrintShopId');
-                localStorage.removeItem('smartPrintPwd');
-                if(!isAutoLogin) toast(err.message || 'Login failed. Please try again.', 'error');
+                localStorage.removeItem('smartPrintShopId'); localStorage.removeItem('smartPrintPwd');
+                if(!isAutoLogin) toast(err.message || 'Login failed.', 'error');
                 $('#loginScreen').classList.remove('hidden'); $('#mainDashboard').classList.add('hidden');
             } finally {
                 if(!isAutoLogin) { btn.innerHTML = `Secure Login <i class="fas fa-arrow-right"></i>`; btn.disabled = false; }
@@ -331,19 +307,14 @@
 
         function logout() { localStorage.removeItem('smartPrintShopId'); localStorage.removeItem('smartPrintPwd'); window.location.reload(); }
 
-        // --- SILENT PRINT LOGIC ---
-        function silentPrintDocument(fileUrl, fileType) {
-            console.log("Triggering Auto-Print for:", fileUrl);
+        // --- THE CORE PRINTING ENGINE ---
+        function silentPrintDocument(fileUrl) {
+            console.log("Triggering Print:", fileUrl);
             const iframeId = 'print-frame-' + Date.now();
             const iframe = document.createElement('iframe');
-            
             iframe.id = iframeId;
-            iframe.style.position = 'absolute';
-            iframe.style.top = '-1000px';
-            iframe.style.left = '-1000px';
-            iframe.style.width = '0px';
-            iframe.style.height = '0px';
-            
+            iframe.style.position = 'absolute'; iframe.style.top = '-1000px'; iframe.style.left = '-1000px';
+            iframe.style.width = '0px'; iframe.style.height = '0px';
             iframe.src = fileUrl; 
             document.body.appendChild(iframe);
             
@@ -352,25 +323,23 @@
                     iframe.contentWindow.focus();
                     iframe.contentWindow.print();
                     setTimeout(() => { document.body.removeChild(iframe); }, 10000);
-                } catch(e) {
-                    console.log("Auto-print block issue:", e);
-                    window.open(fileUrl, '_blank');
-                }
+                } catch(e) { window.open(fileUrl, '_blank'); }
             };
         }
 
         function handleNewJobReceived(jobObj, isDirectWrtc) {
             playAnnouncementSound();
             
+            // Auto Mode: Seedha print maro aur hata do
             if (currentSettings.workflow === 'auto') {
-                toast("Auto-Accept ON: Sending to printer...", "success");
-                jobObj.files.forEach(f => silentPrintDocument(f.url, f.contentType));
-                // Delay fix: Let it show in grid for a moment, then auto clear it
+                toast("Auto-Accept ON: Printing...", "success");
+                jobObj.files.forEach(f => silentPrintDocument(f.url));
+                
                 if(isDirectWrtc) rtcJobs.push(jobObj); else fbJobs.push(jobObj);
                 updateJobsUI();
-                
                 setTimeout(() => markAsDone(jobObj.id, true), 3000); 
             } else {
+                // Manual Mode: Sirf screen pe dikhao
                 if(isDirectWrtc) rtcJobs.push(jobObj);
                 updateJobsUI();
             }
@@ -380,34 +349,29 @@
         function startLiveSync() {
             if(unsubscribeLiveSync) unsubscribeLiveSync();
 
+            // Firebase Cloud Sync
             unsubscribeLiveSync = db.collection('printJobs')
                 .where('shopId', '==', shopId)
                 .where('status', 'in', ['pending-review', 'processing'])
                 .onSnapshot((snapshot) => {
-                    // Update the array without clearing newly received auto-jobs immediately
+                    if(currentSettings.workflow === 'manual') fbJobs = [];
                     let tempJobs = [];
-                    snapshot.forEach(doc => {
-                        const jobData = { id: doc.id, ...doc.data() };
-                        tempJobs.push(jobData);
-                    });
-                    
+                    snapshot.forEach(doc => { tempJobs.push({ id: doc.id, ...doc.data() }); });
                     if(currentSettings.workflow === 'manual') fbJobs = tempJobs;
-                    
                     updateJobsUI();
 
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === "added" && !isInitialLoad) {
-                            const newJob = { id: change.doc.id, ...change.doc.data() };
-                            handleNewJobReceived(newJob, false);
+                            handleNewJobReceived({ id: change.doc.id, ...change.doc.data() }, false);
                         }
                     });
                     isInitialLoad = false;
                 });
 
+            // WebRTC Direct Sync
             if(!window.peerInstance) {
                 window.peerInstance = new Peer('bikripage-print-' + shopId);
-                window.peerInstance.on('open', (id) => console.log("🚀 WebRTC Ready: ", id));
-                
+                window.peerInstance.on('open', (id) => console.log("🚀 WebRTC Ready"));
                 window.peerInstance.on('connection', (conn) => {
                     conn.on('data', async (data) => {
                         if(data.type === 'new_print_job') {
@@ -415,17 +379,13 @@
                                 const blob = new Blob([f.data], { type: f.fileType });
                                 return { name: f.name, url: URL.createObjectURL(blob), contentType: f.fileType };
                             });
-                            
                             const newRtcJob = {
                                 id: 'L' + String(Date.now()).slice(-5), 
                                 createdAt: { toDate: () => new Date(data.timestamp) },
                                 customerNote: data.settings.colorMode + ' | ' + data.settings.printSide,
-                                copies: data.settings.copies,
-                                paper: data.settings.paperSize,
-                                files: parsedFiles,
-                                isLocalWrtc: true
+                                copies: data.settings.copies, paper: data.settings.paperSize,
+                                files: parsedFiles, isLocalWrtc: true
                             };
-                            
                             handleNewJobReceived(newRtcJob, true);
                         }
                     });
@@ -436,8 +396,7 @@
         function playAnnouncementSound() {
             if(soundEnabled) {
                 const audio = document.getElementById('notifySound');
-                audio.currentTime = 0; 
-                audio.play().catch(e => console.log("Audio block", e));
+                audio.currentTime = 0; audio.play().catch(e => console.log("Audio block"));
             }
         }
 
@@ -453,7 +412,6 @@
             
             renderJobs(combinedJobs);
             $('#jobCount').textContent = combinedJobs.length;
-
             if (combinedJobs.length === 0) {
                 $('#emptyState').classList.remove('hidden'); $('#jobsGrid').classList.add('hidden');
             } else {
@@ -461,25 +419,26 @@
             }
         }
 
+        // ✨ ACTION HANDLERS FOR REVIEW MODE ✨
         window.executePrintAndMarkDone = function(jobId) {
-            const btnId = `btn-${jobId}`;
-            const btn = document.getElementById(btnId);
-            if(btn) btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+            const btn = document.getElementById(`btn-accept-${jobId}`);
+            if(btn) btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Printing...`;
 
+            // Background mein Print command bhejo
             const jobObj = fbJobs.find(j => j.id === jobId) || rtcJobs.find(j => j.id === jobId);
-            if(jobObj && currentSettings.workflow === 'manual') {
-                jobObj.files.forEach(f => silentPrintDocument(f.url, f.contentType));
+            if(jobObj) {
+                jobObj.files.forEach(f => silentPrintDocument(f.url));
             }
-            
-            // Adding a small delay to feel natural
+            // Thodi der mein card hide kardo
             setTimeout(() => markAsDone(jobId, false), 800);
         }
 
-        // ✨ FIX: Delete/Cancel Request Logic ✨
         window.cancelJob = function(jobId) {
-            if(confirm("Are you sure you want to cancel and remove this request?")) {
-                markAsDone(jobId, true); 
-                toast("Job removed", "info");
+            if(confirm("Reject this print request?")) {
+                const btn = document.getElementById(`btn-reject-${jobId}`);
+                if(btn) btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+                markAsDone(jobId, true, 'cancelled'); 
+                toast("Print request rejected", "info");
             }
         }
 
@@ -493,6 +452,9 @@
                     : `<span class="bg-gray-100 text-gray-600 border border-gray-200 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider">B & W</span>`;
 
                 const time = job.createdAt ? new Date(getJobTime(job)).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Just now';
+                
+                // Determine file count safely
+                const filesCount = job.files ? job.files.length : (job.files_count || 0);
 
                 const filesHtml = (job.files || []).map(f => {
                     const isPdf = f.contentType === 'application/pdf';
@@ -512,22 +474,28 @@
 
                 const sourceBadge = job.isLocalWrtc ? `<span class="absolute -top-3 -right-3 bg-indigo-600 text-white text-[9px] font-bold px-4 py-1 rounded-bl-xl uppercase shadow-md rotate-12">Direct PC</span>` : '';
                 
-                const isAutoClearing = currentSettings.workflow === 'auto';
-                const printBtnText = isAutoClearing ? 'Auto Printing & Clearing...' : 'Mark as Printed';
-                
-                // Disable button and add pulse if in auto mode to prevent double clicks while it clears
-                const btnClasses = isAutoClearing 
-                    ? "w-full bg-gray-200 text-gray-500 font-bold text-[14px] py-3.5 rounded-[16px] flex items-center justify-center gap-2 cursor-not-allowed animate-pulse"
-                    : "w-full bg-gray-900 hover:bg-black text-white font-bold text-[14px] py-3.5 rounded-[16px] shadow-[0_8px_16px_rgba(0,0,0,0.1)] active:scale-[0.98] transition-all flex items-center justify-center gap-2";
+                // ✨ UI LOGIC: Buttons based on workflow mode ✨
+                let actionButtonsHtml = '';
+                if (currentSettings.workflow === 'auto') {
+                    actionButtonsHtml = `
+                    <button disabled class="w-full bg-gray-200 text-gray-500 font-bold text-[14px] py-3.5 rounded-[16px] flex items-center justify-center gap-2 cursor-not-allowed animate-pulse">
+                        <i class="fas fa-spinner fa-spin"></i> Auto Printing...
+                    </button>`;
+                } else {
+                    actionButtonsHtml = `
+                    <div class="flex gap-3">
+                        <button id="btn-reject-${job.id}" onclick="cancelJob('${job.id}')" class="flex-1 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-[14px] py-3.5 rounded-[16px] shadow-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2 border border-red-100">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                        <button id="btn-accept-${job.id}" onclick="executePrintAndMarkDone('${job.id}')" class="flex-[2] bg-gray-900 hover:bg-black text-white font-bold text-[14px] py-3.5 rounded-[16px] shadow-[0_8px_16px_rgba(0,0,0,0.1)] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-check-circle text-green-400"></i> Accept & Print
+                        </button>
+                    </div>`;
+                }
 
                 return `
                 <div class="bg-white rounded-[24px] p-5 ios-shadow border border-gray-200/60 flex flex-col relative animate-fade-in overflow-hidden" style="animation-delay: ${index * 0.05}s">
                     ${sourceBadge}
-                    
-                    <!-- ✨ FIX: Cancel/Cross Button added to top-right corner ✨ -->
-                    <button onclick="cancelJob('${job.id}')" class="absolute top-4 right-4 w-7 h-7 bg-gray-100 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full flex items-center justify-center transition-colors z-20">
-                        <i class="fas fa-times text-xs"></i>
-                    </button>
 
                     <div class="flex justify-between items-start mb-5 relative z-10 pr-8">
                         <div>
@@ -540,21 +508,20 @@
                         <div class="text-center px-1"><p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">Copies</p><p class="text-[15px] font-black text-gray-900">${job.copies || 1}</p></div>
                         <div class="text-center px-1"><p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">Paper</p><p class="text-[13px] font-black text-gray-900 mt-0.5 leading-tight">${job.paper || 'A4'}</p></div>
                         <div class="text-center px-1"><p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">Side</p><p class="text-[13px] font-black text-gray-900 mt-0.5 leading-tight">${sideMode}</p></div>
-                        <div class="text-center px-1"><p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">Files</p><p class="text-[15px] font-black text-blue-600">${job.files ? job.files.length : 0}</p></div>
+                        <div class="text-center px-1"><p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">Files</p><p class="text-[15px] font-black text-blue-600">${filesCount}</p></div>
                     </div>
                     <div class="flex-1 mb-5 space-y-2 max-h-[160px] overflow-y-auto custom-scrollbar bg-gray-50/30 p-2 rounded-2xl relative z-10">
                         ${filesHtml}
                     </div>
+                    
                     <div class="mt-auto relative z-10">
-                        <button id="btn-${job.id}" ${isAutoClearing ? 'disabled' : `onclick="executePrintAndMarkDone('${job.id}')"`} class="${btnClasses}">
-                            ${isAutoClearing ? `<i class="fas fa-spinner fa-spin"></i>` : `<i class="fas fa-check-circle text-green-400"></i>`} ${printBtnText}
-                        </button>
+                        ${actionButtonsHtml}
                     </div>
                 </div>`;
             }).join('');
         }
 
-        async function markAsDone(jobId, isAutoMode = false) {
+        async function markAsDone(jobId, isAutoMode = false, specificStatus = null) {
             if (jobId.startsWith('L')) {
                 rtcJobs = rtcJobs.filter(j => j.id !== jobId);
                 updateJobsUI();
@@ -562,7 +529,9 @@
             }
             
             try {
-                const statusUpdate = currentSettings.privacy === 'immediate' ? 'deleted' : 'completed';
+                let statusUpdate = currentSettings.privacy === 'immediate' ? 'deleted' : 'completed';
+                if(specificStatus) statusUpdate = specificStatus; // Allow override for 'cancelled'
+
                 await db.collection('printJobs').doc(jobId).update({
                     status: statusUpdate,
                     completedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -570,47 +539,25 @@
                 
                 fbJobs = fbJobs.filter(j => j.id !== jobId);
                 updateJobsUI();
-            } catch(e) {
-                console.error("Error updating job:", e);
-                if(!isAutoMode) toast("Error marking as done!", "error");
-            }
+            } catch(e) { console.error("Error updating job:", e); }
         }
 
-        // --- TOGGLES & MODALS ---
-        function toggleSound() {
-            soundEnabled = !soundEnabled; 
-            localStorage.setItem('smartPrintAudioEnabled', soundEnabled);
-            if (soundEnabled) {
-                const audio = document.getElementById('notifySound');
-                audio.play().then(() => { audio.pause(); audio.currentTime = 0; audioUnlocked = true; }).catch(e => {});
-                toast("Sound alerts activated! 🔔", "success");
-            } else { toast("Sound alerts muted.", "info"); }
-            updateSoundButtonUI();
-        }
-
+        // --- SETTINGS ---
         function openSettings() { $('#settingsModal').classList.remove('hidden'); setTimeout(() => { $('#settingsModal').classList.remove('opacity-0'); $('#settingsModalContent').classList.remove('scale-95'); }, 10); }
         function closeSettings() { $('#settingsModal').classList.add('opacity-0'); $('#settingsModalContent').classList.add('scale-95'); setTimeout(() => $('#settingsModal').classList.add('hidden'), 300); }
         
         async function saveSettings() {
             const btn = $('#saveSettingsBtn'); btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
-            
             const workflow = document.querySelector('input[name="workflowMode"]:checked').value;
             const privacy = document.querySelector('input[name="privacyMode"]:checked').value;
-            const isOnline = $('#storeStatusToggle').checked;
-
-            currentSettings = { workflow, privacy, isOnline }; // Update local state instantly
-
+            currentSettings = { workflow, privacy, isOnline: true };
             try {
-                await db.collection('shops').doc(shopId).set({ printSettings: { workflow, privacy, isOnline }, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-                toast("Preferences saved successfully!", "success");
-                closeSettings();
-            } catch(e) {
-                toast("Preferences applied locally.", "success");
-                closeSettings();
-            } finally { btn.innerHTML = `Save Preferences`; }
+                await db.collection('shops').doc(shopId).set({ printSettings: { workflow, privacy, isOnline: true }, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+                toast("Preferences saved!", "success"); closeSettings();
+            } catch(e) { toast("Applied locally.", "success"); closeSettings(); } finally { btn.innerHTML = `Save Preferences`; }
         }
 
-        // --- QR CODE LOGIC ---
+        // --- QR CODE ---
         function getCustomerUrl() {
             let baseUrl = window.location.origin + window.location.pathname.replace(/cyber-owner\.html$/, 'cyber-customer.html');
             if(!baseUrl.includes('cyber-customer.html')) baseUrl = "https://bikripage.github.io/Online/cyber-customer.html";
@@ -618,18 +565,15 @@
         }
         function openQrModal() {
             const customerUrl = getCustomerUrl(); $('#customerLinkInput').value = customerUrl;
-            $('#qrcodeContainer').innerHTML = ''; 
-            new QRCode(document.getElementById("qrcodeContainer"), { text: customerUrl, width: 180, height: 180, colorDark : "#111827", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
+            $('#qrcodeContainer').innerHTML = ''; new QRCode(document.getElementById("qrcodeContainer"), { text: customerUrl, width: 180, height: 180, colorDark : "#111827", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
             $('#qrModal').classList.remove('hidden'); setTimeout(() => { $('#qrModal').classList.remove('opacity-0'); $('#qrModalContent').classList.remove('scale-95'); }, 10);
         }
         function closeQrModal() { $('#qrModal').classList.add('opacity-0'); $('#qrModalContent').classList.add('scale-95'); setTimeout(() => $('#qrModal').classList.add('hidden'), 300); }
-        function copyCustomerLink() { const copyText = document.getElementById("customerLinkInput"); copyText.select(); navigator.clipboard.writeText(copyText.value); toast("Link Copied!", "success"); }
+        function copyCustomerLink() { const c = document.getElementById("customerLinkInput"); c.select(); navigator.clipboard.writeText(c.value); toast("Copied!", "success"); }
         function downloadQR() {
-            const container = document.getElementById('qrcodeContainer');
-            const qrImg = container.querySelector('img'); const qrCanvas = container.querySelector('canvas');
-            let dataUrl = qrImg && qrImg.src ? qrImg.src : (qrCanvas ? qrCanvas.toDataURL("image/png") : '');
-            if (dataUrl) { const a = document.createElement('a'); a.href = dataUrl; a.download = `SmartPrint_QR_${shopId}.png`; document.body.appendChild(a); a.click(); document.body.removeChild(a); toast("Downloaded!", "success"); } 
-            else { toast("Please wait for QR", "error"); }
+            const c = document.getElementById('qrcodeContainer'); const img = c.querySelector('img'); const canvas = c.querySelector('canvas');
+            let dataUrl = img && img.src ? img.src : (canvas ? canvas.toDataURL("image/png") : '');
+            if (dataUrl) { const a = document.createElement('a'); a.href = dataUrl; a.download = `QR_${shopId}.png`; document.body.appendChild(a); a.click(); document.body.removeChild(a); } 
         }
     </script>
 </body>

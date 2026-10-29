@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#F9FAFB">
+    <meta name="referrer" content="no-referrer">
     <title>Smart Print | BikriPage</title>
     
     <!-- Tailwind & FontAwesome -->
@@ -14,7 +15,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
-    <!-- PDF-Lib (For Page Counting) & jsPDF (For Convert) -->
+    <!-- PDF-Lib & jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -27,7 +28,10 @@
     <!-- Firebase SDKs (v8) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <!-- Storage hata diya gaya hai kyunki bill bachana hai -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+    <!-- ✨ WebRTC PeerJS Library (Sender) ✨ -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
     <script>
         const firebaseConfig = {
@@ -39,6 +43,8 @@
         };
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.firestore();
+        const auth = firebase.auth();
+        const authReady = auth.signInAnonymously().catch(e => console.error("anon auth", e));
     </script>
 
     <style>
@@ -194,7 +200,7 @@
                     <input type="checkbox" id="consent" class="appearance-none w-5 h-5 border-2 border-gray-300 rounded-md checked:bg-blue-600 checked:border-blue-600 transition-colors cursor-pointer peer">
                     <i class="fas fa-check text-white text-xs absolute opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"></i>
                 </div>
-                <span class="text-xs text-gray-500 font-medium leading-tight select-none pt-0.5">I agree to share these files securely with the cyber cafe for printing.</span>
+                <span class="text-xs text-gray-500 font-medium leading-tight select-none pt-0.5">I agree to send these files securely to this cyber cafe for printing.</span>
             </label>
             <button id="submit" class="w-full bg-gray-900 text-white font-bold text-[16px] rounded-2xl py-4 shadow-lg shadow-gray-900/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                 Send to Print <i class="fas fa-paper-plane text-sm ml-1"></i>
@@ -286,18 +292,19 @@
     </div>
 
     <!-- TOAST -->
-    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-5 py-3 rounded-full text-sm font-medium shadow-xl transition-all duration-300 opacity-0 pointer-events-none z-[100] flex items-center gap-2 min-w-max">
+    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-5 py-3 rounded-full text-sm font-medium shadow-xl transition-all duration-300 opacity-0 pointer-events-none z-[100] flex items-center gap-2 min-w-max z-[9999]">
         <i class="fas fa-info-circle text-blue-400"></i> <span id="toast-msg">Message</span>
     </div>
 
+    <!-- CORE SCRIPT (HYBRID: WebRTC + Firebase E2EE Backup) -->
     <script>
         const params = new URLSearchParams(location.search);
-        // ✨ BUG FIX: Ab URL me ID na hone par Error dega (Fallback hata diya hai) ✨
-        const shopId = params.get('shopId');
+        const _rawShop = params.get('shopId') || '';
+        const shopId = /^[A-Za-z0-9_-]{3,60}$/.test(_rawShop) ? _rawShop : null;
         const shopName = params.get('shopName');
 
         if (shopId) {
-            document.querySelector('#shopLabel').textContent = shopName ? decodeURIComponent(shopName) : shopId.toUpperCase();
+            document.querySelector('#shopLabel').textContent = shopName ? decodeURIComponent(shopName).slice(0,40) : shopId.toUpperCase();
         } else {
             document.querySelector('#shopLabel').textContent = "Scan QR Code First";
         }
@@ -306,6 +313,29 @@
         const state = {files:[], copies: 1}; 
         
         const allowed = f => /\.(pdf|jpe?g|png|webp)$/i.test(f.name) && f.size <= 20*1024*1024;
+        const b64 = u8 => { let t=''; for(let i=0;i<u8.length;i++) t+=String.fromCharCode(u8[i]); return btoa(t); };
+        const cat = (...a) => { const o=new Uint8Array(a.reduce((n,x)=>n+x.byteLength,0)); let p=0; a.forEach(x=>{o.set(new Uint8Array(x),p);p+=x.byteLength;}); return o; };
+        
+        async function sniff(f){
+            const h = new Uint8Array(await f.slice(0,12).arrayBuffer());
+            if(h[0]==0x25&&h[1]==0x50&&h[2]==0x44&&h[3]==0x46) return 'application/pdf';
+            if(h[0]==0xFF&&h[1]==0xD8&&h[2]==0xFF) return 'image/jpeg';
+            if(h[0]==0x89&&h[1]==0x50&&h[2]==0x4E&&h[3]==0x47) return 'image/png';
+            if(h[0]==0x52&&h[1]==0x49&&h[2]==0x46&&h[3]==0x46&&h[8]==0x57&&h[9]==0x45&&h[10]==0x42&&h[11]==0x50) return 'image/webp';
+            return null;
+        }
+
+        async function encryptFile(entry, pubKey){
+            const aes = await crypto.subtle.generateKey({name:'AES-GCM',length:256}, true, ['encrypt']);
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const ct = await crypto.subtle.encrypt({name:'AES-GCM',iv}, aes, await entry.file.arrayBuffer());
+            const miv = crypto.getRandomValues(new Uint8Array(12));
+            const meta = JSON.stringify({name: entry.file.name, type: entry.mime, pages: entry.pages || 1});
+            const mct = await crypto.subtle.encrypt({name:'AES-GCM',iv:miv}, aes, new TextEncoder().encode(meta));
+            const wrapped = await crypto.subtle.encrypt({name:'RSA-OAEP'}, pubKey, await crypto.subtle.exportKey('raw', aes));
+            return { blob: new Blob([cat(iv, ct)], {type:'application/octet-stream'}), key: b64(new Uint8Array(wrapped)), meta: b64(cat(miv, mct)) };
+        }
+
         const size = n => n < 1048576 ? `${Math.max(1,Math.round(n/1024))} KB` : `${(n/1048576).toFixed(1)} MB`;
         const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         
@@ -345,11 +375,13 @@
             btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Loading...`;
             
             for(const f of files){
-                if(!allowed(f)){skipped++;continue;}
+                if(!allowed(f) || state.files.length >= 10){skipped++;continue;}
+                const mime = await sniff(f);
+                if(!mime){skipped++;continue;}
                 if(state.files.some(x=>x.name===f.name&&x.size===f.size))continue;
                 
                 let pageCount = null;
-                if (f.type === 'application/pdf' && window.PDFLib) {
+                if (mime === 'application/pdf' && window.PDFLib) {
                     try {
                         const arrayBuffer = await f.arrayBuffer(); 
                         const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
@@ -357,49 +389,39 @@
                     } catch(e) { console.warn("PDF count read error", e); }
                 }
                 
-                state.files.push({file:f, url:URL.createObjectURL(f), pages: pageCount});
+                state.files.push({file:f, url:URL.createObjectURL(f), pages: pageCount, mime});
             }
             renderFiles();
             btn.innerHTML = `<i class="fas fa-folder-open"></i> Browse`;
-            if(skipped) toast('Skipped files over 20MB or invalid format.', 'error');
+            if(skipped) toast('Skipped: invalid format, over 20MB, or > 10 files.', 'error');
         }
         
         function renderFiles(){
             $('#fileList').innerHTML = state.files.map((x,i) => {
-                const isImage = x.file.type.startsWith('image/');
+                const isImage = x.mime.startsWith('image/');
                 const thumb = isImage ? `<img src="${x.url}" class="w-full h-full object-cover">` : `<div class="bg-red-50 text-red-500 w-full h-full flex items-center justify-center"><i class="fas fa-file-pdf text-2xl"></i></div>`;
                 const pageText = x.pages ? ` &bull; <span class="text-indigo-600">${x.pages} Pages</span>` : '';
                 
-                let displayName = "Document";
-                if(x.file && x.file.name) { displayName = x.file.name; }
+                let displayName = x.file && x.file.name ? x.file.name : "Document";
 
                 return `
                 <div class="flex items-center gap-3 p-2 bg-white border border-indigo-100 rounded-2xl shadow-sm animate-fade-in group cursor-pointer hover:bg-indigo-50/30 transition-colors" onclick="handleFileClick(${i}, ${isImage})">
-                    <div class="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center shrink-0 overflow-hidden border border-gray-200">
-                        ${thumb}
-                    </div>
+                    <div class="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center shrink-0 overflow-hidden border border-gray-200">${thumb}</div>
                     <div class="flex-1 min-w-0 py-1">
                         <p class="text-sm font-bold text-gray-900 truncate">${esc(displayName)}</p>
-                        <p class="text-[11px] font-bold mt-0.5 text-gray-500">
-                            ${size(x.file.size)}${pageText}
-                        </p>
+                        <p class="text-[11px] font-bold mt-0.5 text-gray-500">${size(x.file.size)}${pageText}</p>
                         <p class="text-[10px] font-bold text-indigo-600 mt-0.5"><i class="fas fa-eye"></i> Tap to View/Edit</p>
                     </div>
                     <button class="w-10 h-10 rounded-full bg-white border border-gray-100 hover:bg-red-50 text-gray-400 hover:text-red-500 hover:border-red-100 flex items-center justify-center transition-all shrink-0 shadow-sm" onclick="event.stopPropagation(); removeFile(${i})">
                         <i class="fas fa-times text-sm"></i>
                     </button>
-                </div>
-            `}).join('');
+                </div>`;
+            }).join('');
         }
 
-        function removeFile(i) {
-            URL.revokeObjectURL(state.files[i].url);
-            state.files.splice(i,1);
-            renderFiles();
-        }
+        function removeFile(i) { URL.revokeObjectURL(state.files[i].url); state.files.splice(i,1); renderFiles(); }
 
-        let cropper = null;
-        let currentCropIndex = -1;
+        let cropper = null; let currentCropIndex = -1;
 
         async function handleFileClick(index, isImage) {
             currentCropIndex = index;
@@ -435,7 +457,6 @@
                 previewContainer.classList.add('overflow-y-auto');
                 
                 pdfArea.innerHTML = `<div class="mt-20 text-indigo-500 text-center flex flex-col items-center"><i class="fas fa-circle-notch fa-spin text-3xl mb-3"></i><p class="font-bold text-sm">Loading PDF...</p></div>`;
-                
                 setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
 
                 try {
@@ -447,27 +468,16 @@
                     for(let pageNum = 1; pageNum <= pagesToRender; pageNum++) {
                         const page = await pdf.getPage(pageNum);
                         const viewport = page.getViewport({ scale: 0.6 }); 
+                        const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+                        canvas.height = viewport.height; canvas.width = viewport.width; canvas.className = "max-w-full shadow-md rounded border border-gray-300 bg-white mb-2";
                         
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        canvas.height = viewport.height;
-                        canvas.width = viewport.width;
-                        canvas.className = "max-w-full shadow-md rounded border border-gray-300 bg-white mb-2";
-                        
-                        const wrapper = document.createElement('div');
-                        wrapper.className = "w-full flex flex-col items-center";
+                        const wrapper = document.createElement('div'); wrapper.className = "w-full flex flex-col items-center";
                         wrapper.innerHTML = `<p class="text-[10px] font-bold text-gray-400 mb-1">Page ${pageNum}</p>`;
-                        wrapper.appendChild(canvas);
-                        
-                        pdfArea.appendChild(wrapper);
+                        wrapper.appendChild(canvas); pdfArea.appendChild(wrapper);
                         await page.render({ canvasContext: ctx, viewport: viewport }).promise;
                     }
-                    if(pdf.numPages > 3) {
-                        pdfArea.innerHTML += `<p class="text-xs font-bold text-gray-500 my-4 text-center">... and ${pdf.numPages - 3} more pages (Tap Open Full PDF)</p>`;
-                    }
-                } catch(e) {
-                    pdfArea.innerHTML = `<div class="mt-20 text-red-500 text-center"><i class="fas fa-exclamation-triangle text-3xl mb-3"></i><p class="font-bold text-sm">Cannot preview this PDF.</p></div>`;
-                }
+                    if(pdf.numPages > 3) pdfArea.innerHTML += `<p class="text-xs font-bold text-gray-500 my-4 text-center">... and ${pdf.numPages - 3} more pages (Tap Open Full PDF)</p>`;
+                } catch(e) { pdfArea.innerHTML = `<div class="mt-20 text-red-500 text-center"><i class="fas fa-exclamation-triangle text-3xl mb-3"></i><p class="font-bold text-sm">Cannot preview this PDF.</p></div>`; }
             }
         }
 
@@ -477,83 +487,61 @@
                 const blob = new Blob([fileObj.file], { type: 'application/pdf' });
                 const pdfUrl = URL.createObjectURL(blob);
                 const newWindow = window.open(pdfUrl, '_blank');
-                if (!newWindow) { toast('Popup blocked! Browser setting check karein.', 'error'); }
+                if (!newWindow) toast('Popup blocked! Browser setting check karein.', 'error');
             }
         }
 
         function closeCropModal() {
-            const modal = document.getElementById('cropModal');
-            const content = document.getElementById('cropModalContent');
+            const modal = document.getElementById('cropModal'); const content = document.getElementById('cropModalContent');
             modal.classList.add('opacity-0'); content.classList.add('scale-95');
-            setTimeout(() => { 
-                modal.classList.add('hidden'); 
-                if(cropper) cropper.destroy(); 
-                document.getElementById('pdfRenderArea').innerHTML = ""; 
-            }, 300);
+            setTimeout(() => { modal.classList.add('hidden'); if(cropper) cropper.destroy(); document.getElementById('pdfRenderArea').innerHTML = ""; }, 300);
         }
 
         $('#rotateBtn').addEventListener('click', () => { if(cropper) cropper.rotate(90); });
-        
         $('#saveCropBtn').addEventListener('click', () => {
             if(!cropper) return;
             const btn = $('#saveCropBtn'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
             
             cropper.getCroppedCanvas({ imageSmoothingQuality: 'high' }).toBlob((blob) => {
-                if(!blob) return;
+                if(!blob){ btn.innerHTML = 'Save & Update'; return; }
                 const oldFile = state.files[currentCropIndex].file;
                 const safeName = (oldFile && oldFile.name) ? oldFile.name : 'Cropped_Image.jpg';
-                const newFile = new File([blob], safeName, { type: oldFile.type || 'image/jpeg' });
+                const newFile = new File([blob], safeName, { type: blob.type || 'image/jpeg' });
                 
                 URL.revokeObjectURL(state.files[currentCropIndex].url);
                 state.files[currentCropIndex].file = newFile;
+                state.files[currentCropIndex].mime = newFile.type;
                 state.files[currentCropIndex].url = URL.createObjectURL(newFile);
                 
                 renderFiles(); closeCropModal(); btn.innerHTML = 'Save & Update';
             }, state.files[currentCropIndex].file.type || 'image/jpeg', 0.9);
         });
 
-        // Tools Modal Logic
-        let toolRawFile = null;
-        let toolImageObj = new Image();
-
-        function openToolModal() {
-            $('#toolsModal').classList.remove('hidden');
-            setTimeout(() => { $('#toolsModal').classList.remove('opacity-0'); $('#toolsModalContent').classList.remove('scale-95'); }, 10);
-        }
-        function closeToolModal() {
-            $('#toolsModal').classList.add('opacity-0'); $('#toolsModalContent').classList.add('scale-95');
-            setTimeout(() => $('#toolsModal').classList.add('hidden'), 300);
-        }
+        // Tools Modal
+        let toolRawFile = null, toolImageObj = new Image();
+        function openToolModal() { $('#toolsModal').classList.remove('hidden'); setTimeout(() => { $('#toolsModal').classList.remove('opacity-0'); $('#toolsModalContent').classList.remove('scale-95'); }, 10); }
+        function closeToolModal() { $('#toolsModal').classList.add('opacity-0'); $('#toolsModalContent').classList.add('scale-95'); setTimeout(() => $('#toolsModal').classList.add('hidden'), 300); }
         
         $('#toolFile').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if(!file) return;
-            toolRawFile = file;
-            $('#origSize').textContent = size(file.size);
-            const url = URL.createObjectURL(file);
-            $('#toolPreview').src = url;
-            toolImageObj.src = url;
+            const file = e.target.files[0]; if(!file) return;
+            toolRawFile = file; $('#origSize').textContent = size(file.size);
+            const url = URL.createObjectURL(file); $('#toolPreview').src = url;
             toolImageObj.onload = () => { $('#toolPreviewContainer').classList.remove('hidden'); updateEstimatedSize(); };
+            toolImageObj.src = url;
         });
 
         function updateEstimatedSize() {
             if(!toolRawFile || !toolImageObj.src) return;
-            const format = $('#toolFormat').value;
-            const quality = parseFloat($('#toolQuality').value);
+            const format = $('#toolFormat').value, quality = parseFloat($('#toolQuality').value);
             
             if(format === 'image/png' || format === 'application/pdf') {
                 $('#qualitySliderContainer').classList.add('opacity-40', 'pointer-events-none');
-                $('#estSize').textContent = format === 'application/pdf' ? "PDF Format" : "Lossless";
-                $('#estSize').className = "text-[13px] text-indigo-700";
+                $('#estSize').textContent = format === 'application/pdf' ? "PDF Format" : "Lossless"; $('#estSize').className = "text-[13px] text-indigo-700";
                 return;
-            } else {
-                $('#qualitySliderContainer').classList.remove('opacity-40', 'pointer-events-none');
-            }
+            } else { $('#qualitySliderContainer').classList.remove('opacity-40', 'pointer-events-none'); }
 
-            const canvas = document.createElement('canvas');
-            canvas.width = toolImageObj.width; canvas.height = toolImageObj.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(toolImageObj, 0, 0);
+            const canvas = document.createElement('canvas'); canvas.width = toolImageObj.width; canvas.height = toolImageObj.height;
+            canvas.getContext('2d').drawImage(toolImageObj, 0, 0);
             
             canvas.toBlob((blob) => {
                 if(blob) {
@@ -570,26 +558,20 @@
 
         function processAndDownload() {
             if(!toolRawFile) return;
-            const format = $('#toolFormat').value;
-            const quality = parseFloat($('#toolQuality').value);
-            
+            const format = $('#toolFormat').value, quality = parseFloat($('#toolQuality').value);
             let baseName = "Document";
-            if(toolRawFile && toolRawFile.name && toolRawFile.name.includes('.')) { baseName = toolRawFile.name.substring(0, toolRawFile.name.lastIndexOf('.')); } 
-            else if (toolRawFile && toolRawFile.name) { baseName = toolRawFile.name; }
+            if(toolRawFile && toolRawFile.name && toolRawFile.name.includes('.')) baseName = toolRawFile.name.substring(0, toolRawFile.name.lastIndexOf('.'));
+            else if (toolRawFile && toolRawFile.name) baseName = toolRawFile.name;
             
-            const canvas = document.createElement('canvas');
-            canvas.width = toolImageObj.width; canvas.height = toolImageObj.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(toolImageObj, 0, 0);
+            const canvas = document.createElement('canvas'); canvas.width = toolImageObj.width; canvas.height = toolImageObj.height;
+            canvas.getContext('2d').drawImage(toolImageObj, 0, 0);
             
             if(format === 'application/pdf') {
                 try {
                     const imgData = canvas.toDataURL('image/jpeg', 0.95);
                     const { jsPDF } = window.jspdf;
-                    const orientation = toolImageObj.width > toolImageObj.height ? 'l' : 'p';
-                    const pdf = new jsPDF({ orientation: orientation, unit: 'px', format: [toolImageObj.width, toolImageObj.height] });
-                    pdf.addImage(imgData, 'JPEG', 0, 0, toolImageObj.width, toolImageObj.height);
-                    pdf.save(baseName + '_Converted.pdf');
+                    const pdf = new jsPDF({ orientation: toolImageObj.width > toolImageObj.height ? 'l' : 'p', unit: 'px', format: [toolImageObj.width, toolImageObj.height] });
+                    pdf.addImage(imgData, 'JPEG', 0, 0, toolImageObj.width, toolImageObj.height); pdf.save(baseName + '_Converted.pdf');
                     toast('Image converted to PDF successfully!', 'success');
                 } catch (e) { toast('Error creating PDF.', 'error'); }
                 return;
@@ -598,11 +580,8 @@
             canvas.toBlob((blob) => {
                 if(!blob) return;
                 const ext = format.split('/')[1] === 'jpeg' ? 'jpg' : format.split('/')[1];
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = baseName + '_Govt_Ready.' + ext;
-                a.click();
-                toast('File compressed & downloaded!', 'success');
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = baseName + '_Govt_Ready.' + ext;
+                a.click(); toast('File compressed & downloaded!', 'success');
             }, format, quality);
         }
 
@@ -616,76 +595,111 @@
         ['dragleave','drop'].forEach(ev=>$('#dropArea').addEventListener(ev,e=>{ e.preventDefault(); $('#dropArea').classList.remove('border-blue-500', 'bg-blue-50/50'); }));
         $('#dropArea').addEventListener('drop',e => addFiles([...e.dataTransfer.files]));
 
-        // ✨ FREE CLOUD UPLOAD API (SAVES FIREBASE COST) ✨
+        // ✨ HYBRID SUBMIT: Try WebRTC (Local) First -> If Failed/Not Possible -> Use E2EE Cloud Backup ✨
         $('#submit').addEventListener('click', async () => {
             if(!state.files.length) return toast('Please add at least one document.', 'error');
             if(!$('#consent').checked) return toast('Please check the consent box.', 'error');
             if(!shopId) return toast('Invalid QR Code. Please scan the QR Code again!', 'error');
 
-            const btn = $('#submit'); 
-            btn.disabled = true; 
-            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Uploading Securely...`;
+            const btn = $('#submit');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Connecting to Store...`;
+
+            // 1. DUAL ENGINE ATTEMPT (WebRTC Direct PC Transfer logic)
+            const peer = new Peer();
             
-            try {
-                // 1. Firebase mein entry banao
-                const jobRef = await db.collection('printJobs').add({
-                    shopId: shopId, 
-                    status: 'pending-review', 
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    customerNote: printColor + ' | ' + printSide, 
-                    copies: state.copies, 
-                    paper: $('#paper').value, 
-                    pages: 'All', 
-                    files: [], 
-                    source: 'customer-web'
+            let webrtcSuccess = false;
+
+            const sendViaE2EECloud = async () => {
+                if(webrtcSuccess) return; // Agar local network se chala gaya toh cloud pe kyu bhejenge!
+                
+                btn.innerHTML = `<i class="fas fa-lock"></i> Encrypting & Sending...`;
+                
+                try {
+                    await authReady;
+                    if(!auth.currentUser) throw new Error('Connection problem. Reload and try again.');
+                    const keyDoc = await db.collection('printKeys').doc(shopId).get();
+                    if(!keyDoc.exists) throw new Error('This shop has not activated Smart Print yet.');
+                    const pubKey = await crypto.subtle.importKey('jwk', keyDoc.data().publicKey, {name:'RSA-OAEP', hash:'SHA-256'}, false, ['encrypt']);
+
+                    const uploaded = [];
+                    for(const entry of state.files){
+                        const enc = await encryptFile(entry, pubKey);
+                        const fd = new FormData();
+                        fd.append('file', enc.blob, 'enc.bin');   
+                        const res = await fetch('https://tmpfiles.org/api/v1/upload', { method:'POST', body: fd });
+                        const data = await res.json();
+                        if(data.status !== 'success' || !/^https?:\/\/tmpfiles\.org\/\d+\//.test(data.data.url)) throw new Error('Upload failed. Try again.');
+                        const url = data.data.url.replace(/^http:/,'https:').replace('tmpfiles.org/', 'tmpfiles.org/dl/');
+                        uploaded.push({ url, size: entry.file.size, key: enc.key, meta: enc.meta });
+                    }
+
+                    const jobRef = await db.collection('printJobs').add({
+                        shopId, status: 'pending-review',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        customerNote: printColor + ' | ' + printSide,
+                        copies: state.copies, paper: $('#paper').value, pages: 'All',
+                        files: uploaded, source: 'customer-web', customerUid: auth.currentUser.uid
+                    });
+
+                    successUI(jobRef.id.slice(0,6).toUpperCase());
+                } catch (err) {
+                    console.error(err);
+                    toast(err && err.message && !/^(Failed|Network|TypeError)/i.test(err.message) ? err.message : 'Network error. Please try again.', 'error');
+                    resetBtn(btn);
+                }
+            };
+
+            const successUI = (refId) => {
+                state.files.forEach(x=>URL.revokeObjectURL(x.url)); state.files = []; renderFiles();
+                $('#statusCard').classList.remove('hidden');
+                $('#statusRef').textContent = `#${refId}`;
+                document.querySelectorAll('main > section:not(#statusCard)').forEach(el => el.classList.add('hidden'));
+                $('#bottom-bar').classList.add('translate-y-full');
+                toast('Documents sent securely.', 'success');
+            };
+
+            const resetBtn = (btn) => {
+                btn.disabled = false;
+                btn.innerHTML = `Send to Print <i class="fas fa-paper-plane text-sm ml-1"></i>`;
+            };
+
+            // Attempt WebRTC first
+            peer.on('open', (id) => {
+                const targetShopId = 'bikripage-print-' + shopId;
+                const conn = peer.connect(targetShopId, { reliable: true });
+
+                conn.on('open', async () => {
+                    btn.innerHTML = `<i class="fas fa-wifi animate-pulse"></i> Transferring Fast...`;
+                    
+                    const printJobData = {
+                        type: 'new_print_job',
+                        settings: { colorMode: printColor, printSide: printSide, copies: state.copies, paperSize: $('#paper').value },
+                        timestamp: Date.now(), files: []
+                    };
+
+                    for(let i=0; i<state.files.length; i++) {
+                        const fileObj = state.files[i].file;
+                        const arrayBuffer = await fileObj.arrayBuffer();
+                        printJobData.files.push({ name: fileObj.name, fileType: fileObj.type, data: arrayBuffer });
+                    }
+
+                    conn.send(printJobData);
+                    webrtcSuccess = true;
+                    successUI(String(Date.now()).slice(-6));
+                    setTimeout(() => peer.destroy(), 2000);
                 });
 
-                const uploaded = [];
-                // 2. File ko Free TmpFiles API par bhejo (Firebase Storage bypass)
-                for(let i=0; i<state.files.length; i++) {
-                    const {file, pages} = state.files[i];
-                    
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    
-                    const response = await fetch('https://tmpfiles.org/api/v1/upload', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    const data = await response.json();
-                    if(data.status !== "success") throw new Error("API Upload Failed");
-                    
-                    // Owner ke dashboard ke liye direct download link
-                    const directDownloadUrl = data.data.url.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
+                // Fallback to Cloud if connection errors out
+                conn.on('error', () => { if(!webrtcSuccess) sendViaE2EECloud(); });
+            });
 
-                    uploaded.push({ 
-                        name: file.name, 
-                        url: directDownloadUrl, 
-                        size: file.size, 
-                        contentType: file.type, 
-                        pages: pages || 1 
-                    });
-                }
+            // Fallback to Cloud if Peer JS fails completely or Shop is offline
+            peer.on('error', () => { if(!webrtcSuccess) sendViaE2EECloud(); });
 
-                // 3. URLs ko Firebase entry me update karo (Isse Owner Dashboard turant catch karega)
-                await db.collection('printJobs').doc(jobRef.id).update({ files: uploaded });
-                
-                state.files.forEach(x=>URL.revokeObjectURL(x.url)); state.files = []; renderFiles();
-                
-                $('#statusCard').classList.remove('hidden'); 
-                $('#statusRef').textContent = `#${jobRef.id.slice(0,6).toUpperCase()}`;
-                document.querySelectorAll('main > section:not(#statusCard)').forEach(el => el.classList.add('hidden'));
-                $('#bottom-bar').classList.add('translate-y-full'); 
-                toast('Documents sent securely.', 'success');
+            // Safety timeout: If WebRTC doesn't connect in 3.5 seconds, force Cloud Backup
+            setTimeout(() => { if(!webrtcSuccess) { peer.destroy(); sendViaE2EECloud(); } }, 3500);
 
-            } catch (err) { 
-                console.error(err); 
-                toast('Network error. Please try again.', 'error'); 
-            } finally { 
-                btn.disabled = false; 
-                btn.innerHTML = `Send to Print <i class="fas fa-paper-plane text-sm ml-1"></i>`; 
-            }
         });
     </script>
 </body>

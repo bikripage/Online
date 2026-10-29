@@ -25,10 +25,9 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
 
-    <!-- Firebase SDKs (v8) -->
+    <!-- Firebase SDKs (v8) - Auth Removed -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
     <!-- ✨ WebRTC PeerJS Library (Sender) ✨ -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
@@ -43,8 +42,6 @@
         };
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.firestore();
-        const auth = firebase.auth();
-        const authReady = auth.signInAnonymously().catch(e => console.error("anon auth", e));
     </script>
 
     <style>
@@ -208,7 +205,7 @@
         </div>
     </div>
 
-    <!-- PREVIEW MODAL (Image Crop + PDF Pages) -->
+    <!-- PREVIEW MODAL -->
     <div id="cropModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-bg p-4 opacity-0 transition-opacity">
         <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden flex flex-col shadow-2xl scale-95 transition-transform" id="cropModalContent">
             <div class="p-4 flex items-center justify-between border-b border-gray-200 bg-white shadow-sm z-10">
@@ -248,7 +245,6 @@
                 </button>
                 
                 <div id="toolPreviewContainer" class="hidden space-y-5 animate-fade-in">
-                    
                     <div class="relative w-full h-32 bg-gray-50 rounded-xl border border-gray-200 overflow-hidden flex items-center justify-center p-2">
                         <img id="toolPreview" class="max-w-full max-h-full object-contain rounded-lg shadow-sm">
                     </div>
@@ -296,7 +292,7 @@
         <i class="fas fa-info-circle text-blue-400"></i> <span id="toast-msg">Message</span>
     </div>
 
-    <!-- CORE SCRIPT (HYBRID: WebRTC + Firebase E2EE Backup) -->
+    <!-- CORE SCRIPT (HYBRID: WebRTC + Robust Firebase E2EE Backup without Auth) -->
     <script>
         const params = new URLSearchParams(location.search);
         const _rawShop = params.get('shopId') || '';
@@ -325,6 +321,7 @@
             return null;
         }
 
+        // End-to-end encryption function
         async function encryptFile(entry, pubKey){
             const aes = await crypto.subtle.generateKey({name:'AES-GCM',length:256}, true, ['encrypt']);
             const iv = crypto.getRandomValues(new Uint8Array(12));
@@ -595,7 +592,7 @@
         ['dragleave','drop'].forEach(ev=>$('#dropArea').addEventListener(ev,e=>{ e.preventDefault(); $('#dropArea').classList.remove('border-blue-500', 'bg-blue-50/50'); }));
         $('#dropArea').addEventListener('drop',e => addFiles([...e.dataTransfer.files]));
 
-        // ✨ HYBRID SUBMIT: Try WebRTC (Local) First -> If Failed/Not Possible -> Use E2EE Cloud Backup ✨
+        // ✨ HYBRID SUBMIT (100% Auth-Free): WebRTC (Local) First -> If Failed -> E2EE Cloud Backup ✨
         $('#submit').addEventListener('click', async () => {
             if(!state.files.length) return toast('Please add at least one document.', 'error');
             if(!$('#consent').checked) return toast('Please check the consent box.', 'error');
@@ -605,50 +602,8 @@
             btn.disabled = true;
             btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Connecting to Store...`;
 
-            // 1. DUAL ENGINE ATTEMPT (WebRTC Direct PC Transfer logic)
-            const peer = new Peer();
-            
             let webrtcSuccess = false;
-
-            const sendViaE2EECloud = async () => {
-                if(webrtcSuccess) return; // Agar local network se chala gaya toh cloud pe kyu bhejenge!
-                
-                btn.innerHTML = `<i class="fas fa-lock"></i> Encrypting & Sending...`;
-                
-                try {
-                    await authReady;
-                    if(!auth.currentUser) throw new Error('Connection problem. Reload and try again.');
-                    const keyDoc = await db.collection('printKeys').doc(shopId).get();
-                    if(!keyDoc.exists) throw new Error('This shop has not activated Smart Print yet.');
-                    const pubKey = await crypto.subtle.importKey('jwk', keyDoc.data().publicKey, {name:'RSA-OAEP', hash:'SHA-256'}, false, ['encrypt']);
-
-                    const uploaded = [];
-                    for(const entry of state.files){
-                        const enc = await encryptFile(entry, pubKey);
-                        const fd = new FormData();
-                        fd.append('file', enc.blob, 'enc.bin');   
-                        const res = await fetch('https://tmpfiles.org/api/v1/upload', { method:'POST', body: fd });
-                        const data = await res.json();
-                        if(data.status !== 'success' || !/^https?:\/\/tmpfiles\.org\/\d+\//.test(data.data.url)) throw new Error('Upload failed. Try again.');
-                        const url = data.data.url.replace(/^http:/,'https:').replace('tmpfiles.org/', 'tmpfiles.org/dl/');
-                        uploaded.push({ url, size: entry.file.size, key: enc.key, meta: enc.meta });
-                    }
-
-                    const jobRef = await db.collection('printJobs').add({
-                        shopId, status: 'pending-review',
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        customerNote: printColor + ' | ' + printSide,
-                        copies: state.copies, paper: $('#paper').value, pages: 'All',
-                        files: uploaded, source: 'customer-web', customerUid: auth.currentUser.uid
-                    });
-
-                    successUI(jobRef.id.slice(0,6).toUpperCase());
-                } catch (err) {
-                    console.error(err);
-                    toast(err && err.message && !/^(Failed|Network|TypeError)/i.test(err.message) ? err.message : 'Network error. Please try again.', 'error');
-                    resetBtn(btn);
-                }
-            };
+            const peer = new Peer();
 
             const successUI = (refId) => {
                 state.files.forEach(x=>URL.revokeObjectURL(x.url)); state.files = []; renderFiles();
@@ -664,7 +619,58 @@
                 btn.innerHTML = `Send to Print <i class="fas fa-paper-plane text-sm ml-1"></i>`;
             };
 
-            // Attempt WebRTC first
+            const sendViaE2EECloud = async () => {
+                if(webrtcSuccess) return; 
+                
+                btn.innerHTML = `<i class="fas fa-lock"></i> Encrypting & Sending...`;
+                
+                try {
+                    // Fetch Public Key (No auth needed due to new rules)
+                    const keyDoc = await db.collection('printKeys').doc(shopId).get();
+                    if(!keyDoc.exists) throw new Error('Store is offline or invalid QR code.');
+                    const pubKey = await crypto.subtle.importKey('jwk', keyDoc.data().publicKey, {name:'RSA-OAEP', hash:'SHA-256'}, false, ['encrypt']);
+
+                    const uploaded = [];
+                    for(const entry of state.files){
+                        const enc = await encryptFile(entry, pubKey);
+                        const fd = new FormData();
+                        fd.append('file', enc.blob, 'enc.bin');   
+                        
+                        const res = await fetch('https://tmpfiles.org/api/v1/upload', { method:'POST', body: fd });
+                        if (!res.ok) throw new Error("Cloud server busy. Try again.");
+                        
+                        const data = await res.json();
+                        
+                        // ✨ FIX: Simplified API Check (Removed strict Regex that was causing "Upload failed") ✨
+                        if(data.status !== 'success' || !data.data || !data.data.url) {
+                            throw new Error('Upload failed from server.');
+                        }
+                        
+                        const url = data.data.url.replace(/^http:/,'https:').replace('tmpfiles.org/', 'tmpfiles.org/dl/');
+                        uploaded.push({ url, size: entry.file.size, key: enc.key, meta: enc.meta, contentType: entry.mime });
+                    }
+
+                    const jobRef = await db.collection('printJobs').add({
+                        shopId, 
+                        status: 'pending-review',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        customerNote: printColor + ' | ' + printSide,
+                        copies: state.copies, 
+                        paper: $('#paper').value, 
+                        pages: 'All',
+                        files: uploaded, 
+                        source: 'customer-web'
+                    });
+
+                    successUI(jobRef.id.slice(0,6).toUpperCase());
+                } catch (err) {
+                    console.error(err);
+                    toast(err.message || 'Network error. Please try again.', 'error');
+                    resetBtn(btn);
+                }
+            };
+
+            // Attempt WebRTC Direct First
             peer.on('open', (id) => {
                 const targetShopId = 'bikripage-print-' + shopId;
                 const conn = peer.connect(targetShopId, { reliable: true });
@@ -690,15 +696,13 @@
                     setTimeout(() => peer.destroy(), 2000);
                 });
 
-                // Fallback to Cloud if connection errors out
                 conn.on('error', () => { if(!webrtcSuccess) sendViaE2EECloud(); });
             });
 
-            // Fallback to Cloud if Peer JS fails completely or Shop is offline
             peer.on('error', () => { if(!webrtcSuccess) sendViaE2EECloud(); });
 
-            // Safety timeout: If WebRTC doesn't connect in 3.5 seconds, force Cloud Backup
-            setTimeout(() => { if(!webrtcSuccess) { peer.destroy(); sendViaE2EECloud(); } }, 3500);
+            // Fail-safe timeout (3 seconds for WebRTC, then Cloud)
+            setTimeout(() => { if(!webrtcSuccess) { peer.destroy(); sendViaE2EECloud(); } }, 3000);
 
         });
     </script>

@@ -27,7 +27,9 @@
     <!-- Firebase SDKs (v8) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    
+    <!-- ✨ NEW: WebRTC PeerJS Library for Direct PC Transfer ✨ -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
     <script>
         const firebaseConfig = {
@@ -40,7 +42,7 @@
         };
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.firestore();
-        const storage = firebase.storage();
+        // Storage SDK hata diya gaya hai kyunki ab file seedha PC pe jayegi
     </script>
 
     <style>
@@ -302,8 +304,11 @@
 
     <script>
         const params = new URLSearchParams(location.search);
-        const shopId = params.get('shopId');
+        
+        // ✨ FALLBACK ID FIX FOR LOCALHOST TESTING ✨
+        const shopId = params.get('shopId') || 'cyber_cafe_001'; 
         const shopName = params.get('shopName') || 'Cyber Cafe';
+        
         document.querySelector('#shopLabel').textContent = decodeURIComponent(shopName);
         
         const $ = s => document.querySelector(s);
@@ -343,7 +348,6 @@
             window._toastTimer = setTimeout(() => t.classList.add('opacity-0', 'translate-y-[-20px]'), 3000);
         }
         
-        // ✨ SAFE UPLOAD & PAGE COUNT ✨
         async function addFiles(files){
             let skipped = 0;
             const btn = $('#pick');
@@ -403,7 +407,6 @@
             renderFiles();
         }
 
-        // ✨ PRO: FIXED NATIVE PDF RENDERING (Memory safe) ✨
         let cropper = null;
         let currentCropIndex = -1;
 
@@ -421,7 +424,6 @@
             modal.classList.remove('hidden');
             
             if (isImage) {
-                // Show Image Cropper
                 title.textContent = "Preview & Crop Image";
                 pdfArea.classList.add('hidden'); actionsPdf.classList.add('hidden');
                 imgEl.classList.remove('hidden'); actionsImage.classList.remove('hidden');
@@ -435,7 +437,6 @@
                     cropper = new Cropper(imgEl, { viewMode: 1, dragMode: 'move', autoCropArea: 1, background: false });
                 }, 10);
             } else {
-                // Show PDF Preview (Memory safe - 3 pages max preview with low scale)
                 const pages = state.files[index].pages || '?';
                 title.textContent = `Preview (${pages} Pages)`;
                 imgEl.classList.add('hidden'); actionsImage.classList.add('hidden');
@@ -451,12 +452,9 @@
                     const pdf = await loadingTask.promise;
                     pdfArea.innerHTML = ''; 
                     
-                    // PRO FIX: Render only 3 pages max to prevent mobile RAM crash
                     const pagesToRender = Math.min(pdf.numPages, 3); 
-                    
                     for(let pageNum = 1; pageNum <= pagesToRender; pageNum++) {
                         const page = await pdf.getPage(pageNum);
-                        // PRO FIX: Lower scale to 0.6 to save memory and avoid blank screen
                         const viewport = page.getViewport({ scale: 0.6 }); 
                         
                         const canvas = document.createElement('canvas');
@@ -477,31 +475,20 @@
                         pdfArea.innerHTML += `<p class="text-xs font-bold text-gray-500 my-4 text-center">... and ${pdf.numPages - 3} more pages (Tap Open Full PDF)</p>`;
                     }
                 } catch(e) {
-                    console.error("PDF Render Error", e);
                     pdfArea.innerHTML = `<div class="mt-20 text-red-500 text-center"><i class="fas fa-exclamation-triangle text-3xl mb-3"></i><p class="font-bold text-sm">Cannot preview this PDF.</p></div>`;
                 }
             }
         }
 
-            // ✨ PRO FIX: Open in new tab instead of force download ✨
         function downloadCurrentPDF() {
             if(currentCropIndex > -1 && state.files[currentCropIndex]) {
                 const fileObj = state.files[currentCropIndex];
-                
-                // Explicitly 'application/pdf' type set karke URL banayenge
                 const blob = new Blob([fileObj.file], { type: 'application/pdf' });
                 const pdfUrl = URL.createObjectURL(blob);
-                
-                // Naye tab me open karne ki command (Bina download attribute ke)
                 const newWindow = window.open(pdfUrl, '_blank');
-                
-                // Agar popup block ho ya open na ho, toh fallback
-                if (!newWindow) {
-                    toast('Popup blocked! Browser setting check karein.', 'error');
-                }
+                if (!newWindow) { toast('Popup blocked! Browser setting check karein.', 'error'); }
             }
         }
-
 
         function closeCropModal() {
             const modal = document.getElementById('cropModal');
@@ -510,7 +497,7 @@
             setTimeout(() => { 
                 modal.classList.add('hidden'); 
                 if(cropper) cropper.destroy(); 
-                document.getElementById('pdfRenderArea').innerHTML = ""; // Free mobile RAM
+                document.getElementById('pdfRenderArea').innerHTML = ""; 
             }, 300);
         }
 
@@ -534,7 +521,7 @@
             }, state.files[currentCropIndex].file.type || 'image/jpeg', 0.9);
         });
 
-        // ✨ COMPRESS & CONVERT ✨
+        // Tools Modal Logic
         let toolRawFile = null;
         let toolImageObj = new Image();
 
@@ -552,15 +539,10 @@
             if(!file) return;
             toolRawFile = file;
             $('#origSize').textContent = size(file.size);
-            
             const url = URL.createObjectURL(file);
             $('#toolPreview').src = url;
             toolImageObj.src = url;
-            
-            toolImageObj.onload = () => {
-                $('#toolPreviewContainer').classList.remove('hidden');
-                updateEstimatedSize();
-            };
+            toolImageObj.onload = () => { $('#toolPreviewContainer').classList.remove('hidden'); updateEstimatedSize(); };
         });
 
         function updateEstimatedSize() {
@@ -592,10 +574,7 @@
             }, format, quality);
         }
 
-        $('#toolQuality').addEventListener('input', (e) => {
-            $('#qualityPercent').textContent = Math.round(e.target.value * 100) + '%';
-            updateEstimatedSize();
-        });
+        $('#toolQuality').addEventListener('input', (e) => { $('#qualityPercent').textContent = Math.round(e.target.value * 100) + '%'; updateEstimatedSize(); });
         $('#toolFormat').addEventListener('change', updateEstimatedSize);
 
         function processAndDownload() {
@@ -604,11 +583,8 @@
             const quality = parseFloat($('#toolQuality').value);
             
             let baseName = "Document";
-            if(toolRawFile && toolRawFile.name && toolRawFile.name.includes('.')) {
-                baseName = toolRawFile.name.substring(0, toolRawFile.name.lastIndexOf('.'));
-            } else if (toolRawFile && toolRawFile.name) {
-                baseName = toolRawFile.name;
-            }
+            if(toolRawFile && toolRawFile.name && toolRawFile.name.includes('.')) { baseName = toolRawFile.name.substring(0, toolRawFile.name.lastIndexOf('.')); } 
+            else if (toolRawFile && toolRawFile.name) { baseName = toolRawFile.name; }
             
             const canvas = document.createElement('canvas');
             canvas.width = toolImageObj.width; canvas.height = toolImageObj.height;
@@ -621,14 +597,10 @@
                     const { jsPDF } = window.jspdf;
                     const orientation = toolImageObj.width > toolImageObj.height ? 'l' : 'p';
                     const pdf = new jsPDF({ orientation: orientation, unit: 'px', format: [toolImageObj.width, toolImageObj.height] });
-                    
                     pdf.addImage(imgData, 'JPEG', 0, 0, toolImageObj.width, toolImageObj.height);
                     pdf.save(baseName + '_Converted.pdf');
                     toast('Image converted to PDF successfully!', 'success');
-                } catch (e) {
-                    console.error("PDF Error: ", e);
-                    toast('Error creating PDF.', 'error');
-                }
+                } catch (e) { toast('Error creating PDF.', 'error'); }
                 return;
             }
             
@@ -642,8 +614,7 @@
                 toast('File compressed & downloaded!', 'success');
             }, format, quality);
         }
-        
-        // General Upload Listeners
+
         $('#dropArea').addEventListener('click', () => $('#files').click());
         $('#pick').addEventListener('click', (e) => { e.stopPropagation(); $('#files').click(); });
         $('#camera').addEventListener('click', (e) => { e.stopPropagation(); $('#cameraFile').click(); });
@@ -654,44 +625,88 @@
         ['dragleave','drop'].forEach(ev=>$('#dropArea').addEventListener(ev,e=>{ e.preventDefault(); $('#dropArea').classList.remove('border-blue-500', 'bg-blue-50/50'); }));
         $('#dropArea').addEventListener('drop',e => addFiles([...e.dataTransfer.files]));
 
-        // Firebase Submit
+        // ✨ WEBRTC DIRECT PC TRANSFER LOGIC ✨
         $('#submit').addEventListener('click', async () => {
             if(!state.files.length) return toast('Please add at least one document.', 'error');
             if(!$('#consent').checked) return toast('Please check the consent box.', 'error');
             if(!shopId) return toast('Invalid QR Code. Shop ID is missing.', 'error');
 
-            const btn = $('#submit'); btn.disabled = true; btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Uploading...`;
+            const btn = $('#submit'); 
+            btn.disabled = true; 
+            btn.innerHTML = `<i class="fas fa-wifi animate-pulse"></i> Connecting to PC...`;
             
             try {
-                const jobRef = await db.collection('printJobs').add({
-                    shopId: shopId, status: 'pending-review', createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    customerNote: printColor + ' | ' + printSide, copies: state.copies, paper: $('#paper').value, pages: 'All', files: [], source: 'customer-web'
+                // 1. PeerJS Initialise karo
+                const peer = new Peer();
+
+                peer.on('open', (id) => {
+                    // 2. Owner ke PC wale target ID se connect karo
+                    const targetShopId = 'bikripage-print-' + shopId;
+                    const conn = peer.connect(targetShopId, { reliable: true });
+
+                    conn.on('open', async () => {
+                        btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Transferring Files...`;
+                        
+                        // 3. Data pack karo
+                        const printJobData = {
+                            type: 'new_print_job',
+                            settings: {
+                                colorMode: printColor,
+                                printSide: printSide,
+                                copies: state.copies,
+                                paperSize: $('#paper').value
+                            },
+                            timestamp: Date.now(),
+                            files: []
+                        };
+
+                        // Files ko ArrayBuffer mein daalo transfer ke liye
+                        for(let i=0; i<state.files.length; i++) {
+                            const fileObj = state.files[i].file;
+                            const arrayBuffer = await fileObj.arrayBuffer();
+                            printJobData.files.push({
+                                name: fileObj.name,
+                                fileType: fileObj.type,
+                                data: arrayBuffer 
+                            });
+                        }
+
+                        // 4. Data PC pe bhejo
+                        conn.send(printJobData);
+
+                        // 5. Success Status dikhao
+                        $('#statusCard').classList.remove('hidden'); 
+                        $('#statusRef').textContent = `#${String(Date.now()).slice(-6)}`;
+                        document.querySelectorAll('main > section:not(#statusCard)').forEach(el => el.classList.add('hidden'));
+                        $('#bottom-bar').classList.add('translate-y-full'); 
+                        toast('Files sent directly to Shop PC!', 'success');
+
+                        // Clean up
+                        setTimeout(() => peer.destroy(), 2000);
+                    });
+
+                    conn.on('error', (err) => {
+                        toast('Shop PC is offline! Ask them to open Dashboard.', 'error');
+                        btn.disabled = false; btn.innerHTML = `Send to Print <i class="fas fa-paper-plane text-sm ml-1"></i>`;
+                    });
                 });
 
-                const uploaded = [];
-                for(let i=0; i<state.files.length; i++) {
-                    const {file, pages} = state.files[i];
-                    let safeName = "file_" + Date.now();
-                    if(file && file.name) { safeName = file.name.replace(/[^a-zA-Z0-9._-]/g,'_').slice(-100); }
-                    
-                    const path = `printJobs/${shopId}/${jobRef.id}/${Date.now()}_${i}_${safeName}`;
-                    const fileRef = storage.ref().child(path);
-                    
-                    await fileRef.put(file, { contentType: file.type, customMetadata: { jobId: jobRef.id, shopId: shopId, pages: String(pages || '1') } });
-                    const downloadUrl = await fileRef.getDownloadURL();
-                    uploaded.push({ name: file.name, path: path, url: downloadUrl, size: file.size, contentType: file.type, pages: pages || 1 });
-                }
+                peer.on('error', (err) => {
+                    console.log("Peer error: ", err);
+                    if(err.type === 'peer-unavailable') {
+                        toast('Shop PC is offline! Ask them to open Dashboard.', 'error');
+                    } else {
+                        toast('Connection failed. Please try again.', 'error');
+                    }
+                    btn.disabled = false; btn.innerHTML = `Send to Print <i class="fas fa-paper-plane text-sm ml-1"></i>`;
+                });
 
-                await db.collection('printJobs').doc(jobRef.id).update({ files: uploaded });
-                state.files.forEach(x=>URL.revokeObjectURL(x.url)); state.files = []; renderFiles();
-                
-                $('#statusCard').classList.remove('hidden'); $('#statusRef').textContent = `#${jobRef.id.slice(0,6).toUpperCase()}`;
-                document.querySelectorAll('main > section:not(#statusCard)').forEach(el => el.classList.add('hidden'));
-                $('#bottom-bar').classList.add('translate-y-full'); 
-                toast('Documents sent securely.', 'success');
-
-            } catch (err) { console.error(err); toast('Network error. Please try again.', 'error'); }
-            finally { btn.disabled = false; btn.innerHTML = `Send to Print <i class="fas fa-paper-plane text-sm ml-1"></i>`; }
+            } catch (err) { 
+                console.error(err); 
+                toast('Network error. Please try again.', 'error'); 
+                btn.disabled = false; 
+                btn.innerHTML = `Send to Print <i class="fas fa-paper-plane text-sm ml-1"></i>`;
+            }
         });
     </script>
 </body>

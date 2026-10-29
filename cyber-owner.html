@@ -36,23 +36,30 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { background-color: #F2F2F7; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        /* Scrollbar styling */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E5EA; border-radius: 10px; }
+        
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        
         .ios-shadow { box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08); }
         .modal-bg { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); }
+        
         .toggle-checkbox:checked { right: 0; border-color: #34C759; }
         .toggle-checkbox:checked + .toggle-label { background-color: #34C759; }
         .toggle-checkbox:checked + .toggle-label:after { transform: translateX(100%); border-color: white; }
     </style>
 </head>
-<body class="text-gray-900 h-screen flex flex-col overflow-hidden relative" onclick="unlockAudio()">
 
-    <!-- ✨ UPDATED: Premium Announcement Sound ✨ -->
+<!-- ✨ FIX 1: Body pe click lagaya hai taaki browser ko interaction mil jaye aur sound baj sake ✨ -->
+<body class="text-gray-900 min-h-screen flex flex-col relative" onclick="unlockAudio()">
+
+    <!-- Premium Announcement Sound -->
     <audio id="notifySound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
     <!-- SECURE LOGIN SCREEN -->
@@ -82,8 +89,9 @@
         </div>
     </div>
 
-    <!-- DASHBOARD HEADER -->
-    <div id="mainDashboard" class="hidden flex-col h-full w-full">
+    <!-- ✨ FIX 2: Layout Fix - `h-screen` and `overflow-hidden` hatake proper flex layout lagaya hai ✨ -->
+    <div id="mainDashboard" class="hidden flex-col flex-1 w-full min-h-screen pb-20">
+        
         <header class="bg-white/80 backdrop-blur-xl sticky top-0 z-40 px-4 md:px-5 py-3.5 flex items-center justify-between border-b border-gray-200/60 shadow-sm">
             <div class="flex items-center gap-3">
                 <a href="index.html" class="w-9 h-9 md:w-10 md:h-10 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center text-gray-700 transition-colors shadow-sm border border-gray-200 shrink-0"><i class="fas fa-arrow-left"></i></a>
@@ -104,7 +112,8 @@
         </header>
 
         <!-- DASHBOARD CONTENT -->
-        <main class="flex-1 p-5 overflow-y-auto custom-scrollbar w-full max-w-7xl mx-auto">
+        <!-- ✨ FIX 3: Container margin aur padding sahi kari hai ✨ -->
+        <main class="flex-1 p-5 w-full max-w-7xl mx-auto">
             <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center gap-2 text-gray-800">
                     <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center"><i class="fas fa-clock text-sm"></i></div>
@@ -211,6 +220,7 @@
         </div>
     </div>
 
+    <!-- TOAST -->
     <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-5 py-3 rounded-full text-sm font-medium shadow-xl transition-all duration-300 opacity-0 pointer-events-none z-[100] flex items-center gap-2 min-w-max">
         <i class="fas fa-info-circle text-blue-400"></i> <span id="toast-msg">Message</span>
     </div>
@@ -219,10 +229,9 @@
     <script>
         const $ = s => document.querySelector(s);
         let shopId = '';
-        // ✨ Load Audio State From Storage so it never auto-turns off ✨
         let soundEnabled = localStorage.getItem('smartPrintAudioEnabled') === 'true'; 
         let isInitialLoad = true;
-        let audioUnlocked = false; // Internal flag for browser interaction
+        let audioUnlocked = false; 
         
         let unsubscribeLiveSync = null;
         let fbJobs = [];
@@ -239,7 +248,7 @@
             window._toastTimer = setTimeout(() => t.classList.add('opacity-0', 'translate-y-[-20px]'), 3000);
         }
 
-        // ✨ Audio Unlocker for Browser Compliance ✨
+        // ✨ FIX 4: Solid Audio Unlock Logic ✨
         function unlockAudio() {
             if (!audioUnlocked && soundEnabled) {
                 const audio = document.getElementById('notifySound');
@@ -247,7 +256,9 @@
                     audio.pause();
                     audio.currentTime = 0;
                     audioUnlocked = true;
-                }).catch(e => console.log("Audio unlock failed until more interaction.", e));
+                }).catch(e => {
+                    // Fail silently, waiting for next user click
+                });
             }
         }
 
@@ -264,7 +275,7 @@
 
         // --- 1. AUTO-LOGIN & SECURE LOGIN LOGIC ---
         window.onload = () => {
-            updateSoundButtonUI(); // Set button UI on load
+            updateSoundButtonUI();
             const savedShopId = localStorage.getItem('smartPrintShopId');
             const savedPwd = localStorage.getItem('smartPrintPwd');
             if (savedShopId && savedPwd) {
@@ -340,7 +351,7 @@
         function startLiveSync() {
             if(unsubscribeLiveSync) unsubscribeLiveSync();
 
-            // 1. Firebase Cloud Sync (For Normal API files)
+            // 1. Firebase Cloud Sync
             unsubscribeLiveSync = db.collection('printJobs')
                 .where('shopId', '==', shopId)
                 .where('status', 'in', ['pending-review', 'processing'])
@@ -351,7 +362,7 @@
                     updateJobsUI();
 
                     snapshot.docChanges().forEach((change) => {
-                        if (change.type === "added" && !isInitialLoad && soundEnabled) {
+                        if (change.type === "added" && !isInitialLoad) {
                             playAnnouncementSound();
                         }
                     });
@@ -370,9 +381,7 @@
                     conn.on('data', async (data) => {
                         if(data.type === 'new_print_job') {
                             
-                            if(soundEnabled) {
-                                playAnnouncementSound();
-                            }
+                            playAnnouncementSound();
                             
                             const parsedFiles = data.files.map(f => {
                                 const blob = new Blob([f.data], { type: f.fileType });
@@ -409,13 +418,14 @@
             }
         }
 
-        // ✨ Reliable Play Sound Function ✨
         function playAnnouncementSound() {
-            const audio = document.getElementById('notifySound');
-            audio.currentTime = 0; // Rewind to start
-            audio.play().catch(e => {
-                console.log("Audio was blocked by browser. User needs to interact first.", e);
-            });
+            if(soundEnabled) {
+                const audio = document.getElementById('notifySound');
+                audio.currentTime = 0; 
+                audio.play().catch(e => {
+                    console.log("Audio was blocked by browser. User needs to interact first.", e);
+                });
+            }
         }
 
         function getJobTime(job) {
@@ -545,7 +555,7 @@
         // --- 3. ✨ AUDIO ALERTS PERSISTENT TOGGLE ✨ ---
         function toggleSound() {
             soundEnabled = !soundEnabled; 
-            localStorage.setItem('smartPrintAudioEnabled', soundEnabled); // Store preference permanently
+            localStorage.setItem('smartPrintAudioEnabled', soundEnabled);
             
             if (soundEnabled) {
                 // Try playing and unlocking immediately

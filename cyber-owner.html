@@ -37,7 +37,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { background-color: #F2F2F7; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* Scrollbar styling */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E5EA; border-radius: 10px; }
@@ -56,10 +55,8 @@
     </style>
 </head>
 
-<!-- ✨ FIX 1: Body pe click lagaya hai taaki browser ko interaction mil jaye aur sound baj sake ✨ -->
 <body class="text-gray-900 min-h-screen flex flex-col relative" onclick="unlockAudio()">
 
-    <!-- Premium Announcement Sound -->
     <audio id="notifySound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
     <!-- SECURE LOGIN SCREEN -->
@@ -89,7 +86,7 @@
         </div>
     </div>
 
-    <!-- ✨ FIX 2: Layout Fix - `h-screen` and `overflow-hidden` hatake proper flex layout lagaya hai ✨ -->
+    <!-- MAIN DASHBOARD -->
     <div id="mainDashboard" class="hidden flex-col flex-1 w-full min-h-screen pb-20">
         
         <header class="bg-white/80 backdrop-blur-xl sticky top-0 z-40 px-4 md:px-5 py-3.5 flex items-center justify-between border-b border-gray-200/60 shadow-sm">
@@ -111,8 +108,6 @@
             </div>
         </header>
 
-        <!-- DASHBOARD CONTENT -->
-        <!-- ✨ FIX 3: Container margin aur padding sahi kari hai ✨ -->
         <main class="flex-1 p-5 w-full max-w-7xl mx-auto">
             <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center gap-2 text-gray-800">
@@ -237,6 +232,12 @@
         let fbJobs = [];
         let rtcJobs = [];
 
+        let currentSettings = {
+            workflow: 'manual',
+            privacy: 'immediate',
+            isOnline: true
+        };
+
         function toast(msg, type='info'){
             const t = $('#toast'); $('#toast-msg').textContent = msg;
             let icon = '<i class="fas fa-info-circle text-blue-400"></i>';
@@ -248,7 +249,6 @@
             window._toastTimer = setTimeout(() => t.classList.add('opacity-0', 'translate-y-[-20px]'), 3000);
         }
 
-        // ✨ FIX 4: Solid Audio Unlock Logic ✨
         function unlockAudio() {
             if (!audioUnlocked && soundEnabled) {
                 const audio = document.getElementById('notifySound');
@@ -256,9 +256,7 @@
                     audio.pause();
                     audio.currentTime = 0;
                     audioUnlocked = true;
-                }).catch(e => {
-                    // Fail silently, waiting for next user click
-                });
+                }).catch(e => {});
             }
         }
 
@@ -273,7 +271,6 @@
             }
         }
 
-        // --- 1. AUTO-LOGIN & SECURE LOGIN LOGIC ---
         window.onload = () => {
             updateSoundButtonUI();
             const savedShopId = localStorage.getItem('smartPrintShopId');
@@ -294,19 +291,14 @@
 
         async function performLogin(sid, pwd, isAutoLogin) {
             const btn = $('#loginBtn');
-            if(!isAutoLogin) {
-                btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Authenticating...`;
-                btn.disabled = true;
-            }
+            if(!isAutoLogin) { btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Authenticating...`; btn.disabled = true; }
 
             try {
                 const docRef = await db.collection('shops').doc(sid).get();
                 if(!docRef.exists) throw new Error("Shop ID not found.");
                 
                 const shopData = docRef.data();
-                if(shopData.appPassword !== pwd && shopData.password !== pwd) {
-                    throw new Error("Incorrect Password!");
-                }
+                if(shopData.appPassword !== pwd && shopData.password !== pwd) { throw new Error("Incorrect Password!"); }
 
                 shopId = sid;
                 localStorage.setItem('smartPrintShopId', sid);
@@ -319,77 +311,109 @@
                 
                 if(!isAutoLogin) toast('Logged in successfully', 'success');
                 
-                startLiveSync();
-
                 if (shopData.printSettings) {
-                    document.querySelector(`input[name="workflowMode"][value="${shopData.printSettings.workflow}"]`).checked = true;
-                    document.querySelector(`input[name="privacyMode"][value="${shopData.printSettings.privacy}"]`).checked = true;
-                    $('#storeStatusToggle').checked = shopData.printSettings.isOnline;
+                    currentSettings = shopData.printSettings;
+                    document.querySelector(`input[name="workflowMode"][value="${currentSettings.workflow}"]`).checked = true;
+                    document.querySelector(`input[name="privacyMode"][value="${currentSettings.privacy}"]`).checked = true;
+                    $('#storeStatusToggle').checked = currentSettings.isOnline;
                 }
+                
+                startLiveSync();
             } catch (err) {
                 localStorage.removeItem('smartPrintShopId');
                 localStorage.removeItem('smartPrintPwd');
                 if(!isAutoLogin) toast(err.message || 'Login failed. Please try again.', 'error');
-                
-                $('#loginScreen').classList.remove('hidden');
-                $('#mainDashboard').classList.add('hidden');
+                $('#loginScreen').classList.remove('hidden'); $('#mainDashboard').classList.add('hidden');
             } finally {
-                if(!isAutoLogin) {
-                    btn.innerHTML = `Secure Login <i class="fas fa-arrow-right"></i>`;
-                    btn.disabled = false;
-                }
+                if(!isAutoLogin) { btn.innerHTML = `Secure Login <i class="fas fa-arrow-right"></i>`; btn.disabled = false; }
             }
         }
 
-        function logout() {
-            localStorage.removeItem('smartPrintShopId');
-            localStorage.removeItem('smartPrintPwd');
-            window.location.reload();
+        function logout() { localStorage.removeItem('smartPrintShopId'); localStorage.removeItem('smartPrintPwd'); window.location.reload(); }
+
+        // --- SILENT PRINT LOGIC ---
+        function silentPrintDocument(fileUrl, fileType) {
+            console.log("Triggering Auto-Print for:", fileUrl);
+            const iframeId = 'print-frame-' + Date.now();
+            const iframe = document.createElement('iframe');
+            
+            iframe.id = iframeId;
+            iframe.style.position = 'absolute';
+            iframe.style.top = '-1000px';
+            iframe.style.left = '-1000px';
+            iframe.style.width = '0px';
+            iframe.style.height = '0px';
+            
+            iframe.src = fileUrl; 
+            document.body.appendChild(iframe);
+            
+            iframe.onload = function() {
+                try {
+                    iframe.contentWindow.focus();
+                    iframe.contentWindow.print();
+                    setTimeout(() => { document.body.removeChild(iframe); }, 10000);
+                } catch(e) {
+                    console.log("Auto-print block issue:", e);
+                    window.open(fileUrl, '_blank');
+                }
+            };
         }
 
-        // --- 2. ✨ HYBRID DASHBOARD SYNC (FIREBASE + WEBRTC) ✨ ---
+        function handleNewJobReceived(jobObj, isDirectWrtc) {
+            playAnnouncementSound();
+            
+            if (currentSettings.workflow === 'auto') {
+                toast("Auto-Accept ON: Sending to printer...", "success");
+                jobObj.files.forEach(f => silentPrintDocument(f.url, f.contentType));
+                // Delay fix: Let it show in grid for a moment, then auto clear it
+                if(isDirectWrtc) rtcJobs.push(jobObj); else fbJobs.push(jobObj);
+                updateJobsUI();
+                
+                setTimeout(() => markAsDone(jobObj.id, true), 3000); 
+            } else {
+                if(isDirectWrtc) rtcJobs.push(jobObj);
+                updateJobsUI();
+            }
+        }
+
+        // --- DASHBOARD SYNC ---
         function startLiveSync() {
             if(unsubscribeLiveSync) unsubscribeLiveSync();
 
-            // 1. Firebase Cloud Sync
             unsubscribeLiveSync = db.collection('printJobs')
                 .where('shopId', '==', shopId)
                 .where('status', 'in', ['pending-review', 'processing'])
                 .onSnapshot((snapshot) => {
-                    fbJobs = [];
-                    snapshot.forEach(doc => fbJobs.push({ id: doc.id, ...doc.data() }));
+                    // Update the array without clearing newly received auto-jobs immediately
+                    let tempJobs = [];
+                    snapshot.forEach(doc => {
+                        const jobData = { id: doc.id, ...doc.data() };
+                        tempJobs.push(jobData);
+                    });
+                    
+                    if(currentSettings.workflow === 'manual') fbJobs = tempJobs;
                     
                     updateJobsUI();
 
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === "added" && !isInitialLoad) {
-                            playAnnouncementSound();
+                            const newJob = { id: change.doc.id, ...change.doc.data() };
+                            handleNewJobReceived(newJob, false);
                         }
                     });
                     isInitialLoad = false;
                 });
 
-            // 2. WebRTC Direct Sync (Zero Cloud Connection)
             if(!window.peerInstance) {
                 window.peerInstance = new Peer('bikripage-print-' + shopId);
-                
-                window.peerInstance.on('open', (id) => {
-                    console.log("🚀 WebRTC Receiver Ready on Local Network: ", id);
-                });
+                window.peerInstance.on('open', (id) => console.log("🚀 WebRTC Ready: ", id));
                 
                 window.peerInstance.on('connection', (conn) => {
                     conn.on('data', async (data) => {
                         if(data.type === 'new_print_job') {
-                            
-                            playAnnouncementSound();
-                            
                             const parsedFiles = data.files.map(f => {
                                 const blob = new Blob([f.data], { type: f.fileType });
-                                return {
-                                    name: f.name,
-                                    url: URL.createObjectURL(blob),
-                                    contentType: f.fileType
-                                };
+                                return { name: f.name, url: URL.createObjectURL(blob), contentType: f.fileType };
                             });
                             
                             const newRtcJob = {
@@ -402,18 +426,9 @@
                                 isLocalWrtc: true
                             };
                             
-                            rtcJobs.push(newRtcJob);
-                            updateJobsUI();
-                            toast("Direct file received via WiFi/WebRTC!", "success");
+                            handleNewJobReceived(newRtcJob, true);
                         }
                     });
-                });
-                
-                window.peerInstance.on('error', (err) => {
-                    console.error("Peer Error:", err);
-                    if(err.type === 'unavailable-id') {
-                        toast("Warning: Another tab is already listening for local files.", "error");
-                    }
                 });
             }
         }
@@ -422,9 +437,7 @@
             if(soundEnabled) {
                 const audio = document.getElementById('notifySound');
                 audio.currentTime = 0; 
-                audio.play().catch(e => {
-                    console.log("Audio was blocked by browser. User needs to interact first.", e);
-                });
+                audio.play().catch(e => console.log("Audio block", e));
             }
         }
 
@@ -442,11 +455,31 @@
             $('#jobCount').textContent = combinedJobs.length;
 
             if (combinedJobs.length === 0) {
-                $('#emptyState').classList.remove('hidden');
-                $('#jobsGrid').classList.add('hidden');
+                $('#emptyState').classList.remove('hidden'); $('#jobsGrid').classList.add('hidden');
             } else {
-                $('#emptyState').classList.add('hidden');
-                $('#jobsGrid').classList.remove('hidden');
+                $('#emptyState').classList.add('hidden'); $('#jobsGrid').classList.remove('hidden');
+            }
+        }
+
+        window.executePrintAndMarkDone = function(jobId) {
+            const btnId = `btn-${jobId}`;
+            const btn = document.getElementById(btnId);
+            if(btn) btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+
+            const jobObj = fbJobs.find(j => j.id === jobId) || rtcJobs.find(j => j.id === jobId);
+            if(jobObj && currentSettings.workflow === 'manual') {
+                jobObj.files.forEach(f => silentPrintDocument(f.url, f.contentType));
+            }
+            
+            // Adding a small delay to feel natural
+            setTimeout(() => markAsDone(jobId, false), 800);
+        }
+
+        // ✨ FIX: Delete/Cancel Request Logic ✨
+        window.cancelJob = function(jobId) {
+            if(confirm("Are you sure you want to cancel and remove this request?")) {
+                markAsDone(jobId, true); 
+                toast("Job removed", "info");
             }
         }
 
@@ -467,9 +500,7 @@
                     return `
                         <div class="flex items-center justify-between p-2.5 bg-white border border-gray-100 rounded-[12px] shadow-sm hover:border-gray-300 transition-colors">
                             <div class="flex items-center gap-3 overflow-hidden">
-                                <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center shrink-0 border border-gray-100">
-                                    <i class="fas ${icon} text-[13px]"></i>
-                                </div>
+                                <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center shrink-0 border border-gray-100"><i class="fas ${icon} text-[13px]"></i></div>
                                 <div class="truncate text-[12px] font-bold text-gray-800" title="${f.name}">${f.name}</div>
                             </div>
                             <button onclick="window.open('${f.url}', '_blank')" class="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors shrink-0 ml-2">
@@ -479,200 +510,126 @@
                     `;
                 }).join('');
 
-                const sourceBadge = job.isLocalWrtc 
-                    ? `<span class="absolute -top-3 -right-3 bg-indigo-600 text-white text-[9px] font-bold px-4 py-1 rounded-bl-xl uppercase shadow-md rotate-12">Direct PC</span>` 
-                    : '';
+                const sourceBadge = job.isLocalWrtc ? `<span class="absolute -top-3 -right-3 bg-indigo-600 text-white text-[9px] font-bold px-4 py-1 rounded-bl-xl uppercase shadow-md rotate-12">Direct PC</span>` : '';
+                
+                const isAutoClearing = currentSettings.workflow === 'auto';
+                const printBtnText = isAutoClearing ? 'Auto Printing & Clearing...' : 'Mark as Printed';
+                
+                // Disable button and add pulse if in auto mode to prevent double clicks while it clears
+                const btnClasses = isAutoClearing 
+                    ? "w-full bg-gray-200 text-gray-500 font-bold text-[14px] py-3.5 rounded-[16px] flex items-center justify-center gap-2 cursor-not-allowed animate-pulse"
+                    : "w-full bg-gray-900 hover:bg-black text-white font-bold text-[14px] py-3.5 rounded-[16px] shadow-[0_8px_16px_rgba(0,0,0,0.1)] active:scale-[0.98] transition-all flex items-center justify-center gap-2";
 
                 return `
                 <div class="bg-white rounded-[24px] p-5 ios-shadow border border-gray-200/60 flex flex-col relative animate-fade-in overflow-hidden" style="animation-delay: ${index * 0.05}s">
                     ${sourceBadge}
-                    <div class="flex justify-between items-start mb-5 relative z-10">
+                    
+                    <!-- ✨ FIX: Cancel/Cross Button added to top-right corner ✨ -->
+                    <button onclick="cancelJob('${job.id}')" class="absolute top-4 right-4 w-7 h-7 bg-gray-100 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full flex items-center justify-center transition-colors z-20">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+
+                    <div class="flex justify-between items-start mb-5 relative z-10 pr-8">
                         <div>
-                            <div class="flex items-center gap-1.5 mb-1">
-                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">ID: #${job.id.slice(0,6).toUpperCase()}</span>
-                            </div>
+                            <div class="flex items-center gap-1.5 mb-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span><span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">ID: #${job.id.slice(0,6).toUpperCase()}</span></div>
                             <div class="text-[13px] font-bold text-gray-900 tracking-tight"><i class="fas fa-clock text-gray-300 mr-1"></i> ${time}</div>
                         </div>
                         ${colorBadge}
                     </div>
-
                     <div class="grid grid-cols-4 divide-x divide-gray-200/60 bg-gray-50/80 rounded-2xl border border-gray-200/60 mb-5 p-3 relative z-10">
-                        <div class="text-center px-1">
-                            <p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">Copies</p>
-                            <p class="text-[15px] font-black text-gray-900">${job.copies || 1}</p>
-                        </div>
-                        <div class="text-center px-1">
-                            <p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">Paper</p>
-                            <p class="text-[13px] font-black text-gray-900 mt-0.5 leading-tight">${job.paper || 'A4'}</p>
-                        </div>
-                        <div class="text-center px-1">
-                            <p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">Side</p>
-                            <p class="text-[13px] font-black text-gray-900 mt-0.5 leading-tight">${sideMode}</p>
-                        </div>
-                        <div class="text-center px-1">
-                            <p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">Files</p>
-                            <p class="text-[15px] font-black text-blue-600">${job.files ? job.files.length : 0}</p>
-                        </div>
+                        <div class="text-center px-1"><p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">Copies</p><p class="text-[15px] font-black text-gray-900">${job.copies || 1}</p></div>
+                        <div class="text-center px-1"><p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">Paper</p><p class="text-[13px] font-black text-gray-900 mt-0.5 leading-tight">${job.paper || 'A4'}</p></div>
+                        <div class="text-center px-1"><p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">Side</p><p class="text-[13px] font-black text-gray-900 mt-0.5 leading-tight">${sideMode}</p></div>
+                        <div class="text-center px-1"><p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">Files</p><p class="text-[15px] font-black text-blue-600">${job.files ? job.files.length : 0}</p></div>
                     </div>
-
                     <div class="flex-1 mb-5 space-y-2 max-h-[160px] overflow-y-auto custom-scrollbar bg-gray-50/30 p-2 rounded-2xl relative z-10">
                         ${filesHtml}
                     </div>
-
                     <div class="mt-auto relative z-10">
-                        <button onclick="markAsDone('${job.id}')" class="w-full bg-gray-900 hover:bg-black text-white font-bold text-[14px] py-3.5 rounded-[16px] shadow-[0_8px_16px_rgba(0,0,0,0.1)] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                            <i class="fas fa-check-circle text-green-400"></i> Mark as Printed
+                        <button id="btn-${job.id}" ${isAutoClearing ? 'disabled' : `onclick="executePrintAndMarkDone('${job.id}')"`} class="${btnClasses}">
+                            ${isAutoClearing ? `<i class="fas fa-spinner fa-spin"></i>` : `<i class="fas fa-check-circle text-green-400"></i>`} ${printBtnText}
                         </button>
                     </div>
-                </div>
-                `;
+                </div>`;
             }).join('');
         }
 
-        async function markAsDone(jobId) {
-            if(!confirm("Print complete? This will mark the order as Done.")) return;
-            
+        async function markAsDone(jobId, isAutoMode = false) {
             if (jobId.startsWith('L')) {
                 rtcJobs = rtcJobs.filter(j => j.id !== jobId);
                 updateJobsUI();
-                toast("Job marked as completed", "success");
                 return;
             }
             
             try {
+                const statusUpdate = currentSettings.privacy === 'immediate' ? 'deleted' : 'completed';
                 await db.collection('printJobs').doc(jobId).update({
-                    status: 'completed',
+                    status: statusUpdate,
                     completedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                toast("Job marked as completed", "success");
+                
+                fbJobs = fbJobs.filter(j => j.id !== jobId);
+                updateJobsUI();
             } catch(e) {
                 console.error("Error updating job:", e);
-                toast("Error marking as done!", "error");
+                if(!isAutoMode) toast("Error marking as done!", "error");
             }
         }
 
-        // --- 3. ✨ AUDIO ALERTS PERSISTENT TOGGLE ✨ ---
+        // --- TOGGLES & MODALS ---
         function toggleSound() {
             soundEnabled = !soundEnabled; 
             localStorage.setItem('smartPrintAudioEnabled', soundEnabled);
-            
             if (soundEnabled) {
-                // Try playing and unlocking immediately
                 const audio = document.getElementById('notifySound');
-                audio.play().then(() => {
-                    audio.pause(); 
-                    audio.currentTime = 0; 
-                    audioUnlocked = true;
-                }).catch(e => console.log("Sound block during manual toggle", e));
-                
+                audio.play().then(() => { audio.pause(); audio.currentTime = 0; audioUnlocked = true; }).catch(e => {});
                 toast("Sound alerts activated! 🔔", "success");
-            } else {
-                toast("Sound alerts muted.", "info");
-            }
-            
+            } else { toast("Sound alerts muted.", "info"); }
             updateSoundButtonUI();
         }
 
-        // --- 4. ADVANCED SETTINGS MODAL ---
-        function openSettings() {
-            $('#settingsModal').classList.remove('hidden');
-            setTimeout(() => { $('#settingsModal').classList.remove('opacity-0'); $('#settingsModalContent').classList.remove('scale-95'); }, 10);
-        }
-        function closeSettings() {
-            $('#settingsModal').classList.add('opacity-0'); $('#settingsModalContent').classList.add('scale-95');
-            setTimeout(() => $('#settingsModal').classList.add('hidden'), 300);
-        }
+        function openSettings() { $('#settingsModal').classList.remove('hidden'); setTimeout(() => { $('#settingsModal').classList.remove('opacity-0'); $('#settingsModalContent').classList.remove('scale-95'); }, 10); }
+        function closeSettings() { $('#settingsModal').classList.add('opacity-0'); $('#settingsModalContent').classList.add('scale-95'); setTimeout(() => $('#settingsModal').classList.add('hidden'), 300); }
         
         async function saveSettings() {
-            const btn = $('#saveSettingsBtn');
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
+            const btn = $('#saveSettingsBtn'); btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
             
             const workflow = document.querySelector('input[name="workflowMode"]:checked').value;
             const privacy = document.querySelector('input[name="privacyMode"]:checked').value;
             const isOnline = $('#storeStatusToggle').checked;
 
-            try {
-                await db.collection('shops').doc(shopId).set({
-                    printSettings: { workflow, privacy, isOnline },
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
+            currentSettings = { workflow, privacy, isOnline }; // Update local state instantly
 
+            try {
+                await db.collection('shops').doc(shopId).set({ printSettings: { workflow, privacy, isOnline }, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
                 toast("Preferences saved successfully!", "success");
                 closeSettings();
             } catch(e) {
-                console.error("Failed to save settings", e);
                 toast("Preferences applied locally.", "success");
                 closeSettings();
-            } finally {
-                btn.innerHTML = `Save Preferences`;
-            }
+            } finally { btn.innerHTML = `Save Preferences`; }
         }
 
-        // --- 5. QR CODE SHARE & DOWNLOAD ---
+        // --- QR CODE LOGIC ---
         function getCustomerUrl() {
             let baseUrl = window.location.origin + window.location.pathname.replace(/cyber-owner\.html$/, 'cyber-customer.html');
-            if(!baseUrl.includes('cyber-customer.html')) {
-                baseUrl = "https://bikripage.github.io/Online/cyber-customer.html";
-            }
+            if(!baseUrl.includes('cyber-customer.html')) baseUrl = "https://bikripage.github.io/Online/cyber-customer.html";
             return `${baseUrl}?shopId=${shopId}`;
         }
-
         function openQrModal() {
-            const customerUrl = getCustomerUrl();
-            $('#customerLinkInput').value = customerUrl;
-            
+            const customerUrl = getCustomerUrl(); $('#customerLinkInput').value = customerUrl;
             $('#qrcodeContainer').innerHTML = ''; 
-            new QRCode(document.getElementById("qrcodeContainer"), {
-                text: customerUrl,
-                width: 180,
-                height: 180,
-                colorDark : "#111827",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
-            });
-
-            $('#qrModal').classList.remove('hidden');
-            setTimeout(() => { $('#qrModal').classList.remove('opacity-0'); $('#qrModalContent').classList.remove('scale-95'); }, 10);
+            new QRCode(document.getElementById("qrcodeContainer"), { text: customerUrl, width: 180, height: 180, colorDark : "#111827", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
+            $('#qrModal').classList.remove('hidden'); setTimeout(() => { $('#qrModal').classList.remove('opacity-0'); $('#qrModalContent').classList.remove('scale-95'); }, 10);
         }
-
-        function closeQrModal() {
-            $('#qrModal').classList.add('opacity-0'); $('#qrModalContent').classList.add('scale-95');
-            setTimeout(() => $('#qrModal').classList.add('hidden'), 300);
-        }
-
-        function copyCustomerLink() {
-            const copyText = document.getElementById("customerLinkInput");
-            copyText.select();
-            copyText.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(copyText.value);
-            toast("Link Copied to Clipboard!", "success");
-        }
-
+        function closeQrModal() { $('#qrModal').classList.add('opacity-0'); $('#qrModalContent').classList.add('scale-95'); setTimeout(() => $('#qrModal').classList.add('hidden'), 300); }
+        function copyCustomerLink() { const copyText = document.getElementById("customerLinkInput"); copyText.select(); navigator.clipboard.writeText(copyText.value); toast("Link Copied!", "success"); }
         function downloadQR() {
             const container = document.getElementById('qrcodeContainer');
-            const qrImg = container.querySelector('img');
-            const qrCanvas = container.querySelector('canvas');
-            
-            let dataUrl = '';
-            
-            if (qrImg && qrImg.src && qrImg.src !== '') {
-                dataUrl = qrImg.src;
-            } else if (qrCanvas) {
-                dataUrl = qrCanvas.toDataURL("image/png");
-            }
-            
-            if (dataUrl) {
-                const a = document.createElement('a');
-                a.href = dataUrl;
-                a.download = `SmartPrint_QR_${shopId}.png`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                toast("QR Code Downloaded!", "success");
-            } else {
-                toast("Please wait for QR to generate", "error");
-            }
+            const qrImg = container.querySelector('img'); const qrCanvas = container.querySelector('canvas');
+            let dataUrl = qrImg && qrImg.src ? qrImg.src : (qrCanvas ? qrCanvas.toDataURL("image/png") : '');
+            if (dataUrl) { const a = document.createElement('a'); a.href = dataUrl; a.download = `SmartPrint_QR_${shopId}.png`; document.body.appendChild(a); a.click(); document.body.removeChild(a); toast("Downloaded!", "success"); } 
+            else { toast("Please wait for QR", "error"); }
         }
     </script>
 </body>

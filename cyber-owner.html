@@ -182,7 +182,7 @@
         </div>
     </div>
 
-    <!-- QR CODE SHARE & DOWNLOAD MODAL -->
+    <!-- QR CODE MODAL -->
     <div id="qrModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-bg p-4 opacity-0 transition-opacity">
         <div class="bg-white rounded-[24px] w-full max-w-sm shadow-2xl scale-95 transition-transform overflow-hidden flex flex-col" id="qrModalContent">
             <div class="p-4 flex items-center justify-between border-b border-gray-100 bg-white">
@@ -220,11 +220,7 @@
         let fbJobs = [];
         let rtcJobs = [];
 
-        let currentSettings = {
-            workflow: 'manual', 
-            privacy: 'immediate',
-            isOnline: true
-        };
+        let currentSettings = { workflow: 'manual', privacy: 'immediate', isOnline: true };
 
         function toast(msg, type='info'){
             const t = $('#toast'); $('#toast-msg').textContent = msg;
@@ -240,11 +236,7 @@
         function unlockAudio() {
             if (!audioUnlocked && soundEnabled) {
                 const audio = document.getElementById('notifySound');
-                audio.play().then(() => {
-                    audio.pause();
-                    audio.currentTime = 0;
-                    audioUnlocked = true;
-                }).catch(e => { });
+                audio.play().then(() => { audio.pause(); audio.currentTime = 0; audioUnlocked = true; }).catch(e => {});
             }
         }
 
@@ -284,9 +276,8 @@
             try {
                 const docRef = await db.collection('shops').doc(sid).get();
                 if(!docRef.exists) throw new Error("Shop ID not found.");
-                
                 const shopData = docRef.data();
-                if(shopData.appPassword !== pwd && shopData.password !== pwd) { throw new Error("Incorrect Password!"); }
+                if(shopData.appPassword !== pwd && shopData.password !== pwd) throw new Error("Incorrect Password!");
 
                 shopId = sid;
                 localStorage.setItem('smartPrintShopId', sid);
@@ -294,8 +285,7 @@
 
                 $('#shopIdDisplay').textContent = `ID: ${shopId}`;
                 $('#loginScreen').classList.add('hidden');
-                $('#mainDashboard').classList.remove('hidden');
-                $('#mainDashboard').classList.add('flex');
+                $('#mainDashboard').classList.remove('hidden'); $('#mainDashboard').classList.add('flex');
                 
                 if(!isAutoLogin) toast('Logged in successfully', 'success');
                 
@@ -307,8 +297,7 @@
                 
                 startLiveSync();
             } catch (err) {
-                localStorage.removeItem('smartPrintShopId');
-                localStorage.removeItem('smartPrintPwd');
+                localStorage.removeItem('smartPrintShopId'); localStorage.removeItem('smartPrintPwd');
                 if(!isAutoLogin) toast(err.message || 'Login failed.', 'error');
                 $('#loginScreen').classList.remove('hidden'); $('#mainDashboard').classList.add('hidden');
             } finally {
@@ -318,19 +307,14 @@
 
         function logout() { localStorage.removeItem('smartPrintShopId'); localStorage.removeItem('smartPrintPwd'); window.location.reload(); }
 
-        // --- SILENT PRINT LOGIC ---
+        // --- THE CORE PRINTING ENGINE ---
         function silentPrintDocument(fileUrl) {
-            console.log("Triggering Auto-Print for:", fileUrl);
+            console.log("Triggering Print:", fileUrl);
             const iframeId = 'print-frame-' + Date.now();
             const iframe = document.createElement('iframe');
-            
             iframe.id = iframeId;
-            iframe.style.position = 'absolute';
-            iframe.style.top = '-1000px';
-            iframe.style.left = '-1000px';
-            iframe.style.width = '0px';
-            iframe.style.height = '0px';
-            
+            iframe.style.position = 'absolute'; iframe.style.top = '-1000px'; iframe.style.left = '-1000px';
+            iframe.style.width = '0px'; iframe.style.height = '0px';
             iframe.src = fileUrl; 
             document.body.appendChild(iframe);
             
@@ -339,25 +323,23 @@
                     iframe.contentWindow.focus();
                     iframe.contentWindow.print();
                     setTimeout(() => { document.body.removeChild(iframe); }, 10000);
-                } catch(e) {
-                    window.open(fileUrl, '_blank');
-                }
+                } catch(e) { window.open(fileUrl, '_blank'); }
             };
         }
 
         function handleNewJobReceived(jobObj, isDirectWrtc) {
             playAnnouncementSound();
             
+            // Auto Mode: Seedha print maro aur hata do
             if (currentSettings.workflow === 'auto') {
                 toast("Auto-Accept ON: Printing...", "success");
-                if (jobObj.files && jobObj.files.length > 0) {
-                    jobObj.files.forEach(f => silentPrintDocument(f.url));
-                }
+                jobObj.files.forEach(f => silentPrintDocument(f.url));
                 
                 if(isDirectWrtc) rtcJobs.push(jobObj); else fbJobs.push(jobObj);
                 updateJobsUI();
                 setTimeout(() => markAsDone(jobObj.id, true), 3000); 
             } else {
+                // Manual Mode: Sirf screen pe dikhao
                 if(isDirectWrtc) rtcJobs.push(jobObj);
                 updateJobsUI();
             }
@@ -367,26 +349,26 @@
         function startLiveSync() {
             if(unsubscribeLiveSync) unsubscribeLiveSync();
 
+            // Firebase Cloud Sync
             unsubscribeLiveSync = db.collection('printJobs')
                 .where('shopId', '==', shopId)
                 .where('status', 'in', ['pending-review', 'processing'])
                 .onSnapshot((snapshot) => {
+                    if(currentSettings.workflow === 'manual') fbJobs = [];
                     let tempJobs = [];
                     snapshot.forEach(doc => { tempJobs.push({ id: doc.id, ...doc.data() }); });
-                    
                     if(currentSettings.workflow === 'manual') fbJobs = tempJobs;
-                    
                     updateJobsUI();
 
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === "added" && !isInitialLoad) {
-                            const newJob = { id: change.doc.id, ...change.doc.data() };
-                            handleNewJobReceived(newJob, false);
+                            handleNewJobReceived({ id: change.doc.id, ...change.doc.data() }, false);
                         }
                     });
                     isInitialLoad = false;
                 });
 
+            // WebRTC Direct Sync
             if(!window.peerInstance) {
                 window.peerInstance = new Peer('bikripage-print-' + shopId);
                 window.peerInstance.on('open', (id) => console.log("🚀 WebRTC Ready"));
@@ -414,8 +396,7 @@
         function playAnnouncementSound() {
             if(soundEnabled) {
                 const audio = document.getElementById('notifySound');
-                audio.currentTime = 0; 
-                audio.play().catch(e => console.log("Audio block", e));
+                audio.currentTime = 0; audio.play().catch(e => console.log("Audio block"));
             }
         }
 
@@ -431,7 +412,6 @@
             
             renderJobs(combinedJobs);
             $('#jobCount').textContent = combinedJobs.length;
-
             if (combinedJobs.length === 0) {
                 $('#emptyState').classList.remove('hidden'); $('#jobsGrid').classList.add('hidden');
             } else {
@@ -439,16 +419,17 @@
             }
         }
 
-        // ✨ ACTION BUTTON HANDLERS (PRINT & CANCEL) ✨
+        // ✨ ACTION HANDLERS FOR REVIEW MODE ✨
         window.executePrintAndMarkDone = function(jobId) {
             const btn = document.getElementById(`btn-accept-${jobId}`);
             if(btn) btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Printing...`;
 
+            // Background mein Print command bhejo
             const jobObj = fbJobs.find(j => j.id === jobId) || rtcJobs.find(j => j.id === jobId);
-            if(jobObj && jobObj.files && jobObj.files.length > 0) {
+            if(jobObj) {
                 jobObj.files.forEach(f => silentPrintDocument(f.url));
             }
-            
+            // Thodi der mein card hide kardo
             setTimeout(() => markAsDone(jobId, false), 800);
         }
 
@@ -456,8 +437,6 @@
             if(confirm("Reject this print request?")) {
                 const btn = document.getElementById(`btn-reject-${jobId}`);
                 if(btn) btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
-                
-                // Specific status set to 'cancelled' so it completely clears properly
                 markAsDone(jobId, true, 'cancelled'); 
                 toast("Print request rejected", "info");
             }
@@ -474,37 +453,28 @@
 
                 const time = job.createdAt ? new Date(getJobTime(job)).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Just now';
                 
+                // Determine file count safely
                 const filesCount = job.files ? job.files.length : (job.files_count || 0);
 
-                // ✨ FIX: Safe rendering for File Preview Box even if empty ✨
-                let filesHtml = '';
-                if (job.files && job.files.length > 0) {
-                    filesHtml = job.files.map(f => {
-                        const isPdf = f.contentType === 'application/pdf';
-                        const icon = isPdf ? 'fa-file-pdf text-red-500' : 'fa-image text-blue-500';
-                        return `
-                            <div class="flex items-center justify-between p-2.5 bg-white border border-gray-100 rounded-[12px] shadow-sm hover:border-gray-300 transition-colors">
-                                <div class="flex items-center gap-3 overflow-hidden">
-                                    <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center shrink-0 border border-gray-100"><i class="fas ${icon} text-[13px]"></i></div>
-                                    <div class="truncate text-[12px] font-bold text-gray-800" title="${f.name}">${f.name}</div>
-                                </div>
-                                <button onclick="window.open('${f.url}', '_blank')" class="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors shrink-0 ml-2">
-                                    <i class="fas fa-external-link-alt text-[11px]"></i>
-                                </button>
+                const filesHtml = (job.files || []).map(f => {
+                    const isPdf = f.contentType === 'application/pdf';
+                    const icon = isPdf ? 'fa-file-pdf text-red-500' : 'fa-image text-blue-500';
+                    return `
+                        <div class="flex items-center justify-between p-2.5 bg-white border border-gray-100 rounded-[12px] shadow-sm hover:border-gray-300 transition-colors">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center shrink-0 border border-gray-100"><i class="fas ${icon} text-[13px]"></i></div>
+                                <div class="truncate text-[12px] font-bold text-gray-800" title="${f.name}">${f.name}</div>
                             </div>
-                        `;
-                    }).join('');
-                } else {
-                    // Fallback visual agar file 0 ho
-                    filesHtml = `
-                        <div class="flex items-center justify-center p-3 bg-red-50 border border-red-100 rounded-[12px] text-red-500 text-xs font-bold shadow-sm">
-                            <i class="fas fa-exclamation-triangle mr-2"></i> No files attached
+                            <button onclick="window.open('${f.url}', '_blank')" class="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors shrink-0 ml-2">
+                                <i class="fas fa-external-link-alt text-[11px]"></i>
+                            </button>
                         </div>
                     `;
-                }
+                }).join('');
 
                 const sourceBadge = job.isLocalWrtc ? `<span class="absolute -top-3 -right-3 bg-indigo-600 text-white text-[9px] font-bold px-4 py-1 rounded-bl-xl uppercase shadow-md rotate-12">Direct PC</span>` : '';
                 
+                // ✨ UI LOGIC: Buttons based on workflow mode ✨
                 let actionButtonsHtml = '';
                 if (currentSettings.workflow === 'auto') {
                     actionButtonsHtml = `
@@ -526,11 +496,6 @@
                 return `
                 <div class="bg-white rounded-[24px] p-5 ios-shadow border border-gray-200/60 flex flex-col relative animate-fade-in overflow-hidden" style="animation-delay: ${index * 0.05}s">
                     ${sourceBadge}
-
-                    <!-- ✨ Cross Icon for Top Right ✨ -->
-                    <button onclick="cancelJob('${job.id}')" class="absolute top-4 right-4 w-7 h-7 bg-gray-100 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full flex items-center justify-center transition-colors z-20">
-                        <i class="fas fa-times text-xs"></i>
-                    </button>
 
                     <div class="flex justify-between items-start mb-5 relative z-10 pr-8">
                         <div>
@@ -564,9 +529,8 @@
             }
             
             try {
-                // If specificStatus is provided (like 'cancelled'), it will use that instead of 'completed'
                 let statusUpdate = currentSettings.privacy === 'immediate' ? 'deleted' : 'completed';
-                if (specificStatus) statusUpdate = specificStatus; 
+                if(specificStatus) statusUpdate = specificStatus; // Allow override for 'cancelled'
 
                 await db.collection('printJobs').doc(jobId).update({
                     status: statusUpdate,

@@ -57,10 +57,16 @@
 
     <audio id="notifySound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
-    <!-- ✨ 1. SECURE PREMIUM LOGIN SCREEN ✨ -->
+    <!-- ✨ 1. SECURE LOGIN SCREEN ✨ -->
     <div id="loginScreen" class="absolute inset-0 z-[100] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-5">
         <div class="bg-white p-8 md:p-10 rounded-[32px] ios-shadow w-full max-w-md border border-white animate-slide-up">
-            <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[20px] flex items-center justify-center text-white shadow-lg shadow-blue-500/30 mx-auto mb-6">
+            
+            <!-- Login Back Button (if they want to cancel login and go back) -->
+            <a href="index.html" class="absolute top-6 left-6 w-10 h-10 bg-gray-50 hover:bg-gray-100 rounded-full flex items-center justify-center text-gray-600 transition-colors">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+
+            <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[20px] flex items-center justify-center text-white shadow-lg shadow-blue-500/30 mx-auto mb-6 mt-4">
                 <i class="fas fa-print text-2xl"></i>
             </div>
             <h2 class="text-2xl font-black text-center text-gray-900 tracking-tight mb-2">Smart Print Desk</h2>
@@ -94,29 +100,34 @@
 
     <!-- ✨ 2. DASHBOARD HEADER ✨ -->
     <div id="mainDashboard" class="hidden flex-col h-full w-full">
-        <header class="bg-white/80 backdrop-blur-xl sticky top-0 z-40 px-5 py-3.5 flex items-center justify-between border-b border-gray-200/60 shadow-sm">
+        <header class="bg-white/80 backdrop-blur-xl sticky top-0 z-40 px-4 md:px-5 py-3.5 flex items-center justify-between border-b border-gray-200/60 shadow-sm">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-600/20">
+                <!-- ✨ NEW BACK BUTTON ✨ -->
+                <a href="index.html" class="w-9 h-9 md:w-10 md:h-10 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center text-gray-700 transition-colors shadow-sm border border-gray-200 shrink-0">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+
+                <div class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-600/20 shrink-0">
                     <i class="fas fa-print text-sm"></i>
                 </div>
                 <div class="flex flex-col justify-center">
-                    <h1 class="font-bold text-[17px] tracking-tight leading-none mb-1">Live Print Desk</h1>
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none" id="shopIdDisplay">ID: NULL</p>
+                    <h1 class="font-bold text-[15px] md:text-[17px] tracking-tight leading-none mb-1">Live Print Desk</h1>
+                    <p class="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none" id="shopIdDisplay">ID: NULL</p>
                 </div>
             </div>
             
-            <div class="flex items-center gap-3">
-                <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-full border border-green-100 text-[11px] font-bold uppercase tracking-wider mr-2">
+            <div class="flex items-center gap-2 md:gap-3">
+                <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-full border border-green-100 text-[11px] font-bold uppercase tracking-wider mr-1">
                     <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                    System Active
+                    Active
                 </div>
                 <!-- QR CODE ICON -->
-                <button onclick="openQrModal()" class="w-10 h-10 bg-indigo-50 hover:bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 transition-colors shadow-inner border border-indigo-100">
-                    <i class="fas fa-qrcode text-lg"></i>
+                <button onclick="openQrModal()" class="w-9 h-9 md:w-10 md:h-10 bg-indigo-50 hover:bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 transition-colors shadow-inner border border-indigo-100">
+                    <i class="fas fa-qrcode text-[15px] md:text-lg"></i>
                 </button>
                 <!-- SETTINGS GEAR ICON -->
-                <button onclick="openSettings()" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-700 transition-colors shadow-inner border border-gray-200">
-                    <i class="fas fa-cog text-lg"></i>
+                <button onclick="openSettings()" class="w-9 h-9 md:w-10 md:h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-700 transition-colors shadow-inner border border-gray-200">
+                    <i class="fas fa-cog text-[15px] md:text-lg"></i>
                 </button>
             </div>
         </header>
@@ -282,12 +293,9 @@
 
         // --- 1. AUTO-LOGIN & SECURE LOGIN LOGIC ---
         window.onload = () => {
-            // Check if saved credentials exist
             const savedShopId = localStorage.getItem('smartPrintShopId');
             const savedPwd = localStorage.getItem('smartPrintPwd');
-            
             if (savedShopId && savedPwd) {
-                // Background Auto-Login
                 $('#loginShopId').value = savedShopId;
                 $('#loginPassword').value = savedPwd;
                 performLogin(savedShopId, savedPwd, true);
@@ -309,24 +317,15 @@
             }
 
             try {
-                // Fetching Shop Data from Firestore
                 const docRef = await db.collection('shops').doc(sid).get();
-                
-                if(!docRef.exists) {
-                    throw new Error("Shop ID not found.");
-                }
+                if(!docRef.exists) throw new Error("Shop ID not found.");
                 
                 const shopData = docRef.data();
-                
-                // Secure check
                 if(shopData.appPassword !== pwd && shopData.password !== pwd) {
                     throw new Error("Incorrect Password!");
                 }
 
-                // Login Success
                 shopId = sid;
-                
-                // SAVE TO LOCAL STORAGE
                 localStorage.setItem('smartPrintShopId', sid);
                 localStorage.setItem('smartPrintPwd', pwd);
 
@@ -338,15 +337,12 @@
                 if(!isAutoLogin) toast('Logged in successfully', 'success');
                 startLiveSync();
 
-                // Load Settings
                 if (shopData.printSettings) {
                     document.querySelector(`input[name="workflowMode"][value="${shopData.printSettings.workflow}"]`).checked = true;
                     document.querySelector(`input[name="privacyMode"][value="${shopData.printSettings.privacy}"]`).checked = true;
                     $('#storeStatusToggle').checked = shopData.printSettings.isOnline;
                 }
-
             } catch (err) {
-                // If auto-login fails, clear storage
                 localStorage.removeItem('smartPrintShopId');
                 localStorage.removeItem('smartPrintPwd');
                 if(!isAutoLogin) toast(err.message || 'Login failed. Please try again.', 'error');
@@ -477,11 +473,6 @@
         async function markAsDone(jobId) {
             if(!confirm("Print complete? This will mark the order as Done.")) return;
             try {
-                const privacyMode = document.querySelector('input[name="privacyMode"]:checked').value;
-                if(privacyMode === 'immediate') {
-                    console.log("Will auto-delete files to save privacy.");
-                }
-
                 await db.collection('printJobs').doc(jobId).update({
                     status: 'completed',
                     completedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -550,11 +541,9 @@
             }
         }
 
-        // --- 5. QR CODE GENERATION & DOWNLOAD ---
+        // --- 5. ✨ FIXED QR CODE GENERATION & DOWNLOAD ✨ ---
         function getCustomerUrl() {
-            // Build the dynamic URL pointing to cyber-customer.html
             let baseUrl = window.location.origin + window.location.pathname.replace(/cyber-owner\.html$/, 'cyber-customer.html');
-            // GitHub Pages specific fallback if direct path logic fails
             if(!baseUrl.includes('cyber-customer.html')) {
                 baseUrl = "https://bikripage.github.io/Online/cyber-customer.html";
             }
@@ -565,8 +554,7 @@
             const customerUrl = getCustomerUrl();
             $('#customerLinkInput').value = customerUrl;
             
-            // Generate QR Code
-            $('#qrcodeContainer').innerHTML = ''; // Clear old
+            $('#qrcodeContainer').innerHTML = ''; 
             new QRCode(document.getElementById("qrcodeContainer"), {
                 text: customerUrl,
                 width: 180,
@@ -588,17 +576,28 @@
         function copyCustomerLink() {
             const copyText = document.getElementById("customerLinkInput");
             copyText.select();
-            copyText.setSelectionRange(0, 99999); // For mobile devices
+            copyText.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(copyText.value);
             toast("Link Copied to Clipboard!", "success");
         }
 
         function downloadQR() {
-            // Finding the image generated by qrcode.js
-            const qrImg = document.querySelector('#qrcodeContainer img');
-            if (qrImg && qrImg.src) {
+            const container = document.getElementById('qrcodeContainer');
+            // QrCode.js canvas ya img me render karta hai, dono ko check karo
+            const qrImg = container.querySelector('img');
+            const qrCanvas = container.querySelector('canvas');
+            
+            let dataUrl = '';
+            
+            if (qrImg && qrImg.src && qrImg.src !== '') {
+                dataUrl = qrImg.src;
+            } else if (qrCanvas) {
+                dataUrl = qrCanvas.toDataURL("image/png");
+            }
+            
+            if (dataUrl) {
                 const a = document.createElement('a');
-                a.href = qrImg.src;
+                a.href = dataUrl;
                 a.download = `SmartPrint_QR_${shopId}.png`;
                 document.body.appendChild(a);
                 a.click();

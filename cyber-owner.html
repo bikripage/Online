@@ -17,6 +17,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
+    <!-- ✨ WebRTC PeerJS Library (Receiver) ✨ -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+
     <script>
         // REPLACE WITH YOUR FIREBASE CONFIG
         const firebaseConfig = {
@@ -61,7 +64,6 @@
     <div id="loginScreen" class="absolute inset-0 z-[100] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-5">
         <div class="bg-white p-8 md:p-10 rounded-[32px] ios-shadow w-full max-w-md border border-white animate-slide-up">
             
-            <!-- Login Back Button (if they want to cancel login and go back) -->
             <a href="index.html" class="absolute top-6 left-6 w-10 h-10 bg-gray-50 hover:bg-gray-100 rounded-full flex items-center justify-center text-gray-600 transition-colors">
                 <i class="fas fa-arrow-left"></i>
             </a>
@@ -102,7 +104,6 @@
     <div id="mainDashboard" class="hidden flex-col h-full w-full">
         <header class="bg-white/80 backdrop-blur-xl sticky top-0 z-40 px-4 md:px-5 py-3.5 flex items-center justify-between border-b border-gray-200/60 shadow-sm">
             <div class="flex items-center gap-3">
-                <!-- ✨ NEW BACK BUTTON ✨ -->
                 <a href="index.html" class="w-9 h-9 md:w-10 md:h-10 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center text-gray-700 transition-colors shadow-sm border border-gray-200 shrink-0">
                     <i class="fas fa-arrow-left"></i>
                 </a>
@@ -278,7 +279,11 @@
         let shopId = '';
         let soundEnabled = false;
         let isInitialLoad = true;
+        
+        // ✨ NEW: State arrays to combine Firebase Jobs + WebRTC Direct Jobs ✨
         let unsubscribeLiveSync = null;
+        let fbJobs = [];
+        let rtcJobs = [];
 
         function toast(msg, type='info'){
             const t = $('#toast'); $('#toast-msg').textContent = msg;
@@ -335,6 +340,8 @@
                 $('#mainDashboard').classList.add('flex');
                 
                 if(!isAutoLogin) toast('Logged in successfully', 'success');
+                
+                // Initialize both Firebase Sync and WebRTC Receiver
                 startLiveSync();
 
                 if (shopData.printSettings) {
@@ -363,28 +370,19 @@
             window.location.reload();
         }
 
-        // --- 2. DASHBOARD SYNC LOGIC ---
+        // --- 2. ✨ HYBRID DASHBOARD SYNC (FIREBASE + WEBRTC) ✨ ---
         function startLiveSync() {
             if(unsubscribeLiveSync) unsubscribeLiveSync();
 
+            // 1. Firebase Cloud Sync
             unsubscribeLiveSync = db.collection('printJobs')
                 .where('shopId', '==', shopId)
                 .where('status', 'in', ['pending-review', 'processing'])
                 .onSnapshot((snapshot) => {
-                    const jobs = [];
-                    snapshot.forEach(doc => jobs.push({ id: doc.id, ...doc.data() }));
-                    jobs.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
-
-                    renderJobs(jobs);
-                    $('#jobCount').textContent = jobs.length;
-
-                    if (jobs.length === 0) {
-                        $('#emptyState').classList.remove('hidden');
-                        $('#jobsGrid').classList.add('hidden');
-                    } else {
-                        $('#emptyState').classList.add('hidden');
-                        $('#jobsGrid').classList.remove('hidden');
-                    }
+                    fbJobs = [];
+                    snapshot.forEach(doc => fbJobs.push({ id: doc.id, ...doc.data() }));
+                    
+                    updateJobsUI(); // Re-render grid
 
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === "added" && !isInitialLoad && soundEnabled) {
@@ -393,8 +391,89 @@
                     });
                     isInitialLoad = false;
                 });
+
+            // 2. WebRTC Direct Sync (Zero Cloud Connection)
+            if(!window.peerInstance) {
+                window.peerInstance = new Peer('bikripage-print-' + shopId);
+                
+                window.peerInstance.on('open', (id) => {
+                    console.log("🚀 WebRTC Receiver Ready on Local Network: ", id);
+                });
+                
+                window.peerInstance.on('connection', (conn) => {
+                    conn.on('data', async (data) => {
+                        if(data.type === 'new_print_job') {
+                            
+                            // Play sound if alerts are ON
+                            if(soundEnabled) {
+                                document.getElementById('notifySound').play().catch(e => {});
+                            }
+                            
+                            // Convert incoming ArrayBuffer files to Local Blob URLs
+                            const parsedFiles = data.files.map(f => {
+                                const blob = new Blob([f.data], { type: f.fileType });
+                                return {
+                                    name: f.name,
+                                    url: URL.createObjectURL(blob),
+                                    contentType: f.fileType
+                                };
+                            });
+                            
+                            // Create a mock Job Object that matches Firebase structure
+                            const newRtcJob = {
+                                id: 'L' + String(Date.now()).slice(-5), // L + 5 digits = 6 char length
+                                createdAt: { toDate: () => new Date(data.timestamp) },
+                                customerNote: data.settings.colorMode + ' | ' + data.settings.printSide,
+                                copies: data.settings.copies,
+                                paper: data.settings.paperSize,
+                                files: parsedFiles,
+                                isLocalWrtc: true // Flag to identify local files
+                            };
+                            
+                            rtcJobs.push(newRtcJob);
+                            updateJobsUI();
+                            toast("Direct file received via WiFi/WebRTC!", "success");
+                        }
+                    });
+                });
+                
+                window.peerInstance.on('error', (err) => {
+                    console.error("Peer Error:", err);
+                    if(err.type === 'unavailable-id') {
+                        toast("Warning: Another tab is already listening for local files.", "error");
+                    }
+                });
+            }
         }
 
+        // Helper function to safely get time for sorting
+        function getJobTime(job) {
+            if(job.createdAt && typeof job.createdAt.toMillis === 'function') return job.createdAt.toMillis();
+            if(job.createdAt && typeof job.createdAt.toDate === 'function') return job.createdAt.toDate().getTime();
+            return 0;
+        }
+
+        // Unified rendering function
+        function updateJobsUI() {
+            // Combine both Firebase Jobs and Local WebRTC Jobs
+            const combinedJobs = [...fbJobs, ...rtcJobs];
+            
+            // Sort by newest first
+            combinedJobs.sort((a, b) => getJobTime(b) - getJobTime(a));
+            
+            renderJobs(combinedJobs);
+            $('#jobCount').textContent = combinedJobs.length;
+
+            if (combinedJobs.length === 0) {
+                $('#emptyState').classList.remove('hidden');
+                $('#jobsGrid').classList.add('hidden');
+            } else {
+                $('#emptyState').classList.add('hidden');
+                $('#jobsGrid').classList.remove('hidden');
+            }
+        }
+
+        // Exact original HTML structure rendered here
         function renderJobs(jobs) {
             $('#jobsGrid').innerHTML = jobs.map((job, index) => {
                 const colorMode = (job.customerNote || "").includes('Color') ? 'Color' : 'B&W';
@@ -404,7 +483,7 @@
                     ? `<span class="bg-blue-50 text-blue-600 border border-blue-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider">Color Print</span>`
                     : `<span class="bg-gray-100 text-gray-600 border border-gray-200 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider">B & W</span>`;
 
-                const time = job.createdAt ? new Date(job.createdAt.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Just now';
+                const time = job.createdAt ? new Date(getJobTime(job)).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Just now';
 
                 const filesHtml = (job.files || []).map(f => {
                     const isPdf = f.contentType === 'application/pdf';
@@ -424,9 +503,15 @@
                     `;
                 }).join('');
 
+                // Custom badge for Direct Transfer jobs
+                const sourceBadge = job.isLocalWrtc 
+                    ? `<span class="absolute -top-3 -right-3 bg-indigo-600 text-white text-[9px] font-bold px-4 py-1 rounded-bl-xl uppercase shadow-md rotate-12">Direct PC</span>` 
+                    : '';
+
                 return `
-                <div class="bg-white rounded-[24px] p-5 ios-shadow border border-gray-200/60 flex flex-col relative animate-fade-in" style="animation-delay: ${index * 0.05}s">
-                    <div class="flex justify-between items-start mb-5">
+                <div class="bg-white rounded-[24px] p-5 ios-shadow border border-gray-200/60 flex flex-col relative animate-fade-in overflow-hidden" style="animation-delay: ${index * 0.05}s">
+                    ${sourceBadge}
+                    <div class="flex justify-between items-start mb-5 relative z-10">
                         <div>
                             <div class="flex items-center gap-1.5 mb-1">
                                 <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
@@ -437,7 +522,7 @@
                         ${colorBadge}
                     </div>
 
-                    <div class="grid grid-cols-4 divide-x divide-gray-200/60 bg-gray-50/80 rounded-2xl border border-gray-200/60 mb-5 p-3">
+                    <div class="grid grid-cols-4 divide-x divide-gray-200/60 bg-gray-50/80 rounded-2xl border border-gray-200/60 mb-5 p-3 relative z-10">
                         <div class="text-center px-1">
                             <p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">Copies</p>
                             <p class="text-[15px] font-black text-gray-900">${job.copies || 1}</p>
@@ -456,11 +541,11 @@
                         </div>
                     </div>
 
-                    <div class="flex-1 mb-5 space-y-2 max-h-[160px] overflow-y-auto custom-scrollbar bg-gray-50/30 p-2 rounded-2xl">
+                    <div class="flex-1 mb-5 space-y-2 max-h-[160px] overflow-y-auto custom-scrollbar bg-gray-50/30 p-2 rounded-2xl relative z-10">
                         ${filesHtml}
                     </div>
 
-                    <div class="mt-auto">
+                    <div class="mt-auto relative z-10">
                         <button onclick="markAsDone('${job.id}')" class="w-full bg-gray-900 hover:bg-black text-white font-bold text-[14px] py-3.5 rounded-[16px] shadow-[0_8px_16px_rgba(0,0,0,0.1)] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                             <i class="fas fa-check-circle text-green-400"></i> Mark as Printed
                         </button>
@@ -472,6 +557,16 @@
 
         async function markAsDone(jobId) {
             if(!confirm("Print complete? This will mark the order as Done.")) return;
+            
+            // Checking if it's a Direct PC (WebRTC) job
+            if (jobId.startsWith('L')) {
+                rtcJobs = rtcJobs.filter(j => j.id !== jobId);
+                updateJobsUI();
+                toast("Job marked as completed", "success");
+                return;
+            }
+            
+            // Otherwise, it's a Firebase Job
             try {
                 await db.collection('printJobs').doc(jobId).update({
                     status: 'completed',
@@ -583,7 +678,6 @@
 
         function downloadQR() {
             const container = document.getElementById('qrcodeContainer');
-            // QrCode.js canvas ya img me render karta hai, dono ko check karo
             const qrImg = container.querySelector('img');
             const qrCanvas = container.querySelector('canvas');
             

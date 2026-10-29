@@ -29,7 +29,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-    <!-- ✨ WebRTC PeerJS Library (Sender) ✨ -->
+    <!-- WebRTC PeerJS Library (Sender) -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
     <script>
@@ -592,7 +592,7 @@
         ['dragleave','drop'].forEach(ev=>$('#dropArea').addEventListener(ev,e=>{ e.preventDefault(); $('#dropArea').classList.remove('border-blue-500', 'bg-blue-50/50'); }));
         $('#dropArea').addEventListener('drop',e => addFiles([...e.dataTransfer.files]));
 
-        // ✨ HYBRID SUBMIT (100% Auth-Free): WebRTC (Local) First -> If Failed -> E2EE Cloud Backup ✨
+        // ✨ HYBRID SUBMIT: WebRTC (Local) First -> If Failed -> E2EE Cloud Backup ✨
         $('#submit').addEventListener('click', async () => {
             if(!state.files.length) return toast('Please add at least one document.', 'error');
             if(!$('#consent').checked) return toast('Please check the consent box.', 'error');
@@ -603,6 +603,8 @@
             btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Connecting to Store...`;
 
             let webrtcSuccess = false;
+            let cloudBackupStarted = false; // ✨ LOCK FLAG ADDED HERE ✨
+            
             const peer = new Peer();
 
             const successUI = (refId) => {
@@ -620,12 +622,13 @@
             };
 
             const sendViaE2EECloud = async () => {
-                if(webrtcSuccess) return; 
+                // ✨ MAGIC LOCK: Prevent double execution ✨
+                if(webrtcSuccess || cloudBackupStarted) return; 
+                cloudBackupStarted = true; 
                 
                 btn.innerHTML = `<i class="fas fa-lock"></i> Encrypting & Sending...`;
                 
                 try {
-                    // Fetch Public Key (No auth needed due to new rules)
                     const keyDoc = await db.collection('printKeys').doc(shopId).get();
                     if(!keyDoc.exists) throw new Error('Store is offline or invalid QR code.');
                     const pubKey = await crypto.subtle.importKey('jwk', keyDoc.data().publicKey, {name:'RSA-OAEP', hash:'SHA-256'}, false, ['encrypt']);
@@ -640,11 +643,7 @@
                         if (!res.ok) throw new Error("Cloud server busy. Try again.");
                         
                         const data = await res.json();
-                        
-                        // ✨ FIX: Simplified API Check (Removed strict Regex that was causing "Upload failed") ✨
-                        if(data.status !== 'success' || !data.data || !data.data.url) {
-                            throw new Error('Upload failed from server.');
-                        }
+                        if(data.status !== 'success' || !data.data || !data.data.url) throw new Error('Upload failed from server.');
                         
                         const url = data.data.url.replace(/^http:/,'https:').replace('tmpfiles.org/', 'tmpfiles.org/dl/');
                         uploaded.push({ url, size: entry.file.size, key: enc.key, meta: enc.meta, contentType: entry.mime });
@@ -667,6 +666,7 @@
                     console.error(err);
                     toast(err.message || 'Network error. Please try again.', 'error');
                     resetBtn(btn);
+                    cloudBackupStarted = false; // Reset lock if it fails so user can try again
                 }
             };
 
@@ -676,6 +676,7 @@
                 const conn = peer.connect(targetShopId, { reliable: true });
 
                 conn.on('open', async () => {
+                    webrtcSuccess = true;
                     btn.innerHTML = `<i class="fas fa-wifi animate-pulse"></i> Transferring Fast...`;
                     
                     const printJobData = {
@@ -691,19 +692,17 @@
                     }
 
                     conn.send(printJobData);
-                    webrtcSuccess = true;
                     successUI(String(Date.now()).slice(-6));
                     setTimeout(() => peer.destroy(), 2000);
                 });
 
-                conn.on('error', () => { if(!webrtcSuccess) sendViaE2EECloud(); });
+                conn.on('error', () => { if(!webrtcSuccess) { peer.destroy(); sendViaE2EECloud(); } });
             });
 
-            peer.on('error', () => { if(!webrtcSuccess) sendViaE2EECloud(); });
+            peer.on('error', () => { if(!webrtcSuccess) { peer.destroy(); sendViaE2EECloud(); } });
 
             // Fail-safe timeout (3 seconds for WebRTC, then Cloud)
             setTimeout(() => { if(!webrtcSuccess) { peer.destroy(); sendViaE2EECloud(); } }, 3000);
-
         });
     </script>
 </body>

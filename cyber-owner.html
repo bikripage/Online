@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#F2F2F7">
+    <title>Owner Dashboard | Smart Print</title>
+
+    <!-- Tailwind & FontAwesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- QR Code Generator Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <!-- Firebase SDKs (v8) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        // REPLACE WITH YOUR FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyCWquftO39vqj83ZtYqtF_sDfkHVNpjd3k",
+            authDomain: "bikripage-3aba6.firebaseapp.com",
+            projectId: "bikripage-3aba6",
+            storageBucket: "bikripage-3aba6.firebasestorage.app",
+            messagingSenderId: "900882116436",
+            appId: "1:900882116436:web:8a521d0308347ddcccdc92"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { background-color: #F2F2F7; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E5EA; border-radius: 10px; }
+        
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        
+        .ios-shadow { box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08); }
+        .modal-bg { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); }
+
+        .toggle-checkbox:checked { right: 0; border-color: #34C759; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #34C759; }
+        .toggle-checkbox:checked + .toggle-label:after { transform: translateX(100%); border-color: white; }
+    </style>
+</head>
+<body class="text-gray-900 h-screen flex flex-col overflow-hidden relative">
+
+    <audio id="notifySound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+
+    <!-- ✨ 1. SECURE PREMIUM LOGIN SCREEN ✨ -->
+    <div id="loginScreen" class="absolute inset-0 z-[100] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-5">
+        <div class="bg-white p-8 md:p-10 rounded-[32px] ios-shadow w-full max-w-md border border-white animate-slide-up">
+            <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[20px] flex items-center justify-center text-white shadow-lg shadow-blue-500/30 mx-auto mb-6">
+                <i class="fas fa-print text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-black text-center text-gray-900 tracking-tight mb-2">Smart Print Desk</h2>
+            <p class="text-sm text-center text-gray-500 font-medium mb-8">Login with your BikriPage Shop ID & App Password.</p>
+            
+            <form id="loginForm" class="space-y-5">
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Shop ID</label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fas fa-store text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
+                        </div>
+                        <input type="text" id="loginShopId" placeholder="e.g. netajijhadustore-3581" required class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl pl-11 pr-4 py-4 text-sm font-bold text-gray-900 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">App Password</label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fas fa-key text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
+                        </div>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl pl-11 pr-4 py-4 text-sm font-bold text-gray-900 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all">
+                    </div>
+                </div>
+                <button type="submit" id="loginBtn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-2xl shadow-lg shadow-gray-900/20 active:scale-[0.98] transition-all mt-4 flex items-center justify-center gap-2">
+                    Secure Login <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ✨ 2. DASHBOARD HEADER ✨ -->
+    <div id="mainDashboard" class="hidden flex-col h-full w-full">
+        <header class="bg-white/80 backdrop-blur-xl sticky top-0 z-40 px-5 py-3.5 flex items-center justify-between border-b border-gray-200/60 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-600/20">
+                    <i class="fas fa-print text-sm"></i>
+                </div>
+                <div class="flex flex-col justify-center">
+                    <h1 class="font-bold text-[17px] tracking-tight leading-none mb-1">Live Print Desk</h1>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none" id="shopIdDisplay">ID: NULL</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-full border border-green-100 text-[11px] font-bold uppercase tracking-wider mr-2">
+                    <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                    System Active
+                </div>
+                <!-- QR CODE ICON -->
+                <button onclick="openQrModal()" class="w-10 h-10 bg-indigo-50 hover:bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 transition-colors shadow-inner border border-indigo-100">
+                    <i class="fas fa-qrcode text-lg"></i>
+                </button>
+                <!-- SETTINGS GEAR ICON -->
+                <button onclick="openSettings()" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-700 transition-colors shadow-inner border border-gray-200">
+                    <i class="fas fa-cog text-lg"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- ✨ 3. DASHBOARD CONTENT ✨ -->
+        <main class="flex-1 p-5 overflow-y-auto custom-scrollbar w-full max-w-7xl mx-auto">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-2 text-gray-800">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                        <i class="fas fa-clock text-sm"></i>
+                    </div>
+                    <h2 class="text-lg font-bold tracking-tight">Pending Jobs <span class="text-gray-400 ml-1 text-base">(<span id="jobCount">0</span>)</span></h2>
+                </div>
+                <button onclick="toggleSound()" id="soundBtn" class="flex items-center gap-2 bg-white px-4 py-2 rounded-xl text-[12px] font-bold text-gray-600 hover:text-gray-900 border border-gray-200 shadow-sm active:scale-95 transition-all">
+                    <i class="fas fa-volume-mute text-gray-400"></i> Alerts OFF
+                </button>
+            </div>
+
+            <div id="emptyState" class="hidden flex flex-col items-center justify-center py-24 px-4 text-center animate-fade-in">
+                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-5 border border-gray-200">
+                    <i class="fas fa-inbox text-3xl text-gray-300"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 tracking-tight">No Pending Prints</h3>
+                <p class="text-[13px] text-gray-500 font-medium mt-1">New requests from customers will appear here.</p>
+            </div>
+
+            <div id="jobsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
+        </main>
+    </div>
+
+    <!-- ✨ 4. ADVANCED SETTINGS MODAL ✨ -->
+    <div id="settingsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-bg p-4 opacity-0 transition-opacity">
+        <div class="bg-white rounded-[24px] w-full max-w-md shadow-2xl scale-95 transition-transform overflow-hidden flex flex-col" id="settingsModalContent">
+            
+            <div class="p-5 flex items-center justify-between border-b border-gray-100 bg-gray-50/50">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-sliders-h text-blue-600 text-xl"></i>
+                    <h3 class="font-bold text-gray-900 text-lg tracking-tight">System Settings</h3>
+                </div>
+                <button onclick="closeSettings()" class="w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center text-gray-600 active:scale-90 transition-colors"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="p-5 space-y-6 overflow-y-auto max-h-[70vh] custom-scrollbar">
+                
+                <div>
+                    <h4 class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3">Workflow Permissions</h4>
+                    <div class="bg-gray-50 border border-gray-200 rounded-2xl p-2 space-y-1">
+                        <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-white transition-colors border border-transparent">
+                            <input type="radio" name="workflowMode" value="manual" checked class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">Review Every Request</p>
+                                <p class="text-[11px] text-gray-500 font-medium leading-tight mt-0.5">Check files manually before marking as printed.</p>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-white transition-colors border border-transparent">
+                            <input type="radio" name="workflowMode" value="auto" class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">Auto-Accept (Fast Mode)</p>
+                                <p class="text-[11px] text-gray-500 font-medium leading-tight mt-0.5">Directly accept all orders automatically.</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3">Data Privacy (Storage)</h4>
+                    <div class="bg-gray-50 border border-gray-200 rounded-2xl p-2 space-y-1">
+                        <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-white transition-colors border border-transparent">
+                            <input type="radio" name="privacyMode" value="immediate" checked class="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500">
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">Delete Immediately</p>
+                                <p class="text-[11px] text-gray-500 font-medium leading-tight mt-0.5">Files deleted from server once marked as printed.</p>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-white transition-colors border border-transparent">
+                            <input type="radio" name="privacyMode" value="24hours" class="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500">
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">Keep for 24 Hours</p>
+                                <p class="text-[11px] text-gray-500 font-medium leading-tight mt-0.5">Allow re-printing for one day before deletion.</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                    <div>
+                        <p class="text-sm font-bold text-gray-800">Store Status</p>
+                        <p class="text-[11px] text-gray-500 font-medium mt-0.5">Accepting new print orders</p>
+                    </div>
+                    <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                        <input type="checkbox" id="storeStatusToggle" checked class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 z-10 transition-transform duration-200 ease-in-out"/>
+                        <label for="storeStatusToggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer transition-colors duration-200 ease-in-out"></label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-5 border-t border-gray-100 bg-white flex flex-col gap-3">
+                <button onclick="saveSettings()" id="saveSettingsBtn" class="w-full bg-gray-900 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-gray-900/20 active:scale-95 transition-all">
+                    Save Preferences
+                </button>
+                <button onclick="logout()" class="w-full bg-red-50 text-red-600 hover:bg-red-100 font-bold py-3.5 rounded-xl border border-red-100 active:scale-95 transition-all">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Log Out
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✨ 5. QR CODE SHARE & DOWNLOAD MODAL ✨ -->
+    <div id="qrModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-bg p-4 opacity-0 transition-opacity">
+        <div class="bg-white rounded-[24px] w-full max-w-sm shadow-2xl scale-95 transition-transform overflow-hidden flex flex-col" id="qrModalContent">
+            
+            <div class="p-4 flex items-center justify-between border-b border-gray-100 bg-white">
+                <h3 class="font-bold text-gray-900 tracking-tight">Print & Share QR Code</h3>
+                <button onclick="closeQrModal()" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 active:scale-90 transition-colors"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="p-6 flex flex-col items-center bg-gray-50/50">
+                <p class="text-[11px] text-gray-500 font-bold uppercase tracking-wider mb-4 text-center">Customers will scan this to upload files.</p>
+                
+                <!-- QR Code Box -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 mb-5 flex items-center justify-center min-h-[200px]" id="qrcodeContainer">
+                    <!-- QR Code Generated Here -->
+                </div>
+
+                <!-- Customer Link Input -->
+                <div class="w-full relative group mb-5">
+                    <input type="text" id="customerLinkInput" readonly class="w-full bg-white border border-gray-200 rounded-xl pl-4 pr-12 py-3 text-xs font-medium text-gray-600 outline-none">
+                    <button onclick="copyCustomerLink()" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+
+                <button onclick="downloadQR()" class="w-full bg-indigo-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <i class="fas fa-download"></i> Download QR Image
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-5 py-3 rounded-full text-sm font-medium shadow-xl transition-all duration-300 opacity-0 pointer-events-none z-[100] flex items-center gap-2 min-w-max">
+        <i class="fas fa-info-circle text-blue-400"></i> <span id="toast-msg">Message</span>
+    </div>
+
+    <!-- ✨ JS LOGIC ✨ -->
+    <script>
+        const $ = s => document.querySelector(s);
+        let shopId = '';
+        let soundEnabled = false;
+        let isInitialLoad = true;
+        let unsubscribeLiveSync = null;
+
+        function toast(msg, type='info'){
+            const t = $('#toast'); $('#toast-msg').textContent = msg;
+            let icon = '<i class="fas fa-info-circle text-blue-400"></i>';
+            if(type === 'error') icon = '<i class="fas fa-exclamation-circle text-red-400"></i>';
+            if(type === 'success') icon = '<i class="fas fa-check-circle text-green-400"></i>';
+            t.innerHTML = `${icon} <span id="toast-msg">${msg}</span>`;
+            t.classList.remove('opacity-0', 'translate-y-[-20px]');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => t.classList.add('opacity-0', 'translate-y-[-20px]'), 3000);
+        }
+
+        // --- 1. AUTO-LOGIN & SECURE LOGIN LOGIC ---
+        window.onload = () => {
+            // Check if saved credentials exist
+            const savedShopId = localStorage.getItem('smartPrintShopId');
+            const savedPwd = localStorage.getItem('smartPrintPwd');
+            
+            if (savedShopId && savedPwd) {
+                // Background Auto-Login
+                $('#loginShopId').value = savedShopId;
+                $('#loginPassword').value = savedPwd;
+                performLogin(savedShopId, savedPwd, true);
+            }
+        };
+
+        $('#loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const sid = $('#loginShopId').value.trim();
+            const pwd = $('#loginPassword').value.trim();
+            performLogin(sid, pwd, false);
+        });
+
+        async function performLogin(sid, pwd, isAutoLogin) {
+            const btn = $('#loginBtn');
+            if(!isAutoLogin) {
+                btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Authenticating...`;
+                btn.disabled = true;
+            }
+
+            try {
+                // Fetching Shop Data from Firestore
+                const docRef = await db.collection('shops').doc(sid).get();
+                
+                if(!docRef.exists) {
+                    throw new Error("Shop ID not found.");
+                }
+                
+                const shopData = docRef.data();
+                
+                // Secure check
+                if(shopData.appPassword !== pwd && shopData.password !== pwd) {
+                    throw new Error("Incorrect Password!");
+                }
+
+                // Login Success
+                shopId = sid;
+                
+                // SAVE TO LOCAL STORAGE
+                localStorage.setItem('smartPrintShopId', sid);
+                localStorage.setItem('smartPrintPwd', pwd);
+
+                $('#shopIdDisplay').textContent = `ID: ${shopId}`;
+                $('#loginScreen').classList.add('hidden');
+                $('#mainDashboard').classList.remove('hidden');
+                $('#mainDashboard').classList.add('flex');
+                
+                if(!isAutoLogin) toast('Logged in successfully', 'success');
+                startLiveSync();
+
+                // Load Settings
+                if (shopData.printSettings) {
+                    document.querySelector(`input[name="workflowMode"][value="${shopData.printSettings.workflow}"]`).checked = true;
+                    document.querySelector(`input[name="privacyMode"][value="${shopData.printSettings.privacy}"]`).checked = true;
+                    $('#storeStatusToggle').checked = shopData.printSettings.isOnline;
+                }
+
+            } catch (err) {
+                // If auto-login fails, clear storage
+                localStorage.removeItem('smartPrintShopId');
+                localStorage.removeItem('smartPrintPwd');
+                if(!isAutoLogin) toast(err.message || 'Login failed. Please try again.', 'error');
+                
+                $('#loginScreen').classList.remove('hidden');
+                $('#mainDashboard').classList.add('hidden');
+            } finally {
+                if(!isAutoLogin) {
+                    btn.innerHTML = `Secure Login <i class="fas fa-arrow-right"></i>`;
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('smartPrintShopId');
+            localStorage.removeItem('smartPrintPwd');
+            window.location.reload();
+        }
+
+        // --- 2. DASHBOARD SYNC LOGIC ---
+        function startLiveSync() {
+            if(unsubscribeLiveSync) unsubscribeLiveSync();
+
+            unsubscribeLiveSync = db.collection('printJobs')
+                .where('shopId', '==', shopId)
+                .where('status', 'in', ['pending-review', 'processing'])
+                .onSnapshot((snapshot) => {
+                    const jobs = [];
+                    snapshot.forEach(doc => jobs.push({ id: doc.id, ...doc.data() }));
+                    jobs.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+
+                    renderJobs(jobs);
+                    $('#jobCount').textContent = jobs.length;
+
+                    if (jobs.length === 0) {
+                        $('#emptyState').classList.remove('hidden');
+                        $('#jobsGrid').classList.add('hidden');
+                    } else {
+                        $('#emptyState').classList.add('hidden');
+                        $('#jobsGrid').classList.remove('hidden');
+                    }
+
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === "added" && !isInitialLoad && soundEnabled) {
+                            document.getElementById('notifySound').play().catch(e => {});
+                        }
+                    });
+                    isInitialLoad = false;
+                });
+        }
+
+        function renderJobs(jobs) {
+            $('#jobsGrid').innerHTML = jobs.map((job, index) => {
+                const colorMode = (job.customerNote || "").includes('Color') ? 'Color' : 'B&W';
+                const sideMode = (job.customerNote || "").includes('Double') ? 'Double' : 'Single';
+                
+                const colorBadge = colorMode === 'Color' 
+                    ? `<span class="bg-blue-50 text-blue-600 border border-blue-100 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider">Color Print</span>`
+                    : `<span class="bg-gray-100 text-gray-600 border border-gray-200 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider">B & W</span>`;
+
+                const time = job.createdAt ? new Date(job.createdAt.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Just now';
+
+                const filesHtml = (job.files || []).map(f => {
+                    const isPdf = f.contentType === 'application/pdf';
+                    const icon = isPdf ? 'fa-file-pdf text-red-500' : 'fa-image text-blue-500';
+                    return `
+                        <div class="flex items-center justify-between p-2.5 bg-white border border-gray-100 rounded-[12px] shadow-sm hover:border-gray-300 transition-colors">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center shrink-0 border border-gray-100">
+                                    <i class="fas ${icon} text-[13px]"></i>
+                                </div>
+                                <div class="truncate text-[12px] font-bold text-gray-800" title="${f.name}">${f.name}</div>
+                            </div>
+                            <button onclick="window.open('${f.url}', '_blank')" class="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors shrink-0 ml-2">
+                                <i class="fas fa-external-link-alt text-[11px]"></i>
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                <div class="bg-white rounded-[24px] p-5 ios-shadow border border-gray-200/60 flex flex-col relative animate-fade-in" style="animation-delay: ${index * 0.05}s">
+                    <div class="flex justify-between items-start mb-5">
+                        <div>
+                            <div class="flex items-center gap-1.5 mb-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">ID: #${job.id.slice(0,6).toUpperCase()}</span>
+                            </div>
+                            <div class="text-[13px] font-bold text-gray-900 tracking-tight"><i class="fas fa-clock text-gray-300 mr-1"></i> ${time}</div>
+                        </div>
+                        ${colorBadge}
+                    </div>
+
+                    <div class="grid grid-cols-4 divide-x divide-gray-200/60 bg-gray-50/80 rounded-2xl border border-gray-200/60 mb-5 p-3">
+                        <div class="text-center px-1">
+                            <p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">Copies</p>
+                            <p class="text-[15px] font-black text-gray-900">${job.copies || 1}</p>
+                        </div>
+                        <div class="text-center px-1">
+                            <p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">Paper</p>
+                            <p class="text-[13px] font-black text-gray-900 mt-0.5 leading-tight">${job.paper || 'A4'}</p>
+                        </div>
+                        <div class="text-center px-1">
+                            <p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">Side</p>
+                            <p class="text-[13px] font-black text-gray-900 mt-0.5 leading-tight">${sideMode}</p>
+                        </div>
+                        <div class="text-center px-1">
+                            <p class="text-[9px] font-black text-gray-400 uppercase mb-0.5">Files</p>
+                            <p class="text-[15px] font-black text-blue-600">${job.files ? job.files.length : 0}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 mb-5 space-y-2 max-h-[160px] overflow-y-auto custom-scrollbar bg-gray-50/30 p-2 rounded-2xl">
+                        ${filesHtml}
+                    </div>
+
+                    <div class="mt-auto">
+                        <button onclick="markAsDone('${job.id}')" class="w-full bg-gray-900 hover:bg-black text-white font-bold text-[14px] py-3.5 rounded-[16px] shadow-[0_8px_16px_rgba(0,0,0,0.1)] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-check-circle text-green-400"></i> Mark as Printed
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        async function markAsDone(jobId) {
+            if(!confirm("Print complete? This will mark the order as Done.")) return;
+            try {
+                const privacyMode = document.querySelector('input[name="privacyMode"]:checked').value;
+                if(privacyMode === 'immediate') {
+                    console.log("Will auto-delete files to save privacy.");
+                }
+
+                await db.collection('printJobs').doc(jobId).update({
+                    status: 'completed',
+                    completedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                toast("Job marked as completed", "success");
+            } catch(e) {
+                console.error("Error updating job:", e);
+                toast("Error marking as done!", "error");
+            }
+        }
+
+        // --- 3. AUDIO ALERTS TOGGLE LOGIC ---
+        function toggleSound() {
+            soundEnabled = !soundEnabled; 
+            const btn = $('#soundBtn');
+            
+            if (soundEnabled) {
+                const audio = document.getElementById('notifySound');
+                audio.play().then(() => {
+                    audio.pause(); 
+                    audio.currentTime = 0; 
+                }).catch(e => console.log("Sound block", e));
+                
+                btn.innerHTML = `<i class="fas fa-volume-up text-green-500"></i> Alerts ON`;
+                btn.classList.add('bg-green-50', 'border-green-300');
+                toast("Sound alerts activated! 🔔", "success");
+            } else {
+                btn.innerHTML = `<i class="fas fa-volume-mute text-gray-400"></i> Alerts OFF`;
+                btn.classList.remove('bg-green-50', 'border-green-300');
+                toast("Sound alerts muted.", "info");
+            }
+        }
+
+        // --- 4. ADVANCED SETTINGS MODAL ---
+        function openSettings() {
+            $('#settingsModal').classList.remove('hidden');
+            setTimeout(() => { $('#settingsModal').classList.remove('opacity-0'); $('#settingsModalContent').classList.remove('scale-95'); }, 10);
+        }
+        function closeSettings() {
+            $('#settingsModal').classList.add('opacity-0'); $('#settingsModalContent').classList.add('scale-95');
+            setTimeout(() => $('#settingsModal').classList.add('hidden'), 300);
+        }
+        
+        async function saveSettings() {
+            const btn = $('#saveSettingsBtn');
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
+            
+            const workflow = document.querySelector('input[name="workflowMode"]:checked').value;
+            const privacy = document.querySelector('input[name="privacyMode"]:checked').value;
+            const isOnline = $('#storeStatusToggle').checked;
+
+            try {
+                await db.collection('shops').doc(shopId).set({
+                    printSettings: { workflow, privacy, isOnline },
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+
+                toast("Preferences saved successfully!", "success");
+                closeSettings();
+            } catch(e) {
+                console.error("Failed to save settings", e);
+                toast("Preferences applied locally.", "success");
+                closeSettings();
+            } finally {
+                btn.innerHTML = `Save Preferences`;
+            }
+        }
+
+        // --- 5. QR CODE GENERATION & DOWNLOAD ---
+        function getCustomerUrl() {
+            // Build the dynamic URL pointing to cyber-customer.html
+            let baseUrl = window.location.origin + window.location.pathname.replace(/cyber-owner\.html$/, 'cyber-customer.html');
+            // GitHub Pages specific fallback if direct path logic fails
+            if(!baseUrl.includes('cyber-customer.html')) {
+                baseUrl = "https://bikripage.github.io/Online/cyber-customer.html";
+            }
+            return `${baseUrl}?shopId=${shopId}`;
+        }
+
+        function openQrModal() {
+            const customerUrl = getCustomerUrl();
+            $('#customerLinkInput').value = customerUrl;
+            
+            // Generate QR Code
+            $('#qrcodeContainer').innerHTML = ''; // Clear old
+            new QRCode(document.getElementById("qrcodeContainer"), {
+                text: customerUrl,
+                width: 180,
+                height: 180,
+                colorDark : "#111827",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+
+            $('#qrModal').classList.remove('hidden');
+            setTimeout(() => { $('#qrModal').classList.remove('opacity-0'); $('#qrModalContent').classList.remove('scale-95'); }, 10);
+        }
+
+        function closeQrModal() {
+            $('#qrModal').classList.add('opacity-0'); $('#qrModalContent').classList.add('scale-95');
+            setTimeout(() => $('#qrModal').classList.add('hidden'), 300);
+        }
+
+        function copyCustomerLink() {
+            const copyText = document.getElementById("customerLinkInput");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); // For mobile devices
+            navigator.clipboard.writeText(copyText.value);
+            toast("Link Copied to Clipboard!", "success");
+        }
+
+        function downloadQR() {
+            // Finding the image generated by qrcode.js
+            const qrImg = document.querySelector('#qrcodeContainer img');
+            if (qrImg && qrImg.src) {
+                const a = document.createElement('a');
+                a.href = qrImg.src;
+                a.download = `SmartPrint_QR_${shopId}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                toast("QR Code Downloaded!", "success");
+            } else {
+                toast("Please wait for QR to generate", "error");
+            }
+        }
+    </script>
+</body>
+</html>

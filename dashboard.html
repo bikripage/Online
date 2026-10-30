@@ -2384,6 +2384,48 @@ function applyProLocks(shopData) {
             renderAdminBills(); 
             renderInsights(); 
         }
+        // ✨ NAYA FUNCTION: Order Verify Karne Ke Liye WhatsApp Message ✨
+window.sendOrderVerification = function(orderId) {
+    if (!window.globalLiveOrders) return;
+    
+    // Order ki sari details fetch karna
+    let order = window.globalLiveOrders.find(o => o.id === orderId);
+    if (!order) return;
+
+    let name = order.customerName || 'Customer';
+    let phone = order.customerPhone || '';
+    let address = order.customerAddress || 'No address provided';
+    let total = order.totalAmount || 0;
+    let shopName = (typeof globalShopData !== 'undefined' && globalShopData.shopName) ? globalShopData.shopName : 'Store';
+    
+    // Google Map Link Generate karna
+    let mapLink = (order.lat && order.lng) 
+        ? `https://www.google.com/maps/dir/?api=1&destination=${order.lat},${order.lng}` 
+        : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`;
+    
+    // Items ki list banana
+    let itemsPlainList = "";
+    if (order.items && order.items.length > 0) {
+        itemsPlainList = order.items.map(i => {
+            let cleanName = (i.name || "Item").replace(/\s*\([^)]*\)$/, '').trim();
+            let displayQty = i.qty;
+            if (i.unit) {
+                displayQty = `${i.qty} ${i.unit}`;
+            } else if (i.name && i.name.includes('(') && i.name.includes(')')) {
+                let extractedUnit = i.name.match(/\(([^)]+)\)/);
+                if (extractedUnit && extractedUnit[1]) displayQty = `${i.qty} ${extractedUnit[1]}`;
+            }
+            return `▪ ${displayQty} x ${cleanName}`;
+        }).join('\n');
+    }
+
+    // Professional Hindi Message Draft karna
+    let msg = `नमस्ते *${name}* जी,\n\nमैं *${shopName}* से बात कर रहा/रही हूँ। आपका एक नया ऑर्डर हमें प्राप्त हुआ है।\n\nकृपया अपनी डिटेल्स वेरीफाई करें:\n\n👤 *ग्राहक का नाम:* ${name}\n📞 *फ़ोन नंबर:* ${phone}\n📍 *डिलीवरी पता:* ${address}\n🗺️ *गूगल मैप लोकेशन:* ${mapLink}\n\n🛒 *ऑर्डर आइटम्स:*\n${itemsPlainList}\n\n💰 *कुल राशि (Total): ₹${total}*\n\nयह मैसेज ऑर्डर वेरीफाई करने के लिए किया गया है। *अगर इसमें सब जानकारी सही-सही है, तो कृपया 'Ok' लिखकर रिप्लाई करें* ताकि हम आपका ऑर्डर तुरंत तैयार कर सकें।\n\nधन्यवाद!`;
+    
+    // WhatsApp Open karna
+    window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+};
+
                              function renderLiveOrders(orders) {
     const list = document.getElementById('merchant-orders-list');
     if(!list) return;
@@ -2488,24 +2530,33 @@ function applyProLocks(shopData) {
         }
 
         let btns = '';
-        if(o.status === 'pending') {
+                if(o.status === 'pending') {
             btns = `
-                <div class="flex items-center gap-2 w-full mt-2">
-                    <a href="tel:${o.customerPhone}" class="w-11 h-11 bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 rounded-[14px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
+                <div class="flex items-center gap-1.5 w-full mt-2">
+                    <!-- NAYA: WhatsApp Verify Button -->
+                    <button onclick="sendOrderVerification('${o.id}')" class="w-10 h-11 bg-[#DCFCE7] border border-[#BBF7D0] text-[#16A34A] hover:bg-[#16A34A] hover:text-white rounded-[14px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm" title="Verify Order">
+                        <i class="fab fa-whatsapp text-[16px]"></i>
+                    </button>
+                    <!-- Call Button -->
+                    <a href="tel:${o.customerPhone}" class="w-10 h-11 bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 rounded-[14px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
                         <i class="fas fa-phone-alt text-[13px]"></i>
                     </a>
-                    <button onclick="updateLiveOrderStatus('${o.id}', 'cancelled', '${o.customerPhone}', '${o.customerName}')" class="w-11 h-11 bg-red-50 border border-red-100 text-red-500 rounded-[14px] flex items-center justify-center text-base active:scale-95 transition shrink-0 shadow-sm">
+                    <!-- Cancel Button -->
+                    <button onclick="updateLiveOrderStatus('${o.id}', 'cancelled', '${o.customerPhone}', '${o.customerName}')" class="w-10 h-11 bg-red-50 border border-red-100 text-red-500 hover:bg-red-100 rounded-[14px] flex items-center justify-center text-base active:scale-95 transition shrink-0 shadow-sm">
                         <i class="fas fa-times"></i>
                     </button>
-                    <button onclick="updateLiveOrderStatus('${o.id}', 'accepted', '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-[#111827] text-white font-bold h-11 rounded-[14px] text-[13px] hover:bg-black active:scale-95 transition shadow-sm flex items-center justify-center gap-1.5">
-                        Accept Order
+                    <!-- Accept Button -->
+                    <button onclick="updateLiveOrderStatus('${o.id}', 'accepted', '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-[#111827] text-white font-bold h-11 rounded-[14px] text-[13px] hover:bg-black active:scale-95 transition shadow-sm flex items-center justify-center gap-1">
+                        Accept
                     </button>
-                    <button onclick="deleteLiveOrder('${o.id}')" class="w-11 h-11 bg-red-50 border border-red-100 text-red-600 hover:bg-red-100 rounded-[14px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
+                    <!-- Delete Button -->
+                    <button onclick="deleteLiveOrder('${o.id}')" class="w-10 h-11 bg-red-50 border border-red-100 text-red-600 hover:bg-red-100 rounded-[14px] flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm">
                         <i class="fas fa-trash-alt text-[13px]"></i>
                     </button>
                 </div>
             `;
-        } else if(o.status === 'accepted') {
+        }
+else if(o.status === 'accepted') {
             let otpCheckHtml = '';
             let btnDisabledState = 'disabled';
             let btnOpacity = 'opacity-40 cursor-not-allowed';

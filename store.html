@@ -1734,31 +1734,48 @@ async function submitStoreReview() {
                 if (snap.docs.length < 5) { hasMoreReviews = false; btn.classList.add('hidden'); } 
                 else { hasMoreReviews = true; btn.classList.remove('hidden'); btn.innerHTML = `Load More`; }
                 
-                                             let html = '';
+                                                             let html = '';
                 snap.forEach(doc => {
                     if (doc.id === customerPhone) return; 
                     const data = doc.data();
-                    let starsHtml = ''; for(let i=1; i<=5; i++) { starsHtml += i <= data.rating ? `<i class="fas fa-star text-yellow-400 text-[10px]"></i> ` : `<i class="far fa-star text-gray-200 text-[10px]"></i> `; }
+                    let starsHtml = ''; for(let i=1; i<=5; i++) { starsHtml += i <= data.rating ? `<i class="fas fa-star text-[#007AFF] text-[10px]"></i> ` : `<i class="far fa-star text-gray-200 text-[10px]"></i> `; }
                     const dateStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleDateString('en-GB', {day: 'numeric', month: 'short'}) : 'Just now';
                     
-                    let firstLetter = data.customerName ? data.customerName.charAt(0).toUpperCase() : 'U';
-                    const bgColors = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500', 'bg-indigo-500', 'bg-teal-500', 'bg-orange-500'];
-                    let colorIdx = data.customerName ? data.customerName.charCodeAt(0) % bgColors.length : 0;
-                    let dpColor = bgColors[colorIdx];
+                    // ✨ FIX 1: ACTUAL DP YA BETTER RANDOM COLORS ✨
+                    let dpHtml = '';
+                    if (data.profilePic && data.profilePic.startsWith('http')) {
+                        dpHtml = `<img src="${data.profilePic}" class="w-8 h-8 rounded-full object-cover shrink-0" alt="DP">`;
+                    } else {
+                        let firstLetter = data.customerName ? data.customerName.charAt(0).toUpperCase() : 'U';
+                        const bgColors = ['bg-[#FF3B30]', 'bg-[#FF9500]', 'bg-[#34C759]', 'bg-[#007AFF]', 'bg-[#5856D6]', 'bg-[#AF52DE]', 'bg-[#FF2D55]'];
+                        // Naam ki length aur charCode mix karke ek better random index nikalte hain
+                        let strToCalc = data.customerName || "User";
+                        let hash = 0;
+                        for (let i = 0; i < strToCalc.length; i++) { hash += strToCalc.charCodeAt(i); }
+                        let dpColor = bgColors[hash % bgColors.length];
+                        dpHtml = `<div class="w-8 h-8 ${dpColor} text-white rounded-full flex justify-center items-center text-[13px] font-bold uppercase shrink-0">${firstLetter}</div>`;
+                    }
 
-                    let storageKey = 'BikriPage_store_likes_' + (localStorage.getItem('BikriPage_customer_phone') || 'guest');
-                    let likedReviews = JSON.parse(localStorage.getItem(storageKey)) || [];
-                    let isLiked = likedReviews.includes(doc.id);
-                    let thumbIcon = isLiked ? 'fas fa-thumbs-up text-blue-600' : 'far fa-thumbs-up';
+                    // ✨ FIX 2: LIKE & DISLIKE STATE SEPARATION ✨
+                    let likeStorageKey = 'BikriPage_store_likes_' + (localStorage.getItem('BikriPage_customer_phone') || 'guest');
+                    let dislikeStorageKey = 'BikriPage_store_dislikes_' + (localStorage.getItem('BikriPage_customer_phone') || 'guest');
                     
-                    // ✨ NAYA: Database se likes fetch karna ✨
+                    let likedReviews = JSON.parse(localStorage.getItem(likeStorageKey)) || [];
+                    let dislikedReviews = JSON.parse(localStorage.getItem(dislikeStorageKey)) || [];
+                    
+                    let isLiked = likedReviews.includes(doc.id);
+                    let isDisliked = dislikedReviews.includes(doc.id);
+                    
+                    let thumbUpIcon = isLiked ? 'fas fa-thumbs-up text-blue-600' : 'far fa-thumbs-up';
+                    let thumbDownIcon = isDisliked ? 'fas fa-thumbs-down text-blue-600' : 'far fa-thumbs-down';
+                    
                     let likesCount = Math.max(0, data.likes || 0);
 
                     html += `
                     <div class="bg-white p-0 border-b border-gray-100 pb-5 mb-5 last:border-0 last:mb-0 last:pb-0">
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 ${dpColor} text-white rounded-full flex justify-center items-center text-[13px] font-bold uppercase shrink-0">${firstLetter}</div>
+                                ${dpHtml}
                                 <h5 class="font-bold text-gray-900 text-[13px]">${data.customerName}</h5>
                             </div>
                             <button class="text-gray-400 hover:text-gray-600 active:scale-95"><i class="fas fa-ellipsis-v text-[12px]"></i></button>
@@ -1772,21 +1789,20 @@ async function submitStoreReview() {
                         <div class="flex items-center gap-4 mt-4 text-[11px] text-gray-500 font-medium">
                             <span>Was this review helpful?</span>
                             <div class="flex items-center gap-4">
-                                <!-- ✨ NAYA: Like Button with Count Span ✨ -->
+                                <!-- Like Button -->
                                 <button onclick="toggleStoreReviewLike('${doc.id}', this)" class="flex items-center gap-1.5 hover:text-gray-800 active:scale-90 transition">
-                                    <i class="${thumbIcon} text-[13px] transition-colors"></i>
+                                    <i class="${thumbUpIcon} text-[13px] transition-colors"></i>
                                     <span class="like-count font-bold">${likesCount > 0 ? likesCount : ''}</span>
                                 </button>
                                 <!-- Dislike Button -->
-                                <button onclick="this.querySelector('i').classList.toggle('fas'); this.querySelector('i').classList.toggle('far');" class="hover:text-gray-800 active:scale-90 transition">
-                                    <i class="far fa-thumbs-down text-[13px]"></i>
+                                <button onclick="toggleStoreReviewDislike('${doc.id}', this)" class="flex items-center gap-1.5 hover:text-gray-800 active:scale-90 transition">
+                                    <i class="${thumbDownIcon} text-[13px] transition-colors"></i>
                                 </button>
                             </div>
                         </div>
                     </div>`;
                 });
 
-                
                 if (isLoadMore) { document.getElementById('reviews-list').insertAdjacentHTML('beforeend', html); } 
                 else { document.getElementById('reviews-list').innerHTML = html || `<div class="text-center py-6"><p class="text-[13px] text-gray-400 font-semibold">No other reviews yet.</p></div>`; }
             } catch (e) { console.error(e); }
@@ -2998,58 +3014,106 @@ function cancelEdit() {
     document.getElementById('review-form-container').classList.add('hidden');
     document.getElementById('my-review-container').classList.remove('hidden');
 }
-// ✨ UPDATED: Store Review Like/Unlike Function ✨
+// ✨ UPDATED: Store Review LIKE Function ✨
 function toggleStoreReviewLike(reviewId, btnElement) {
     const userPhone = localStorage.getItem('BikriPage_customer_phone');
     if (!userPhone) {
-        if(typeof showIOSAlert === 'function') {
-            showIOSAlert("Login Required", "Please log in to like reviews!", "OK");
-        } else {
-            alert("Please log in to like reviews!");
-        }
+        if(typeof showIOSAlert === 'function') showIOSAlert("Login Required", "Please log in to like reviews!", "OK");
+        else alert("Please log in to like reviews!");
         return;
     }
     
     let icon = btnElement.querySelector('i');
     let countSpan = btnElement.querySelector('.like-count');
-    let currentCount = parseInt(countSpan.innerText) || 0; // Current count nikal rahe hain
+    let currentCount = parseInt(countSpan.innerText) || 0;
     
-    let storageKey = 'BikriPage_store_likes_' + userPhone;
-    let likedReviews = JSON.parse(localStorage.getItem(storageKey)) || [];
+    let likeKey = 'BikriPage_store_likes_' + userPhone;
+    let dislikeKey = 'BikriPage_store_dislikes_' + userPhone;
+    
+    let likedReviews = JSON.parse(localStorage.getItem(likeKey)) || [];
+    let dislikedReviews = JSON.parse(localStorage.getItem(dislikeKey)) || [];
+    
     let isLiked = icon.classList.contains('fas'); 
+    
+    // Agar Dislike button on hai, usko pehle band karo
+    let dislikeBtn = btnElement.nextElementSibling;
+    let dislikeIcon = dislikeBtn.querySelector('i');
+    if (dislikedReviews.includes(reviewId)) {
+        dislikedReviews = dislikedReviews.filter(id => id !== reviewId);
+        dislikeIcon.classList.remove('fas', 'text-blue-600');
+        dislikeIcon.classList.add('far');
+        localStorage.setItem(dislikeKey, JSON.stringify(dislikedReviews));
+    }
 
     try {
         if (isLiked) {
-            // Unlike Action
             icon.classList.remove('fas', 'text-blue-600');
             icon.classList.add('far');
-            
-            // Count decrease karna (0 se neeche nahi jane dena)
             currentCount = Math.max(0, currentCount - 1);
-            
             likedReviews = likedReviews.filter(id => id !== reviewId);
             db.collection('shops').doc(currentShopId).collection('reviews').doc(reviewId)
               .update({ likes: firebase.firestore.FieldValue.increment(-1) }).catch(e => console.log(e));
         } else {
-            // Like Action
             icon.classList.remove('far');
             icon.classList.add('fas', 'text-blue-600');
-            
-            // Count increase karna
             currentCount += 1;
-            
             if (!likedReviews.includes(reviewId)) likedReviews.push(reviewId);
             db.collection('shops').doc(currentShopId).collection('reviews').doc(reviewId)
               .update({ likes: firebase.firestore.FieldValue.increment(1) }).catch(e => console.log(e));
         }
         
-        // UI mein text update karna (Agar 0 hai toh text hata do)
+        countSpan.innerText = currentCount > 0 ? currentCount : '';
+        localStorage.setItem(likeKey, JSON.stringify(likedReviews));
+    } catch (error) { console.log(error); }
+}
+
+// ✨ NAYA: Store Review DISLIKE Function ✨
+function toggleStoreReviewDislike(reviewId, btnElement) {
+    const userPhone = localStorage.getItem('BikriPage_customer_phone');
+    if (!userPhone) {
+        if(typeof showIOSAlert === 'function') showIOSAlert("Login Required", "Please log in to dislike reviews!", "OK");
+        else alert("Please log in to dislike reviews!");
+        return;
+    }
+
+    let icon = btnElement.querySelector('i');
+    let likeKey = 'BikriPage_store_likes_' + userPhone;
+    let dislikeKey = 'BikriPage_store_dislikes_' + userPhone;
+    
+    let likedReviews = JSON.parse(localStorage.getItem(likeKey)) || [];
+    let dislikedReviews = JSON.parse(localStorage.getItem(dislikeKey)) || [];
+    
+    let isDisliked = icon.classList.contains('fas');
+
+    // Agar Like button on hai, usko pehle band karo (aur count kam karo)
+    let likeBtn = btnElement.previousElementSibling;
+    let likeIcon = likeBtn.querySelector('i');
+    let countSpan = likeBtn.querySelector('.like-count');
+    if (likedReviews.includes(reviewId)) {
+        likedReviews = likedReviews.filter(id => id !== reviewId);
+        likeIcon.classList.remove('fas', 'text-blue-600');
+        likeIcon.classList.add('far');
+        
+        let currentCount = parseInt(countSpan.innerText) || 0;
+        currentCount = Math.max(0, currentCount - 1);
         countSpan.innerText = currentCount > 0 ? currentCount : '';
         
-        localStorage.setItem(storageKey, JSON.stringify(likedReviews));
-    } catch (error) {
-        console.log("Error liking review: ", error);
+        localStorage.setItem(likeKey, JSON.stringify(likedReviews));
+        db.collection('shops').doc(currentShopId).collection('reviews').doc(reviewId)
+          .update({ likes: firebase.firestore.FieldValue.increment(-1) }).catch(e => console.log(e));
     }
+
+    if (isDisliked) {
+        icon.classList.remove('fas', 'text-blue-600');
+        icon.classList.add('far');
+        dislikedReviews = dislikedReviews.filter(id => id !== reviewId);
+    } else {
+        icon.classList.remove('far');
+        icon.classList.add('fas', 'text-blue-600');
+        if (!dislikedReviews.includes(reviewId)) dislikedReviews.push(reviewId);
+    }
+    
+    localStorage.setItem(dislikeKey, JSON.stringify(dislikedReviews));
 }
 
 

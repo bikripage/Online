@@ -127,34 +127,21 @@
     <!-- SETTINGS MODAL -->
     <div id="settingsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-bg p-4 opacity-0 transition-opacity">
         <div class="bg-white rounded-[24px] w-full max-w-md shadow-2xl scale-95 transition-transform overflow-hidden flex flex-col" id="settingsModalContent">
-            <div class="p-5 flex items-center justify-between border-b border-gray-100 bg-gray-50/50">
+            <div class="p-5 flex items-center justify-between border-b border-gray-100 bg-white">
                 <div class="flex items-center gap-3"><i class="fas fa-sliders-h text-blue-600 text-xl"></i><h3 class="font-bold text-gray-900 text-lg tracking-tight">System Settings</h3></div>
-                <button onclick="closeSettings()" class="w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center text-gray-600 active:scale-90 transition-colors"><i class="fas fa-times"></i></button>
+                <button onclick="closeSettings()" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-600 active:scale-90 transition-colors"><i class="fas fa-times"></i></button>
             </div>
-            <div class="p-5 space-y-6 overflow-y-auto max-h-[70vh] custom-scrollbar">
+            <div class="p-5 space-y-6 overflow-y-auto max-h-[70vh] custom-scrollbar bg-gray-50/50">
                 <div>
                     <h4 class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3">Workflow Permissions</h4>
-                    <div class="bg-gray-50 border border-gray-200 rounded-2xl p-2 space-y-1">
-                        <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-white transition-colors border border-transparent">
+                    <div class="bg-white border border-gray-200 rounded-2xl p-2 space-y-1">
+                        <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors border border-transparent">
                             <input type="radio" name="workflowMode" value="manual" checked class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
                             <div><p class="text-sm font-bold text-gray-800">Review Every Request</p><p class="text-[11px] text-gray-500 font-medium leading-tight mt-0.5">Check files manually before printing.</p></div>
                         </label>
-                        <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-white transition-colors border border-transparent">
+                        <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors border border-transparent">
                             <input type="radio" name="workflowMode" value="auto" class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
                             <div><p class="text-sm font-bold text-gray-800">Auto-Accept (Fast Mode)</p><p class="text-[11px] text-gray-500 font-medium leading-tight mt-0.5">Directly print all orders automatically.</p></div>
-                        </label>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3">Data Privacy (Storage)</h4>
-                    <div class="bg-gray-50 border border-gray-200 rounded-2xl p-2 space-y-1">
-                        <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-white transition-colors border border-transparent">
-                            <input type="radio" name="privacyMode" value="immediate" checked class="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500">
-                            <div><p class="text-sm font-bold text-gray-800">Delete Immediately</p><p class="text-[11px] text-gray-500 font-medium leading-tight mt-0.5">Files deleted once marked as printed.</p></div>
-                        </label>
-                        <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-white transition-colors border border-transparent">
-                            <input type="radio" name="privacyMode" value="24hours" class="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500">
-                            <div><p class="text-sm font-bold text-gray-800">Keep for 24 Hours</p><p class="text-[11px] text-gray-500 font-medium leading-tight mt-0.5">Allow re-printing for one day.</p></div>
                         </label>
                     </div>
                 </div>
@@ -192,7 +179,7 @@
         <i class="fas fa-info-circle text-blue-400"></i> <span id="toast-msg">Message</span>
     </div>
 
-    <!-- CORE ENGINE JS -->
+    <!-- TRUE P2P & ZERO-API SYNC ENGINE -->
     <script>
         const $ = s => document.querySelector(s);
         const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -278,44 +265,6 @@
             const o = JSON.parse(new TextDecoder().decode(pt));
             return { name: String(o.name || 'Document').slice(0,120), type: OK_TYPES.includes(o.type) ? o.type : null, pages: Number(o.pages) || 1 };
         }
-        
-        // ✨ FIX: Multi-Layer CORS Proxy Fetcher with Smart Fallback ✨
-        async function fetchWithFallback(url) {
-            const proxies = [
-                url, // 1st try: Direct
-                'https://api.allorigins.win/raw?url=' + encodeURIComponent(url), // 2nd try: AllOrigins
-                'https://corsproxy.io/?' + encodeURIComponent(url), // 3rd try: CORSProxy
-                'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url) // 4th try: CodeTabs
-            ];
-            
-            for (let proxy of proxies) {
-                try {
-                    let response = await fetch(proxy);
-                    if (response.ok) return response; 
-                } catch (e) {
-                    console.warn("Proxy block bypassed, trying next...");
-                }
-            }
-            return null; // All failed
-        }
-
-        async function getDecryptedBlobUrl(f) {
-            const meta = await getMeta(f);
-            if(!meta.type) throw new Error('Unsupported file type.');
-            
-            let r = await fetchWithFallback(f.url);
-
-            if(!r) throw new Error('File expired or blocked by server.');
-            
-            const buf = new Uint8Array(await r.arrayBuffer());
-            let pt; 
-            try { 
-                pt = await crypto.subtle.decrypt({name:'AES-GCM', iv: buf.slice(0,12)}, await aesOf(f), buf.slice(12)); 
-            } catch(e) { 
-                throw new Error('File corrupted or wrong key.'); 
-            }
-            return URL.createObjectURL(new Blob([pt], { type: meta.type }));
-        }
 
         // ---------- SIMPLE LOGIN FLOW ----------
         $('#loginForm').addEventListener('submit', async e => {
@@ -348,9 +297,10 @@
             if (shopData.printSettings) {
                 currentSettings = shopData.printSettings;
                 document.querySelector(`input[name="workflowMode"][value="${currentSettings.workflow}"]`).checked = true;
-                document.querySelector(`input[name="privacyMode"][value="${currentSettings.privacy}"]`).checked = true;
             }
             
+            // Start WebRTC Peer for Owner
+            window.peerInstance = new Peer('bikripage-print-' + shopId);
             startLiveSync();
         }
 
@@ -380,18 +330,77 @@
             };
         }
 
-        async function triggerJobPrint(jobObj) {
+        // ✨ P2P PHONE-PULL ENGINE ✨
+        function pullFileFromCustomerPhone(senderPeerId, localKey, f, onComplete) {
+            if (!window.peerInstance) {
+                onComplete(null, "System not ready.");
+                return;
+            }
+            
+            let completed = false;
+            const conn = window.peerInstance.connect(senderPeerId, { reliable: true });
+
+            conn.on('open', () => {
+                conn.send({ type: 'request_file', localKey: localKey });
+            });
+
+            conn.on('data', async (data) => {
+                if (data.type === 'file_transfer' && data.localKey === localKey) {
+                    try {
+                        const buf = new Uint8Array(data.data);
+                        let pt = await crypto.subtle.decrypt({name:'AES-GCM', iv: buf.slice(0,12)}, await aesOf(f), buf.slice(12));
+                        const meta = await getMeta(f);
+                        const url = URL.createObjectURL(new Blob([pt], { type: meta.type }));
+                        
+                        conn.send({ type: 'transfer_complete' });
+                        completed = true;
+                        setTimeout(() => conn.close(), 1000);
+                        onComplete(url, null);
+                    } catch(e) {
+                        completed = true;
+                        onComplete(null, "Decryption failed. Wrong password?");
+                    }
+                }
+            });
+
+            conn.on('error', (err) => {
+                if(!completed) { completed = true; onComplete(null, "Customer phone disconnected (Keep tab open on phone)."); }
+            });
+
+            setTimeout(() => {
+                if(!completed) { completed = true; onComplete(null, "Connection timed out. Ask customer to keep screen ON."); }
+            }, 10000);
+        }
+
+        async function triggerJobPrint(jobObj, btnElement = null) {
             if (jobObj.isLocalWrtc) {
                 jobObj.files.forEach(f => silentPrintDocument(f.url));
+                return Promise.resolve();
             } else {
-                for (const f of (jobObj.files || [])) {
-                    const url = await getDecryptedBlobUrl(f); 
-                    silentPrintDocument(url); 
-                }
+                return new Promise((resolve, reject) => {
+                    let filesProcessed = 0;
+                    let hasError = false;
+                    const totalFiles = jobObj.files.length;
+                    
+                    for (const f of jobObj.files) {
+                        pullFileFromCustomerPhone(f.senderPeerId, f.localKey, f, (url, err) => {
+                            if (hasError) return;
+                            filesProcessed++;
+                            
+                            if(err) {
+                                hasError = true;
+                                reject(err);
+                            } else {
+                                silentPrintDocument(url);
+                                if(filesProcessed === totalFiles) resolve();
+                            }
+                        });
+                    }
+                });
             }
         }
 
-        // ---------- HYBRID SYNC ----------
+        // ---------- SYNC LOGIC ----------
         function startLiveSync() {
             if(unsubscribeLiveSync) unsubscribeLiveSync();
 
@@ -415,8 +424,8 @@
                     isInitialLoad = false;
                 });
 
-            if(!window.peerInstance) {
-                window.peerInstance = new Peer('bikripage-print-' + shopId);
+            // Listen for Direct P2P Files
+            if(window.peerInstance) {
                 window.peerInstance.on('connection', (conn) => {
                     conn.on('data', async (data) => {
                         if(data.type === 'new_print_job') {
@@ -463,14 +472,8 @@
                     setTimeout(() => markAsDone(jobObj.id, true, 'completed'), 1500); 
                 } catch (e) {
                     toast("Auto-print failed. Accept manually.", "error");
-                    // Update state safely so UI resets
-                    if (isDirectWrtc) {
-                        const job = rtcJobs.find(j => j.id === jobObj.id);
-                        if (job) job.autoFailed = true;
-                    } else {
-                        const job = fbJobs.find(j => j.id === jobObj.id);
-                        if (job) job.autoFailed = true;
-                    }
+                    if (isDirectWrtc) { const job = rtcJobs.find(j => j.id === jobObj.id); if (job) job.autoFailed = true; } 
+                    else { const job = fbJobs.find(j => j.id === jobObj.id); if (job) job.autoFailed = true; }
                     updateJobsUI();
                 }
             } else {
@@ -502,15 +505,15 @@
         // ---------- UI ACTIONS ----------
         window.executePrintAndMarkDone = async function(jobId) {
             const btn = document.getElementById(`btn-accept-${jobId}`);
-            if(btn) btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Printing...`;
+            if(btn) btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Pulling from Phone...`;
 
             const jobObj = fbJobs.find(j => j.id === jobId) || rtcJobs.find(j => j.id === jobId);
             if(jobObj) {
                 try {
-                    await triggerJobPrint(jobObj);
+                    await triggerJobPrint(jobObj, btn);
                     setTimeout(() => markAsDone(jobId, false, 'completed'), 1000);
                 } catch (e) {
-                    toast(e.message || "Print failed.", "error");
+                    toast(e || "Failed to pull file. Customer phone might be off.", "error");
                     if(btn) btn.innerHTML = `<i class="fas fa-check-circle text-green-400"></i> Accept & Print`;
                 }
             }
@@ -544,7 +547,7 @@
                         : `<span class="bg-gray-100 text-gray-600 border border-gray-200 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider">B & W</span>`);
 
                 const time = job.createdAt ? new Date(getJobTime(job)).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Just now';
-                const filesCount = job.files ? job.files.length : (job.files_count || 0);
+                const filesCount = job.files ? job.files.length : 0;
 
                 let filesHtml = '';
                 if (job.files && job.files.length > 0) {
@@ -559,7 +562,7 @@
                         } else {
                             const m = metaCache[job.id + ':' + i];
                             if(m) { name = m.name; icon = m.type === 'application/pdf' ? 'fa-file-pdf text-red-500' : 'fa-image text-blue-500'; }
-                            // 🚀 PREVIEW BUTTON REMOVED FOR CLOUD FILES
+                            // 🚀 PREVIEW BUTTON HATT GAYA HAI YAHAN SE (Customer Request)
                             viewActionHtml = ``;
                         }
 
@@ -577,16 +580,16 @@
                     filesHtml = `<div class="flex items-center justify-center p-3 bg-red-50 border border-red-100 rounded-[12px] text-red-500 text-xs font-bold shadow-sm"><i class="fas fa-exclamation-triangle mr-2"></i> No files attached</div>`;
                 }
 
-                // 🚀 FIXED GREEN STRIP POSITION (TOP-LEFT)
+                // 🚀 GREEN BADGE MOVED TO TOP-LEFT
                 const sourceBadge = job.isLocalWrtc 
                     ? `<span class="absolute top-0 left-0 bg-indigo-600 text-white text-[10px] font-bold px-3 py-1 rounded-br-2xl shadow-sm"><i class="fas fa-bolt text-[9px] mr-1"></i> Direct PC</span>` 
-                    : `<span class="absolute top-0 left-0 bg-emerald-500 text-white text-[10px] font-bold px-3 py-1 rounded-br-2xl shadow-sm"><i class="fas fa-lock text-[9px] mr-1"></i> Encrypted</span>`;
+                    : `<span class="absolute top-0 left-0 bg-emerald-500 text-white text-[10px] font-bold px-3 py-1 rounded-br-2xl shadow-sm"><i class="fas fa-mobile-alt text-[9px] mr-1"></i> Pulling from Phone</span>`;
                 
                 let actionButtonsHtml = '';
                 if (isRejected) {
                     actionButtonsHtml = `<button onclick="dismissJob('${job.id}')" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-[14px] py-3.5 rounded-[16px] transition-all flex items-center justify-center gap-2"><i class="fas fa-trash text-gray-400"></i> Remove from List</button>`;
                 } else if (currentSettings.workflow === 'auto' && !job.autoFailed) {
-                    actionButtonsHtml = `<button disabled class="w-full bg-gray-200 text-gray-500 font-bold text-[14px] py-3.5 rounded-[16px] flex items-center justify-center gap-2 cursor-not-allowed animate-pulse"><i class="fas fa-spinner fa-spin"></i> Auto Printing...</button>`;
+                    actionButtonsHtml = `<button disabled class="w-full bg-gray-200 text-gray-500 font-bold text-[14px] py-3.5 rounded-[16px] flex items-center justify-center gap-2 cursor-not-allowed animate-pulse"><i class="fas fa-spinner fa-spin"></i> Pulling from Phone...</button>`;
                 } else {
                     actionButtonsHtml = `
                     <div class="flex gap-3">
@@ -641,7 +644,8 @@
             
             try {
                 let finalStatus = targetStatus;
-                if (targetStatus === 'completed' && currentSettings.privacy === 'immediate') finalStatus = 'deleted';
+                if (targetStatus === 'completed') finalStatus = 'deleted'; // Storage Privacy Immediate 
+                
                 if (finalStatus === 'deleted') await db.collection('printJobs').doc(jobId).delete();
                 else await db.collection('printJobs').doc(jobId).update({ status: finalStatus, completedAt: firebase.firestore.FieldValue.serverTimestamp() });
                 
@@ -657,10 +661,9 @@
         async function saveSettings() {
             const btn = $('#saveSettingsBtn'); btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
             const workflow = document.querySelector('input[name="workflowMode"]:checked').value;
-            const privacy = document.querySelector('input[name="privacyMode"]:checked').value;
-            currentSettings = { workflow, privacy, isOnline: true };
+            currentSettings = { workflow, privacy: 'immediate', isOnline: true };
             try {
-                await db.collection('shops').doc(shopId).set({ printSettings: { workflow, privacy, isOnline: true } }, { merge: true });
+                await db.collection('shops').doc(shopId).set({ printSettings: { workflow, privacy: 'immediate', isOnline: true } }, { merge: true });
                 toast("Preferences saved!", "success"); closeSettings();
             } catch(e) { toast("Applied locally.", "success"); closeSettings(); } finally { btn.innerHTML = `Save Preferences`; renderJobs(fbJobs.concat(rtcJobs)); }
         }
@@ -677,11 +680,11 @@
             $('#qrModal').classList.remove('hidden'); setTimeout(() => { $('#qrModal').classList.remove('opacity-0'); $('#qrModalContent').classList.remove('scale-95'); }, 10);
         }
         function closeQrModal() { $('#qrModal').classList.add('opacity-0'); $('#qrModalContent').classList.add('scale-95'); setTimeout(() => $('#qrModal').classList.add('hidden'), 300); }
-        function copyCustomerLink() { const c = $('#customerLinkInput'); c.select(); navigator.clipboard.writeText(c.value).then(() => toast('Copied!', 'success')).catch(() => toast('Copy failed', 'error')); }
+        function copyCustomerLink() { const c = document.getElementById("customerLinkInput"); c.select(); navigator.clipboard.writeText(c.value).then(() => toast('Copied!', 'success')).catch(() => toast('Copy failed', 'error')); }
         function downloadQR() {
-            const c = $('#qrcodeContainer'); const img = c.querySelector('img'); const canvas = c.querySelector('canvas');
-            const dataUrl = img && img.src ? img.src : (canvas ? canvas.toDataURL('image/png') : '');
-            if(dataUrl) { const a = document.createElement('a'); a.href = dataUrl; a.download = `QR_${shopId}.png`; document.body.appendChild(a); a.click(); a.remove(); }
+            const c = document.getElementById('qrcodeContainer'); const img = c.querySelector('img'); const canvas = c.querySelector('canvas');
+            let dataUrl = img && img.src ? img.src : (canvas ? canvas.toDataURL("image/png") : '');
+            if (dataUrl) { const a = document.createElement('a'); a.href = dataUrl; a.download = `QR_${shopId}.png`; document.body.appendChild(a); a.click(); document.body.removeChild(a); } 
         }
     </script>
 </body>

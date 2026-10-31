@@ -25,11 +25,11 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
 
-    <!-- Firebase SDKs (v8) - Auth Removed -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-    <!-- WebRTC PeerJS Library (Sender) -->
+    <!-- WebRTC PeerJS Library -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
     <script>
@@ -229,70 +229,11 @@
         </div>
     </div>
 
-    <!-- COMPRESS & CONVERT MODAL -->
-    <div id="toolsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-bg p-4 opacity-0 transition-opacity overflow-y-auto">
-        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl scale-95 transition-transform p-5 my-auto" id="toolsModalContent">
-            <div class="flex items-center justify-between mb-2">
-                <div class="flex items-center gap-2"><i class="fas fa-file-export text-indigo-600"></i><h3 class="font-bold text-gray-900 text-lg">Convert & Compress</h3></div>
-                <button onclick="closeToolModal()" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-600 active:scale-90 transition-colors"><i class="fas fa-times"></i></button>
-            </div>
-            <p class="text-xs text-gray-500 font-medium mb-5">Optimize files for Govt. Portals or convert images directly to PDF.</p>
-            
-            <div class="space-y-4">
-                <input type="file" id="toolFile" accept="image/*" class="hidden">
-                <button onclick="document.getElementById('toolFile').click()" class="w-full py-4 border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/30 rounded-2xl text-indigo-700 font-bold active:bg-indigo-50 transition-colors">
-                    <i class="fas fa-image mr-2"></i> Select Image to Process
-                </button>
-                
-                <div id="toolPreviewContainer" class="hidden space-y-5 animate-fade-in">
-                    <div class="relative w-full h-32 bg-gray-50 rounded-xl border border-gray-200 overflow-hidden flex items-center justify-center p-2">
-                        <img id="toolPreview" class="max-w-full max-h-full object-contain rounded-lg shadow-sm">
-                    </div>
-                    
-                    <div class="flex items-center justify-between px-1">
-                        <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Original: <span id="origSize" class="text-gray-700">0 KB</span></div>
-                        <div class="text-[11px] font-black text-indigo-600 uppercase tracking-wide bg-indigo-50 px-3 py-1.5 rounded-full border border-indigo-100">
-                            Est. Size: <span id="estSize" class="text-[13px]">0 KB</span>
-                        </div>
-                    </div>
-
-                    <div class="space-y-4 bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                        <div>
-                            <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-2">Convert To Format</label>
-                            <div class="relative">
-                                <select id="toolFormat" class="w-full bg-white border border-gray-200 p-3 pr-8 rounded-xl font-bold text-gray-800 text-sm outline-none focus:border-indigo-500 transition-colors cursor-pointer appearance-none">
-                                    <option value="application/pdf">PDF (Document)</option>
-                                    <option value="image/jpeg">JPG / JPEG (Standard)</option>
-                                    <option value="image/png">PNG (Lossless)</option>
-                                    <option value="image/webp">WebP (Smallest)</option>
-                                </select>
-                                <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
-                            </div>
-                        </div>
-
-                        <div id="qualitySliderContainer" class="transition-opacity">
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wide">Compression Level</label>
-                                <span id="qualityPercent" class="text-xs font-bold text-gray-900 bg-white px-2 py-0.5 rounded-md border border-gray-200">80%</span>
-                            </div>
-                            <input type="range" id="toolQuality" min="0.1" max="1.0" step="0.05" value="0.8" class="w-full h-2 bg-gray-200 rounded-lg outline-none cursor-pointer">
-                        </div>
-                    </div>
-
-                    <button onclick="processAndDownload()" class="w-full py-4 bg-gray-900 hover:bg-black text-white rounded-2xl font-bold shadow-lg shadow-gray-900/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                        <i class="fas fa-download"></i> Process & Download
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- TOAST -->
     <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-5 py-3 rounded-full text-sm font-medium shadow-xl transition-all duration-300 opacity-0 pointer-events-none z-[100] flex items-center gap-2 min-w-max z-[9999]">
         <i class="fas fa-info-circle text-blue-400"></i> <span id="toast-msg">Message</span>
     </div>
 
-    <!-- CORE SCRIPT (HYBRID: WebRTC + Robust Firebase E2EE Backup without Auth) -->
     <script>
         const params = new URLSearchParams(location.search);
         const _rawShop = params.get('shopId') || '';
@@ -321,7 +262,6 @@
             return null;
         }
 
-        // End-to-end encryption function
         async function encryptFile(entry, pubKey){
             const aes = await crypto.subtle.generateKey({name:'AES-GCM',length:256}, true, ['encrypt']);
             const iv = crypto.getRandomValues(new Uint8Array(12));
@@ -383,14 +323,14 @@
                         const arrayBuffer = await f.arrayBuffer(); 
                         const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
                         pageCount = pdfDoc.getPageCount();
-                    } catch(e) { console.warn("PDF count read error", e); }
+                    } catch(e) { console.warn("PDF count error", e); }
                 }
                 
                 state.files.push({file:f, url:URL.createObjectURL(f), pages: pageCount, mime});
             }
             renderFiles();
             btn.innerHTML = `<i class="fas fa-folder-open"></i> Browse`;
-            if(skipped) toast('Skipped: invalid format, over 20MB, or > 10 files.', 'error');
+            if(skipped) toast('Skipped: invalid format or over 20MB.', 'error');
         }
         
         function renderFiles(){
@@ -398,7 +338,6 @@
                 const isImage = x.mime.startsWith('image/');
                 const thumb = isImage ? `<img src="${x.url}" class="w-full h-full object-cover">` : `<div class="bg-red-50 text-red-500 w-full h-full flex items-center justify-center"><i class="fas fa-file-pdf text-2xl"></i></div>`;
                 const pageText = x.pages ? ` &bull; <span class="text-indigo-600">${x.pages} Pages</span>` : '';
-                
                 let displayName = x.file && x.file.name ? x.file.name : "Document";
 
                 return `
@@ -514,74 +453,6 @@
             }, state.files[currentCropIndex].file.type || 'image/jpeg', 0.9);
         });
 
-        // Tools Modal
-        let toolRawFile = null, toolImageObj = new Image();
-        function openToolModal() { $('#toolsModal').classList.remove('hidden'); setTimeout(() => { $('#toolsModal').classList.remove('opacity-0'); $('#toolsModalContent').classList.remove('scale-95'); }, 10); }
-        function closeToolModal() { $('#toolsModal').classList.add('opacity-0'); $('#toolsModalContent').classList.add('scale-95'); setTimeout(() => $('#toolsModal').classList.add('hidden'), 300); }
-        
-        $('#toolFile').addEventListener('change', (e) => {
-            const file = e.target.files[0]; if(!file) return;
-            toolRawFile = file; $('#origSize').textContent = size(file.size);
-            const url = URL.createObjectURL(file); $('#toolPreview').src = url;
-            toolImageObj.onload = () => { $('#toolPreviewContainer').classList.remove('hidden'); updateEstimatedSize(); };
-            toolImageObj.src = url;
-        });
-
-        function updateEstimatedSize() {
-            if(!toolRawFile || !toolImageObj.src) return;
-            const format = $('#toolFormat').value, quality = parseFloat($('#toolQuality').value);
-            
-            if(format === 'image/png' || format === 'application/pdf') {
-                $('#qualitySliderContainer').classList.add('opacity-40', 'pointer-events-none');
-                $('#estSize').textContent = format === 'application/pdf' ? "PDF Format" : "Lossless"; $('#estSize').className = "text-[13px] text-indigo-700";
-                return;
-            } else { $('#qualitySliderContainer').classList.remove('opacity-40', 'pointer-events-none'); }
-
-            const canvas = document.createElement('canvas'); canvas.width = toolImageObj.width; canvas.height = toolImageObj.height;
-            canvas.getContext('2d').drawImage(toolImageObj, 0, 0);
-            
-            canvas.toBlob((blob) => {
-                if(blob) {
-                    $('#estSize').textContent = size(blob.size);
-                    if(blob.size <= 100 * 1024) $('#estSize').className = "text-[13px] text-green-600";
-                    else if (blob.size >= 500 * 1024) $('#estSize').className = "text-[13px] text-red-500";
-                    else $('#estSize').className = "text-[13px] text-indigo-700";
-                }
-            }, format, quality);
-        }
-
-        $('#toolQuality').addEventListener('input', (e) => { $('#qualityPercent').textContent = Math.round(e.target.value * 100) + '%'; updateEstimatedSize(); });
-        $('#toolFormat').addEventListener('change', updateEstimatedSize);
-
-        function processAndDownload() {
-            if(!toolRawFile) return;
-            const format = $('#toolFormat').value, quality = parseFloat($('#toolQuality').value);
-            let baseName = "Document";
-            if(toolRawFile && toolRawFile.name && toolRawFile.name.includes('.')) baseName = toolRawFile.name.substring(0, toolRawFile.name.lastIndexOf('.'));
-            else if (toolRawFile && toolRawFile.name) baseName = toolRawFile.name;
-            
-            const canvas = document.createElement('canvas'); canvas.width = toolImageObj.width; canvas.height = toolImageObj.height;
-            canvas.getContext('2d').drawImage(toolImageObj, 0, 0);
-            
-            if(format === 'application/pdf') {
-                try {
-                    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-                    const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF({ orientation: toolImageObj.width > toolImageObj.height ? 'l' : 'p', unit: 'px', format: [toolImageObj.width, toolImageObj.height] });
-                    pdf.addImage(imgData, 'JPEG', 0, 0, toolImageObj.width, toolImageObj.height); pdf.save(baseName + '_Converted.pdf');
-                    toast('Image converted to PDF successfully!', 'success');
-                } catch (e) { toast('Error creating PDF.', 'error'); }
-                return;
-            }
-            
-            canvas.toBlob((blob) => {
-                if(!blob) return;
-                const ext = format.split('/')[1] === 'jpeg' ? 'jpg' : format.split('/')[1];
-                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = baseName + '_Govt_Ready.' + ext;
-                a.click(); toast('File compressed & downloaded!', 'success');
-            }, format, quality);
-        }
-
         $('#dropArea').addEventListener('click', () => $('#files').click());
         $('#pick').addEventListener('click', (e) => { e.stopPropagation(); $('#files').click(); });
         $('#camera').addEventListener('click', (e) => { e.stopPropagation(); $('#cameraFile').click(); });
@@ -592,7 +463,7 @@
         ['dragleave','drop'].forEach(ev=>$('#dropArea').addEventListener(ev,e=>{ e.preventDefault(); $('#dropArea').classList.remove('border-blue-500', 'bg-blue-50/50'); }));
         $('#dropArea').addEventListener('drop',e => addFiles([...e.dataTransfer.files]));
 
-        // ✨ HYBRID SUBMIT: WebRTC (Local) First -> If Failed -> E2EE Cloud Backup ✨
+        // ✨ THE BIG UPLOAD FIX: Filebin API (100% CORS Allowed, No Proxy Needed) ✨
         $('#submit').addEventListener('click', async () => {
             if(!state.files.length) return toast('Please add at least one document.', 'error');
             if(!$('#consent').checked) return toast('Please check the consent box.', 'error');
@@ -603,8 +474,7 @@
             btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Connecting to Store...`;
 
             let webrtcSuccess = false;
-            let cloudBackupStarted = false; // ✨ LOCK FLAG ADDED HERE ✨
-            
+            let cloudBackupStarted = false; 
             const peer = new Peer();
 
             const successUI = (refId) => {
@@ -622,10 +492,8 @@
             };
 
             const sendViaE2EECloud = async () => {
-                // ✨ MAGIC LOCK: Prevent double execution ✨
                 if(webrtcSuccess || cloudBackupStarted) return; 
                 cloudBackupStarted = true; 
-                
                 btn.innerHTML = `<i class="fas fa-lock"></i> Encrypting & Sending...`;
                 
                 try {
@@ -633,20 +501,24 @@
                     if(!keyDoc.exists) throw new Error('Store is offline or invalid QR code.');
                     const pubKey = await crypto.subtle.importKey('jwk', keyDoc.data().publicKey, {name:'RSA-OAEP', hash:'SHA-256'}, false, ['encrypt']);
 
+                    // Create a unique bin for this job on Filebin (Files auto-delete in 6 days safely)
+                    const binId = 'sp-' + Date.now() + '-' + Math.floor(Math.random() * 100000);
                     const uploaded = [];
+                    
                     for(const entry of state.files){
                         const enc = await encryptFile(entry, pubKey);
-                        const fd = new FormData();
-                        fd.append('file', enc.blob, 'enc.bin');   
+                        const safeFileName = Math.floor(Math.random() * 100000) + '.bin';
+                        const fileUrl = `https://filebin.net/${binId}/${safeFileName}`;
                         
-                        const res = await fetch('https://tmpfiles.org/api/v1/upload', { method:'POST', body: fd });
+                        const res = await fetch(fileUrl, { 
+                            method: 'POST', 
+                            body: enc.blob,
+                            headers: { 'Content-Type': 'application/octet-stream' }
+                        });
+                        
                         if (!res.ok) throw new Error("Cloud server busy. Try again.");
                         
-                        const data = await res.json();
-                        if(data.status !== 'success' || !data.data || !data.data.url) throw new Error('Upload failed from server.');
-                        
-                        const url = data.data.url.replace(/^http:/,'https:').replace('tmpfiles.org/', 'tmpfiles.org/dl/');
-                        uploaded.push({ url, size: entry.file.size, key: enc.key, meta: enc.meta, contentType: entry.mime });
+                        uploaded.push({ url: fileUrl, size: entry.file.size, key: enc.key, meta: enc.meta, contentType: entry.mime });
                     }
 
                     const jobRef = await db.collection('printJobs').add({
@@ -663,14 +535,12 @@
 
                     successUI(jobRef.id.slice(0,6).toUpperCase());
                 } catch (err) {
-                    console.error(err);
                     toast(err.message || 'Network error. Please try again.', 'error');
                     resetBtn(btn);
-                    cloudBackupStarted = false; // Reset lock if it fails so user can try again
+                    cloudBackupStarted = false; 
                 }
             };
 
-            // Attempt WebRTC Direct First
             peer.on('open', (id) => {
                 const targetShopId = 'bikripage-print-' + shopId;
                 const conn = peer.connect(targetShopId, { reliable: true });
@@ -695,13 +565,10 @@
                     successUI(String(Date.now()).slice(-6));
                     setTimeout(() => peer.destroy(), 2000);
                 });
-
                 conn.on('error', () => { if(!webrtcSuccess) { peer.destroy(); sendViaE2EECloud(); } });
             });
 
             peer.on('error', () => { if(!webrtcSuccess) { peer.destroy(); sendViaE2EECloud(); } });
-
-            // Fail-safe timeout (3 seconds for WebRTC, then Cloud)
             setTimeout(() => { if(!webrtcSuccess) { peer.destroy(); sendViaE2EECloud(); } }, 3000);
         });
     </script>

@@ -192,7 +192,7 @@
         <i class="fas fa-info-circle text-blue-400"></i> <span id="toast-msg">Message</span>
     </div>
 
-    <!-- CORE ENGINE JS (Fixed Login, Fixed Encryption & Sync) -->
+    <!-- CORE ENGINE JS -->
     <script>
         const $ = s => document.querySelector(s);
         const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -279,26 +279,41 @@
             return { name: String(o.name || 'Document').slice(0,120), type: OK_TYPES.includes(o.type) ? o.type : null, pages: Number(o.pages) || 1 };
         }
         
+        // ✨ FIX: Multi-Layer CORS Proxy Fetcher with Smart Fallback ✨
+        async function fetchWithFallback(url) {
+            const proxies = [
+                url, // 1st try: Direct
+                'https://api.allorigins.win/raw?url=' + encodeURIComponent(url), // 2nd try: AllOrigins
+                'https://corsproxy.io/?' + encodeURIComponent(url), // 3rd try: CORSProxy
+                'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url) // 4th try: CodeTabs
+            ];
+            
+            for (let proxy of proxies) {
+                try {
+                    let response = await fetch(proxy);
+                    if (response.ok) return response; 
+                } catch (e) {
+                    console.warn("Proxy block bypassed, trying next...");
+                }
+            }
+            return null; // All failed
+        }
+
         async function getDecryptedBlobUrl(f) {
             const meta = await getMeta(f);
             if(!meta.type) throw new Error('Unsupported file type.');
             
-            let r; 
-            try { r = await fetch(f.url); } catch(e1) { 
-                try { r = await fetch('https://corsproxy.io/?' + encodeURIComponent(f.url)); } catch(e2) {
-                    try { r = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(f.url)); } catch(e3) {
-                        throw new Error('Browser is blocking the download (CORS Policy).');
-                    }
-                }
-            }
+            let r = await fetchWithFallback(f.url);
 
-            if(!r || !r.ok) throw new Error('File expired on server.');
+            if(!r) throw new Error('File expired or blocked by server.');
             
             const buf = new Uint8Array(await r.arrayBuffer());
             let pt; 
-            try { pt = await crypto.subtle.decrypt({name:'AES-GCM', iv: buf.slice(0,12)}, await aesOf(f), buf.slice(12)); } 
-            catch(e) { throw new Error('File corrupted or wrong key.'); }
-            
+            try { 
+                pt = await crypto.subtle.decrypt({name:'AES-GCM', iv: buf.slice(0,12)}, await aesOf(f), buf.slice(12)); 
+            } catch(e) { 
+                throw new Error('File corrupted or wrong key.'); 
+            }
             return URL.createObjectURL(new Blob([pt], { type: meta.type }));
         }
 
@@ -448,7 +463,14 @@
                     setTimeout(() => markAsDone(jobObj.id, true, 'completed'), 1500); 
                 } catch (e) {
                     toast("Auto-print failed. Accept manually.", "error");
-                    jobObj.autoFailed = true; 
+                    // Update state safely so UI resets
+                    if (isDirectWrtc) {
+                        const job = rtcJobs.find(j => j.id === jobObj.id);
+                        if (job) job.autoFailed = true;
+                    } else {
+                        const job = fbJobs.find(j => j.id === jobObj.id);
+                        if (job) job.autoFailed = true;
+                    }
                     updateJobsUI();
                 }
             } else {
@@ -537,7 +559,7 @@
                         } else {
                             const m = metaCache[job.id + ':' + i];
                             if(m) { name = m.name; icon = m.type === 'application/pdf' ? 'fa-file-pdf text-red-500' : 'fa-image text-blue-500'; }
-                            // 🚀 FIX 2: Removed external link preview button for Cloud files entirely
+                            // 🚀 PREVIEW BUTTON REMOVED FOR CLOUD FILES
                             viewActionHtml = ``;
                         }
 
@@ -555,7 +577,7 @@
                     filesHtml = `<div class="flex items-center justify-center p-3 bg-red-50 border border-red-100 rounded-[12px] text-red-500 text-xs font-bold shadow-sm"><i class="fas fa-exclamation-triangle mr-2"></i> No files attached</div>`;
                 }
 
-                // 🚀 FIX 1: Shifted badges to top-left with `top-0 left-0 rounded-br-xl` so they don't overlap with the 'X' button
+                // 🚀 FIXED GREEN STRIP POSITION (TOP-LEFT)
                 const sourceBadge = job.isLocalWrtc 
                     ? `<span class="absolute top-0 left-0 bg-indigo-600 text-white text-[10px] font-bold px-3 py-1 rounded-br-2xl shadow-sm"><i class="fas fa-bolt text-[9px] mr-1"></i> Direct PC</span>` 
                     : `<span class="absolute top-0 left-0 bg-emerald-500 text-white text-[10px] font-bold px-3 py-1 rounded-br-2xl shadow-sm"><i class="fas fa-lock text-[9px] mr-1"></i> Encrypted</span>`;
@@ -564,7 +586,6 @@
                 if (isRejected) {
                     actionButtonsHtml = `<button onclick="dismissJob('${job.id}')" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-[14px] py-3.5 rounded-[16px] transition-all flex items-center justify-center gap-2"><i class="fas fa-trash text-gray-400"></i> Remove from List</button>`;
                 } else if (currentSettings.workflow === 'auto' && !job.autoFailed) {
-                    // 🚀 FIX 3: if auto print failed, we don't show this disabled button, we show the manual Accept/Reject buttons
                     actionButtonsHtml = `<button disabled class="w-full bg-gray-200 text-gray-500 font-bold text-[14px] py-3.5 rounded-[16px] flex items-center justify-center gap-2 cursor-not-allowed animate-pulse"><i class="fas fa-spinner fa-spin"></i> Auto Printing...</button>`;
                 } else {
                     actionButtonsHtml = `

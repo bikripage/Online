@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#F7F9FE">
 
     <title>BikriPage | Smart Print PC</title>
@@ -12,8 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
         * {
@@ -49,7 +47,6 @@
         }
 
         /* Background decoration */
-
         .ambient {
             position: fixed;
             width: 280px;
@@ -74,7 +71,6 @@
         }
 
         /* Back button */
-
         .back-btn {
             position: absolute;
             top: 28px;
@@ -99,7 +95,6 @@
         }
 
         /* Main layout */
-
         .page {
             position: relative;
             z-index: 1;
@@ -119,7 +114,6 @@
         }
 
         /* Branding */
-
         .brand {
             display: inline-flex;
             align-items: center;
@@ -138,7 +132,6 @@
         }
 
         /* Icon */
-
         .icon-area {
             position: relative;
             display: flex;
@@ -180,7 +173,6 @@
         }
 
         /* Heading */
-
         h1 {
             font-size: clamp(29px, 8vw, 36px);
             letter-spacing: -1.6px;
@@ -194,13 +186,12 @@
             color: #778195;
             font-size: 15px;
             font-weight: 500;
-            line-height: 1.85;
+            line-height: 1.6;
             max-width: 350px;
             margin: 0 auto 34px;
         }
 
         /* Download card */
-
         .download-card {
             padding: 9px;
             background: rgba(255,255,255,.72);
@@ -211,6 +202,7 @@
                 inset 0 1px 2px white;
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
+            margin-bottom: 18px;
         }
 
         .download-btn {
@@ -240,8 +232,72 @@
             box-shadow: 0 3px 10px rgba(10,115,240,.15);
         }
 
-        /* Security */
+        /* Credentials Box */
+        .creds-box {
+            background: rgba(255,255,255,.6);
+            border: 1px solid rgba(255,255,255,.9);
+            border-radius: 22px;
+            padding: 16px 20px;
+            text-align: left;
+            box-shadow: 0 8px 25px rgba(30,60,100,.04);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
 
+        .cred-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+        }
+
+        .cred-item:not(:last-child) {
+            border-bottom: 1px solid rgba(0,0,0,.05);
+            margin-bottom: 6px;
+            padding-bottom: 12px;
+        }
+
+        .cred-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .cred-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #8792A4;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .cred-val {
+            font-size: 15px;
+            font-weight: 700;
+            color: #101828;
+            letter-spacing: -0.2px;
+        }
+
+        .copy-btn {
+            background: #F0F4FA;
+            border: 1px solid #E5EDFA;
+            color: var(--blue);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .copy-btn:active {
+            transform: scale(0.9);
+            background: #E5EDFA;
+        }
+
+        /* Security */
         .security {
             margin-top: 30px;
             display: inline-flex;
@@ -263,7 +319,6 @@
         }
 
         /* Small footer */
-
         .footer {
             margin-top: 48px;
             color: #A1AABB;
@@ -272,8 +327,31 @@
             letter-spacing: .2px;
         }
 
-        /* Animation */
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #111827;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0,0,0,.15);
+            opacity: 0;
+            visibility: hidden;
+            transition: all .3s cubic-bezier(.16,1,.3,1);
+            z-index: 100;
+        }
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
 
+        /* Animation */
         @keyframes reveal {
             from {
                 opacity: 0;
@@ -377,6 +455,28 @@
                 </a>
             </div>
 
+            <!-- App Credentials Box -->
+            <div class="creds-box" id="credsBox" style="display: none;">
+                <div class="cred-item">
+                    <div class="cred-info">
+                        <span class="cred-label">Shop ID</span>
+                        <span class="cred-val" id="dispShopId">...</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyText('dispShopId')" aria-label="Copy ID">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                </div>
+                <div class="cred-item">
+                    <div class="cred-info">
+                        <span class="cred-label">App Password</span>
+                        <span class="cred-val" id="dispPwd">...</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyText('dispPwd')" aria-label="Copy Password">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+
             <!-- Security -->
             <div class="security">
                 <i class="fa-solid fa-shield-halved"></i>
@@ -392,5 +492,39 @@
 
     </main>
 
+    <!-- Copy Toast -->
+    <div id="toast" class="toast">Copied to clipboard!</div>
+
+    <script>
+        // Fetch saved credentials and display them
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedShopId = localStorage.getItem('smartPrintShopId');
+            const savedPwd = localStorage.getItem('smartPrintPwd');
+            
+            if (savedShopId && savedPwd) {
+                document.getElementById('dispShopId').innerText = savedShopId;
+                document.getElementById('dispPwd').innerText = savedPwd;
+                document.getElementById('credsBox').style.display = 'block';
+            }
+        });
+
+        // Copy functionality with Toast notification
+        function copyText(elementId) {
+            const textToCopy = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showToast();
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+    </script>
 </body>
 </html>

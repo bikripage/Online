@@ -1,134 +1,396 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#F3F4F6">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="theme-color" content="#F7F9FE">
+
     <title>BikriPage | Smart Print PC</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #F3F4F6; 
-            -webkit-tap-highlight-color: transparent; 
-        }
-        
-        /* Premium Frosted Glassmorphism Card */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08), 0 0 15px rgba(255, 255, 255, 0.5) inset;
-        }
-        
-        /* 3D Icon Glow */
-        .icon-glow {
-            background: linear-gradient(135deg, #2563EB 0%, #4F46E5 100%);
-            box-shadow: 0 15px 30px rgba(37, 99, 235, 0.3), inset 0 2px 4px rgba(255,255,255,0.4);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        /* Custom Animations */
-        @keyframes slideUpFade {
-            0% { opacity: 0; transform: translateY(40px) scale(0.95); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        :root {
+            --blue: #087AFF;
+            --blue-dark: #0562DB;
+            --text: #111827;
+            --muted: #7B8495;
         }
 
-        @keyframes blobBounce {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-20px) scale(1.05); }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            min-height: 100svh;
+            color: var(--text);
+            background:
+                radial-gradient(ellipse at 50% 8%,
+                    rgba(75, 155, 255, 0.15), transparent 45%),
+                radial-gradient(ellipse at 95% 65%,
+                    rgba(150, 190, 255, 0.12), transparent 40%),
+                linear-gradient(145deg, #FFFFFF 0%, #F5F8FF 55%, #EEF4FF 100%);
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
         }
 
-        @keyframes shimmer {
-            100% { transform: translateX(100%); }
+        button, a {
+            font: inherit;
         }
 
-        .animate-card {
-            animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        
-        .animate-float {
-            animation: float 4s ease-in-out infinite;
+        /* Background decoration */
+
+        .ambient {
+            position: fixed;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: .35;
+            pointer-events: none;
+            z-index: 0;
         }
 
-        .animate-blob {
-            animation: blobBounce 8s ease-in-out infinite;
+        .ambient.one {
+            background: #8CC4FF;
+            top: -130px;
+            right: -100px;
         }
-        
-        .btn-hover-effect {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        .ambient.two {
+            background: #B5C9FF;
+            bottom: -150px;
+            left: -120px;
         }
-        .btn-hover-effect:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+        /* Back button */
+
+        .back-btn {
+            position: absolute;
+            top: 28px;
+            left: 24px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #202B3C;
+            background: rgba(255,255,255,.75);
+            border: 1px solid rgba(20,40,80,.07);
+            border-radius: 15px;
+            box-shadow: 0 4px 18px rgba(30,60,110,.06);
+            transition: .2s ease;
+            z-index: 5;
         }
-        .btn-hover-effect:active {
-            transform: translateY(1px) scale(0.98);
+
+        .back-btn:active {
+            transform: scale(.91);
+        }
+
+        /* Main layout */
+
+        .page {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            min-height: 100svh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 85px 24px 55px;
+        }
+
+        .content {
+            width: 100%;
+            max-width: 410px;
+            text-align: center;
+            animation: reveal .8s cubic-bezier(.16,1,.3,1) both;
+        }
+
+        /* Branding */
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            color: #657187;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 2.3px;
+            text-transform: uppercase;
+            margin-bottom: 42px;
+        }
+
+        .brand i {
+            color: var(--blue);
+            font-size: 15px;
+        }
+
+        /* Icon */
+
+        .icon-area {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .app-icon {
+            width: 116px;
+            height: 116px;
+            border-radius: 34px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 47px;
+            background: linear-gradient(145deg, #2994FF, #0865E8 75%);
+            box-shadow:
+                0 18px 38px rgba(15,115,235,.22),
+                inset 0 1px 1px rgba(255,255,255,.4);
+            position: relative;
+        }
+
+        .windows-badge {
+            position: absolute;
+            width: 37px;
+            height: 37px;
+            right: calc(50% - 68px);
+            bottom: -4px;
+            background: #FFFFFF;
+            color: #087AFF;
+            border: 1px solid #E5EDFA;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            box-shadow: 0 5px 15px rgba(30,60,100,.12);
+        }
+
+        /* Heading */
+
+        h1 {
+            font-size: clamp(29px, 8vw, 36px);
+            letter-spacing: -1.6px;
+            font-weight: 800;
+            line-height: 1.2;
+            color: #101828;
+            margin-bottom: 15px;
+        }
+
+        .description {
+            color: #778195;
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 1.85;
+            max-width: 350px;
+            margin: 0 auto 34px;
+        }
+
+        /* Download card */
+
+        .download-card {
+            padding: 9px;
+            background: rgba(255,255,255,.72);
+            border: 1px solid rgba(255,255,255,.95);
+            border-radius: 25px;
+            box-shadow:
+                0 15px 45px rgba(43,78,130,.08),
+                inset 0 1px 2px white;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+
+        .download-btn {
+            min-height: 64px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: white;
+            background: linear-gradient(110deg, #168AFF, #0868E9);
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -.3px;
+            box-shadow: 0 7px 18px rgba(10,115,240,.22);
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .download-btn i {
+            font-size: 20px;
+        }
+
+        .download-btn:active {
+            transform: scale(.97);
+            box-shadow: 0 3px 10px rgba(10,115,240,.15);
+        }
+
+        /* Security */
+
+        .security {
+            margin-top: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 11px 16px;
+            border-radius: 30px;
+            background: rgba(255,255,255,.55);
+            border: 1px solid rgba(255,255,255,.9);
+            color: #8792A4;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(40,60,100,.035);
+        }
+
+        .security i {
+            color: #22A879;
+            font-size: 13px;
+        }
+
+        /* Small footer */
+
+        .footer {
+            margin-top: 48px;
+            color: #A1AABB;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: .2px;
+        }
+
+        /* Animation */
+
+        @keyframes reveal {
+            from {
+                opacity: 0;
+                transform: translateY(22px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 380px) {
+            .page {
+                padding-left: 19px;
+                padding-right: 19px;
+            }
+
+            .brand {
+                margin-bottom: 32px;
+            }
+
+            .app-icon {
+                width: 104px;
+                height: 104px;
+                font-size: 42px;
+            }
+
+            h1 {
+                font-size: 29px;
+            }
+
+            .description {
+                font-size: 14px;
+            }
+
+            .download-btn {
+                min-height: 59px;
+                font-size: 15px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important;
+            }
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-5 relative overflow-hidden">
-    
-    <!-- Animated Background Glowing Orbs -->
-    <div class="absolute top-[-10%] left-[-10%] w-[350px] h-[350px] bg-blue-300/30 rounded-full blur-[80px] animate-blob z-0 pointer-events-none"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] bg-indigo-300/20 rounded-full blur-[80px] animate-blob z-0 pointer-events-none" style="animation-delay: 2s;"></div>
-    <div class="absolute top-[20%] right-[10%] w-[200px] h-[200px] bg-purple-300/20 rounded-full blur-[60px] animate-blob z-0 pointer-events-none" style="animation-delay: 4s;"></div>
 
-    <!-- BikriPage Branding Header -->
-    <div class="absolute top-8 text-center w-full z-10 animate-[fadeIn_1s_ease-out]">
-        <span class="bg-white/80 backdrop-blur-md px-5 py-2 rounded-full border border-white/60 text-[11px] font-black tracking-widest uppercase text-blue-600 shadow-sm flex items-center justify-center gap-2 w-max mx-auto">
-            <i class="fas fa-store"></i> BikriPage
-        </span>
-    </div>
+<body>
 
-    <!-- Main Premium Card -->
-    <div class="glass-card rounded-[36px] p-8 md:p-10 w-full max-w-[380px] flex flex-col items-center text-center animate-card relative z-10 mt-10">
-        
-        <!-- Floating App Icon with Windows Badge -->
-        <div class="animate-float mb-8">
-            <div class="w-28 h-28 icon-glow rounded-[28px] flex items-center justify-center relative">
-                <i class="fas fa-print text-[44px] text-white drop-shadow-md"></i>
-                <div class="absolute -bottom-2 -right-2 w-12 h-12 bg-white border-4 border-[#F3F4F6] rounded-full flex items-center justify-center shadow-lg">
-                    <i class="fab fa-windows text-[20px] text-blue-600"></i>
+    <div class="ambient one"></div>
+    <div class="ambient two"></div>
+
+    <!-- Back -->
+    <a href="javascript:history.back()" class="back-btn" aria-label="Go back">
+        <i class="fa-solid fa-chevron-left"></i>
+    </a>
+
+    <main class="page">
+
+        <section class="content">
+
+            <!-- Brand -->
+            <div class="brand">
+                <i class="fa-solid fa-store"></i>
+                BIKRIPAGE
+            </div>
+
+            <!-- App Icon -->
+            <div class="icon-area">
+                <div class="app-icon">
+                    <i class="fa-solid fa-print"></i>
+                </div>
+
+                <div class="windows-badge">
+                    <i class="fa-brands fa-windows"></i>
                 </div>
             </div>
-        </div>
 
-        <!-- Typography & Details -->
-        <div class="w-full flex justify-center mb-1">
-            <div class="bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-3 border border-blue-100/50 inline-block">
-                Desktop Utility
+            <!-- Title -->
+            <h1>Smart Print PC</h1>
+
+            <p class="description">
+                Enable zero-click background printing.
+                Install the native utility on your Windows
+                machine to seamlessly receive and print files.
+            </p>
+
+            <!-- Download -->
+            <div class="download-card">
+                <a
+                    href="https://github.com/bikripage/smart-print-desktop/releases/download/Windows/SmartPrint-Setup.zip"
+                    class="download-btn"
+                >
+                    <i class="fa-brands fa-windows"></i>
+                    <span>Download for Windows</span>
+                    <i class="fa-solid fa-arrow-down"
+                       style="font-size:14px"></i>
+                </a>
             </div>
-        </div>
-        <h1 class="text-[26px] font-black tracking-tight mb-3 text-gray-900 leading-tight">Smart Print PC</h1>
-        <p class="text-[14px] font-medium text-gray-500 mb-8 leading-relaxed px-1">
-            Zero-click auto printing powered by <span class="font-bold text-gray-800">BikriPage</span>. Install the native Windows software to auto-receive files.
-        </p>
 
-        <!-- Download Button with Shimmer Effect -->
-        <a href="https://github.com/bikripage/smart-print-desktop/releases/download/Windows/SmartPrint-Setup.zip" 
-           class="w-full bg-gray-900 text-white rounded-2xl py-4 flex items-center justify-center gap-3 font-bold text-[16px] shadow-[0_10px_20px_rgba(0,0,0,0.15)] btn-hover-effect overflow-hidden relative group">
-            <div class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.5s_infinite]"></div>
-            <i class="fab fa-windows text-blue-400 text-[20px]"></i>
-            Download for Windows
-        </a>
-        
-    </div>
+            <!-- Security -->
+            <div class="security">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>End-to-End P2P Encryption</span>
+            </div>
 
-    <!-- Footer Security Note -->
-    <p class="mt-8 text-[11px] font-bold text-gray-400 uppercase tracking-widest relative z-10 flex items-center gap-1.5 opacity-80">
-        <i class="fas fa-shield-alt text-gray-400"></i> 100% Secure P2P Transfer
-    </p>
+            <!-- Footer -->
+            <div class="footer">
+                A smarter way to print · BikriPage
+            </div>
+
+        </section>
+
+    </main>
 
 </body>
 </html>

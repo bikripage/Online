@@ -475,7 +475,7 @@
             }
         }
 
-        // ✨ NAYA FUNCTION: Safely open or download files ✨
+        // ✨ NAYA FUNCTION: Safely Preview Files (Download fix) ✨
         window.viewCustomerFile = function(jobId, fileIdx) {
             const job = fbJobs.find(j => j.id === jobId) || rtcJobs.find(j => j.id === jobId);
             
@@ -490,11 +490,11 @@
                 return toast("File is secured on customer's phone. Open PC app to sync.", "error");
             }
 
+            // Preview ke liye - bina 'download' attribute ke <a> tag use kiya hai
             try {
                 const a = document.createElement('a');
                 a.href = fileUrl;
-                a.target = '_blank';
-                a.download = f.name || 'Print_Document';
+                a.target = '_blank'; // Naye tab me kholne ke liye
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);

@@ -44,7 +44,7 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
         .ios-shadow { box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08); }
-        .modal-bg { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); }
+        .modal-bg { background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); }
         .toggle-checkbox:checked { right: 0; border-color: #34C759; }
         .toggle-checkbox:checked + .toggle-label { background-color: #34C759; }
         .toggle-checkbox:checked + .toggle-label:after { transform: translateX(100%); border-color: white; }
@@ -125,6 +125,22 @@
         </main>
     </div>
 
+    <!-- IN-APP PREVIEW MODAL (Fix for Download/404 issues) -->
+    <div id="previewModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center modal-bg p-4 opacity-0 transition-opacity">
+        <div class="bg-white rounded-[24px] w-full max-w-3xl h-[85vh] flex flex-col shadow-2xl overflow-hidden scale-95 transition-transform" id="previewModalContent">
+            <div class="p-4 flex items-center justify-between border-b border-gray-100 bg-gray-50/80">
+                <div class="flex items-center gap-2 overflow-hidden">
+                    <i class="fas fa-eye text-blue-500"></i>
+                    <h3 class="font-bold text-gray-900 truncate max-w-[80%]" id="previewTitle">Preview</h3>
+                </div>
+                <button onclick="closePreviewModal()" class="w-8 h-8 bg-white border border-gray-200 hover:bg-gray-100 rounded-full flex items-center justify-center text-gray-600 transition-colors shadow-sm active:scale-90"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="flex-1 bg-gray-100/80 p-4 overflow-auto flex justify-center items-center relative" id="previewContainer">
+                <!-- Data injected here -->
+            </div>
+        </div>
+    </div>
+
     <!-- ADVANCED SETTINGS MODAL -->
     <div id="settingsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-bg p-4 opacity-0 transition-opacity">
         <div class="bg-white rounded-[24px] w-full max-w-md shadow-2xl scale-95 transition-transform overflow-hidden flex flex-col" id="settingsModalContent">
@@ -153,7 +169,6 @@
                         </label>
                     </div>
                 </div>
-                <!-- Data Privacy options removed -->
             </div>
             
             <div class="p-5 border-t border-gray-100 bg-white flex flex-col gap-3">
@@ -328,31 +343,37 @@
 
         function logout() { localStorage.removeItem('smartPrintShopId'); localStorage.removeItem('smartPrintPwd'); window.location.reload(); }
 
-        // --- SILENT PRINT LOGIC ---
-        function silentPrintDocument(fileUrl) {
-            console.log("Triggering Auto-Print for:", fileUrl);
+        // ✨ 404 PRINT ERROR FIX (Writes images safely or sets PDF URL directly) ✨
+        function silentPrintDocument(fileUrl, fileType) {
+            if(!fileUrl || fileUrl === 'undefined') {
+                return toast("Cannot print offline secured file. Open PC app.", "error");
+            }
+            console.log("Triggering Auto-Print for:", fileType);
+            
             const iframeId = 'print-frame-' + Date.now();
             const iframe = document.createElement('iframe');
-            
             iframe.id = iframeId;
             iframe.style.position = 'absolute';
-            iframe.style.top = '-1000px';
-            iframe.style.left = '-1000px';
-            iframe.style.width = '0px';
-            iframe.style.height = '0px';
-            
-            iframe.src = fileUrl; 
+            iframe.style.top = '-9999px';
+            iframe.style.left = '-9999px';
             document.body.appendChild(iframe);
             
-            iframe.onload = function() {
-                try {
-                    iframe.contentWindow.focus();
-                    iframe.contentWindow.print();
-                    setTimeout(() => { document.body.removeChild(iframe); }, 10000);
-                } catch(e) {
-                    window.open(fileUrl, '_blank');
-                }
-            };
+            if (fileType && fileType.startsWith('image/')) {
+                iframe.contentWindow.document.write(`<html><body style="margin:0;display:flex;justify-content:center;align-items:center;height:100%;"><img src="${fileUrl}" style="max-width:100%;max-height:100%;"></body></html>`);
+                iframe.contentWindow.document.close();
+                setTimeout(() => { 
+                    try { iframe.contentWindow.focus(); iframe.contentWindow.print(); } catch(e){} 
+                }, 1000);
+            } else {
+                iframe.src = fileUrl;
+                iframe.onload = function() {
+                    setTimeout(() => { 
+                        try { iframe.contentWindow.focus(); iframe.contentWindow.print(); } catch(e){} 
+                    }, 1000);
+                };
+            }
+            
+            setTimeout(() => { if(document.body.contains(iframe)) document.body.removeChild(iframe); }, 15000);
         }
 
         function handleNewJobReceived(jobObj, isDirectWrtc) {
@@ -361,7 +382,7 @@
             if (currentSettings.workflow === 'auto') {
                 toast("Auto-Accept ON: Printing...", "success");
                 if (jobObj.files && jobObj.files.length > 0) {
-                    jobObj.files.forEach(f => silentPrintDocument(f.url));
+                    jobObj.files.forEach(f => silentPrintDocument(f.url, f.contentType));
                 }
                 
                 if(isDirectWrtc) rtcJobs.push(jobObj); else fbJobs.push(jobObj);
@@ -373,7 +394,7 @@
             }
         }
 
-        // --- DASHBOARD SYNC ---
+        // --- DASHBOARD SYNC (WebRTC Data URI Fix) ---
         function startLiveSync() {
             if(unsubscribeLiveSync) unsubscribeLiveSync();
 
@@ -385,7 +406,6 @@
                     snapshot.forEach(doc => { tempJobs.push({ id: doc.id, ...doc.data() }); });
                     
                     if(currentSettings.workflow === 'manual') fbJobs = tempJobs;
-                    
                     updateJobsUI();
 
                     snapshot.docChanges().forEach((change) => {
@@ -403,21 +423,31 @@
                 window.peerInstance.on('connection', (conn) => {
                     conn.on('data', async (data) => {
                         if(data.type === 'new_print_job') {
-                            const parsedFiles = data.files.map(f => {
-                                const blob = new Blob([f.data], { type: f.fileType });
-                                return { name: f.name, url: URL.createObjectURL(blob), contentType: f.fileType };
-                            });
-                            const newRtcJob = {
-                                id: 'RTC-' + String(Date.now()).slice(-5), 
-                                createdAt: { toDate: () => new Date(data.timestamp) },
-                                customerNote: data.settings.colorMode + ' | ' + data.settings.printSide,
-                                copies: data.settings.copies, paper: data.settings.paperSize,
-                                files: parsedFiles, isLocalWrtc: true
-                            };
-                            handleNewJobReceived(newRtcJob, true);
+                            try {
+                                // 🔴 FIX: Convert Blob to Data URI (Base64) to avoid 404 errors on Mobile
+                                const parsedFiles = await Promise.all(data.files.map(async f => {
+                                    const blob = new Blob([f.data], { type: f.fileType });
+                                    const dataUrl = await new Promise((resolve, reject) => {
+                                        const reader = new FileReader();
+                                        reader.onloadend = () => resolve(reader.result);
+                                        reader.onerror = reject;
+                                        reader.readAsDataURL(blob);
+                                    });
+                                    return { name: f.name, url: dataUrl, contentType: f.fileType };
+                                }));
 
-                            // Signal back to phone that files received
-                            conn.send({ type: 'transfer_complete' });
+                                const newRtcJob = {
+                                    id: 'RTC-' + String(Date.now()).slice(-5), 
+                                    createdAt: { toDate: () => new Date(data.timestamp) },
+                                    customerNote: data.settings.colorMode + ' | ' + data.settings.printSide,
+                                    copies: data.settings.copies, paper: data.settings.paperSize,
+                                    files: parsedFiles, isLocalWrtc: true
+                                };
+                                handleNewJobReceived(newRtcJob, true);
+                                conn.send({ type: 'transfer_complete' });
+                            } catch (e) {
+                                console.error("WebRTC File processing error:", e);
+                            }
                         }
                     });
                 });
@@ -459,7 +489,10 @@
 
             const jobObj = fbJobs.find(j => j.id === jobId) || rtcJobs.find(j => j.id === jobId);
             if(jobObj && jobObj.files && jobObj.files.length > 0) {
-                jobObj.files.forEach(f => silentPrintDocument(f.url));
+                jobObj.files.forEach(f => {
+                    const fileUrl = f.url || f.downloadURL || f.fileUrl;
+                    silentPrintDocument(fileUrl, f.contentType);
+                });
             }
             
             setTimeout(() => markAsDone(jobId, false), 800);
@@ -475,13 +508,19 @@
             }
         }
 
-        // ✨ NAYA FUNCTION: Safely Preview Files (Download fix) ✨
+        // ✨ 404 PREVIEW ERROR FIX (In-App Modal Viewer) ✨
+        function closePreviewModal() {
+            $('#previewModal').classList.add('opacity-0'); 
+            $('#previewModalContent').classList.add('scale-95');
+            setTimeout(() => { 
+                $('#previewModal').classList.add('hidden'); 
+                $('#previewContainer').innerHTML = ''; 
+            }, 300);
+        }
+
         window.viewCustomerFile = function(jobId, fileIdx) {
             const job = fbJobs.find(j => j.id === jobId) || rtcJobs.find(j => j.id === jobId);
-            
-            if (!job || !job.files || !job.files[fileIdx]) {
-                return toast("Error: File data missing!", "error");
-            }
+            if (!job || !job.files || !job.files[fileIdx]) return toast("Error: File data missing!", "error");
 
             const f = job.files[fileIdx];
             const fileUrl = f.url || f.downloadURL || f.fileUrl; 
@@ -490,17 +529,22 @@
                 return toast("File is secured on customer's phone. Open PC app to sync.", "error");
             }
 
-            // Preview ke liye - bina 'download' attribute ke <a> tag use kiya hai
-            try {
-                const a = document.createElement('a');
-                a.href = fileUrl;
-                a.target = '_blank'; // Naye tab me kholne ke liye
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            } catch(e) {
-                window.open(fileUrl, '_blank');
-            }
+            $('#previewTitle').textContent = f.name || 'Document';
+            $('#previewContainer').innerHTML = '<div class="flex items-center justify-center h-full w-full"><i class="fas fa-spinner fa-spin text-4xl text-blue-500"></i></div>';
+            
+            $('#previewModal').classList.remove('hidden');
+            setTimeout(() => { 
+                $('#previewModal').classList.remove('opacity-0'); 
+                $('#previewModalContent').classList.remove('scale-95'); 
+            }, 10);
+
+            setTimeout(() => {
+                if (f.contentType && f.contentType.startsWith('image/')) {
+                    $('#previewContainer').innerHTML = `<img src="${fileUrl}" class="max-w-full max-h-full object-contain rounded-lg shadow-md">`;
+                } else {
+                    $('#previewContainer').innerHTML = `<iframe src="${fileUrl}" class="w-full h-full border-0 rounded-lg shadow-md bg-white"></iframe>`;
+                }
+            }, 400);
         };
 
         // ✨ UPDATED RENDER JOBS FUNCTION ✨

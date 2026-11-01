@@ -422,9 +422,151 @@
 
         function removeFile(i) { URL.revokeObjectURL(state.files[i].url); state.files.splice(i,1); renderFiles(); }
 
-        let cropper = null; let currentCropIndex = -1;
-        async function handleFileClick(index, isImage) { /* Modal implementation as before... */ }
-        function closeCropModal() { $('#cropModal').classList.add('opacity-0'); setTimeout(() => { $('#cropModal').classList.add('hidden'); }, 300); }
+        /* --- ADDED MISSING LOGIC FOR VIEW & EDIT --- */
+        let cropper = null; 
+        let currentCropIndex = -1;
+
+        async function handleFileClick(index, isImage) {
+            currentCropIndex = index;
+            const fileObj = state.files[index];
+            
+            $('#cropModal').classList.remove('hidden');
+            setTimeout(() => $('#cropModal').classList.remove('opacity-0'), 10);
+
+            $('#cropImage').classList.add('hidden');
+            $('#pdfRenderArea').classList.add('hidden');
+            $('#cropActions').classList.add('hidden');
+            $('#pdfActions').classList.add('hidden');
+
+            if(cropper) { cropper.destroy(); cropper = null; }
+
+            if(isImage) {
+                $('#cropImage').src = fileObj.url;
+                $('#cropImage').classList.remove('hidden');
+                $('#cropActions').classList.remove('hidden');
+                cropper = new Cropper($('#cropImage'), {
+                    viewMode: 1, autoCropArea: 1, responsive: true
+                });
+            } else {
+                $('#pdfRenderArea').innerHTML = `
+                    <div class="bg-gray-800 text-white p-6 rounded-2xl text-center w-full mt-5 shadow-lg border border-gray-700">
+                        <i class="fas fa-file-pdf text-5xl mb-4 text-red-500"></i>
+                        <p class="font-bold text-sm mb-2 truncate">${fileObj.file.name}</p>
+                        <p class="text-[11px] text-gray-400">PDF documents open in a new tab.</p>
+                    </div>`;
+                $('#pdfRenderArea').classList.remove('hidden');
+                $('#pdfActions').classList.remove('hidden');
+            }
+        }
+
+        function closeCropModal() { 
+            $('#cropModal').classList.add('opacity-0'); 
+            setTimeout(() => { 
+                $('#cropModal').classList.add('hidden'); 
+                if(cropper) { cropper.destroy(); cropper = null; }
+            }, 300); 
+        }
+
+        $('#rotateBtn')?.addEventListener('click', () => { if(cropper) cropper.rotate(90); });
+        
+        $('#saveCropBtn')?.addEventListener('click', () => {
+            if(!cropper || currentCropIndex === -1) return;
+            toast('Saving changes...', 'info');
+            cropper.getCroppedCanvas().toBlob((blob) => {
+                const oldFile = state.files[currentCropIndex];
+                const newFile = new File([blob], oldFile.file.name, {type: oldFile.file.type});
+                URL.revokeObjectURL(oldFile.url);
+                state.files[currentCropIndex] = { ...oldFile, file: newFile, url: URL.createObjectURL(newFile), size: newFile.size };
+                renderFiles();
+                closeCropModal();
+                toast('Image updated successfully!', 'success');
+            }, state.files[currentCropIndex].mime);
+        });
+
+        function downloadCurrentPDF() {
+            if(currentCropIndex === -1) return;
+            window.open(state.files[currentCropIndex].url, '_blank');
+        }
+
+        /* --- ADDED MISSING LOGIC FOR CONVERT & COMPRESS --- */
+        function openToolModal() {
+            $('#toolsModal').classList.remove('hidden');
+            setTimeout(() => $('#toolsModal').classList.remove('opacity-0'), 10);
+        }
+        
+        function closeToolModal() {
+            $('#toolsModal').classList.add('opacity-0');
+            setTimeout(() => { $('#toolsModal').classList.add('hidden'); }, 300);
+        }
+
+        let toolFileBlob = null;
+        let toolImgElement = new Image();
+
+        $('#toolFile')?.addEventListener('change', (e) => {
+            const f = e.target.files[0];
+            if(!f) return;
+            toolFileBlob = f;
+            const url = URL.createObjectURL(f);
+            $('#toolPreview').src = url;
+            toolImgElement.src = url;
+            $('#origSize').innerText = size(f.size);
+            $('#toolPreviewContainer').classList.remove('hidden');
+            updateEstSize();
+        });
+
+        function updateEstSize() {
+            if(!toolFileBlob) return;
+            const q = parseFloat($('#toolQuality').value);
+            $('#estSize').innerText = size(toolFileBlob.size * (q + 0.15)); // Estimation math
+        }
+
+        $('#toolQuality')?.addEventListener('input', (e) => {
+            $('#qualityPercent').innerText = Math.round(e.target.value * 100) + '%';
+            updateEstSize();
+        });
+
+        async function processAndDownload() {
+            if(!toolFileBlob) return toast('Please select an image first.', 'error');
+            const format = $('#toolFormat').value;
+            const quality = parseFloat($('#toolQuality').value);
+            
+            toast('Processing...', 'info');
+
+            const canvas = document.createElement('canvas');
+            canvas.width = toolImgElement.naturalWidth;
+            canvas.height = toolImgElement.naturalHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(toolImgElement, 0, 0);
+
+            if(format === 'application/pdf') {
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF({
+                        orientation: canvas.width > canvas.height ? 'l' : 'p',
+                        unit: 'px',
+                        format: [canvas.width, canvas.height]
+                    });
+                    pdf.addImage(canvas.toDataURL('image/jpeg', quality), 'JPEG', 0, 0, canvas.width, canvas.height);
+                    pdf.save('compressed-document.pdf');
+                    toast('PDF Downloaded!', 'success');
+                } catch(e) { 
+                    toast('Error creating PDF.', 'error'); 
+                }
+            } else {
+                canvas.toBlob((blob) => {
+                    const ext = format.split('/')[1] === 'jpeg' ? 'jpg' : format.split('/')[1];
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `compressed-image.${ext}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    toast('Image Downloaded!', 'success');
+                }, format, quality);
+            }
+        }
 
         $('#dropArea').addEventListener('click', () => $('#files').click());
         $('#pick').addEventListener('click', (e) => { e.stopPropagation(); $('#files').click(); });

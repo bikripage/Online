@@ -153,7 +153,7 @@
                         </label>
                     </div>
                 </div>
-                <!-- Data Privacy removed from here as requested -->
+                <!-- Data Privacy options removed -->
             </div>
             
             <div class="p-5 border-t border-gray-100 bg-white flex flex-col gap-3">
@@ -313,7 +313,6 @@
                 if (shopData.printSettings) {
                     currentSettings = shopData.printSettings;
                     document.querySelector(`input[name="workflowMode"][value="${currentSettings.workflow}"]`).checked = true;
-                    // Privacy validation hataya gaya taki error na aaye
                 }
                 
                 startLiveSync();
@@ -417,7 +416,7 @@
                             };
                             handleNewJobReceived(newRtcJob, true);
 
-                            // ✨ FIX: Tell customer phone that files are received ✨
+                            // Signal back to phone that files received
                             conn.send({ type: 'transfer_complete' });
                         }
                     });
@@ -471,12 +470,40 @@
                 const btn = document.getElementById(`btn-reject-${jobId}`);
                 if(btn) btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
                 
-                // Specific status set to 'cancelled' so it completely clears properly
                 markAsDone(jobId, true, 'cancelled'); 
                 toast("Print request rejected", "info");
             }
         }
 
+        // ✨ NAYA FUNCTION: Safely open or download files ✨
+        window.viewCustomerFile = function(jobId, fileIdx) {
+            const job = fbJobs.find(j => j.id === jobId) || rtcJobs.find(j => j.id === jobId);
+            
+            if (!job || !job.files || !job.files[fileIdx]) {
+                return toast("Error: File data missing!", "error");
+            }
+
+            const f = job.files[fileIdx];
+            const fileUrl = f.url || f.downloadURL || f.fileUrl; 
+
+            if (!fileUrl || fileUrl === 'undefined') {
+                return toast("File is secured on customer's phone. Open PC app to sync.", "error");
+            }
+
+            try {
+                const a = document.createElement('a');
+                a.href = fileUrl;
+                a.target = '_blank';
+                a.download = f.name || 'Print_Document';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } catch(e) {
+                window.open(fileUrl, '_blank');
+            }
+        };
+
+        // ✨ UPDATED RENDER JOBS FUNCTION ✨
         function renderJobs(jobs) {
             $('#jobsGrid').innerHTML = jobs.map((job, index) => {
                 const colorMode = (job.customerNote || "").includes('Color') ? 'Color' : 'B&W';
@@ -487,21 +514,21 @@
                     : `<span class="bg-gray-100 text-gray-600 border border-gray-200 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider">B & W</span>`;
 
                 const time = job.createdAt ? new Date(getJobTime(job)).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Just now';
-                
                 const filesCount = job.files ? job.files.length : (job.files_count || 0);
 
                 let filesHtml = '';
                 if (job.files && job.files.length > 0) {
-                    filesHtml = job.files.map(f => {
-                        const isPdf = f.contentType === 'application/pdf';
+                    filesHtml = job.files.map((f, fileIdx) => {
+                        const isPdf = f.contentType === 'application/pdf' || (f.name && f.name.toLowerCase().endsWith('.pdf'));
                         const icon = isPdf ? 'fa-file-pdf text-red-500' : 'fa-image text-blue-500';
+                        
                         return `
                             <div class="flex items-center justify-between p-2.5 bg-white border border-gray-100 rounded-[12px] shadow-sm hover:border-gray-300 transition-colors">
                                 <div class="flex items-center gap-3 overflow-hidden">
                                     <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center shrink-0 border border-gray-100"><i class="fas ${icon} text-[13px]"></i></div>
-                                    <div class="truncate text-[12px] font-bold text-gray-800" title="${f.name}">${f.name}</div>
+                                    <div class="truncate text-[12px] font-bold text-gray-800" title="${f.name || 'Document'}">${f.name || 'Document'}</div>
                                 </div>
-                                <button onclick="window.open('${f.url}', '_blank')" class="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors shrink-0 ml-2">
+                                <button onclick="viewCustomerFile('${job.id}', ${fileIdx})" class="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors shrink-0 ml-2">
                                     <i class="fas fa-external-link-alt text-[11px]"></i>
                                 </button>
                             </div>
@@ -594,7 +621,7 @@
         async function saveSettings() {
             const btn = $('#saveSettingsBtn'); btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
             const workflow = document.querySelector('input[name="workflowMode"]:checked').value;
-            const privacy = 'immediate'; // Always immediate as UI is removed
+            const privacy = 'immediate'; 
             currentSettings = { workflow, privacy, isOnline: true };
             try {
                 await db.collection('shops').doc(shopId).set({ printSettings: { workflow, privacy, isOnline: true }, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });

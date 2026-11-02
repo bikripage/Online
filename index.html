@@ -1942,44 +1942,7 @@ function getVIPBadge(isVerified, plan) {
 }
 
 
-                        function addToCart(event, name, price, shopName, shopPhone, shopId) {
-            event.stopPropagation(); 
-            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
-            const existingItem = cart.find(item => item.name === name && item.shopId === shopId);
-            if (existingItem) {
-                existingItem.qty += 1; 
-            } else {
-                cart.push({ name, price: parseInt(price), shopName, shopPhone, shopId: shopId, qty: 1 });
-            }
-            localStorage.setItem(getCartKey(), JSON.stringify(cart));
-            if (typeof updateCartBadge === 'function') updateCartBadge();
-            
-            let btn = event.currentTarget;
-            if (btn.id === 'detail-cart-btn') return;
-            if (btn.dataset.adding === "true") return;
-            btn.dataset.adding = "true";
-
-            // Flipkart style button ke liye Original HTML set karo
-            let origHtml = `<i class="fas fa-shopping-cart text-[10px]"></i> Add`;
-            
-            // Jab "Added" likha aaye toh thoda light green/grey background dikhao taaki white text chip na jaye
-            btn.innerHTML = `<i class="fas fa-check text-[10px]"></i> Added`;
-            
-            // Flipkart style button ki purani classes hatao
-            btn.classList.remove('bg-white', 'border-gray-300', 'text-gray-700', 'hover:bg-gray-50');
-            // Success animation classes dalo
-            btn.classList.add('bg-green-50', 'border-green-200', 'text-green-700');
-
-            setTimeout(() => {
-                // Wapas default Flipkart style karna
-                btn.innerHTML = origHtml;
-                btn.classList.remove('bg-green-50', 'border-green-200', 'text-green-700');
-                btn.classList.add('bg-white', 'border-gray-300', 'text-gray-700', 'hover:bg-gray-50');
-                btn.dataset.adding = "false"; 
-            }, 1200);
-        }
-
-
+                     
                         function toggleCartModal() {
             const modal = document.getElementById('cart-modal');
             const content = document.getElementById('cart-modal-content');
@@ -2081,41 +2044,48 @@ function getVIPBadge(isVerified, plan) {
             }
         }
 
-             function addToCart(event, name, price, shopName, shopPhone, shopId) {
-            event.stopPropagation(); 
-            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
-            const existingItem = cart.find(item => item.name === name && item.shopId === shopId);
-            if (existingItem) {
-                existingItem.qty += 1; 
-            } else {
-                cart.push({ name, price: parseInt(price), shopName, shopPhone, shopId: shopId, qty: 1 });
-            }
-            localStorage.setItem(getCartKey(), JSON.stringify(cart));
-            if (typeof updateCartBadge === 'function') updateCartBadge();
-            let btn = event.currentTarget;
-            if (btn.id === 'detail-cart-btn') return;
-            if (btn.dataset.adding === "true") return;
-            btn.dataset.adding = "true";
+         function addToCart(event, name, price, shopName, shopPhone, shopId) {
+    event.stopPropagation(); 
 
-            // Flipkart style button ke liye Original HTML set karo
-            let origHtml = `<i class="fas fa-shopping-cart text-[10px]"></i> Add`;
-            
-            // Jab "Added" likha aaye toh thoda light green/grey background dikhao taaki white text chip na jaye
-            btn.innerHTML = `<i class="fas fa-check text-[10px]"></i> Added`;
-            
-            // Flipkart style button ki purani classes hatao
-            btn.classList.remove('bg-white', 'border-gray-300', 'text-gray-700', 'hover:bg-gray-50');
-            // Success animation classes dalo
-            btn.classList.add('bg-green-50', 'border-green-200', 'text-green-700');
+    // 🛑 FIX: Cart me add hone se pehle check karo ki delivery hai ya nahi
+    if (globalHomeDelivery === false) {
+        showIOSAlert(
+            "Delivery Unavailable", 
+            "Home delivery is not started yet. Please pick up from our store.", 
+            "OK"
+        );
+        return; 
+    }
 
-            setTimeout(() => {
-                // Wapas default Flipkart style karna
-                btn.innerHTML = origHtml;
-                btn.classList.remove('bg-green-50', 'border-green-200', 'text-green-700');
-                btn.classList.add('bg-white', 'border-gray-300', 'text-gray-700', 'hover:bg-gray-50');
-                btn.dataset.adding = "false"; 
-            }, 1200);
-        }
+    let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
+    const existingItem = cart.find(item => item.name === name && item.shopId === shopId);
+    if (existingItem) {
+        existingItem.qty += 1; 
+    } else {
+        cart.push({ name, price: parseInt(price), shopName, shopPhone, shopId: shopId, qty: 1 });
+    }
+    localStorage.setItem(getCartKey(), JSON.stringify(cart));
+    if (typeof updateCartBadge === 'function') updateCartBadge();
+    
+    let btn = event.currentTarget;
+    if (btn.id === 'detail-cart-btn') return;
+    if (btn.dataset.adding === "true") return;
+    btn.dataset.adding = "true";
+
+    let origHtml = `<i class="fas fa-cart-plus text-sm"></i> Cart`;
+    btn.innerHTML = `<i class="fas fa-check text-lg"></i> Added`;
+    
+    btn.classList.add('bg-purple-600', 'text-white', 'shadow-md', 'border-purple-600');
+    btn.classList.remove('bg-purple-50', 'text-purple-600', 'hover:bg-purple-100', 'border-purple-100');
+
+    setTimeout(() => {
+        btn.innerHTML = origHtml;
+        btn.classList.remove('bg-purple-600', 'text-white', 'shadow-md', 'border-purple-600');
+        btn.classList.add('bg-purple-50', 'text-purple-600', 'hover:bg-purple-100', 'border-purple-100');
+        btn.dataset.adding = "false"; 
+    }, 1200);
+}
+
 
         function renderCartItems() {
             let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
@@ -2239,18 +2209,16 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
 
       // ✨ CART CHECKOUT (NO LOGIN REQUIRED) ✨
 async function checkoutCartInApp() {
-if (globalHomeDelivery === false && !skipDeliveryCheck) {
+    // 🛑 FIX: Strictly block if home delivery is false.
+    if (globalHomeDelivery === false) {
         showIOSAlert(
             "Delivery Unavailable", 
             "Home delivery is not started yet. Please pick up from our store.", 
-            "OK",
-            function() {
-                // Jab user OK dabayega, tabhi wapas function chalega
-                checkoutCartInApp(true); 
-            }
+            "OK"
         );
-        return; // 🚨 YAHAN RETURN LAGANA ZAROORI HAI TAAKI CODE AAGE NA JAYE 🚨
+        return; 
     }
+
     let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
     if(cart.length === 0) { alert("Cart is empty!"); return; }
     
@@ -2260,6 +2228,8 @@ if (globalHomeDelivery === false && !skipDeliveryCheck) {
     
     if(!custName || !custWhatsApp) { alert("Please enter your name and WhatsApp number!"); return; }
     if(!address) { alert("Please enter delivery address!"); return; }
+
+    
 
     // ✨ NAYA: Save for next time
     localStorage.setItem('BikriPage_saved_name', custName);

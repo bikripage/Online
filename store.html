@@ -1842,37 +1842,47 @@ async function submitStoreReview() {
             }
         }
 
-              function addToCart(event, name, price, shopName, shopPhone, shopId) {
-            event.stopPropagation(); 
-            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
-            // shopId ke through check karega
-            const existingItem = cart.find(item => item.name === name && item.shopId === shopId);
-            if (existingItem) {
-                existingItem.qty += 1; 
-            } else {
-                cart.push({ name, price: parseInt(price), shopName, shopPhone, shopId: shopId, qty: 1 });
-            }
-            localStorage.setItem(getCartKey(), JSON.stringify(cart));
-            if (typeof updateCartBadge === 'function') updateCartBadge();
-            
-            let btn = event.currentTarget;
-            if (btn.id === 'detail-cart-btn') return;
-            if (btn.dataset.adding === "true") return;
-            btn.dataset.adding = "true";
+       function addToCart(event, name, price, shopName, shopPhone, shopId) {
+    event.stopPropagation(); 
 
-            let origHtml = `<i class="fas fa-cart-plus text-sm"></i> Cart`;
-            btn.innerHTML = `<i class="fas fa-check text-lg"></i> Added`;
-            
-            btn.classList.add('bg-purple-600', 'text-white', 'shadow-md', 'border-purple-600');
-            btn.classList.remove('bg-purple-50', 'text-purple-600', 'hover:bg-purple-100', 'border-purple-100');
+    // 🛑 FIX: Cart me add hone se pehle check karo ki delivery hai ya nahi
+    if (globalHomeDelivery === false) {
+        showIOSAlert(
+            "Delivery Unavailable", 
+            "Home delivery is not started yet. Please pick up from our store.", 
+            "OK"
+        );
+        return; 
+    }
 
-            setTimeout(() => {
-                btn.innerHTML = origHtml;
-                btn.classList.remove('bg-purple-600', 'text-white', 'shadow-md', 'border-purple-600');
-                btn.classList.add('bg-purple-50', 'text-purple-600', 'hover:bg-purple-100', 'border-purple-100');
-                btn.dataset.adding = "false"; 
-            }, 1200);
-        }
+    let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
+    const existingItem = cart.find(item => item.name === name && item.shopId === shopId);
+    if (existingItem) {
+        existingItem.qty += 1; 
+    } else {
+        cart.push({ name, price: parseInt(price), shopName, shopPhone, shopId: shopId, qty: 1 });
+    }
+    localStorage.setItem(getCartKey(), JSON.stringify(cart));
+    if (typeof updateCartBadge === 'function') updateCartBadge();
+    
+    let btn = event.currentTarget;
+    if (btn.id === 'detail-cart-btn') return;
+    if (btn.dataset.adding === "true") return;
+    btn.dataset.adding = "true";
+
+    let origHtml = `<i class="fas fa-cart-plus text-sm"></i> Cart`;
+    btn.innerHTML = `<i class="fas fa-check text-lg"></i> Added`;
+    
+    btn.classList.add('bg-purple-600', 'text-white', 'shadow-md', 'border-purple-600');
+    btn.classList.remove('bg-purple-50', 'text-purple-600', 'hover:bg-purple-100', 'border-purple-100');
+
+    setTimeout(() => {
+        btn.innerHTML = origHtml;
+        btn.classList.remove('bg-purple-600', 'text-white', 'shadow-md', 'border-purple-600');
+        btn.classList.add('bg-purple-50', 'text-purple-600', 'hover:bg-purple-100', 'border-purple-100');
+        btn.dataset.adding = "false"; 
+    }, 1200);
+}
 
 
         function toggleCartModal() {
@@ -2062,18 +2072,16 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
 
 // ✨ CART CHECKOUT (NO LOGIN REQUIRED) ✨
 async function checkoutCartInApp() {
- if (globalHomeDelivery === false && !skipDeliveryCheck) {
+    // 🛑 FIX: Strictly block if home delivery is false.
+    if (globalHomeDelivery === false) {
         showIOSAlert(
             "Delivery Unavailable", 
             "Home delivery is not started yet. Please pick up from our store.", 
-            "OK",
-            function() {
-                // Jab user OK dabayega, tabhi wapas function chalega
-                checkoutCartInApp(true); 
-            }
+            "OK"
         );
-        return; // 🚨 YAHAN RETURN LAGANA ZAROORI HAI TAAKI CODE AAGE NA JAYE 🚨
+        return; 
     }
+
     let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
     if(cart.length === 0) { alert("Cart is empty!"); return; }
     
@@ -2083,6 +2091,8 @@ async function checkoutCartInApp() {
     
     if(!custName || !custWhatsApp) { alert("Please enter your name and WhatsApp number!"); return; }
     if(!address) { alert("Please enter delivery address!"); return; }
+
+ 
 
     // ✨ NAYA: Save for next time
     localStorage.setItem('BikriPage_saved_name', custName);
@@ -2192,75 +2202,75 @@ async function checkoutCartInApp() {
 
         let currentOrder = null;
 
-        function openOrderModal(itemName, itemPrice, shopName, shopPhone, shopId) {
-        if (globalHomeDelivery === false) {
+    function openOrderModal(itemName, itemPrice, shopName, shopPhone, shopId) {
+    // 🛑 FIX: Alert ke baad return lagaya hai taaki modal open hi na ho
+    if (globalHomeDelivery === false) {
         showIOSAlert(
             "Delivery Unavailable", 
             "Home delivery is not started yet. Please pick up from our store.", 
             "OK"
         );
+        return; 
     }
+
     currentOrder = { itemName, itemPrice, shopName, shopPhone, shopId: shopId };
 
-            document.getElementById('order-item-name').innerText = itemName;
-            document.getElementById('order-item-price').innerText = `₹${itemPrice}`;
-            document.getElementById('order-shop-name').innerText = shopName || 'Local Store';
-            
-            let isServiceModal = false;
-            if (typeof globalBusinessType !== 'undefined' && globalBusinessType === 'Service Provider') {
-                isServiceModal = true;
-            } else if (itemName.toLowerCase().includes('service')) {
-                isServiceModal = true;
-            }
+    document.getElementById('order-item-name').innerText = itemName;
+    document.getElementById('order-item-price').innerText = `₹${itemPrice}`;
+    document.getElementById('order-shop-name').innerText = shopName || 'Local Store';
+    
+    let isServiceModal = false;
+    if (typeof globalBusinessType !== 'undefined' && globalBusinessType === 'Service Provider') {
+        isServiceModal = true;
+    } else if (itemName.toLowerCase().includes('service')) {
+        isServiceModal = true;
+    }
 
-            const mainBtn = document.getElementById('main-order-btn');
-            const waBtn = document.querySelector('button[onclick="orderViaWhatsApp()"]');
+    const mainBtn = document.getElementById('main-order-btn');
+    const waBtn = document.querySelector('button[onclick="orderViaWhatsApp()"]');
 
-            if (mainBtn) {
-                mainBtn.innerHTML = isServiceModal 
-                    ? `Book Now <i class="fas fa-check-circle text-green-400"></i>` 
-                    : `Place Order Now <i class="fas fa-check-circle text-green-400"></i>`;
-            }
-            if (waBtn) {
-                waBtn.innerHTML = isServiceModal 
-                    ? `<i class="fab fa-whatsapp text-lg"></i> Book via WhatsApp` 
-                    : `<i class="fab fa-whatsapp text-lg"></i> Order via WhatsApp`;
-            }
-            
-                        const savedName = localStorage.getItem('BikriPage_saved_name') || localStorage.getItem('BikriPage_customer_name') || '';
-            let savedPhone = localStorage.getItem('BikriPage_saved_phone') || localStorage.getItem('BikriPage_customer_phone') || '';
-            const savedAddress = localStorage.getItem('BikriPage_saved_address') || '';
-            
-            // ✨ YAHAN GPS COORDINATES FETCH KAR RAHE HAIN
-            const savedLat = localStorage.getItem('BikriPage_saved_lat') || '';
-            const savedLng = localStorage.getItem('BikriPage_saved_lng') || '';
+    if (mainBtn) {
+        mainBtn.innerHTML = isServiceModal 
+            ? `Book Now <i class="fas fa-check-circle text-green-400"></i>` 
+            : `Place Order Now <i class="fas fa-check-circle text-green-400"></i>`;
+    }
+    if (waBtn) {
+        waBtn.innerHTML = isServiceModal 
+            ? `<i class="fab fa-whatsapp text-lg"></i> Book via WhatsApp` 
+            : `<i class="fab fa-whatsapp text-lg"></i> Order via WhatsApp`;
+    }
+    
+    const savedName = localStorage.getItem('BikriPage_saved_name') || localStorage.getItem('BikriPage_customer_name') || '';
+    let savedPhone = localStorage.getItem('BikriPage_saved_phone') || localStorage.getItem('BikriPage_customer_phone') || '';
+    const savedAddress = localStorage.getItem('BikriPage_saved_address') || '';
+    
+    const savedLat = localStorage.getItem('BikriPage_saved_lat') || '';
+    const savedLng = localStorage.getItem('BikriPage_saved_lng') || '';
 
-            if (savedPhone.includes('@')) savedPhone = '';
+    if (savedPhone.includes('@')) savedPhone = '';
 
-            document.getElementById('order-cust-name').value = savedName;
-            document.getElementById('order-cust-phone').value = savedPhone;
-            document.getElementById('order-address').value = savedAddress;
-            
-            // ✨ YAHAN HIDDEN INPUTS MEIN GPS DAAL RAHE HAIN
-            if (document.getElementById('order-lat')) document.getElementById('order-lat').value = savedLat;
-            if (document.getElementById('order-lng')) document.getElementById('order-lng').value = savedLng;
+    document.getElementById('order-cust-name').value = savedName;
+    document.getElementById('order-cust-phone').value = savedPhone;
+    document.getElementById('order-address').value = savedAddress;
+    
+    if (document.getElementById('order-lat')) document.getElementById('order-lat').value = savedLat;
+    if (document.getElementById('order-lng')) document.getElementById('order-lng').value = savedLng;
 
-            
-            if (document.getElementById('order-shop-phone')) {
-                document.getElementById('order-shop-phone').value = shopPhone || '';
-            }
+    if (document.getElementById('order-shop-phone')) {
+        document.getElementById('order-shop-phone').value = shopPhone || '';
+    }
 
-            const modal = document.getElementById('order-modal');
-            const content = document.getElementById('order-modal-content');
-            modal.classList.remove('hidden');
-            
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                content.classList.remove('scale-75');
-                content.classList.add('scale-100');
-            }, 10);
-            document.body.style.overflow = 'hidden'; 
-        }
+    const modal = document.getElementById('order-modal');
+    const content = document.getElementById('order-modal-content');
+    modal.classList.remove('hidden');
+    
+    setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        content.classList.remove('scale-75');
+        content.classList.add('scale-100');
+    }, 10);
+    document.body.style.overflow = 'hidden'; 
+}
 
         function closeOrderModal() {
             const modal = document.getElementById('order-modal');

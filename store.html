@@ -2062,12 +2062,17 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
 
 // ✨ CART CHECKOUT (NO LOGIN REQUIRED) ✨
 async function checkoutCartInApp() {
- if (globalHomeDelivery === false) {
+ if (globalHomeDelivery === false && !skipDeliveryCheck) {
         showIOSAlert(
             "Delivery Unavailable", 
             "Home delivery is not started yet. Please pick up from our store.", 
-            "OK"
+            "OK",
+            function() {
+                // Jab user OK dabayega, tabhi wapas function chalega
+                checkoutCartInApp(true); 
+            }
         );
+        return; // 🚨 YAHAN RETURN LAGANA ZAROORI HAI TAAKI CODE AAGE NA JAYE 🚨
     }
     let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
     if(cart.length === 0) { alert("Cart is empty!"); return; }

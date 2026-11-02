@@ -593,6 +593,7 @@
         let globalShopPhone = "";
         let globalShopName = "";
         let globalBusinessType = "";
+        let globalHomeDelivery = true;
         let currentShopId = new URLSearchParams(window.location.search).get('shop') || localStorage.getItem('BikriPage_active_shop');
         
         let fullDesc = "";
@@ -626,6 +627,7 @@
                     globalShopPhone = shopData.phone;
                     globalShopName = shopData.shopName;
                     globalBusinessType = shopData.businessType || '';
+                     globalHomeDelivery = shopData.homeDelivery;
                     const safeOwnerName = shopData.ownerName || "Shop Owner";
 
                     document.title = `${shopData.shopName} | BikriPage`;                                                                     
@@ -2060,6 +2062,13 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
 
 // ✨ CART CHECKOUT (NO LOGIN REQUIRED) ✨
 async function checkoutCartInApp() {
+ if (globalHomeDelivery === false) {
+        showIOSAlert(
+            "Delivery Unavailable", 
+            "Home delivery is not started yet. Please pick up from our store.", 
+            "OK"
+        );
+    }
     let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
     if(cart.length === 0) { alert("Cart is empty!"); return; }
     
@@ -2179,6 +2188,13 @@ async function checkoutCartInApp() {
         let currentOrder = null;
 
         function openOrderModal(itemName, itemPrice, shopName, shopPhone, shopId) {
+        if (globalHomeDelivery === false) {
+        showIOSAlert(
+            "Delivery Unavailable", 
+            "Home delivery is not started yet. Please pick up from our store.", 
+            "OK"
+        );
+    }
     currentOrder = { itemName, itemPrice, shopName, shopPhone, shopId: shopId };
 
             document.getElementById('order-item-name').innerText = itemName;

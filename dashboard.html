@@ -12058,6 +12058,18 @@ setTimeout(loadAppSecurityDetails, 2500);
             </div>
         </div>
     </div>
+    <!-- 🚨 FIX FOR BUTTON FREEZE & TIMER (Duplicate Code Issue) 🚨 -->
+    <script>
+        window.checkDailyBillLimit = function(isButtonClick) {
+            if (isButtonClick === false) {
+                // Background limit refresh after saving/deleting
+                if (typeof updateDailyLimitUI === 'function') updateDailyLimitUI();
+            } else {
+                // When New Bill button is clicked
+                if (typeof handleNewBillClick === 'function') handleNewBillClick();
+            }
+        };
+    </script>
 
 
 </body>

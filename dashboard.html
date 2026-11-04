@@ -3102,28 +3102,16 @@ else if(o.status === 'accepted') {
         // ✨ SUPER FAST STRICT DAILY LIMIT LOGIC (100% WORKING) ✨
         // ==========================================
         let countdownInterval = null;
-
-        // Ye helper strict count dega, array based checking se
+        // Ye helper ekdum strict count dega (Delete karne par minus nahi hoga)
         function getStrictTodayCount() {
-            let today = new Date(); today.setHours(0,0,0,0);
-            let todaysCreatedBills = 0;
-
-            // Admin bills (recent session me banaye gaye) count karna
-            if (typeof adminBills !== 'undefined' && adminBills.length > 0) {
-                adminBills.forEach(bill => {
-                    let billDate = null;
-                    if (bill.timestamp && typeof bill.timestamp.toDate === 'function') billDate = bill.timestamp.toDate();
-                    else if (bill.timestamp && bill.timestamp.seconds) billDate = new Date(bill.timestamp.seconds * 1000);
-                    else {
-                        let p = bill.date.split('/'); 
-                        if(p.length===3) billDate = new Date(p[2], p[1]-1, p[0]); 
-                        else billDate = new Date(bill.date);
-                    }
-                    if (billDate && billDate >= today) todaysCreatedBills++;
-                });
+            let tDate = new Date().toDateString(); // Aaj ki date (e.g., Wed Nov 04 2026)
+            
+            if (globalShopData && globalShopData.dailyLimitData && globalShopData.dailyLimitData.date === tDate) {
+                return globalShopData.dailyLimitData.count || 0; // Asli permanent count
             }
-            return todaysCreatedBills;
+            return 0; // Agar naya din hai, toh count zero
         }
+
 
         // 1. Ye Background me Timer aur UI update karega
         function updateDailyLimitUI() {
@@ -3305,7 +3293,7 @@ function toggleNewBillDateField() {
             tot.innerText = `₹${gt}`;
         }
 
-        async function saveBillProcess(isSend) {
+              async function saveBillProcess(isSend) {
             const n = document.getElementById('bill-cust-name').value.trim(); const p = document.getElementById('bill-cust-phone').value.trim();
             if(!n) return alert("Enter Customer Name"); if(draftBillItems.length === 0) return alert("Add items!");
             if(isSend && !p) { if(!confirm("No phone provided. Cannot WhatsApp. Save anyway?")) return; isSend = false; }
@@ -3349,16 +3337,19 @@ function toggleNewBillDateField() {
                 nb.id = doc.id; 
                 adminBills.unshift(nb);
                 
-                // 🚀 NAYA: Strict Daily Bill Counter Firebase mein update karna
+                // 🚀 NAYA: Strict Daily Bill Counter Firebase mein update karna (Never decrements)
                 const tDateString = new Date().toDateString();
                 let currentLimitData = (globalShopData && globalShopData.dailyLimitData) ? globalShopData.dailyLimitData : { date: '', count: 0 };
+                
                 if (currentLimitData.date !== tDateString) {
-                    currentLimitData = { date: tDateString, count: 1 };
+                    currentLimitData = { date: tDateString, count: 1 }; // Naye din ka pehla bill
                 } else {
-                    currentLimitData.count += 1;
+                    currentLimitData.count += 1; // Purane bill delete bhi ho jayein, ye count sirf badhega
                 }
+                
+                // Firestore aur Local Data dono me save kar do
                 await db.collection('shops').doc(currentShopId).update({ dailyLimitData: currentLimitData });
-                if(globalShopData) globalShopData.dailyLimitData = currentLimitData;
+                if (globalShopData) globalShopData.dailyLimitData = currentLimitData;
                 
                 // Trackers update
                 if(tId && tId !== 'none' && (iTot-disc) > 0) {
@@ -3369,7 +3360,7 @@ function toggleNewBillDateField() {
                 closeCreateBillModal(); 
                 renderAdminBills(); 
                 processCustomerData();
-                updateDailyLimitUI();
+                updateDailyLimitUI(); // 🚀 UI aur Timer ko background me update karega
                 
                 if(isSend) {
                     downloadBillImage(nb.id);
@@ -3388,6 +3379,7 @@ function toggleNewBillDateField() {
                 btn.disabled = false; 
             }
         }
+
 
 // Status के हिसाब से सही मैसेज बनाने का अपडेटेड फंक्शन
 function getWhatsAppBillMessage(bill) {

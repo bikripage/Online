@@ -800,11 +800,12 @@
 
                                 </div>
                                 
-                                <!-- ✨ NAYA: Timer Display (Hidden by default) -->
-                                <div id="billing-limit-timer" class="hidden text-center mb-6 p-3 bg-red-50 border border-red-100 rounded-xl">
+                                                                <!-- ✨ FIX: Timer Display (Hidden by default) -->
+                                <div id="billing-limit-timer" class="hidden flex-col items-center justify-center text-center mb-6 p-4 bg-red-50 border border-red-100 rounded-xl transition-all duration-300">
                                     <p class="text-[11px] font-bold text-red-600 uppercase tracking-wide">Daily Limit Reached (10/10)</p>
-                                    <p class="text-[13px] font-black text-gray-900 mt-1">Resets in: <span id="midnight-countdown" class="text-red-500">00:00:00</span></p>
+                                    <p class="text-[14px] font-black text-gray-900 mt-1">Resets in: <span id="midnight-countdown" class="text-red-500">00:00:00</span></p>
                                 </div>
+
 
                                 <div class="flex flex-col sm:flex-row gap-3 mb-6"><div class="relative flex-1"><i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]"></i><input type="text" id="admin-search-order" onkeyup="renderAdminBills()" placeholder="Search Order ID or Name..." class="w-full ios-input pl-11 pr-4 text-sm font-semibold outline-none"></div><select id="admin-filter-status" onchange="renderAdminBills()" class="w-full sm:w-40 ios-input px-4 text-xs font-bold tracking-wide outline-none cursor-pointer"><option value="All">ALL STATUS</option><option value="Paid">PAID</option><option value="Unpaid">UNPAID</option><option value="Delivered">DELIVERED</option><option value="Processing">PROCESSING</option><option value="Cancelled">CANCELLED</option></select></div>
                                 <div class="flex justify-between items-center border-b border-[#E5E7EB] pb-2 mb-4"><h4 class="text-[11px] text-[#6B7280] uppercase tracking-wider font-bold">Recent Bills</h4><span id="admin-total-orders" class="text-xs font-bold text-[#2563EB] bg-[#E0E7FF] px-2 py-0.5 rounded-full">0</span></div>
@@ -3097,40 +3098,34 @@ else if(o.status === 'accepted') {
             [...materialBatches].reverse().forEach(b => { html += `<option value="${b.id}">${b.name} (Cost: ₹${b.cost})</option>`; });
             select.innerHTML = html;
         }
-                                      // ==========================================
-        // ✨ SUPER FAST STRICT DAILY LIMIT LOGIC ✨
+                                           // ==========================================
+        // ✨ SUPER FAST STRICT DAILY LIMIT LOGIC (100% WORKING) ✨
         // ==========================================
         let countdownInterval = null;
 
-        // Ye helper function strict count deta hai (Delete karne par bhi bypass nahi hoga)
+        // Ye helper strict count dega, array based checking se
         function getStrictTodayCount() {
-            const tDate = new Date().toDateString();
-            let limitData = (globalShopData && globalShopData.dailyLimitData) ? globalShopData.dailyLimitData : null;
-            
-            if (limitData && limitData.date === tDate) {
-                return limitData.count; // Database me saved strict count
-            } else {
-                // Fallback: Agar aaj pehli baar load hua hai
-                let today = new Date(); today.setHours(0,0,0,0);
-                let todaysCreatedBills = 0;
-                if (typeof adminBills !== 'undefined' && adminBills.length > 0) {
-                    adminBills.forEach(bill => {
-                        let billDate = null;
-                        if (bill.timestamp && typeof bill.timestamp.toDate === 'function') billDate = bill.timestamp.toDate();
-                        else if (bill.timestamp && bill.timestamp.seconds) billDate = new Date(bill.timestamp.seconds * 1000);
-                        else {
-                            let p = bill.date.split('/'); 
-                            if(p.length===3) billDate = new Date(p[2], p[1]-1, p[0]); 
-                            else billDate = new Date(bill.date);
-                        }
-                        if (billDate && billDate >= today) todaysCreatedBills++;
-                    });
-                }
-                return todaysCreatedBills;
+            let today = new Date(); today.setHours(0,0,0,0);
+            let todaysCreatedBills = 0;
+
+            // Admin bills (recent session me banaye gaye) count karna
+            if (typeof adminBills !== 'undefined' && adminBills.length > 0) {
+                adminBills.forEach(bill => {
+                    let billDate = null;
+                    if (bill.timestamp && typeof bill.timestamp.toDate === 'function') billDate = bill.timestamp.toDate();
+                    else if (bill.timestamp && bill.timestamp.seconds) billDate = new Date(bill.timestamp.seconds * 1000);
+                    else {
+                        let p = bill.date.split('/'); 
+                        if(p.length===3) billDate = new Date(p[2], p[1]-1, p[0]); 
+                        else billDate = new Date(bill.date);
+                    }
+                    if (billDate && billDate >= today) todaysCreatedBills++;
+                });
             }
+            return todaysCreatedBills;
         }
 
-        // 1. Ye Background me Timer aur UI update karega (No freeze)
+        // 1. Ye Background me Timer aur UI update karega
         function updateDailyLimitUI() {
             const plan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
             const email = (typeof globalShopData !== 'undefined' && globalShopData.email) ? globalShopData.email : '';
@@ -3138,21 +3133,22 @@ else if(o.status === 'accepted') {
             
             // VIPs ke liye limit hamesha off
             if (plan === 'plus' || plan === 'pro' || email === 'netajijhadustore@gmail.com') {
-                if(timerDiv) timerDiv.classList.add('hidden');
+                if(timerDiv) { timerDiv.classList.add('hidden'); timerDiv.classList.remove('flex'); }
                 return;
             }
 
             let todaysCount = getStrictTodayCount();
             
             if (todaysCount >= 10) {
-                startMidnightTimer(); // Limit khatam, timer dikhao
+                if(timerDiv) { timerDiv.classList.remove('hidden'); timerDiv.classList.add('flex'); }
+                startMidnightTimer(); // Limit khatam, timer chalao
             } else {
                 if (countdownInterval) clearInterval(countdownInterval);
-                if (timerDiv) timerDiv.classList.add('hidden'); // Limit bachi hai, timer chupao
+                if(timerDiv) { timerDiv.classList.add('hidden'); timerDiv.classList.remove('flex'); }
             }
         }
 
-        // 2. Sirf tab chalega jab 'New Bill' button dabega (Instant Reaction)
+        // 2. Sirf tab chalega jab 'New Bill' button dabega
         function handleNewBillClick() {
             const plan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
             const email = (typeof globalShopData !== 'undefined' && globalShopData.email) ? globalShopData.email : '';
@@ -3173,10 +3169,7 @@ else if(o.status === 'accepted') {
 
         // Raat 12 baje tak ka countdown timer
         function startMidnightTimer() {
-            const timerDiv = document.getElementById('billing-limit-timer');
             const displaySpan = document.getElementById('midnight-countdown');
-            if(timerDiv) timerDiv.classList.remove('hidden');
-
             if (countdownInterval) clearInterval(countdownInterval);
 
             countdownInterval = setInterval(() => {
@@ -3186,7 +3179,8 @@ else if(o.status === 'accepted') {
 
                 if (diff <= 0) {
                     clearInterval(countdownInterval);
-                    if(timerDiv) timerDiv.classList.add('hidden');
+                    const timerDiv = document.getElementById('billing-limit-timer');
+                    if(timerDiv) { timerDiv.classList.add('hidden'); timerDiv.classList.remove('flex'); }
                     return;
                 }
 

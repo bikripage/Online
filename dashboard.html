@@ -795,7 +795,8 @@
                                         <div class="w-10 h-10 bg-[#DCFCE7] text-[#16A34A] rounded-[12px] flex items-center justify-center"><i class="fas fa-file-invoice-dollar"></i></div>Billing System
                                     </h3>
                                     <!-- ✨ NAYA: checkDailyBillLimit() add kiya gaya hai -->
-                                    <button id="new-bill-main-btn" onclick="checkDailyBillLimit()" class="w-full sm:w-auto bg-[#16A34A] hover:bg-[#15803D] text-white text-sm font-bold px-5 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm"><i class="fas fa-plus"></i> New Bill</button>
+                                    <button id="new-bill-main-btn" onclick="handleNewBillClick()" class="w-full sm:w-auto bg-[#16A34A] hover:bg-[#15803D] text-white text-sm font-bold px-5 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm"><i class="fas fa-plus"></i> New Bill</button>
+
                                 </div>
                                 
                                 <!-- ✨ NAYA: Timer Display (Hidden by default) -->
@@ -2395,7 +2396,7 @@ function applyProLocks(shopData) {
             materialBatches = []; snap.forEach(doc => materialBatches.push({ id: doc.id, ...doc.data() })); renderMaterialBatches(); } catch(e){}
 
             renderAdminBills(); 
-            checkDailyBillLimit(false);
+            updateDailyLimitUI();
             renderInsights(); 
         }
         // ✨ NAYA FUNCTION: Order Verify Karne Ke Liye WhatsApp Message ✨
@@ -3095,81 +3096,78 @@ else if(o.status === 'accepted') {
             [...materialBatches].reverse().forEach(b => { html += `<option value="${b.id}">${b.name} (Cost: ₹${b.cost})</option>`; });
             select.innerHTML = html;
         }
-                              // ==========================================
-        // ✨ STRICT & FAST: DAILY BILL LIMIT LOGIC ✨
+                                      // ==========================================
+        // ✨ SUPER FAST STRICT DAILY LIMIT LOGIC ✨
         // ==========================================
         let countdownInterval = null;
 
-        function checkDailyBillLimit(isButtonClick = false) {
+        // Ye helper function strict count deta hai (Delete karne par bhi bypass nahi hoga)
+        function getStrictTodayCount() {
+            const tDate = new Date().toDateString();
+            let limitData = (globalShopData && globalShopData.dailyLimitData) ? globalShopData.dailyLimitData : null;
+            
+            if (limitData && limitData.date === tDate) {
+                return limitData.count; // Database me saved strict count
+            } else {
+                // Fallback: Agar aaj pehli baar load hua hai
+                let today = new Date(); today.setHours(0,0,0,0);
+                let todaysCreatedBills = 0;
+                if (typeof adminBills !== 'undefined' && adminBills.length > 0) {
+                    adminBills.forEach(bill => {
+                        let billDate = null;
+                        if (bill.timestamp && typeof bill.timestamp.toDate === 'function') billDate = bill.timestamp.toDate();
+                        else if (bill.timestamp && bill.timestamp.seconds) billDate = new Date(bill.timestamp.seconds * 1000);
+                        else {
+                            let p = bill.date.split('/'); 
+                            if(p.length===3) billDate = new Date(p[2], p[1]-1, p[0]); 
+                            else billDate = new Date(bill.date);
+                        }
+                        if (billDate && billDate >= today) todaysCreatedBills++;
+                    });
+                }
+                return todaysCreatedBills;
+            }
+        }
+
+        // 1. Ye Background me Timer aur UI update karega (No freeze)
+        function updateDailyLimitUI() {
             const plan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
             const email = (typeof globalShopData !== 'undefined' && globalShopData.email) ? globalShopData.email : '';
-            const btn = document.getElementById('new-bill-main-btn');
             const timerDiv = document.getElementById('billing-limit-timer');
             
-            // Plus/Pro plan ya Netaji Jhadu Store ko unlimited access do
+            // VIPs ke liye limit hamesha off
             if (plan === 'plus' || plan === 'pro' || email === 'netajijhadustore@gmail.com') {
                 if(timerDiv) timerDiv.classList.add('hidden');
-                if (isButtonClick) openBillingChoiceModal(); 
                 return;
             }
 
-            if (isButtonClick && btn) {
-                btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Checking...`;
-                btn.disabled = true;
+            let todaysCount = getStrictTodayCount();
+            
+            if (todaysCount >= 10) {
+                startMidnightTimer(); // Limit khatam, timer dikhao
+            } else {
+                if (countdownInterval) clearInterval(countdownInterval);
+                if (timerDiv) timerDiv.classList.add('hidden'); // Limit bachi hai, timer chupao
+            }
+        }
+
+        // 2. Sirf tab chalega jab 'New Bill' button dabega (Instant Reaction)
+        function handleNewBillClick() {
+            const plan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
+            const email = (typeof globalShopData !== 'undefined' && globalShopData.email) ? globalShopData.email : '';
+            
+            if (plan === 'plus' || plan === 'pro' || email === 'netajijhadustore@gmail.com') {
+                openBillingChoiceModal();
+                return;
             }
 
-            // Timeout use kiya hai taaki UI freeze na ho
-            setTimeout(() => {
-                try {
-                    const tDate = new Date().toDateString();
-                    let limitData = (globalShopData && globalShopData.dailyLimitData) ? globalShopData.dailyLimitData : { date: '', count: 0 };
-                    let todaysBillCount = 0;
-
-                    // 1. Agar DB me aaj ka exact counter hai, toh wo uthao
-                    if (limitData.date === tDate) {
-                        todaysBillCount = limitData.count;
-                    } 
-                    // 2. Fallback: Agar local state me save nahi hai par adminBills me bill hain
-                    else {
-                        let today = new Date(); 
-                        today.setHours(0,0,0,0);
-                        if (typeof adminBills !== 'undefined' && adminBills.length > 0) {
-                            adminBills.forEach(bill => {
-                                let billDate = null;
-                                if (bill.timestamp && typeof bill.timestamp.toDate === 'function') billDate = bill.timestamp.toDate();
-                                else if (bill.timestamp && bill.timestamp.seconds) billDate = new Date(bill.timestamp.seconds * 1000);
-                                else {
-                                    let p = bill.date.split('/'); 
-                                    if(p.length===3) billDate = new Date(p[2], p[1]-1, p[0]); 
-                                    else billDate = new Date(bill.date);
-                                }
-                                if (billDate && billDate >= today) todaysBillCount++;
-                            });
-                        }
-                    }
-
-                    // UI Update Logic
-                    if (todaysBillCount >= 10) {
-                        // Limit khatam! Timer dikhao
-                        startMidnightTimer();
-                        if (isButtonClick) showLimitUpgradeAlert();
-                    } else {
-                        // Limit bachi hai
-                        if (countdownInterval) clearInterval(countdownInterval);
-                        if (timerDiv) timerDiv.classList.add('hidden');
-
-                        if (isButtonClick) openBillingChoiceModal();
-                    }
-                } catch (error) {
-                    console.error("Error checking bill limit:", error);
-                    if (isButtonClick) alert("Failed to check limit.");
-                } finally {
-                    if (isButtonClick && btn) {
-                        btn.innerHTML = `<i class="fas fa-plus"></i> New Bill`;
-                        btn.disabled = false;
-                    }
-                }
-            }, 50); // 50ms ka halka timeout UI thread ko free rakhega
+            let todaysCount = getStrictTodayCount();
+            
+            if (todaysCount >= 10) {
+                showLimitUpgradeAlert(); // Alert turant aayega
+            } else {
+                openBillingChoiceModal(); // Bill modal turant khulega
+            }
         }
 
         // Raat 12 baje tak ka countdown timer
@@ -3216,6 +3214,7 @@ else if(o.status === 'accepted') {
                 setTimeout(() => { modal.classList.add('hidden'); }, 300);
             }
         }
+
 
         function openCreateBillModal() {
             draftBillItems = []; document.getElementById('bill-cust-name').value='';

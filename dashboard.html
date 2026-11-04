@@ -3094,66 +3094,78 @@ else if(o.status === 'accepted') {
             [...materialBatches].reverse().forEach(b => { html += `<option value="${b.id}">${b.name} (Cost: ₹${b.cost})</option>`; });
             select.innerHTML = html;
         }
-        // ==========================================
-        // ✨ NAYA: DAILY BILL LIMIT & TIMER LOGIC ✨
+                // ==========================================
+        // ✨ STRICT: DAILY BILL LIMIT & TIMER LOGIC (No Delete Loophole) ✨
         // ==========================================
         let countdownInterval = null;
 
-        async function checkDailyBillLimit() {
+        async function checkDailyBillLimit(isButtonClick = false) {
             const plan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
             const email = (typeof globalShopData !== 'undefined' && globalShopData.email) ? globalShopData.email : '';
+            const btn = document.getElementById('new-bill-main-btn');
+            const timerDiv = document.getElementById('billing-limit-timer');
             
-            // Plus/Pro plan ya Netaji Jhadu Store ko direct access do
+            // Plus/Pro plan ya Netaji Jhadu Store ko unlimited access do
             if (plan === 'plus' || plan === 'pro' || email === 'netajijhadustore@gmail.com') {
-                openBillingChoiceModal(); // Aapka purana default button action
+                if(timerDiv) timerDiv.classList.add('hidden');
+                if (isButtonClick) openBillingChoiceModal(); 
                 return;
             }
 
-            const btn = document.getElementById('new-bill-main-btn');
-            const origText = btn.innerHTML;
-            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Checking...`;
-            btn.disabled = true;
+            if (isButtonClick && btn) {
+                const origText = btn.innerHTML;
+                btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Checking...`;
+                btn.disabled = true;
+            }
 
             try {
-                // Aaj raat 12 baje se lekar ab tak ka time 
-                let today = new Date();
-                today.setHours(0, 0, 0, 0);
-
-                // Admin Bills array me se aaj ke bills count karna
+                // 🚀 NAYA LOGIC: Database me save hua strict counter check karega
+                const tDate = new Date().toDateString();
+                let limitData = (globalShopData && globalShopData.dailyLimitData) ? globalShopData.dailyLimitData : { date: '', count: 0 };
                 let todaysBillCount = 0;
-                if (typeof adminBills !== 'undefined' && adminBills.length > 0) {
-                    adminBills.forEach(bill => {
-                        let billDate = null;
-                        if (bill.timestamp && typeof bill.timestamp.toDate === 'function') {
-                            billDate = bill.timestamp.toDate();
-                        } else if (bill.timestamp && bill.timestamp.seconds) {
-                            billDate = new Date(bill.timestamp.seconds * 1000);
-                        } else {
-                            let p = bill.date.split('/'); 
-                            if(p.length===3) billDate = new Date(p[2], p[1]-1, p[0]); 
-                            else billDate = new Date(bill.date);
-                        }
 
-                        if (billDate && billDate >= today) {
-                            todaysBillCount++;
-                        }
-                    });
+                if (limitData.date === tDate) {
+                    todaysBillCount = limitData.count;
+                } else {
+                    // Fallback: Agar code update hone se pehle aaj kuch bills banaye gaye the, toh unhe ek baar gin lega
+                    let today = new Date(); today.setHours(0,0,0,0);
+                    if (typeof adminBills !== 'undefined' && adminBills.length > 0) {
+                        adminBills.forEach(bill => {
+                            let billDate = null;
+                            if (bill.timestamp && typeof bill.timestamp.toDate === 'function') billDate = bill.timestamp.toDate();
+                            else if (bill.timestamp && bill.timestamp.seconds) billDate = new Date(bill.timestamp.seconds * 1000);
+                            else {
+                                let p = bill.date.split('/');
+                                if(p.length===3) billDate = new Date(p[2], p[1]-1, p[0]);
+                                else billDate = new Date(bill.date);
+                            }
+                            if (billDate && billDate >= today) todaysBillCount++;
+                        });
+                    }
+                    // Current session ke liye save kar do taaki delete dabane par count wapas kam na ho
+                    if (globalShopData) globalShopData.dailyLimitData = { date: tDate, count: todaysBillCount };
                 }
 
+                // UI Update Logic
                 if (todaysBillCount >= 10) {
-                    // Limit khatam! Alert dikhao aur timer chalu karo
-                    showLimitUpgradeAlert();
+                    // Limit strictly khatam!
                     startMidnightTimer();
+                    if (isButtonClick) showLimitUpgradeAlert();
                 } else {
-                    // Limit bachi hai, choice modal open hone do
-                    openBillingChoiceModal();
+                    // Limit bachi hai
+                    if (countdownInterval) clearInterval(countdownInterval);
+                    if (timerDiv) timerDiv.classList.add('hidden');
+
+                    if (isButtonClick) openBillingChoiceModal();
                 }
             } catch (error) {
                 console.error("Error checking bill limit:", error);
-                alert("Failed to check limit. Try again.");
+                if (isButtonClick) alert("Failed to check limit.");
             } finally {
-                btn.innerHTML = origText;
-                btn.disabled = false;
+                if (isButtonClick && btn) {
+                    btn.innerHTML = `<i class="fas fa-plus"></i> New Bill`;
+                    btn.disabled = false;
+                }
             }
         }
 
@@ -3161,7 +3173,7 @@ else if(o.status === 'accepted') {
         function startMidnightTimer() {
             const timerDiv = document.getElementById('billing-limit-timer');
             const displaySpan = document.getElementById('midnight-countdown');
-            timerDiv.classList.remove('hidden');
+            if(timerDiv) timerDiv.classList.remove('hidden');
 
             if (countdownInterval) clearInterval(countdownInterval);
 
@@ -3172,7 +3184,7 @@ else if(o.status === 'accepted') {
 
                 if (diff <= 0) {
                     clearInterval(countdownInterval);
-                    timerDiv.classList.add('hidden');
+                    if(timerDiv) timerDiv.classList.add('hidden');
                     return;
                 }
 
@@ -3180,28 +3192,26 @@ else if(o.status === 'accepted') {
                 const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 const s = Math.floor((diff % (1000 * 60)) / 1000);
 
-                displaySpan.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                if(displaySpan) displaySpan.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
             }, 1000);
         }
 
         function showLimitUpgradeAlert() {
             const modal = document.getElementById('ios-limit-upgrade-alert');
             const card = document.getElementById('ios-limit-upgrade-card');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                card.classList.remove('scale-95');
-            }, 10);
+            if(modal && card) {
+                modal.classList.remove('hidden');
+                setTimeout(() => { modal.classList.remove('opacity-0'); card.classList.remove('scale-95'); }, 10);
+            }
         }
 
         function closeLimitUpgradeAlert() {
             const modal = document.getElementById('ios-limit-upgrade-alert');
             const card = document.getElementById('ios-limit-upgrade-card');
-            modal.classList.add('opacity-0');
-            card.classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
+            if(modal && card) {
+                modal.classList.add('opacity-0'); card.classList.add('scale-95');
+                setTimeout(() => { modal.classList.add('hidden'); }, 300);
+            }
         }
 
         function openCreateBillModal() {
@@ -3298,7 +3308,6 @@ function toggleNewBillDateField() {
             tot.innerText = `₹${gt}`;
         }
 
-
         async function saveBillProcess(isSend) {
             const n = document.getElementById('bill-cust-name').value.trim(); const p = document.getElementById('bill-cust-phone').value.trim();
             if(!n) return alert("Enter Customer Name"); if(draftBillItems.length === 0) return alert("Add items!");
@@ -3313,11 +3322,11 @@ function toggleNewBillDateField() {
             let iTot = draftBillItems.reduce((s, i) => s + i.total, 0); 
             let gt = Math.max(0, iTot - disc + del - adv);
             const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-                        // कस्टम डिलीवरी डेट चेक करना
+            
             let dStatus = document.getElementById('bill-delivery-status').value;
             if(dStatus === 'Custom') {
                 let dDate = document.getElementById('bill-delivery-date').value;
-                if(!dDate) return alert("Please select a delivery date!"); // अगर तारीख नहीं चुनी तो रोक देगा
+                if(!dDate) { alert("Please select a delivery date!"); btn.innerHTML = orig; btn.disabled = false; return; }
                 dStatus = `Delivery by ` + new Date(dDate).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
             }
 
@@ -3333,35 +3342,56 @@ function toggleNewBillDateField() {
                 payStatus: document.getElementById('bill-pay-status').value, 
                 payMode: document.getElementById('bill-pay-mode').value, 
                 deliveryStatus: dStatus,
-
-                 
                 timestamp: firebase.firestore.FieldValue.serverTimestamp() 
             };
 
             let tId = document.getElementById('bill-tracker-select').value;
 
             try {
-                const doc = await db.collection('shops').doc(currentShopId).collection('bills').add(nb); nb.id = doc.id; adminBills.unshift(nb);
+                const doc = await db.collection('shops').doc(currentShopId).collection('bills').add(nb); 
+                nb.id = doc.id; 
+                adminBills.unshift(nb);
+                
+                // 🚀 NAYA: Strict Daily Bill Counter Firebase mein update karna
+                const tDateString = new Date().toDateString();
+                let currentLimitData = (globalShopData && globalShopData.dailyLimitData) ? globalShopData.dailyLimitData : { date: '', count: 0 };
+                if (currentLimitData.date !== tDateString) {
+                    currentLimitData = { date: tDateString, count: 1 };
+                } else {
+                    currentLimitData.count += 1;
+                }
+                await db.collection('shops').doc(currentShopId).update({ dailyLimitData: currentLimitData });
+                if(globalShopData) globalShopData.dailyLimitData = currentLimitData;
+                
+                // Trackers update
                 if(tId && tId !== 'none' && (iTot-disc) > 0) {
                     let b = materialBatches.find(x => x.id === tId);
                     if(b) { b.recovered += (iTot-disc); await db.collection('shops').doc(currentShopId).collection('materialTracker').doc(tId).update({recovered: b.recovered}); renderMaterialBatches(); }
                 }
-                closeCreateBillModal(); renderAdminBills(); processCustomerData();
-                                if(isSend) {
-                    // बिल इमेज ऑटो डाउनलोड
+                
+                closeCreateBillModal(); 
+                renderAdminBills(); 
+                processCustomerData();
+                checkDailyBillLimit(false); // Background me limit UI refresh karega
+                
+                if(isSend) {
                     downloadBillImage(nb.id);
-                    
-                    // नया हिंदी मैसेज
-                    let msg = getWhatsAppBillMessage();
-                    
+                    let msg = getWhatsAppBillMessage(nb);
                     setTimeout(() => {
                         window.open(`https://wa.me/91${p}?text=${msg}`, '_blank');
                     }, 500);
-              } else iosAlert("Success", "✅ Bill Saved Successfully!");
+                } else {
+                    iosAlert("Success", "✅ Bill Saved Successfully!");
+                }
 
-            } catch(e) { alert("Error: " + e.message); }
-            finally { btn.innerHTML = orig; btn.disabled = false; }
+            } catch(e) { 
+                alert("Error: " + e.message); 
+            } finally { 
+                btn.innerHTML = orig; 
+                btn.disabled = false; 
+            }
         }
+
 // Status के हिसाब से सही मैसेज बनाने का अपडेटेड फंक्शन
 function getWhatsAppBillMessage(bill) {
     const shopName = globalShopData.shopName || "स्टोर";

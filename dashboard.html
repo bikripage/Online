@@ -786,34 +786,18 @@
                             </div>
                         </div>
 
-                                     <!-- ✨ TAB 3: BILLING ✨ -->
+                     <!-- ✨ TAB 3: BILLING ✨ -->
 <div id="tab-billing" class="tab-content hidden space-y-8 pb-24">
 
                             <div class="ios-card p-6 sm:p-8 border border-[#E5E7EB]">
-                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
-                                    <h3 class="text-xl font-bold text-[#111827] flex items-center gap-2">
-                                        <div class="w-10 h-10 bg-[#DCFCE7] text-[#16A34A] rounded-[12px] flex items-center justify-center"><i class="fas fa-file-invoice-dollar"></i></div>Billing System
-                                    </h3>
-                                    <!-- ✨ NAYA: checkDailyBillLimit() add kiya gaya hai -->
-                                    <button id="new-bill-main-btn" onclick="handleNewBillClick()" class="w-full sm:w-auto bg-[#16A34A] hover:bg-[#15803D] text-white text-sm font-bold px-5 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm"><i class="fas fa-plus"></i> New Bill</button>
-
-
-                                </div>
-                                
-                                                                <!-- ✨ FIX: Timer Display (Hidden by default) -->
-                                <div id="billing-limit-timer" class="hidden flex-col items-center justify-center text-center mb-6 p-4 bg-red-50 border border-red-100 rounded-xl transition-all duration-300">
-                                    <p class="text-[11px] font-bold text-red-600 uppercase tracking-wide">Daily Limit Reached (10/10)</p>
-                                    <p class="text-[14px] font-black text-gray-900 mt-1">Resets in: <span id="midnight-countdown" class="text-red-500">00:00:00</span></p>
-                                </div>
-
-
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6"><h3 class="text-xl font-bold text-[#111827] flex items-center gap-2"><div class="w-10 h-10 bg-[#DCFCE7] text-[#16A34A] rounded-[12px] flex items-center justify-center"><i class="fas fa-file-invoice-dollar"></i></div>Billing System</h3><button onclick="openBillingChoiceModal()" class="w-full sm:w-auto bg-[#16A34A] hover:bg-[#15803D] text-white text-sm font-bold px-5 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm"><i class="fas fa-plus"></i> New Bill</button>
+</div>
                                 <div class="flex flex-col sm:flex-row gap-3 mb-6"><div class="relative flex-1"><i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]"></i><input type="text" id="admin-search-order" onkeyup="renderAdminBills()" placeholder="Search Order ID or Name..." class="w-full ios-input pl-11 pr-4 text-sm font-semibold outline-none"></div><select id="admin-filter-status" onchange="renderAdminBills()" class="w-full sm:w-40 ios-input px-4 text-xs font-bold tracking-wide outline-none cursor-pointer"><option value="All">ALL STATUS</option><option value="Paid">PAID</option><option value="Unpaid">UNPAID</option><option value="Delivered">DELIVERED</option><option value="Processing">PROCESSING</option><option value="Cancelled">CANCELLED</option></select></div>
                                 <div class="flex justify-between items-center border-b border-[#E5E7EB] pb-2 mb-4"><h4 class="text-[11px] text-[#6B7280] uppercase tracking-wider font-bold">Recent Bills</h4><span id="admin-total-orders" class="text-xs font-bold text-[#2563EB] bg-[#E0E7FF] px-2 py-0.5 rounded-full">0</span></div>
                             <div id="admin-bills-list" class="flex flex-col gap-3 p-1"></div>
 
                             </div>
                         </div>
-
 
                     <!-- ✨ TAB 4: CUSTOMERS ✨ -->
 <div id="tab-crm" class="tab-content hidden space-y-8 pb-24">
@@ -2398,7 +2382,6 @@ function applyProLocks(shopData) {
             materialBatches = []; snap.forEach(doc => materialBatches.push({ id: doc.id, ...doc.data() })); renderMaterialBatches(); } catch(e){}
 
             renderAdminBills(); 
-            updateDailyLimitUI();
             renderInsights(); 
         }
         // ✨ NAYA FUNCTION: Order Verify Karne Ke Liye WhatsApp Message ✨
@@ -3098,106 +3081,6 @@ else if(o.status === 'accepted') {
             [...materialBatches].reverse().forEach(b => { html += `<option value="${b.id}">${b.name} (Cost: ₹${b.cost})</option>`; });
             select.innerHTML = html;
         }
-                                           // ==========================================
-        // ✨ SUPER FAST STRICT DAILY LIMIT LOGIC (100% WORKING) ✨
-        // ==========================================
-        let countdownInterval = null;
-        // Ye helper ekdum strict count dega (Delete karne par minus nahi hoga)
-        function getStrictTodayCount() {
-            let tDate = new Date().toDateString(); // Aaj ki date (e.g., Wed Nov 04 2026)
-            
-            if (globalShopData && globalShopData.dailyLimitData && globalShopData.dailyLimitData.date === tDate) {
-                return globalShopData.dailyLimitData.count || 0; // Asli permanent count
-            }
-            return 0; // Agar naya din hai, toh count zero
-        }
-
-
-        // 1. Ye Background me Timer aur UI update karega
-        function updateDailyLimitUI() {
-            const plan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
-            const email = (typeof globalShopData !== 'undefined' && globalShopData.email) ? globalShopData.email : '';
-            const timerDiv = document.getElementById('billing-limit-timer');
-            
-            // VIPs ke liye limit hamesha off
-            if (plan === 'plus' || plan === 'pro' || email === 'netajijhadustore@gmail.com') {
-                if(timerDiv) { timerDiv.classList.add('hidden'); timerDiv.classList.remove('flex'); }
-                return;
-            }
-
-            let todaysCount = getStrictTodayCount();
-            
-            if (todaysCount >= 10) {
-                if(timerDiv) { timerDiv.classList.remove('hidden'); timerDiv.classList.add('flex'); }
-                startMidnightTimer(); // Limit khatam, timer chalao
-            } else {
-                if (countdownInterval) clearInterval(countdownInterval);
-                if(timerDiv) { timerDiv.classList.add('hidden'); timerDiv.classList.remove('flex'); }
-            }
-        }
-
-        // 2. Sirf tab chalega jab 'New Bill' button dabega
-        function handleNewBillClick() {
-            const plan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
-            const email = (typeof globalShopData !== 'undefined' && globalShopData.email) ? globalShopData.email : '';
-            
-            if (plan === 'plus' || plan === 'pro' || email === 'netajijhadustore@gmail.com') {
-                openBillingChoiceModal();
-                return;
-            }
-
-            let todaysCount = getStrictTodayCount();
-            
-            if (todaysCount >= 10) {
-                showLimitUpgradeAlert(); // Alert turant aayega
-            } else {
-                openBillingChoiceModal(); // Bill modal turant khulega
-            }
-        }
-
-        // Raat 12 baje tak ka countdown timer
-        function startMidnightTimer() {
-            const displaySpan = document.getElementById('midnight-countdown');
-            if (countdownInterval) clearInterval(countdownInterval);
-
-            countdownInterval = setInterval(() => {
-                const now = new Date();
-                const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-                const diff = tomorrow - now; 
-
-                if (diff <= 0) {
-                    clearInterval(countdownInterval);
-                    const timerDiv = document.getElementById('billing-limit-timer');
-                    if(timerDiv) { timerDiv.classList.add('hidden'); timerDiv.classList.remove('flex'); }
-                    return;
-                }
-
-                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const s = Math.floor((diff % (1000 * 60)) / 1000);
-
-                if(displaySpan) displaySpan.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-            }, 1000);
-        }
-
-        function showLimitUpgradeAlert() {
-            const modal = document.getElementById('ios-limit-upgrade-alert');
-            const card = document.getElementById('ios-limit-upgrade-card');
-            if(modal && card) {
-                modal.classList.remove('hidden');
-                setTimeout(() => { modal.classList.remove('opacity-0'); card.classList.remove('scale-95'); }, 10);
-            }
-        }
-
-        function closeLimitUpgradeAlert() {
-            const modal = document.getElementById('ios-limit-upgrade-alert');
-            const card = document.getElementById('ios-limit-upgrade-card');
-            if(modal && card) {
-                modal.classList.add('opacity-0'); card.classList.add('scale-95');
-                setTimeout(() => { modal.classList.add('hidden'); }, 300);
-            }
-        }
-
 
         function openCreateBillModal() {
             draftBillItems = []; document.getElementById('bill-cust-name').value='';
@@ -3293,7 +3176,8 @@ function toggleNewBillDateField() {
             tot.innerText = `₹${gt}`;
         }
 
-              async function saveBillProcess(isSend) {
+
+        async function saveBillProcess(isSend) {
             const n = document.getElementById('bill-cust-name').value.trim(); const p = document.getElementById('bill-cust-phone').value.trim();
             if(!n) return alert("Enter Customer Name"); if(draftBillItems.length === 0) return alert("Add items!");
             if(isSend && !p) { if(!confirm("No phone provided. Cannot WhatsApp. Save anyway?")) return; isSend = false; }
@@ -3307,11 +3191,11 @@ function toggleNewBillDateField() {
             let iTot = draftBillItems.reduce((s, i) => s + i.total, 0); 
             let gt = Math.max(0, iTot - disc + del - adv);
             const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-            
+                        // कस्टम डिलीवरी डेट चेक करना
             let dStatus = document.getElementById('bill-delivery-status').value;
             if(dStatus === 'Custom') {
                 let dDate = document.getElementById('bill-delivery-date').value;
-                if(!dDate) { alert("Please select a delivery date!"); btn.innerHTML = orig; btn.disabled = false; return; }
+                if(!dDate) return alert("Please select a delivery date!"); // अगर तारीख नहीं चुनी तो रोक देगा
                 dStatus = `Delivery by ` + new Date(dDate).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
             }
 
@@ -3327,60 +3211,35 @@ function toggleNewBillDateField() {
                 payStatus: document.getElementById('bill-pay-status').value, 
                 payMode: document.getElementById('bill-pay-mode').value, 
                 deliveryStatus: dStatus,
+
+                 
                 timestamp: firebase.firestore.FieldValue.serverTimestamp() 
             };
 
             let tId = document.getElementById('bill-tracker-select').value;
 
             try {
-                const doc = await db.collection('shops').doc(currentShopId).collection('bills').add(nb); 
-                nb.id = doc.id; 
-                adminBills.unshift(nb);
-                
-                // 🚀 NAYA: Strict Daily Bill Counter Firebase mein update karna (Never decrements)
-                const tDateString = new Date().toDateString();
-                let currentLimitData = (globalShopData && globalShopData.dailyLimitData) ? globalShopData.dailyLimitData : { date: '', count: 0 };
-                
-                if (currentLimitData.date !== tDateString) {
-                    currentLimitData = { date: tDateString, count: 1 }; // Naye din ka pehla bill
-                } else {
-                    currentLimitData.count += 1; // Purane bill delete bhi ho jayein, ye count sirf badhega
-                }
-                
-                // Firestore aur Local Data dono me save kar do
-                await db.collection('shops').doc(currentShopId).update({ dailyLimitData: currentLimitData });
-                if (globalShopData) globalShopData.dailyLimitData = currentLimitData;
-                
-                // Trackers update
+                const doc = await db.collection('shops').doc(currentShopId).collection('bills').add(nb); nb.id = doc.id; adminBills.unshift(nb);
                 if(tId && tId !== 'none' && (iTot-disc) > 0) {
                     let b = materialBatches.find(x => x.id === tId);
                     if(b) { b.recovered += (iTot-disc); await db.collection('shops').doc(currentShopId).collection('materialTracker').doc(tId).update({recovered: b.recovered}); renderMaterialBatches(); }
                 }
-                
-                closeCreateBillModal(); 
-                renderAdminBills(); 
-                processCustomerData();
-                updateDailyLimitUI(); // 🚀 UI aur Timer ko background me update karega
-                
-                if(isSend) {
+                closeCreateBillModal(); renderAdminBills(); processCustomerData();
+                                if(isSend) {
+                    // बिल इमेज ऑटो डाउनलोड
                     downloadBillImage(nb.id);
-                    let msg = getWhatsAppBillMessage(nb);
+                    
+                    // नया हिंदी मैसेज
+                    let msg = getWhatsAppBillMessage();
+                    
                     setTimeout(() => {
                         window.open(`https://wa.me/91${p}?text=${msg}`, '_blank');
                     }, 500);
-                } else {
-                    iosAlert("Success", "✅ Bill Saved Successfully!");
-                }
+              } else iosAlert("Success", "✅ Bill Saved Successfully!");
 
-            } catch(e) { 
-                alert("Error: " + e.message); 
-            } finally { 
-                btn.innerHTML = orig; 
-                btn.disabled = false; 
-            }
+            } catch(e) { alert("Error: " + e.message); }
+            finally { btn.innerHTML = orig; btn.disabled = false; }
         }
-
-
 // Status के हिसाब से सही मैसेज बनाने का अपडेटेड फंक्शन
 function getWhatsAppBillMessage(bill) {
     const shopName = globalShopData.shopName || "स्टोर";
@@ -12028,34 +11887,6 @@ setTimeout(loadAppSecurityDetails, 2500);
             </div>
         </div>
     </div>
-    <!-- ✨ iOS STYLE DAILY LIMIT UPGRADE ALERT ✨ -->
-    <div id="ios-limit-upgrade-alert" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0">
-        <div id="ios-limit-upgrade-card" class="bg-white/90 backdrop-blur-xl w-[280px] rounded-[14px] shadow-2xl transform scale-95 transition-transform duration-300 text-center overflow-hidden flex flex-col">
-            <div class="p-5 pt-6 pb-5">
-                <div class="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-xl mx-auto mb-3 shadow-sm border border-red-100">
-                    <i class="fas fa-lock"></i>
-                </div>
-                <h3 class="text-[17px] font-semibold text-black leading-tight mb-1.5">Daily Limit Reached</h3>
-                <p class="text-[13px] text-black/70 leading-snug">You have created 10 bills today. Please wait for the daily reset or upgrade to Plus/Pro for unlimited billing.</p>
-            </div>
-            <div class="flex border-t border-black/10">
-                <button onclick="closeLimitUpgradeAlert()" class="flex-1 py-3.5 text-[17px] text-gray-500 font-normal border-r border-black/10 hover:bg-black/5 active:bg-black/10 transition-colors">Wait</button>
-                <button onclick="window.location.href='index.html?shop=' + currentShopId + '#merchant-upgrade-plans'" class="flex-1 py-3.5 text-[17px] text-[#007AFF] font-semibold hover:bg-black/5 active:bg-black/10 transition-colors">Upgrade</button>
-            </div>
-        </div>
-    </div>
-    <!-- 🚨 FIX FOR BUTTON FREEZE & TIMER (Duplicate Code Issue) 🚨 -->
-    <script>
-        window.checkDailyBillLimit = function(isButtonClick) {
-            if (isButtonClick === false) {
-                // Background limit refresh after saving/deleting
-                if (typeof updateDailyLimitUI === 'function') updateDailyLimitUI();
-            } else {
-                // When New Bill button is clicked
-                if (typeof handleNewBillClick === 'function') handleNewBillClick();
-            }
-        };
-    </script>
 
 
 </body>

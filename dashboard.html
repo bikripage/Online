@@ -797,6 +797,7 @@
                                     <!-- ✨ NAYA: checkDailyBillLimit() add kiya gaya hai -->
                                     <button id="new-bill-main-btn" onclick="handleNewBillClick()" class="w-full sm:w-auto bg-[#16A34A] hover:bg-[#15803D] text-white text-sm font-bold px-5 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm"><i class="fas fa-plus"></i> New Bill</button>
 
+
                                 </div>
                                 
                                 <!-- ✨ NAYA: Timer Display (Hidden by default) -->
@@ -3374,7 +3375,7 @@ function toggleNewBillDateField() {
                 closeCreateBillModal(); 
                 renderAdminBills(); 
                 processCustomerData();
-                checkDailyBillLimit(false); // Background me limit UI refresh karega
+                updateDailyLimitUI();
                 
                 if(isSend) {
                     downloadBillImage(nb.id);

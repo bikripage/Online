@@ -147,52 +147,51 @@
         }
     </script>
 
-
     <!-- Header -->
-    <header class="bg-white/80 backdrop-blur-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] border-b border-white py-3 px-4 sm:px-6 fixed w-full top-0 z-50 flex justify-between items-center transition-all duration-300">
-        <div class="flex items-center gap-2 cursor-pointer hover:scale-105 transition-transform duration-300" onclick="window.scrollTo(0,0)">
-<!-- ✨ EXCLUSIVE BIKRIPAGE 3D BRAND LOGO (CLEAN) ✨ -->
-<div class="w-9 h-9 sm:w-10 sm:h-10 rounded-[14px] flex items-center justify-center relative overflow-hidden group cursor-pointer shadow-[0_8px_20px_rgba(59,130,246,0.4)] transition-all duration-500 hover:shadow-[0_15px_35px_rgba(79,70,229,0.6)] hover:-translate-y-1">
-    
-    <!-- 1. Base Vibrant Gradient -->
-    <div class="absolute inset-0 bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-700 z-0 group-hover:scale-110 transition-transform duration-700 ease-in-out"></div>
-    
-    <!-- 2. 3D Glossy Lighting Effect (Apple App Style) -->
-    <div class="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent z-0"></div>
-    
-    <!-- 3. Secret Rotating Shine (Activates ONLY on Hover) -->
-    <div class="absolute w-[200%] h-[200%] bg-[conic-gradient(from_0deg,transparent_0_310deg,rgba(255,255,255,0.7)_360deg)] animate-[spin_3s_linear_infinite] opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0"></div>
-    
-    <!-- 4. Inner Border for Glass Effect -->
-    <div class="absolute inset-0 border border-white/20 rounded-[14px] z-10 pointer-events-none"></div>
+    <header class="bg-white/70 backdrop-blur-[24px] saturate-[1.8] shadow-[0_4px_30px_rgba(0,0,0,0.04)] border-b border-gray-200/50 py-3 sm:py-3.5 px-4 sm:px-6 fixed w-full top-0 z-50 flex justify-between items-center transition-all duration-500">
+        <div class="flex items-center gap-2.5 sm:gap-3 cursor-pointer hover:scale-105 transition-transform duration-300" onclick="window.scrollTo(0,0)">
+            <!-- ✨ EXCLUSIVE BIKRIPAGE 3D BRAND LOGO (CLEAN) ✨ -->
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-[14px] flex items-center justify-center relative overflow-hidden group cursor-pointer shadow-[0_8px_20px_rgba(59,130,246,0.4)] transition-all duration-500 hover:shadow-[0_15px_35px_rgba(79,70,229,0.6)] hover:-translate-y-1">
+                
+                <!-- 1. Base Vibrant Gradient -->
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-700 z-0 group-hover:scale-110 transition-transform duration-700 ease-in-out"></div>
+                
+                <!-- 2. 3D Glossy Lighting Effect (Apple App Style) -->
+                <div class="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent z-0"></div>
+                
+                <!-- 3. Secret Rotating Shine (Activates ONLY on Hover) -->
+                <div class="absolute w-[200%] h-[200%] bg-[conic-gradient(from_0deg,transparent_0_310deg,rgba(255,255,255,0.7)_360deg)] animate-[spin_3s_linear_infinite] opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0"></div>
+                
+                <!-- 4. Inner Border for Glass Effect -->
+                <div class="absolute inset-0 border border-white/20 rounded-[14px] z-10 pointer-events-none"></div>
 
-    <!-- 5. Premium Geometric 'B' Logo (Centered & Clean) -->
-    <svg class="w-[22px] h-[22px] sm:w-6 sm:h-6 relative z-20 text-white transition-transform duration-500 group-hover:scale-110 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
-        
-        <!-- Modern Sharp 'B' (Perfectly centered, no weird dots) -->
-        <path d="M7 4v16" stroke-width="2.5" stroke-linecap="round"/>
-        <path d="M7 4h8a4 4 0 0 1 0 8H7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M7 12h9a4 4 0 0 1 0 8H7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-</div>
+                <!-- 5. Premium Geometric 'B' Logo (Centered & Clean) -->
+                <svg class="w-[22px] h-[22px] sm:w-6 sm:h-6 relative z-20 text-white transition-transform duration-500 group-hover:scale-110 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7 4v16" stroke-width="2.5" stroke-linecap="round"/>
+                    <path d="M7 4h8a4 4 0 0 1 0 8H7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M7 12h9a4 4 0 0 1 0 8H7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
 
-
-            <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">BikriPage</h1>
+            <!-- Apple Style Dark Text for Title -->
+            <h1 class="text-[22px] sm:text-2xl font-black text-[#1D1D1F] tracking-tight">BikriPage</h1>
         </div>
         
-        <div class="flex items-center gap-2 sm:gap-3 relative">
+        <div class="flex items-center gap-2.5 sm:gap-3 relative">
             <div id="auth-container" class="relative">
-                <button onclick="checkAuthAndOpenModal()" class="w-9 h-9 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-full flex items-center justify-center transition border border-gray-200 shadow-sm active:scale-95">
+                <!-- User Icon / Login (Premium iOS Look) -->
+                <button onclick="checkAuthAndOpenModal()" class="w-9 h-9 sm:w-10 sm:h-10 bg-white/80 backdrop-blur-md hover:bg-white text-gray-700 rounded-full flex items-center justify-center transition-all duration-300 border border-gray-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] active:scale-95">
                     <i class="fas fa-user text-sm"></i>
                 </button>
             </div>
-                      
-                        <button onclick="toggleSidebar()" class="text-gray-600 hover:text-black transition active:scale-95 ml-1 p-1">
-                <i class="fas fa-bars text-xl"></i>
+            
+            <!-- Hamburger Menu (Premium iOS Look) -->
+            <button onclick="toggleSidebar()" class="w-9 h-9 sm:w-10 sm:h-10 bg-white/80 backdrop-blur-md hover:bg-white text-gray-700 rounded-full flex items-center justify-center transition-all duration-300 border border-gray-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] active:scale-95">
+                <i class="fas fa-bars text-[15px]"></i>
             </button>
-
         </div>
     </header>
+
 
 <!-- ✨ GOOGLE ONLY LOGIN MODAL ✨ -->
 <div id="auth-modal" class="fixed inset-0 bg-[#111827]/60 backdrop-blur-md z-[70] hidden flex items-center justify-center p-4 transition-opacity duration-300 opacity-0">
@@ -541,7 +540,9 @@
     </div>
 
     <!-- Main Wrapper -->
-    <main class="flex-1 w-full flex flex-col pt-16">
+    <main class="flex-1 w-full flex flex-col pt-[64px]">
+
+
       <!-- ✨ AMAZON/FLIPKART STYLE COMPACT HERO SECTION ✨ -->
 <section class="relative w-full bg-gray-50 flex flex-col shrink-0 min-h-0 border-b border-gray-200">
     <div id="hero-content" class="relative z-10 w-full flex flex-col">
@@ -1390,7 +1391,8 @@ async function handleShopSubmit(e) {
                 <div class="w-full bg-[#F5F5F7] text-[#1D1D1F] font-sans selection:bg-blue-200 overflow-hidden relative border-b border-gray-200">
                     <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-200 blur-[80px] opacity-30 pointer-events-none" style="transform: translateZ(0);"></div>
                     <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-200 blur-[80px] opacity-30 pointer-events-none" style="transform: translateZ(0);"></div>
-                    <section class="relative z-10 px-6 pt-16 pb-20 md:pt-28 md:pb-28 max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-8">
+                  <section class="relative z-10 px-6 pt-4 pb-20 md:pt-12 md:pb-28 max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-8">
+
                         <div class="flex-1 text-center md:text-left flex flex-col items-center md:items-start z-20">
                             <div class="inline-flex items-center gap-1.5 px-3 py-1 mb-6 rounded-full bg-blue-50/80 border border-blue-100/50 text-[11px] font-black tracking-widest text-blue-600 uppercase shadow-sm">
                                 <i class="fas fa-crown text-[10px]"></i> Merchant Hub
@@ -1462,11 +1464,13 @@ async function handleShopSubmit(e) {
                 const initials = getInitials(shopOwnerName || 'My Store');
                 const savedImg = localStorage.getItem('BikriPage_profile_img'); 
                 
+                             // Login hone ke baad ka premium profile button
                 authContainer.innerHTML = `
-                    <button onclick="toggleProfileModal()" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition shadow-sm border border-gray-200 active:scale-95 focus:outline-none font-semibold text-[13px] tracking-wide relative overflow-hidden">
+                    <button onclick="toggleProfileModal()" class="w-9 h-9 sm:w-10 sm:h-10 bg-white/80 backdrop-blur-md hover:bg-white text-gray-700 rounded-full flex items-center justify-center transition-all duration-300 border border-gray-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] active:scale-95 focus:outline-none font-bold text-[13px] tracking-wide relative overflow-hidden">
                         <span id="nav-initials" style="${savedImg ? 'display:none;' : ''}">${initials}</span>
                         <img id="nav-profile-img" src="${savedImg || ''}" class="absolute inset-0 w-full h-full object-cover ${savedImg ? '' : 'hidden'}">
                     </button>
+                    
                     <div id="profile-dropdown-menu" class="hidden absolute right-0 top-12 mt-2 w-56 sm:w-64 bg-white/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden z-50 transform origin-top-right transition-all">
                         <div class="p-5 bg-gray-50/50 border-b border-gray-100">
                             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Store Owner</p>
@@ -1478,6 +1482,7 @@ async function handleShopSubmit(e) {
                         </div>
                     </div>
                 `;
+
                 fetchLiveShops();
                 return true;
 

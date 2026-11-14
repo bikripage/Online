@@ -388,6 +388,18 @@
         New
     </span>
 </a>
+        <!-- ✨ NAYA: Smart Review System Button ✨ -->
+        <a href="#" onclick="openReviewSetupModal(); return false;" class="flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-amber-50 hover:text-amber-600 rounded-xl transition-colors group mt-1">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-amber-100 flex items-center justify-center text-gray-500 group-hover:text-amber-600 transition-colors">
+                    <i class="fas fa-star text-amber-500"></i>
+                </div>
+                <span class="font-bold text-[14px]">Smart Review System</span>
+            </div>
+            <span class="bg-amber-100 text-amber-700 text-[9px] font-black px-2 py-0.5 rounded-full border border-amber-200 uppercase tracking-widest">
+                Hot
+            </span>
+        </a>
 
        
         <div class="my-4 border-t border-[#E5E7EB] mx-2"></div>
@@ -1381,6 +1393,66 @@
                     Publish Offer <i class="fas fa-rocket"></i>
                 </button>
             </form>
+        </div>
+    </div>
+    <!-- ✨ SMART REVIEW SYSTEM MODAL ✨ -->
+    <div id="review-setup-modal" class="fixed inset-0 bg-[#111827]/60 backdrop-blur-sm z-[160] hidden flex items-center justify-center p-4 transition-all duration-300 opacity-0">
+        <div class="bg-white rounded-[24px] shadow-2xl max-w-md w-full p-6 relative transform scale-95 transition-all duration-300 flex flex-col max-h-[90vh]">
+            <button onclick="closeReviewSetupModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center transition active:scale-90"><i class="fas fa-times"></i></button>
+            
+            <div class="flex items-center gap-4 mb-5 border-b border-gray-100 pb-4 shrink-0">
+                <div class="w-12 h-12 bg-amber-50 text-amber-500 rounded-[16px] flex items-center justify-center text-2xl border border-amber-100">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-black text-gray-900 leading-tight">Smart Review Setup</h3>
+                    <p class="text-xs text-gray-500 font-medium">Get 5-star Google Reviews easily</p>
+                </div>
+            </div>
+
+            <div class="overflow-y-auto custom-scrollbar pr-2 flex-1 space-y-5">
+                <!-- Google Link -->
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-widest mb-1.5">Google Review Link *</label>
+                    <p class="text-[10px] text-gray-400 mb-2 leading-tight">Copy your 'Ask for reviews' link from Google My Business.</p>
+                    <input type="url" id="rs-google-link" placeholder="https://search.google.com/local/writereview?placeid=..." required class="w-full bg-[#F7F7F9] focus:bg-white border border-gray-200 focus:border-amber-500 rounded-[12px] h-12 px-4 text-sm font-semibold outline-none transition-all text-[#2563EB]">
+                </div>
+
+                <!-- Suggested Reviews -->
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-widest mb-1.5">Pre-filled Suggestions (Max 5)</label>
+                    <p class="text-[10px] text-gray-400 mb-2 leading-tight">Write 5 good reviews. Customers can just tap & copy them!</p>
+                    
+                    <div class="space-y-3">
+                        <input type="text" id="rs-sugg-1" placeholder="1. e.g., Best quality products!" class="w-full bg-white border border-gray-200 focus:border-amber-500 rounded-[10px] h-10 px-3 text-[13px] font-medium outline-none transition-all">
+                        <input type="text" id="rs-sugg-2" placeholder="2. e.g., Fast service and polite staff." class="w-full bg-white border border-gray-200 focus:border-amber-500 rounded-[10px] h-10 px-3 text-[13px] font-medium outline-none transition-all">
+                        <input type="text" id="rs-sugg-3" placeholder="3. e.g., Highly recommended store in town." class="w-full bg-white border border-gray-200 focus:border-amber-500 rounded-[10px] h-10 px-3 text-[13px] font-medium outline-none transition-all">
+                        <input type="text" id="rs-sugg-4" placeholder="4. Optional review..." class="w-full bg-white border border-gray-200 focus:border-amber-500 rounded-[10px] h-10 px-3 text-[13px] font-medium outline-none transition-all">
+                        <input type="text" id="rs-sugg-5" placeholder="5. Optional review..." class="w-full bg-white border border-gray-200 focus:border-amber-500 rounded-[10px] h-10 px-3 text-[13px] font-medium outline-none transition-all">
+                    </div>
+                </div>
+
+                <!-- QR & Link Preview -->
+                <div class="bg-gray-50 border border-gray-200 rounded-[16px] p-4 flex flex-col items-center mt-2 hidden" id="rs-qr-section">
+                    <p class="text-[11px] font-bold text-gray-600 uppercase tracking-widest mb-3">Your Review QR Code</p>
+                    <div id="rs-qr-code" class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-3"></div>
+                    <p class="text-[10px] text-gray-500 text-center mb-3">Print this QR or let customers scan directly from here.</p>
+                    <div class="flex gap-2 w-full">
+                        <button onclick="window.open('review.html?storeId=' + currentShopId, '_blank')" class="flex-1 bg-amber-100 hover:bg-amber-200 text-amber-700 font-bold h-10 rounded-[10px] text-[11px] transition-colors flex items-center justify-center gap-1.5 shadow-sm active:scale-95">
+                            <i class="fas fa-external-link-alt"></i> Open Review App
+                        </button>
+                        <button onclick="copyReviewLink()" class="flex-1 bg-white border border-gray-200 hover:bg-gray-100 text-gray-700 font-bold h-10 rounded-[10px] text-[11px] transition-colors flex items-center justify-center gap-1.5 shadow-sm active:scale-95">
+                            <i class="fas fa-copy"></i> Copy Link
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4 mt-2 border-t border-gray-100 shrink-0">
+                <button id="rs-save-btn" onclick="saveReviewSetup(event)" class="w-full bg-gray-900 hover:bg-black text-white font-bold h-[48px] rounded-[14px] active:scale-95 transition-transform shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex justify-center items-center gap-2">
+                    Save & Generate QR <i class="fas fa-qrcode"></i>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -11837,6 +11909,142 @@ setTimeout(loadAppSecurityDetails, 2500);
                 }
             }, 1500);
         });
+        // ==========================================
+        // ✨ SMART REVIEW SYSTEM LOGIC ✨
+        // ==========================================
+        let reviewQrInstance = null;
+
+        function openReviewSetupModal() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && !sidebar.classList.contains('-translate-x-full') && window.innerWidth < 768) {
+                toggleSidebar();
+            }
+
+            if (globalShopData && globalShopData.reviewSystem) {
+                document.getElementById('rs-google-link').value = globalShopData.reviewSystem.googleLink || '';
+                const suggs = globalShopData.reviewSystem.suggestions || [];
+                for(let i=1; i<=5; i++) {
+                    document.getElementById(`rs-sugg-${i}`).value = suggs[i-1] || '';
+                }
+                generateReviewQR();
+            } else {
+                document.getElementById('rs-google-link').value = '';
+                for(let i=1; i<=5; i++) document.getElementById(`rs-sugg-${i}`).value = '';
+                document.getElementById('rs-qr-section').classList.add('hidden');
+            }
+
+            const modal = document.getElementById('review-setup-modal');
+            const card = modal.querySelector('div.bg-white');
+            modal.classList.remove('hidden');
+            setTimeout(() => { 
+                modal.classList.remove('opacity-0'); 
+                card.classList.remove('scale-95'); 
+            }, 10);
+        }
+
+        function closeReviewSetupModal() {
+            const modal = document.getElementById('review-setup-modal');
+            const card = modal.querySelector('div.bg-white');
+            modal.classList.add('opacity-0'); 
+            card.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+        async function saveReviewSetup(e) {
+            const link = document.getElementById('rs-google-link').value.trim();
+            if(!link) return iosAlert("Missing Link", "Please enter your Google Review Link.");
+
+            const suggestions = [];
+            for(let i=1; i<=5; i++) {
+                const val = document.getElementById(`rs-sugg-${i}`).value.trim();
+                if(val) suggestions.push(val);
+            }
+
+            if(suggestions.length === 0) return iosAlert("Missing Suggestions", "Please add at least 1 suggested review for your customers.");
+
+            const btn = document.getElementById('rs-save-btn');
+            const orig = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
+            btn.disabled = true;
+
+            try {
+                const reviewData = {
+                    googleLink: link,
+                    suggestions: suggestions,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                await db.collection('shops').doc(currentShopId).set({
+                    reviewSystem: reviewData
+                }, { merge: true });
+
+                if(!globalShopData) globalShopData = {};
+                globalShopData.reviewSystem = reviewData;
+
+                generateReviewQR();
+                iosAlert("Success", "Review System data saved successfully!");
+
+            } catch(err) {
+                iosAlert("Error", err.message);
+            } finally {
+                btn.innerHTML = orig;
+                btn.disabled = false;
+            }
+        }
+
+        function generateReviewQR() {
+            const qrContainer = document.getElementById('rs-qr-code');
+            qrContainer.innerHTML = ""; 
+            
+            let baseUrl = window.location.href.split('?')[0];
+            let reviewUrl = baseUrl.replace(/dashboard\.html/i, 'review.html');
+            if (reviewUrl.startsWith("file://")) {
+                reviewUrl = "https://bikripage.github.io/Online/review.html"; 
+            }
+            
+            const finalUrl = reviewUrl + "?storeId=" + currentShopId;
+
+            if(!reviewQrInstance) {
+                reviewQrInstance = new QRCode(qrContainer, {
+                    text: finalUrl,
+                    width: 130,
+                    height: 130,
+                    colorDark : "#111827",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            } else {
+                reviewQrInstance.clear();
+                reviewQrInstance.makeCode(finalUrl);
+            }
+
+            document.getElementById('rs-qr-section').classList.remove('hidden');
+        }
+
+        function copyReviewLink() {
+            let baseUrl = window.location.href.split('?')[0];
+            let reviewUrl = baseUrl.replace(/dashboard\.html/i, 'review.html');
+            if (reviewUrl.startsWith("file://")) {
+                reviewUrl = "https://bikripage.github.io/Online/review.html"; 
+            }
+            const finalUrl = reviewUrl + "?storeId=" + currentShopId;
+
+            if(navigator.clipboard && window.isSecureContext) { 
+                navigator.clipboard.writeText(finalUrl).then(() => iosAlert("Copied!", "Smart Review link copied to clipboard. Share it with your customers!"));
+            } else { 
+                const textArea = document.createElement("textarea");
+                textArea.value = finalUrl;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    iosAlert("Copied!", "Smart Review link copied to clipboard.");
+                } catch (err) {
+                    prompt("Copy this link manually:", finalUrl);
+                }
+                document.body.removeChild(textArea);
+            }
+        }
 
     </script>
 

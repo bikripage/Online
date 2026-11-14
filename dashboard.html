@@ -1432,26 +1432,63 @@
                     </div>
                 </div>
 
-                <!-- QR & Link Preview -->
-                <div class="bg-gray-50 border border-gray-200 rounded-[16px] p-4 flex flex-col items-center mt-2 hidden" id="rs-qr-section">
+                                <!-- QR Code & Actions Section (Hidden initially) -->
+                <div class="bg-gray-50 border border-gray-200 rounded-[16px] p-5 flex flex-col items-center mt-2 hidden transition-all duration-300" id="rs-qr-section">
                     <p class="text-[11px] font-bold text-gray-600 uppercase tracking-widest mb-3">Your Review QR Code</p>
-                    <div id="rs-qr-code" class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-3"></div>
-                    <p class="text-[10px] text-gray-500 text-center mb-3">Print this QR or let customers scan directly from here.</p>
-                    <div class="flex gap-2 w-full">
-                        <button onclick="window.open('review.html?storeId=' + currentShopId, '_blank')" class="flex-1 bg-amber-100 hover:bg-amber-200 text-amber-700 font-bold h-10 rounded-[10px] text-[11px] transition-colors flex items-center justify-center gap-1.5 shadow-sm active:scale-95">
-                            <i class="fas fa-external-link-alt"></i> Open Review App
-                        </button>
-                        <button onclick="copyReviewLink()" class="flex-1 bg-white border border-gray-200 hover:bg-gray-100 text-gray-700 font-bold h-10 rounded-[10px] text-[11px] transition-colors flex items-center justify-center gap-1.5 shadow-sm active:scale-95">
-                            <i class="fas fa-copy"></i> Copy Link
+                    
+                    <div id="rs-qr-code" class="bg-white p-4 rounded-[16px] shadow-sm border border-gray-100 mb-3 flex items-center justify-center">
+                        <!-- QR Code will be injected here -->
+                    </div>
+                    
+                    <p class="text-[10px] text-gray-500 text-center mb-4 leading-snug">Print this QR for your desk or let customers scan it directly from your phone.</p>
+                    
+                    <div class="flex flex-col gap-2 w-full">
+                        <div class="flex gap-2 w-full">
+                            <button onclick="openReviewApp()" class="flex-1 bg-amber-100 hover:bg-amber-200 text-amber-700 font-bold h-11 rounded-[12px] text-[12px] transition-colors flex items-center justify-center gap-2 shadow-sm active:scale-95">
+                                <i class="fas fa-external-link-alt"></i> Open App
+                            </button>
+                            <button onclick="shareReviewLink()" id="rs-share-btn" class="flex-1 bg-white border border-gray-200 hover:bg-gray-100 text-gray-700 font-bold h-11 rounded-[12px] text-[12px] transition-colors flex items-center justify-center gap-2 shadow-sm active:scale-95">
+                                <i class="fas fa-share-nodes"></i> Share Link
+                            </button>
+                        </div>
+                        <!-- Naya Feedback Inbox Button -->
+                        <button onclick="openFeedbackInbox()" class="w-full bg-red-50 border border-red-100 hover:bg-red-100 text-red-600 font-bold h-11 rounded-[12px] text-[12px] transition-colors flex items-center justify-center gap-2 shadow-sm active:scale-95 mt-1">
+                            <i class="fas fa-inbox"></i> View Private Feedback (1-3 Stars)
                         </button>
                     </div>
                 </div>
+
             </div>
 
             <div class="pt-4 mt-2 border-t border-gray-100 shrink-0">
                 <button id="rs-save-btn" onclick="saveReviewSetup(event)" class="w-full bg-gray-900 hover:bg-black text-white font-bold h-[48px] rounded-[14px] active:scale-95 transition-transform shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex justify-center items-center gap-2">
                     Save & Generate QR <i class="fas fa-qrcode"></i>
                 </button>
+            </div>
+        </div>
+    </div>
+    <!-- ✨ FEEDBACK INBOX MODAL ✨ -->
+    <div id="feedback-inbox-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[170] hidden flex items-center justify-center p-4 transition-all duration-300 opacity-0">
+        <div class="bg-white rounded-[24px] shadow-2xl max-w-md w-full p-6 relative transform scale-95 transition-all duration-300 flex flex-col max-h-[90vh]">
+            <button onclick="closeFeedbackInbox()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center transition active:scale-90 shadow-sm border border-gray-100">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="flex items-center gap-4 mb-5 border-b border-gray-100 pb-4 shrink-0">
+                <div class="w-12 h-12 bg-red-50 text-red-500 rounded-[16px] flex items-center justify-center text-xl border border-red-100 shadow-sm">
+                    <i class="fas fa-comment-slash"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-black text-gray-900 leading-tight tracking-tight">Private Feedback</h3>
+                    <p class="text-xs text-gray-500 font-medium">1-3 Star reviews from customers</p>
+                </div>
+            </div>
+
+            <div id="feedback-list-container" class="overflow-y-auto custom-scrollbar pr-2 flex-1 space-y-3 min-h-[250px]">
+                <!-- Feedback items yahan aayenge -->
+                <div class="flex items-center justify-center h-full">
+                    <i class="fas fa-circle-notch fa-spin text-gray-300 text-2xl"></i>
+                </div>
             </div>
         </div>
     </div>
@@ -12043,6 +12080,145 @@ setTimeout(loadAppSecurityDetails, 2500);
                     prompt("Copy this link manually:", finalUrl);
                 }
                 document.body.removeChild(textArea);
+            }
+        }
+        // ==========================================
+        // ✨ SHARE LINK & FEEDBACK INBOX LOGIC ✨
+        // ==========================================
+        
+        async function shareReviewLink() {
+            const finalUrl = getReviewAppUrl();
+            const shopName = (typeof globalShopData !== 'undefined' && globalShopData.shopName) ? globalShopData.shopName : "Our Store";
+            
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: `Review ${shopName}`,
+                        text: `Did you enjoy your time at ${shopName}? Please share your feedback and help us improve! Tap here:`,
+                        url: finalUrl
+                    });
+                } catch (err) {
+                    console.log("Share dialogue closed", err);
+                }
+            } else {
+                // Agar phone me share support nahi hai toh copy kar dega
+                copyReviewLink(); 
+            }
+        }
+
+        let feedbackUnsubscribe = null;
+
+        function openFeedbackInbox() {
+            const modal = document.getElementById('feedback-inbox-modal');
+            const card = modal.querySelector('div.bg-white');
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            setTimeout(() => { 
+                modal.classList.remove('opacity-0'); 
+                card.classList.remove('scale-95'); 
+                card.classList.add('scale-100');
+            }, 10);
+            
+            fetchPrivateFeedback(); // Firebase se data laayega
+        }
+
+        function closeFeedbackInbox() {
+            const modal = document.getElementById('feedback-inbox-modal');
+            const card = modal.querySelector('div.bg-white');
+            
+            modal.classList.add('opacity-0'); 
+            card.classList.remove('scale-100');
+            card.classList.add('scale-95');
+            
+            // Firebase real-time listener band karna taaki background me data waste na ho
+            if (feedbackUnsubscribe) {
+                feedbackUnsubscribe();
+                feedbackUnsubscribe = null;
+            }
+
+            setTimeout(() => { 
+                modal.classList.add('hidden'); 
+                modal.classList.remove('flex');
+            }, 300);
+        }
+
+        function fetchPrivateFeedback() {
+            const container = document.getElementById('feedback-list-container');
+            container.innerHTML = `<div class="flex items-center justify-center h-full py-10"><i class="fas fa-circle-notch fa-spin text-red-400 text-3xl"></i></div>`;
+            
+            if (feedbackUnsubscribe) feedbackUnsubscribe();
+
+            // BikriPage Firestore path jahan 1-3 star wale review save honge
+            feedbackUnsubscribe = db.collection('shops').doc(currentShopId).collection('private_feedback')
+                .orderBy('timestamp', 'desc')
+                .onSnapshot(snapshot => {
+                    if (snapshot.empty) {
+                        container.innerHTML = `
+                            <div class="text-center py-10">
+                                <i class="fas fa-inbox text-5xl text-gray-200 mb-3"></i>
+                                <p class="text-gray-500 font-bold text-sm">No negative feedback yet!</p>
+                                <p class="text-gray-400 text-xs mt-1">Keep up the good work.</p>
+                            </div>`;
+                        return;
+                    }
+
+                    let html = '';
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        let dateStr = "Just now";
+                        
+                        if (data.timestamp && data.timestamp.toDate) {
+                            const d = data.timestamp.toDate();
+                            dateStr = d.toLocaleDateString('en-IN', {day:'numeric', month:'short'}) + " at " + d.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+                        }
+
+                        // Star Rating UI generate karna
+                        let starsHtml = '';
+                        for (let i = 1; i <= 5; i++) {
+                            if (i <= data.rating) {
+                                starsHtml += `<i class="fas fa-star text-amber-500 text-[11px]"></i>`;
+                            } else {
+                                starsHtml += `<i class="fas fa-star text-gray-200 text-[11px]"></i>`;
+                            }
+                        }
+
+                        html += `
+                            <div class="bg-gray-50 border border-gray-200 rounded-[16px] p-4 shadow-sm relative group transition-all">
+                                <button onclick="deleteFeedback('${doc.id}')" class="absolute top-3 right-3 w-8 h-8 bg-white border border-red-100 text-red-500 rounded-full flex items-center justify-center hover:bg-red-50 transition active:scale-95 shadow-sm">
+                                    <i class="fas fa-trash-alt text-[12px]"></i>
+                                </button>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <div class="flex gap-0.5">${starsHtml}</div>
+                                    <span class="text-[10px] text-gray-400 font-bold ml-2 bg-white px-2 py-0.5 rounded-full border border-gray-200">${dateStr}</span>
+                                </div>
+                                <p class="text-[13px] text-gray-800 font-semibold leading-relaxed pr-8">"${data.feedback}"</p>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                }, err => {
+                    console.error("Error fetching feedback:", err);
+                    container.innerHTML = `<div class="text-center py-10 text-red-500 text-sm font-bold">Error loading feedback</div>`;
+                });
+        }
+
+        async function deleteFeedback(feedbackId) {
+            // Confirm karne ke baad delete hoga (Aapka pehle se bana hua iosConfirm use kar raha hu)
+            if (typeof iosConfirm === 'function') {
+                const isConfirmed = await iosConfirm("Delete Feedback", "Are you sure you want to permanently delete this customer feedback?", "Delete", "text-red-500");
+                if(!isConfirmed) return;
+            } else {
+                if(!confirm("Are you sure you want to permanently delete this feedback?")) return;
+            }
+
+            try {
+                await db.collection('shops').doc(currentShopId).collection('private_feedback').doc(feedbackId).delete();
+                if(typeof showToast === 'function') showToast("Feedback deleted successfully", "success");
+            } catch (error) {
+                if(typeof showToast === 'function') showToast("Error deleting feedback: " + error.message, "error");
+                else alert("Error: " + error.message);
             }
         }
 

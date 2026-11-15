@@ -522,6 +522,124 @@ header.sticky,.modal,.fixed.inset-0{
 }
 </style>
 
+
+<style id="netaji-profile-layout-v4">
+/* Profile hero: balanced two-column identity row + clean content rhythm */
+main>section:first-child{
+  padding:24px clamp(18px,4.5vw,42px) 28px!important;
+  background:
+    radial-gradient(ellipse at 92% 0%,rgba(181,150,93,.09),transparent 35%),
+    linear-gradient(145deg,#fbfaf6 0%,#f5f4ef 100%)!important;
+}
+main>section:first-child>div:first-child{
+  display:grid!important;
+  grid-template-columns:minmax(94px,116px) minmax(0,1fr)!important;
+  align-items:center!important;
+  column-gap:16px!important;
+  row-gap:0!important;
+}
+main>section:first-child>div:first-child>div:first-child{
+  width:100%!important;min-width:0!important;
+  display:flex!important;flex-direction:column!important;
+  align-items:center!important;justify-content:flex-start!important;
+  gap:9px!important;
+}
+#profile-pic-ring{
+  width:96px!important;height:96px!important;
+  padding:3px!important;border-radius:27px!important;
+  position:relative!important;z-index:1!important;
+}
+#profile-pic-ring>div{border-radius:23px!important}
+#store-logo-wrapper{border-radius:20px!important}
+#premium-biz-badge{
+  position:static!important;inset:auto!important;
+  display:block!important;width:100%!important;
+  margin:0!important;transform:none!important;text-align:center!important;
+}
+#premium-biz-badge>div{
+  display:flex!important;width:100%!important;min-height:25px!important;
+  padding:5px 7px!important;font-size:8px!important;
+  letter-spacing:.11em!important;border-radius:999px!important;
+  white-space:nowrap!important;
+}
+main>section:first-child>div:first-child>div:last-child{
+  width:100%!important;min-width:0!important;min-height:112px!important;
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  align-items:center!important;justify-content:stretch!important;
+  padding:13px 7px!important;border-radius:21px!important;
+  background:rgba(255,255,255,.92)!important;
+  border:1px solid #e8e4db!important;
+  box-shadow:0 7px 22px rgba(40,45,52,.045)!important;
+}
+main>section:first-child>div:first-child>div:last-child>div{
+  min-width:0!important;width:100%!important;padding:0 3px!important;
+}
+main>section:first-child>div:first-child>div:last-child>div+div:before{
+  background:#eae7df!important;height:58%!important;top:21%!important;
+}
+#stat-rating,#stat-orders,#stat-followers{
+  font-size:clamp(19px,4vw,25px)!important;line-height:1.1!important;
+  white-space:nowrap!important;letter-spacing:-.045em!important;
+}
+main>section:first-child>div:first-child>div:last-child span,
+main>section:first-child>div:first-child>div:last-child p{
+  font-size:8px!important;letter-spacing:.10em!important;
+  margin-top:6px!important;white-space:nowrap!important;
+}
+main>section:first-child>div:nth-child(2){
+  margin-top:22px!important;display:flex!important;flex-direction:column!important;
+  align-items:flex-start!important;gap:0!important;
+}
+#profile-shop-name{font-size:clamp(25px,5vw,34px)!important;line-height:1.12!important}
+#profile-owner-name{margin-top:5px!important;font-size:13px!important}
+#profile-category{display:inline-flex!important;margin-top:13px!important}
+#desc-text{font-size:14px!important;line-height:1.65!important}
+main>section:first-child>div:nth-child(2)>div{
+  margin-top:18px!important;
+}
+#profile-location{margin-top:16px!important;gap:8px!important}
+#profile-map-link{margin-top:10px!important;min-height:40px!important}
+#profile-delivery-banner{
+  margin-top:18px!important;padding:12px 14px!important;
+  border-radius:18px!important;display:flex!important;align-items:center!important;
+  gap:12px!important;
+}
+#profile-delivery-banner>div:first-child{
+  width:44px!important;height:44px!important;flex:0 0 44px!important;
+  border-radius:14px!important;
+}
+#profile-delivery-banner p:last-child{font-size:12px!important;line-height:1.45!important}
+@media(max-width:480px){
+  main>section:first-child{padding:20px 18px 24px!important}
+  main>section:first-child>div:first-child{
+    grid-template-columns:98px minmax(0,1fr)!important;column-gap:12px!important;
+  }
+  #profile-pic-ring{width:88px!important;height:88px!important;border-radius:24px!important}
+  #profile-pic-ring>div{border-radius:20px!important}
+  #store-logo-wrapper{border-radius:17px!important}
+  main>section:first-child>div:first-child>div:last-child{
+    min-height:98px!important;padding:10px 4px!important;border-radius:18px!important;
+  }
+  #stat-rating,#stat-orders,#stat-followers{font-size:20px!important}
+  main>section:first-child>div:first-child>div:last-child span,
+  main>section:first-child>div:first-child>div:last-child p{
+    font-size:7px!important;letter-spacing:.075em!important;
+  }
+  main>section:first-child>div:nth-child(2){margin-top:20px!important}
+  #profile-shop-name{font-size:27px!important}
+  #desc-text{font-size:13px!important;line-height:1.65!important}
+  #profile-location{font-size:11px!important;line-height:1.55!important}
+  #profile-delivery-banner{padding:11px!important;gap:10px!important}
+}
+@media(min-width:600px){
+  main>section:first-child>div:first-child{
+    grid-template-columns:120px minmax(0,1fr)!important;column-gap:22px!important;
+  }
+  #profile-pic-ring{width:108px!important;height:108px!important}
+  main>section:first-child>div:first-child>div:last-child{min-height:118px!important}
+}
+</style>
+
 </head>
 <body class="font-sans text-gray-800 pb-24 selection:bg-purple-200">
 

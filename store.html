@@ -357,6 +357,104 @@ footer a span{background:linear-gradient(90deg,#1e392b,#617265)!important;backgr
 </style>
 
 
+
+<style id="netaji-signature-polish-v2">
+/* Reviews: restrained, readable rating distribution */
+html{scroll-behavior:auto!important;scroll-padding-top:76px}
+#play-store-rating-stats{
+  display:flex!important;align-items:center!important;gap:clamp(16px,4vw,34px)!important;
+  padding:18px clamp(14px,3vw,24px)!important;border-radius:22px!important;
+  background:linear-gradient(135deg,#f7f9f4,#eef3eb)!important;
+  border:1px solid #e3e9df!important;box-shadow:0 8px 22px rgba(26,49,34,.035)!important;
+}
+#play-store-rating-stats>div:first-child{min-width:88px!important}
+#big-avg-rating{font-size:clamp(42px,8vw,58px)!important;line-height:1!important}
+#big-avg-stars{gap:2px!important;color:#b89655!important}
+#big-avg-stars i{color:#b89655!important}
+#total-reviews-count{font-size:11px!important;color:#7b887d!important;font-weight:650!important}
+#rating-bars-container{gap:9px!important;min-width:0!important}
+#rating-bars-container>div{
+  display:grid!important;grid-template-columns:14px minmax(0,1fr)!important;align-items:center!important;
+  gap:9px!important;background:transparent!important;border-radius:0!important;overflow:visible!important;
+}
+#rating-bars-container>div>span{
+  width:auto!important;text-align:right!important;font-size:10px!important;color:#7d897f!important;font-weight:750!important
+}
+#rating-bars-container>div>div{
+  height:7px!important;border-radius:99px!important;background:#dfe7dc!important;overflow:hidden!important;
+}
+#rating-bars-container>div>div>div{
+  height:100%!important;min-width:0!important;border-radius:99px!important;
+  background:linear-gradient(90deg,#286449,#6e9878)!important;transition:none!important
+}
+/* Delivery: one clean information row, no nested card effect */
+#profile-delivery-banner{
+  display:flex!important;align-items:center!important;gap:12px!important;
+  width:100%!important;max-width:100%!important;margin-top:18px!important;
+  padding:13px 15px!important;border-radius:18px!important;
+  background:#f7f8f3!important;border:1px solid #e5e9df!important;
+  box-shadow:0 4px 14px rgba(24,45,34,.035)!important;
+}
+#profile-delivery-banner>div{
+  min-width:0!important;padding:0!important;margin:0!important;
+  border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;
+}
+#profile-delivery-banner>div:first-child{
+  width:42px!important;height:42px!important;flex:0 0 42px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  border-radius:14px!important;background:#e8f0e7!important;color:#24583f!important;
+}
+#profile-delivery-banner>div:first-child i{color:#24583f!important}
+#profile-delivery-banner p:first-child{
+  margin:0 0 4px!important;font-size:9px!important;letter-spacing:.13em!important;
+  color:#718075!important;font-weight:850!important
+}
+#profile-delivery-banner p:last-child{
+  margin:0!important;font-size:12px!important;line-height:1.45!important;
+  color:#26372f!important;font-weight:680!important;white-space:normal!important
+}
+/* Business type badge: muted forest + champagne, never bright orange */
+#premium-biz-badge>div{
+  background:linear-gradient(135deg,#214f3a,#173d2d)!important;
+  color:#f5f0df!important;border:1px solid rgba(184,150,85,.65)!important;
+  box-shadow:0 5px 14px rgba(23,75,56,.15)!important;
+  letter-spacing:.16em!important;font-size:9px!important;padding:5px 12px!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important
+}
+#profile-pic-ring{
+  background:linear-gradient(145deg,#b89655,#e7d9b5 48%,#9c814c)!important;
+  box-shadow:0 7px 18px rgba(73,83,57,.10)!important
+}
+/* Performance: avoid expensive smooth scrolling, blur and off-screen containment */
+*,*::before,*::after{scroll-behavior:auto!important}
+button,a{transition:background-color .12s ease,color .12s ease,border-color .12s ease!important}
+#products-grid .grid-item{
+  content-visibility:visible!important;contain:none!important;
+  box-shadow:0 3px 12px rgba(24,45,34,.035)!important
+}
+header.sticky{
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  background:#fbfcf8!important
+}
+#smart-filter-modal,#cart-modal,#order-modal,#flash-offer-modal,#order-success-modal,#map-picker-modal{
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important
+}
+#product-details-page>div:first-child{
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important
+}
+@media(max-width:480px){
+  #play-store-rating-stats{gap:14px!important;padding:16px 13px!important}
+  #play-store-rating-stats>div:first-child{min-width:78px!important}
+  #big-avg-rating{font-size:46px!important}
+  #rating-bars-container{gap:8px!important}
+  #profile-delivery-banner{padding:12px!important;gap:10px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+
 </head>
 <body class="font-sans text-gray-800 pb-24 selection:bg-purple-200">
 

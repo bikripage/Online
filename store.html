@@ -455,6 +455,73 @@ header.sticky{
 }
 </style>
 
+
+<style id="netaji-signature-refinement-v3">
+/* New palette: warm ivory, graphite and muted champagne */
+:root{
+ --lux-ink:#20252c!important;--lux-ink-2:#414852!important;
+ --lux-muted:#85898d!important;--lux-line:#e9e5dc!important;
+ --lux-paper:#fffefa!important;--lux-canvas:#f5f3ed!important;
+ --lux-card:#ffffff!important;--lux-green:#34465d!important;
+ --lux-green-2:#53677f!important;--lux-green-soft:#edf0f3!important;
+ --lux-gold:#b5965d!important;--lux-gold-soft:#f4efe3!important;
+ --lux-shadow:0 12px 32px rgba(36,42,50,.055)!important;
+}
+body,main.max-w-4xl{background:#fffefa!important;color:#20252c!important}
+header.sticky{background:#fffefa!important;border-bottom-color:#ebe7df!important}
+header h1{color:#252a31!important}
+#premium-biz-badge{
+ position:static!important;left:auto!important;bottom:auto!important;
+ transform:none!important;margin:9px auto 0!important;
+ width:max-content!important;max-width:100%!important;
+ display:block!important;z-index:2!important;
+}
+#premium-biz-badge>div{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ position:static!important;transform:none!important;
+ background:linear-gradient(135deg,#34465d,#263548)!important;
+ color:#f7f2e8!important;border:1px solid #c4aa78!important;
+ box-shadow:0 3px 9px rgba(39,53,72,.12)!important;
+ border-radius:999px!important;padding:6px 13px!important;
+ font-size:9px!important;line-height:1.2!important;letter-spacing:.14em!important;
+ white-space:nowrap!important
+}
+#profile-pic-ring{box-shadow:0 7px 18px rgba(48,55,64,.09)!important}
+#profile-delivery-banner{
+ background:#faf9f5!important;border-color:#e9e5dc!important;
+ box-shadow:0 3px 12px rgba(35,40,47,.025)!important
+}
+#profile-delivery-banner>div:first-child{background:#edf0f3!important}
+#profile-delivery-banner>div:first-child i{color:#53677f!important}
+#profile-delivery-banner p:last-child{color:#343b44!important}
+#play-store-rating-stats{background:#f7f6f1!important;border-color:#e9e5dc!important}
+#rating-bars-container>div>div{background:#e8e5dc!important}
+#rating-bars-container>div>div>div{background:linear-gradient(90deg,#64758a,#a9a18d)!important}
+/* Keep native touch scrolling responsive; contain long product lists efficiently */
+html,body{scroll-behavior:auto!important;overscroll-behavior-y:auto!important}
+body{-webkit-overflow-scrolling:touch!important}
+#products-grid .grid-item{
+ content-visibility:auto!important;
+ contain-intrinsic-size:360px 410px!important;
+ contain:layout paint style!important;
+ box-shadow:0 2px 9px rgba(35,40,47,.025)!important;
+}
+#products-grid img{content-visibility:auto}
+*,*::before,*::after{scroll-behavior:auto!important}
+button,a{transition:background-color .12s ease,color .12s ease,border-color .12s ease!important}
+button:active{transform:none!important}
+header.sticky,.modal,.fixed.inset-0{
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important
+}
+@media(max-width:480px){
+ #premium-biz-badge{margin-top:8px!important}
+ #premium-biz-badge>div{font-size:8px!important;padding:6px 11px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+
 </head>
 <body class="font-sans text-gray-800 pb-24 selection:bg-purple-200">
 

@@ -777,6 +777,123 @@ button.bg-green-700,button.bg-green-800,
 }
 </style>
 
+
+<style id="netaji-atelier-premium-v7">
+/* NETAJI ATELIER — one disciplined luxury palette */
+:root{
+ --lux-ink:#292331!important;
+ --lux-ink-2:#514a59!important;
+ --lux-muted:#89838c!important;
+ --lux-line:#e8e3da!important;
+ --lux-paper:#fcfbf8!important;
+ --lux-canvas:#f5f2ec!important;
+ --lux-card:#fffefa!important;
+ --lux-green:#493b55!important;
+ --lux-green-2:#62516f!important;
+ --lux-green-soft:#eee9f0!important;
+ --lux-gold:#b49a70!important;
+ --lux-gold-soft:#f3eee4!important;
+ --brand-primary:#493b55!important;
+ --brand-secondary:#62516f!important;
+}
+html,body{background:#fcfbf8!important;color:#292331!important}
+body{ -webkit-font-smoothing:antialiased!important }
+header.sticky{
+ background:rgba(252,251,248,.97)!important;
+ border-bottom:1px solid #eae5dc!important;
+ box-shadow:0 4px 18px rgba(42,34,48,.035)!important;
+}
+header.sticky button,header.sticky a{color:#493b55!important}
+main>section:first-child{
+ background:
+  radial-gradient(ellipse at 90% 0%,rgba(180,154,112,.10),transparent 36%),
+  linear-gradient(145deg,#fcfbf8 0%,#f4f0e9 100%)!important;
+}
+#profile-pic-ring{
+ background:linear-gradient(145deg,#b49a70,#eee4d1 48%,#a58b60)!important;
+ box-shadow:0 7px 20px rgba(65,53,69,.09)!important;
+}
+#premium-biz-badge>div{
+ background:linear-gradient(110deg,#30283a 0%,#51435e 55%,#30283a 100%)!important;
+ color:#f7f1e7!important;
+ border:1px solid rgba(180,154,112,.82)!important;
+ box-shadow:0 4px 12px rgba(48,40,58,.16),inset 0 1px 0 rgba(255,255,255,.18)!important;
+ text-shadow:none!important;
+}
+#premium-biz-badge>div:after{
+ background:linear-gradient(90deg,transparent,rgba(244,228,196,.58),transparent)!important;
+ animation:atelierSoftShine 5.5s ease-in-out infinite!important;
+}
+@keyframes atelierSoftShine{
+ 0%,58%{left:-55%;opacity:0}
+ 66%{opacity:.8}
+ 88%,100%{left:130%;opacity:0}
+}
+#profile-category{
+ background:#f3eee4!important;border:1px solid #e6dcc9!important;
+ color:#746044!important;
+}
+#profile-map-link{
+ background:#f1ede6!important;border:1px solid #e7dfd2!important;
+ color:#51435e!important;box-shadow:none!important;
+}
+#profile-delivery-banner{
+ background:#fbfaf6!important;border:1px solid #e8e3da!important;
+ box-shadow:0 3px 12px rgba(42,34,48,.025)!important;
+}
+#profile-delivery-banner>div:first-child{background:#eee9f0!important}
+#profile-delivery-banner>div:first-child i{color:#62516f!important}
+#profile-delivery-banner p:last-child{color:#393340!important}
+#play-store-rating-stats{
+ background:#f5f2ec!important;border-color:#e8e3da!important;
+ box-shadow:0 6px 20px rgba(42,34,48,.035)!important;
+}
+#rating-bars-container>div>div{background:#e5dfd5!important}
+#rating-bars-container>div>div>div{
+ background:linear-gradient(90deg,#74647d,#b49a70)!important;
+}
+/* Remove competing red/green accents: all discount labels use the same plum finish */
+#products-grid .grid-item .aspect-square>div[class*="DC2626"],
+#products-grid .grid-item .aspect-square>div[class*="red-50"],
+#detail-discount-badge{
+ background:linear-gradient(115deg,#3d3348,#5a4a66)!important;
+ color:#f7f1e7!important;
+ border:1px solid rgba(180,154,112,.72)!important;
+ box-shadow:0 3px 10px rgba(48,40,58,.16)!important;
+ text-shadow:none!important;
+}
+#products-grid .grid-item .aspect-square>div[class*="DC2626"]:after,
+#products-grid .grid-item .aspect-square>div[class*="red-50"]:after,
+#detail-discount-badge:after{
+ background:linear-gradient(90deg,transparent,rgba(244,228,196,.5),transparent)!important;
+ animation:atelierSoftShine 5.5s ease-in-out infinite!important;
+}
+/* One consistent primary action color across the storefront */
+#products-grid .grid-item>div:last-child>div button:first-child,
+#products-grid .grid-item button.add-to-cart-btn,
+#products-grid .grid-item .add-to-cart-btn,
+#product-details-page button,
+button.bg-green-700,button.bg-green-800,
+.bg-green-700,.bg-green-800{
+ background:linear-gradient(135deg,#554563,#392e43)!important;
+ color:#fffdf9!important;border:1px solid rgba(180,154,112,.32)!important;
+ box-shadow:0 4px 12px rgba(57,46,67,.12)!important;
+}
+#products-grid .grid-item button i,
+#products-grid .grid-item button svg{color:inherit!important}
+.text-green-700,.text-green-800,.text-green-900{color:#62516f!important}
+.border-green-700,.border-green-800{border-color:#ded5e1!important}
+.bg-green-50,.bg-green-100{background:#f0ebf1!important}
+button,a{transition:background-color .14s ease,color .14s ease,border-color .14s ease!important}
+button:active{transform:none!important}
+@media(prefers-reduced-motion:reduce){
+ #premium-biz-badge>div:after,
+ #products-grid .grid-item .aspect-square>div[class*="DC2626"]:after,
+ #products-grid .grid-item .aspect-square>div[class*="red-50"]:after,
+ #detail-discount-badge:after{animation:none!important;display:none!important}
+}
+</style>
+
 </head>
 <body class="font-sans text-gray-800 pb-24 selection:bg-purple-200">
 

@@ -1176,11 +1176,22 @@
                 if (images.length > 1) {
                     dotsBox.innerHTML = images.map((_, i) => `<div class="w-1.5 h-1.5 rounded-full ${i===0 ? 'bg-gray-800 w-3' : 'bg-white/80 shadow-sm'} transition-all duration-300" id="dot-${i}"></div>`).join('');
                     
+                    let sliderFrame = 0;
+                    let lastActiveIdx = -1;
                     slider.onscroll = () => {
-                        const activeIdx = Math.round(slider.scrollLeft / slider.clientWidth);
-                        images.forEach((_, i) => {
-                            const dot = document.getElementById(`dot-${i}`);
-                            if(dot) dot.className = i === activeIdx ? "w-3 h-1.5 rounded-full bg-gray-800 transition-all duration-300" : "w-1.5 h-1.5 rounded-full bg-white/80 shadow-sm transition-all duration-300";
+                        if (sliderFrame) return;
+                        sliderFrame = requestAnimationFrame(() => {
+                            sliderFrame = 0;
+                            const activeIdx = Math.round(slider.scrollLeft / Math.max(1, slider.clientWidth));
+                            if (activeIdx === lastActiveIdx) return;
+                            lastActiveIdx = activeIdx;
+                            images.forEach((_, i) => {
+                                const dot = document.getElementById(`dot-${i}`);
+                                if (!dot) return;
+                                dot.className = i === activeIdx
+                                  ? "w-3 h-1.5 rounded-full bg-gray-800 transition-all duration-300"
+                                  : "w-1.5 h-1.5 rounded-full bg-white/80 shadow-sm transition-all duration-300";
+                            });
                         });
                     };
                 } else {
@@ -3202,7 +3213,7 @@ function toggleStoreReviewDislike(reviewId, btnElement) {
   
 }
 *{box-sizing:border-box;}
-html{scroll-behavior:smooth!important;scroll-padding-top:82px;}
+html{scroll-behavior:auto!important;scroll-padding-top:82px;-webkit-overflow-scrolling:touch;}
 body{
   margin:0!important;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Inter,"Segoe UI",sans-serif!important;
@@ -3217,13 +3228,13 @@ button:active{transform:scale(.975);}
 ::-webkit-scrollbar{width:0;height:0;}
 main.max-w-4xl{
   max-width:1220px!important;min-height:100vh;
-  overflow:hidden
+  overflow:clip
 ;}
 /* top navigation */
 header.sticky{
   min-height:70px;padding:12px clamp(16px,4vw,42px)!important;
   
-  backdrop-filter:saturate(160%) blur(18px)!important;-webkit-backdrop-filter:saturate(160%) blur(18px)!important;}
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
 header h1{font-size:11px!important;letter-spacing:.23em!important;font-weight:850!important;}
 header h1>span{
   width:34px!important;height:34px!important;border-radius:12px!important;
@@ -3383,7 +3394,7 @@ footer a span{background-clip:text!important;}
 
 #product-details-page>div:first-child{
   height:66px!important;
-  backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important;}
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
 #product-details-page>div:first-child button{border-radius:14px!important;}
 #product-details-page>div:first-child h2{font-size:16px!important;letter-spacing:-.035em!important;}
 #detail-scroll-area{top:66px!important;bottom:82px!important;}
@@ -3403,7 +3414,7 @@ footer a span{background-clip:text!important;}
 #product-reviews-list>div{border-radius:15px!important;}
 /* sheets, dialogs and forms */
 #smart-filter-modal,#cart-modal,#order-modal,#flash-offer-modal,#order-success-modal,#map-picker-modal{
-  backdrop-filter:blur(12px)!important;-webkit-backdrop-filter:blur(12px)!important;}
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
 #smart-filter-content,#cart-modal-content,#order-modal-content,#flash-offer-content,#order-success-content{
   }
 #smart-filter-content h3,#cart-modal-content h3,#order-modal-content h3{letter-spacing:-.035em;}
@@ -3450,6 +3461,42 @@ footer a span{background-clip:text!important;}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;}
+}
+
+
+/* MOBILE SCROLL PERFORMANCE — preserve all colors and layout */
+html, body {
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: auto !important;
+  touch-action: pan-y pinch-zoom;
+}
+body {
+  text-rendering: auto !important;
+}
+#detail-scroll-area {
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  scroll-behavior: auto !important;
+}
+#detail-image-slider {
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-x pan-y pinch-zoom;
+  scroll-behavior: auto !important;
+}
+/* Keep off-screen product cards cheap to render without changing their appearance. */
+#products-grid .grid-item {
+  content-visibility: auto !important;
+  contain-intrinsic-size: 360px 420px !important;
+}
+@media (max-width: 640px) {
+  header.sticky, #product-details-page > div:first-child,
+  #smart-filter-modal, #cart-modal, #order-modal,
+  #flash-offer-modal, #order-success-modal, #map-picker-modal {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  button { transition-duration: .12s !important; }
 }
 
 </style>

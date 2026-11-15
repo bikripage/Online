@@ -16,11 +16,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Smart Review Hub | BikriPage</title>
 
-    <!-- Tailwind, FontAwesome, HTML2Canvas & QRCode.js -->
+    <!-- Tailwind, FontAwesome, HTML2Canvas, QRCode.js & jsPDF -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <!-- Firebase v8 SDKs (Same as BikriPage) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -299,9 +301,9 @@
 
                 <!-- ✨ 3 ACTION BUTTONS BELOW QR: DOWNLOAD, SHARE, COPY LINK ✨ -->
                 <div class="grid grid-cols-3 gap-2.5 w-full">
-                    <!-- 1. Download Standee PNG -->
+                    <!-- 1. Download Standee PDF -->
                     <button onclick="downloadStandeeQr(event)" class="bg-[#111827] hover:bg-black text-white font-bold py-3.5 px-2 rounded-2xl text-xs flex flex-col items-center justify-center gap-1.5 shadow-md active:scale-95 transition">
-                        <i class="fas fa-download text-base text-amber-400"></i>
+                        <i class="fas fa-file-pdf text-base text-amber-400"></i>
                         <span>Download QR</span>
                     </button>
 
@@ -618,30 +620,50 @@
             }
         }
 
-        function downloadStandeeQr(e) {
+        // Updated PDF Download Function (No Clipping)
+        async function downloadStandeeQr(e) {
             const btn = e.currentTarget;
             const orig = btn.innerHTML;
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin text-base"></i><span>Saving...</span>`;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin text-base text-amber-400"></i><span>Saving...</span>`;
             btn.disabled = true;
 
             const standeeEl = document.getElementById('printable-standee');
-            html2canvas(standeeEl, {
-                scale: 3,
-                backgroundColor: "#ffffff",
-                useCORS: true
-            }).then(canvas => {
-                const link = document.createElement('a');
+            
+            try {
+                // html2canvas configuration fixed to prevent scroll clipping
+                const canvas = await html2canvas(standeeEl, {
+                    scale: 3,
+                    backgroundColor: "#ffffff",
+                    useCORS: true,
+                    scrollY: -window.scrollY // Very important to stop bottom cut-off
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                
+                // Keep dimensions strictly mapped to the generated canvas size
+                const pdfWidth = 100; // millimeters
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+                const pdf = new jsPDF({
+                    orientation: "portrait",
+                    unit: "mm",
+                    format: [pdfWidth, pdfHeight]
+                });
+
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                
                 const safeName = (globalShopData.shopName || 'Store').replace(/[^a-zA-Z0-9]/g, '_');
-                link.download = `${safeName}_Google_Review_Standee_QR.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                showToast("HD Standee QR Downloaded!");
-            }).catch(err => {
+                pdf.save(`${safeName}_Review_Standee.pdf`);
+                
+                showToast("HD Standee PDF Downloaded!");
+            } catch (err) {
+                console.error("PDF generation failed:", err);
                 alert("Download error: " + err.message);
-            }).finally(() => {
+            } finally {
                 btn.innerHTML = orig;
                 btn.disabled = false;
-            });
+            }
         }
 
         function previewClientPage() {

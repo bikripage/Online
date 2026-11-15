@@ -24,7 +24,7 @@
     <!-- jsPDF for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <!-- Firebase v8 SDKs (Same as BikriPage) -->
+    <!-- Firebase v8 SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -86,9 +86,7 @@
             </div>
         </div>
 
-        <!-- ✨ QR SVG ICON BUTTON (Click karne par QR Modal khulega) ✨ -->
         <button onclick="openQrModal()" title="Open Review QR Code" class="relative group bg-[#111827] hover:bg-black text-white px-3.5 sm:px-4 h-11 rounded-[14px] flex items-center gap-2.5 shadow-[0_4px_14px_rgba(17,24,39,0.2)] active:scale-95 transition shrink-0">
-            <!-- Custom Crisp QR SVG -->
             <svg class="w-5 h-5 text-[#FBBF24] group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="7" height="7" rx="1"></rect>
                 <rect x="14" y="3" width="7" height="7" rx="1"></rect>
@@ -106,7 +104,6 @@
     <!-- ================= MAIN CONTENT ================= -->
     <main class="max-w-4xl mx-auto px-4 sm:px-6 pt-6 space-y-6">
 
-        <!-- 1. HERO BANNER + QUICK QR TRIGGER -->
         <div class="bg-[#111827] rounded-[28px] p-6 text-white relative overflow-hidden shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
             <div class="absolute -right-12 -top-12 w-52 h-52 bg-gradient-to-br from-amber-400 to-blue-500 opacity-20 rounded-full blur-3xl pointer-events-none"></div>
             
@@ -136,7 +133,6 @@
             </div>
         </div>
 
-        <!-- 2. GOOGLE REVIEW LINK CONFIGURATION -->
         <div class="ios-card p-5 sm:p-6 border border-[#E5E7EB]">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                 <div class="flex items-center gap-2.5">
@@ -162,7 +158,6 @@
             </div>
         </div>
 
-        <!-- 3. STATS OVERVIEW CARDS -->
         <div class="grid grid-cols-3 gap-3 sm:gap-4">
             <div class="ios-card p-4 border border-[#E5E7EB]">
                 <p class="text-[10px] font-bold uppercase tracking-wider text-[#6B7280]">Total Feedback</p>
@@ -183,7 +178,6 @@
             </div>
         </div>
 
-        <!-- 4. LIVE PRIVATE FEEDBACK INBOX (1-3 STARS) -->
         <div class="ios-card p-5 sm:p-6 border border-[#E5E7EB]">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E5E7EB] mb-5">
                 <div class="flex items-center gap-3">
@@ -199,7 +193,6 @@
                     </div>
                 </div>
 
-                <!-- Filter Buttons -->
                 <div class="flex items-center gap-2">
                     <select id="feedback-filter" onchange="renderFeedbackList()" class="bg-[#F7F7F9] border border-[#E5E7EB] rounded-xl px-3.5 h-10 text-xs font-bold text-[#111827] outline-none cursor-pointer">
                         <option value="all">All Messages</option>
@@ -212,7 +205,6 @@
                 </div>
             </div>
 
-            <!-- Feedback List Container -->
             <div id="feedback-list" class="space-y-3.5">
                 <div class="text-center py-12">
                     <i class="fas fa-circle-notch fa-spin text-2xl text-blue-600 mb-3"></i>
@@ -229,10 +221,8 @@
     <div id="qr-modal" class="fixed inset-0 z-50 hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-300 opacity-0" onclick="closeQrModal()">
         <div id="qr-modal-card" onclick="event.stopPropagation()" class="bg-[#F2F2F7] w-full sm:w-[430px] rounded-t-[28px] sm:rounded-[28px] shadow-2xl transform translate-y-full sm:translate-y-0 sm:scale-95 transition-transform duration-300 overflow-hidden flex flex-col max-h-[94vh]">
             
-            <!-- Mobile Pull Bar -->
             <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mt-3 sm:hidden"></div>
 
-            <!-- Modal Header -->
             <div class="px-6 pt-4 pb-3 flex items-center justify-between border-b border-gray-200/80 bg-white">
                 <div>
                     <h3 class="text-[16px] font-black text-[#111827]">Google Review Standee QR</h3>
@@ -243,14 +233,11 @@
                 </button>
             </div>
 
-            <!-- Scrollable Standee Preview + Actions -->
             <div class="p-5 overflow-y-auto space-y-5 flex flex-col items-center">
                 
-                <!-- ✨ PRINTABLE STANDEE CARD (Exact match to your photo) ✨ -->
-                <!-- PADDING FIX: px-6 pt-6 pb-10 aur text me mb-2 add kiya hai taki bottom se cut na ho -->
-                <div id="printable-standee" class="standee-frame w-[290px] rounded-[28px] px-6 pt-6 pb-10 text-center flex flex-col items-center relative bg-white">
+                <!-- ✨ PRINTABLE STANDEE CARD ✨ -->
+                <div id="printable-standee" class="standee-frame w-[290px] rounded-[28px] px-6 pt-6 pb-8 text-center flex flex-col items-center relative bg-white">
                     
-                    <!-- Multi-color Google 'G' SVG -->
                     <div class="w-14 h-14 mb-2 flex items-center justify-center">
                         <svg viewBox="0 0 48 48" class="w-12 h-12">
                             <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -266,7 +253,6 @@
                         <span class="text-[#4285F4]">G</span><span class="text-[#EA4335]">o</span><span class="text-[#FBBC05]">o</span><span class="text-[#4285F4]">g</span><span class="text-[#34A853]">l</span><span class="text-[#EA4335]">e</span>
                     </div>
 
-                    <!-- 5 Golden Stars -->
                     <div class="flex items-center justify-center gap-1.5 text-[#FBBF24] text-xl mb-3">
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
@@ -280,16 +266,14 @@
 
                     <div class="w-full h-px bg-gray-200 mb-3"></div>
 
-                    <!-- QR Code Box -->
                     <div class="bg-white p-2.5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-center mb-1">
                         <div id="standee-qr-container" class="w-[148px] h-[148px] flex items-center justify-center"></div>
                     </div>
 
-                    <p class="text-[12px] font-extrabold text-[#111827] mt-2.5">Scan here</p>
-                    <p id="standee-shop-name" class="text-[11px] font-black uppercase tracking-widest text-[#D4AF37] mt-1 mb-2 truncate max-w-[240px] leading-relaxed">STORE NAME</p>
+                    <!-- Shop Name Removed, only Scan Here remains -->
+                    <p class="text-[13px] font-extrabold text-[#111827] mt-3 mb-2">Scan here</p>
                 </div>
 
-                <!-- URL Preview Pill -->
                 <div class="w-full bg-white rounded-2xl border border-gray-200 p-2 flex items-center justify-between gap-2 shadow-sm">
                     <div class="flex items-center gap-2 min-w-0 pl-2">
                         <i class="fas fa-link text-blue-600 text-xs shrink-0"></i>
@@ -300,27 +284,22 @@
                     </button>
                 </div>
 
-                <!-- ✨ 3 ACTION BUTTONS BELOW QR: DOWNLOAD, SHARE, COPY LINK ✨ -->
                 <div class="grid grid-cols-3 gap-2.5 w-full">
-                    <!-- 1. Download Standee PDF -->
                     <button onclick="downloadStandeeQr(event)" class="bg-[#111827] hover:bg-black text-white font-bold py-3.5 px-2 rounded-2xl text-xs flex flex-col items-center justify-center gap-1.5 shadow-md active:scale-95 transition">
                         <i class="fas fa-file-pdf text-base text-amber-400"></i>
                         <span>Download QR</span>
                     </button>
 
-                    <!-- 2. Share Link (Native / WhatsApp) -->
                     <button onclick="shareClientLink()" class="bg-[#16A34A] hover:bg-green-700 text-white font-bold py-3.5 px-2 rounded-2xl text-xs flex flex-col items-center justify-center gap-1.5 shadow-md active:scale-95 transition">
                         <i class="fas fa-share-alt text-base"></i>
                         <span>Share Link</span>
                     </button>
 
-                    <!-- 3. Copy Link -->
                     <button onclick="copyClientLink()" class="bg-white hover:bg-gray-50 text-[#111827] border border-gray-200 font-bold py-3.5 px-2 rounded-2xl text-xs flex flex-col items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
                         <i class="fas fa-copy text-base text-blue-600"></i>
                         <span>Copy Link</span>
                     </button>
                 </div>
-
             </div>
         </div>
     </div>
@@ -340,7 +319,6 @@
         let feedbackUnsubscribe = null;
         let clientReviewUrl = "";
 
-        // Build exact client.html URL dynamically
         function buildClientUrl() {
             let baseUrl = window.location.href.split('?')[0];
             if (baseUrl.includes('shopkeeper.html')) {
@@ -351,7 +329,6 @@
             return `${baseUrl}?shop=${encodeURIComponent(currentShopId)}`;
         }
 
-        // Initialize Shopkeeper Page
         async function initShopkeeperHub() {
             clientReviewUrl = buildClientUrl();
             document.getElementById('client-url-display').innerText = clientReviewUrl.replace(/^https?:\/\//, '');
@@ -362,9 +339,7 @@
                     globalShopData = doc.data();
                     const sName = globalShopData.shopName || "My Store";
                     document.getElementById('header-shop-name').innerText = sName;
-                    document.getElementById('standee-shop-name').innerText = sName;
 
-                    // Pre-fill Google Review Link (or fallback to googleMapLink)
                     const savedRevLink = globalShopData.googleReviewLink || globalShopData.googleMapLink || "";
                     document.getElementById('google-review-url-input').value = savedRevLink;
                     updateLinkBadge(savedRevLink);
@@ -373,7 +348,6 @@
                 console.error("Error loading shop details:", err);
             }
 
-            // Start Real-time Listener for 1-3 Star Private Feedback
             listenToPrivateFeedback();
         }
 
@@ -388,7 +362,6 @@
             }
         }
 
-        // Save Google Review URL to shops/{shopId}
         async function saveGoogleReviewLink(e) {
             const input = document.getElementById('google-review-url-input');
             const urlVal = input.value.trim();
@@ -414,7 +387,6 @@
             }
         }
 
-        // Real-time Firestore listener for 1-3 Star Feedback
         function listenToPrivateFeedback() {
             if (feedbackUnsubscribe) feedbackUnsubscribe();
 
@@ -483,7 +455,6 @@
                 const rating = Number(item.rating) || 1;
                 const isResolved = item.status === 'resolved';
                 
-                // Format Timestamp
                 let dateStr = "Just now";
                 if (item.createdAt && item.createdAt.toDate) {
                     const dt = item.createdAt.toDate();
@@ -491,7 +462,6 @@
                               " • " + dt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
                 }
 
-                // Star Colors
                 let badgeStyle = "bg-rose-50 text-rose-600 border-rose-200";
                 if (rating === 2) badgeStyle = "bg-orange-50 text-orange-600 border-orange-200";
                 if (rating === 3) badgeStyle = "bg-amber-50 text-amber-700 border-amber-200";
@@ -562,7 +532,6 @@
             }
         }
 
-        // ================= QR MODAL & SHARE/DOWNLOAD/COPY FUNCTIONS =================
         function openQrModal() {
             const qrBox = document.getElementById('standee-qr-container');
             qrBox.innerHTML = "";
@@ -621,7 +590,6 @@
             }
         }
 
-        // Updated PDF Download Function (No Clipping)
         async function downloadStandeeQr(e) {
             const btn = e.currentTarget;
             const orig = btn.innerHTML;
@@ -631,19 +599,17 @@
             const standeeEl = document.getElementById('printable-standee');
             
             try {
-                // html2canvas configuration fixed to prevent scroll clipping
                 const canvas = await html2canvas(standeeEl, {
                     scale: 3,
                     backgroundColor: "#ffffff",
                     useCORS: true,
-                    scrollY: -window.scrollY // Very important to stop bottom cut-off
+                    scrollY: -window.scrollY 
                 });
 
                 const imgData = canvas.toDataURL('image/png');
                 const { jsPDF } = window.jspdf;
                 
-                // Keep dimensions strictly mapped to the generated canvas size
-                const pdfWidth = 100; // millimeters
+                const pdfWidth = 100; 
                 const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
                 const pdf = new jsPDF({

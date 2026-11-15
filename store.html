@@ -722,6 +722,61 @@ button.bg-green-700,button.bg-green-800,
 }
 </style>
 
+
+<style id="netaji-purple-red-green-shine-v6">
+/* Discount labels: confident red, high contrast */
+#products-grid .grid-item .aspect-square>div[class*="DC2626"],
+#products-grid .grid-item .aspect-square>div[class*="red-50"],
+#detail-discount-badge{
+ background:linear-gradient(110deg,#d92d3a,#a9152c)!important;
+ color:#fff!important;border:1px solid rgba(255,255,255,.55)!important;
+ box-shadow:0 4px 12px rgba(174,25,47,.25)!important;
+ text-shadow:0 1px 3px rgba(75,0,12,.28)!important;
+}
+#products-grid .grid-item .aspect-square>div[class*="DC2626"],
+#products-grid .grid-item .aspect-square>div[class*="red-50"]{
+ position:absolute!important;overflow:hidden!important;isolation:isolate!important;
+}
+#products-grid .grid-item .aspect-square>div[class*="DC2626"]:after,
+#products-grid .grid-item .aspect-square>div[class*="red-50"]:after,
+#detail-discount-badge:after{
+ content:""!important;position:absolute!important;top:-70%!important;bottom:-70%!important;
+ left:-55%!important;width:38%!important;pointer-events:none!important;
+ transform:skewX(-22deg)!important;
+ background:linear-gradient(90deg,transparent,rgba(255,255,255,.72),transparent)!important;
+ animation:netajiTagShine 3.2s ease-in-out infinite!important;
+}
+@keyframes netajiTagShine{
+ 0%,38%{left:-55%;opacity:0}
+ 48%{opacity:1}
+ 76%,100%{left:130%;opacity:0}
+}
+/* Add to Cart: clean emerald green, distinct from purple brand theme */
+#products-grid .grid-item>div:last-child>div button:first-child{
+ background:linear-gradient(135deg,#238653,#12633f)!important;
+ color:#fff!important;border:1px solid rgba(255,255,255,.22)!important;
+ box-shadow:0 5px 13px rgba(18,99,63,.17)!important;
+}
+#products-grid .grid-item>div:last-child>div button:first-child i{color:#fff!important}
+#products-grid .grid-item>div:last-child>div button:first-child:active{
+ filter:brightness(.94)!important
+}
+/* Every prominent business/product tag gets a subtle glossy sweep */
+#premium-biz-badge>div{
+ box-shadow:0 4px 14px rgba(88,48,128,.28),inset 0 1px 0 rgba(255,255,255,.42)!important
+}
+#premium-biz-badge>div:after{
+ animation:netajiTagShine 3.2s ease-in-out infinite!important
+}
+@media(prefers-reduced-motion:reduce){
+ #products-grid .grid-item .aspect-square>div[class*="DC2626"]:after,
+ #products-grid .grid-item .aspect-square>div[class*="red-50"]:after,
+ #detail-discount-badge:after,#premium-biz-badge>div:after{
+  animation:none!important;display:none!important
+ }
+}
+</style>
+
 </head>
 <body class="font-sans text-gray-800 pb-24 selection:bg-purple-200">
 

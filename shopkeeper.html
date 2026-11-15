@@ -247,7 +247,8 @@
             <div class="p-5 overflow-y-auto space-y-5 flex flex-col items-center">
                 
                 <!-- ✨ PRINTABLE STANDEE CARD (Exact match to your photo) ✨ -->
-                <div id="printable-standee" class="standee-frame w-[290px] rounded-[28px] p-6 text-center flex flex-col items-center relative">
+                <!-- PADDING FIX: px-6 pt-6 pb-10 aur text me mb-2 add kiya hai taki bottom se cut na ho -->
+                <div id="printable-standee" class="standee-frame w-[290px] rounded-[28px] px-6 pt-6 pb-10 text-center flex flex-col items-center relative bg-white">
                     
                     <!-- Multi-color Google 'G' SVG -->
                     <div class="w-14 h-14 mb-2 flex items-center justify-center">
@@ -280,12 +281,12 @@
                     <div class="w-full h-px bg-gray-200 mb-3"></div>
 
                     <!-- QR Code Box -->
-                    <div class="bg-white p-2.5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-center">
+                    <div class="bg-white p-2.5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-center mb-1">
                         <div id="standee-qr-container" class="w-[148px] h-[148px] flex items-center justify-center"></div>
                     </div>
 
                     <p class="text-[12px] font-extrabold text-[#111827] mt-2.5">Scan here</p>
-                    <p id="standee-shop-name" class="text-[10px] font-black uppercase tracking-widest text-[#D4AF37] mt-1 truncate max-w-[240px]">STORE NAME</p>
+                    <p id="standee-shop-name" class="text-[11px] font-black uppercase tracking-widest text-[#D4AF37] mt-1 mb-2 truncate max-w-[240px] leading-relaxed">STORE NAME</p>
                 </div>
 
                 <!-- URL Preview Pill -->

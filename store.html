@@ -4168,3 +4168,66 @@ function toggleStoreReviewDislike(reviewId, btnElement) {
 </body>
 </html>
 
+
+<style id="netaji-profile-alignment-and-readmore-fix">
+/* Align the shop logo and the rating / orders / followers card on the same top line */
+main>section:first-child>div:first-child{
+  align-items:start!important;
+}
+main>section:first-child>div:first-child>div:last-child{
+  align-self:start!important;
+  margin-top:0!important;
+}
+/* Keep the three statistics evenly distributed and vertically centered */
+main>section:first-child>div:first-child>div:last-child>div{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:64px!important;
+}
+/* Read more / Read less should look like quiet inline text, not a highlighted button */
+#desc-toggle-btn,
+#detail-desc-toggle-btn{
+  display:inline!important;
+  width:auto!important;
+  min-width:0!important;
+  min-height:0!important;
+  padding:0!important;
+  margin:0 0 0 4px!important;
+  border:0!important;
+  border-radius:0!important;
+  outline:0!important;
+  background:transparent!important;
+  background-image:none!important;
+  box-shadow:none!important;
+  color:#526b91!important;
+  font-size:inherit!important;
+  line-height:inherit!important;
+  font-weight:750!important;
+  letter-spacing:0!important;
+  text-transform:none!important;
+  text-shadow:none!important;
+  vertical-align:baseline!important;
+  cursor:pointer!important;
+  -webkit-appearance:none!important;
+  appearance:none!important;
+}
+#desc-toggle-btn:hover,
+#detail-desc-toggle-btn:hover,
+#desc-toggle-btn:focus,
+#detail-desc-toggle-btn:focus,
+#desc-toggle-btn:active,
+#detail-desc-toggle-btn:active{
+  background:transparent!important;
+  background-image:none!important;
+  box-shadow:none!important;
+  color:#354d70!important;
+  outline:none!important;
+  transform:none!important;
+}
+#desc-toggle-btn.hidden,
+#detail-desc-toggle-btn.hidden{
+  display:none!important;
+}
+</style>

@@ -4231,3 +4231,80 @@ main>section:first-child>div:first-child>div:last-child>div{
   display:none!important;
 }
 </style>
+
+
+<!-- FINAL UI OVERRIDES: clean description toggle + forest-green order actions -->
+<style id="netaji-final-ui-fixes-v2">
+/* Read more / Read less: remove every button-like highlight, including Android tap/focus */
+#product-details-page button#detail-desc-toggle-btn,
+button#desc-toggle-btn,
+button#detail-desc-toggle-btn {
+  all: unset !important;
+  display: inline !important;
+  margin: 0 0 0 4px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  color: #5b4380 !important;
+  font: inherit !important;
+  font-weight: 800 !important;
+  line-height: inherit !important;
+  text-decoration: none !important;
+  text-shadow: none !important;
+  vertical-align: baseline !important;
+  cursor: pointer !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+#product-details-page button#detail-desc-toggle-btn:hover,
+#product-details-page button#detail-desc-toggle-btn:focus,
+#product-details-page button#detail-desc-toggle-btn:focus-visible,
+#product-details-page button#detail-desc-toggle-btn:active,
+button#desc-toggle-btn:hover, button#desc-toggle-btn:focus,
+button#desc-toggle-btn:focus-visible, button#desc-toggle-btn:active,
+button#detail-desc-toggle-btn:hover, button#detail-desc-toggle-btn:focus,
+button#detail-desc-toggle-btn:focus-visible, button#detail-desc-toggle-btn:active {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  color: #3f3154 !important;
+  transform: none !important;
+}
+button#desc-toggle-btn.hidden, button#detail-desc-toggle-btn.hidden {
+  display: none !important;
+}
+
+/* Match the sticky Order Now action to the forest-green Book Now theme */
+#product-details-page button#detail-order-btn,
+#products-grid button[onclick*="openOrderModal"] {
+  background: linear-gradient(135deg, #205b41 0%, #123c2b 100%) !important;
+  background-color: #174a35 !important;
+  background-image: linear-gradient(135deg, #205b41 0%, #123c2b 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 8px 20px rgba(23,75,56,.18) !important;
+  text-shadow: none !important;
+}
+#product-details-page button#detail-order-btn:hover,
+#product-details-page button#detail-order-btn:focus,
+#product-details-page button#detail-order-btn:active,
+#products-grid button[onclick*="openOrderModal"]:hover,
+#products-grid button[onclick*="openOrderModal"]:focus,
+#products-grid button[onclick*="openOrderModal"]:active {
+  background: linear-gradient(135deg, #205b41 0%, #123c2b 100%) !important;
+  background-color: #174a35 !important;
+  background-image: linear-gradient(135deg, #205b41 0%, #123c2b 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 16px rgba(23,75,56,.16) !important;
+  outline: none !important;
+}
+</style>

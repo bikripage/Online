@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101827">
+  <title>Share Your Experience | BikriPage</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <style>
+    :root { --ink:#111827; --muted:#64748b; --line:#e8edf3; --blue:#2563eb; }
+    * { -webkit-tap-highlight-color:transparent; }
+    body { background:#f3f5f9; color:var(--ink); font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    .glass { background:rgba(255,255,255,.88); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
+    .panel { background:#fff; border:1px solid var(--line); border-radius:26px; box-shadow:0 12px 35px rgba(15,23,42,.055); }
+    .star { color:#d5dbe4; transition:transform .18s ease,color .18s ease; }
+    .star.active { color:#f5ad24; }
+    .star:active { transform:scale(.88); }
+    .btn { transition:transform .18s ease,background .18s ease,box-shadow .18s ease; }
+    .btn:active { transform:scale(.98); }
+    .fade-up { animation:fadeUp .45s cubic-bezier(.2,.8,.2,1) both; }
+    @keyframes fadeUp { from {opacity:0;transform:translateY(14px)} to {opacity:1;transform:translateY(0)} }
+    .safe-bottom { padding-bottom:max(24px,env(safe-area-inset-bottom)); }
+    textarea { resize:vertical; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <header class="glass sticky top-0 z-30 border-b border-slate-200/70">
+    <div class="max-w-xl mx-auto px-5 h-[66px] flex items-center justify-between">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 rounded-2xl bg-slate-900 text-amber-300 flex items-center justify-center shadow-sm">
+          <i class="fa-solid fa-store"></i>
+        </div>
+        <div class="min-w-0">
+          <p class="text-[10px] uppercase tracking-[.18em] text-slate-400 font-extrabold">BikriPage</p>
+          <p id="header-shop-name" class="font-extrabold text-sm truncate">Loading store…</p>
+        </div>
+      </div>
+      <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-3 py-1.5">
+        <i class="fa-solid fa-shield-check mr-1"></i> Customer feedback
+      </span>
+    </div>
+  </header>
+
+  <main class="max-w-xl mx-auto px-4 pt-7 pb-12 safe-bottom">
+    <section class="fade-up text-center mb-6">
+      <div class="inline-flex items-center gap-2 bg-white border border-slate-200 rounded-full px-3.5 py-2 text-[11px] font-bold text-slate-500 shadow-sm mb-4">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        Your opinion matters
+      </div>
+      <h1 class="text-[30px] leading-[1.12] font-black tracking-tight text-slate-900">How was your<br><span class="text-blue-600">experience?</span></h1>
+      <p id="hero-shop-name" class="text-sm text-slate-500 mt-3 leading-relaxed">Tell us how we did. Your honest feedback helps this store improve.</p>
+    </section>
+
+    <section id="main-card" class="panel p-5 sm:p-7 fade-up">
+      <div class="flex items-center gap-3 pb-5 border-b border-slate-100">
+        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
+          <i class="fa-regular fa-face-smile"></i>
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-extrabold text-slate-900">Rate your experience</p>
+          <p class="text-xs text-slate-500 mt-0.5">Choose a rating from 1 to 5 stars</p>
+        </div>
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Step 1 of 1</span>
+      </div>
+
+      <div class="py-7 text-center">
+        <div id="star-picker" class="flex justify-center gap-2 sm:gap-3" role="group" aria-label="Choose your rating">
+          <button class="star text-[39px] sm:text-[43px]" type="button" data-rating="1" aria-label="1 star"><i class="fa-solid fa-star"></i></button>
+          <button class="star text-[39px] sm:text-[43px]" type="button" data-rating="2" aria-label="2 stars"><i class="fa-solid fa-star"></i></button>
+          <button class="star text-[39px] sm:text-[43px]" type="button" data-rating="3" aria-label="3 stars"><i class="fa-solid fa-star"></i></button>
+          <button class="star text-[39px] sm:text-[43px]" type="button" data-rating="4" aria-label="4 stars"><i class="fa-solid fa-star"></i></button>
+          <button class="star text-[39px] sm:text-[43px]" type="button" data-rating="5" aria-label="5 stars"><i class="fa-solid fa-star"></i></button>
+        </div>
+        <p id="rating-label" class="text-sm font-bold text-slate-400 mt-3">Tap a star to rate us</p>
+      </div>
+
+      <div id="feedback-area" class="hidden border-t border-slate-100 pt-5">
+        <label for="customer-message" class="block text-sm font-extrabold text-slate-900 mb-1">Anything you'd like us to know?</label>
+        <p class="text-xs text-slate-500 mb-3">Optional. Share what went well or what we could improve.</p>
+        <textarea id="customer-message" rows="4" maxlength="1000" placeholder="Write your feedback here…" class="w-full rounded-2xl bg-slate-50 border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none p-4 text-sm text-slate-800 placeholder:text-slate-400"></textarea>
+        <div class="flex items-center justify-between mt-2 mb-5">
+          <span class="text-[10px] text-slate-400">Please don't include sensitive personal information.</span>
+          <span id="char-count" class="text-[10px] text-slate-400">0/1000</span>
+        </div>
+
+        <button id="private-submit" type="button" class="btn w-full rounded-2xl bg-slate-900 hover:bg-black text-white font-extrabold text-sm h-[52px] flex items-center justify-center gap-2 shadow-lg shadow-slate-900/10">
+          <i class="fa-regular fa-paper-plane"></i> Send feedback to the store
+        </button>
+        <div class="relative flex items-center gap-3 my-5">
+          <div class="h-px bg-slate-100 flex-1"></div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Or</span><div class="h-px bg-slate-100 flex-1"></div>
+        </div>
+        <button id="google-button" type="button" class="btn w-full rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-extrabold text-sm h-[52px] flex items-center justify-center gap-2">
+          <i class="fa-brands fa-google text-lg"></i> Continue to Google
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400"></i>
+        </button>
+        <p class="text-[10px] text-center text-slate-400 leading-relaxed mt-3">You can share an honest Google review regardless of the rating you selected. Google reviews are public and subject to Google's policies.</p>
+      </div>
+    </section>
+
+    <section class="mt-4 grid grid-cols-2 gap-3">
+      <div class="bg-white/75 border border-slate-200/80 rounded-2xl p-4">
+        <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2"><i class="fa-solid fa-lock text-xs"></i></div>
+        <p class="text-xs font-extrabold text-slate-800">Your choice</p>
+        <p class="text-[10px] text-slate-500 leading-relaxed mt-1">Private feedback is sent to the store only.</p>
+      </div>
+      <div class="bg-white/75 border border-slate-200/80 rounded-2xl p-4">
+        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-2"><i class="fa-solid fa-star text-xs"></i></div>
+        <p class="text-xs font-extrabold text-slate-800">Honest reviews</p>
+        <p class="text-[10px] text-slate-500 leading-relaxed mt-1">Google reviews are optional and public.</p>
+      </div>
+    </section>
+
+    <footer class="text-center pt-7">
+      <p class="text-[10px] text-slate-400 font-medium">Powered by <span class="font-black text-slate-600">BikriPage</span></p>
+      <p class="text-[10px] text-slate-400 mt-1">Thank you for taking a moment to help us grow.</p>
+    </footer>
+  </main>
+
+  <div id="toast" class="fixed left-1/2 bottom-6 -translate-x-1/2 translate-y-5 opacity-0 pointer-events-none z-50 bg-slate-900 text-white rounded-full px-5 py-3 text-xs font-bold shadow-xl transition-all duration-300 whitespace-nowrap">
+    <i class="fa-solid fa-check-circle text-emerald-400 mr-2"></i><span id="toast-text">Done</span>
+  </div>
+
+  <div id="loading-screen" class="fixed inset-0 z-[60] bg-[#f3f5f9] flex items-center justify-center p-6">
+    <div class="text-center">
+      <div class="w-12 h-12 rounded-2xl bg-slate-900 text-amber-300 flex items-center justify-center mx-auto mb-4 shadow-lg"><i class="fa-solid fa-store"></i></div>
+      <i class="fa-solid fa-circle-notch fa-spin text-blue-600 text-xl"></i>
+      <p class="text-sm font-bold text-slate-700 mt-3">Loading store details…</p>
+    </div>
+  </div>
+
+  <script>
+    // Same Firebase project as shopkeeper.html
+    const firebaseConfig = {
+      apiKey: "AIzaSyCWquftO39vqj83ZtYqtF_sDfkHVNpjd3k",
+      authDomain: "bikripage-3aba6.firebaseapp.com",
+      projectId: "bikripage-3aba6",
+      storageBucket: "bikripage-3aba6.firebasestorage.app",
+      messagingSenderId: "900882116436",
+      appId: "1:900882116436:web:8a521d0308347ddcccdc92",
+      measurementId: "G-ZP8L3S5R66"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const params = new URLSearchParams(window.location.search);
+    const shopId = (params.get("shop") || "").trim();
+    let shopData = {};
+    let selectedRating = 0;
+    let googleReviewUrl = "";
+
+    const ratingLabels = {
+      1: "We're sorry — tell us how we can improve.",
+      2: "Thanks for your honesty. What could be better?",
+      3: "Thanks! Tell us how we can improve.",
+      4: "Glad you had a good experience!",
+      5: "That's wonderful! Thank you for your support."
+    };
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toast-text").textContent = message;
+      toast.classList.remove("opacity-0", "translate-y-5");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.add("opacity-0", "translate-y-5"), 2600);
+    }
+
+    function showFatal(message) {
+      document.getElementById("loading-screen").innerHTML = `
+        <div class="text-center max-w-sm">
+          <div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-4 text-xl"><i class="fa-solid fa-store-slash"></i></div>
+          <h2 class="font-black text-slate-900 text-lg">Store unavailable</h2>
+          <p class="text-sm text-slate-500 mt-2">${message}</p>
+          <p class="text-xs text-slate-400 mt-4">Please scan the store's QR code again or contact the store.</p>
+        </div>`;
+    }
+
+    function safeHttpUrl(value) {
+      try {
+        const url = new URL(value);
+        return url.protocol === "https:" || url.protocol === "http:" ? url.href : "";
+      } catch (_) { return ""; }
+    }
+
+    async function loadShop() {
+      if (!shopId) {
+        showFatal("This review link is missing its store ID.");
+        return;
+      }
+
+      try {
+        const doc = await db.collection("shops").doc(shopId).get();
+        if (!doc.exists) {
+          showFatal("We couldn't find this store. The QR code may be outdated.");
+          return;
+        }
+
+        shopData = doc.data() || {};
+        const shopName = shopData.shopName || "Our Store";
+        googleReviewUrl = safeHttpUrl(shopData.googleReviewLink || shopData.googleMapLink || "");
+
+        document.title = `Share Your Experience | ${shopName}`;
+        document.getElementById("header-shop-name").textContent = shopName;
+        document.getElementById("hero-shop-name").textContent =
+          `Tell ${shopName} how they did. Your honest feedback helps the store improve.`;
+
+        document.getElementById("loading-screen").classList.add("hidden");
+        document.getElementById("google-button").disabled = !googleReviewUrl;
+        if (!googleReviewUrl) {
+          document.getElementById("google-button").classList.add("opacity-50", "cursor-not-allowed");
+          document.getElementById("google-button").title = "The store has not added a Google review link yet.";
+        }
+      } catch (error) {
+        console.error("Shop load error:", error);
+        showFatal("We couldn't load the store details right now. Please try again later.");
+      }
+    }
+
+    function selectRating(rating) {
+      selectedRating = rating;
+      document.querySelectorAll("#star-picker .star").forEach(button => {
+        const value = Number(button.dataset.rating);
+        button.classList.toggle("active", value <= rating);
+        button.setAttribute("aria-pressed", value === rating ? "true" : "false");
+      });
+      document.getElementById("rating-label").textContent = ratingLabels[rating];
+      document.getElementById("rating-label").className = "text-sm font-bold mt-3 " + (rating <= 2 ? "text-rose-600" : "text-slate-700");
+      document.getElementById("feedback-area").classList.remove("hidden");
+      document.getElementById("feedback-area").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    document.querySelectorAll("#star-picker .star").forEach(button => {
+      button.addEventListener("click", () => selectRating(Number(button.dataset.rating)));
+    });
+
+    document.getElementById("customer-message").addEventListener("input", event => {
+      document.getElementById("char-count").textContent = `${event.target.value.length}/1000`;
+    });
+
+    document.getElementById("private-submit").addEventListener("click", async () => {
+      if (!selectedRating) {
+        showToast("Please select a star rating first.");
+        return;
+      }
+
+      const button = document.getElementById("private-submit");
+      const message = document.getElementById("customer-message").value.trim();
+      const original = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Sending…';
+
+      try {
+        await db.collection("shops").doc(shopId).collection("privateFeedback").add({
+          rating: selectedRating,
+          message: message,
+          status: "unread",
+          source: "client_qr",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        document.getElementById("main-card").innerHTML = `
+          <div class="text-center py-8 fade-up">
+            <div class="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mx-auto mb-4"><i class="fa-solid fa-check"></i></div>
+            <h2 class="text-xl font-black text-slate-900">Thank you for your feedback!</h2>
+            <p class="text-sm text-slate-500 leading-relaxed mt-2">Your message has been sent to ${escapeHtml(shopData.shopName || "the store")}.</p>
+            <p class="text-xs text-slate-400 mt-5">Your feedback helps the store serve customers better.</p>
+            ${googleReviewUrl ? '<button id="success-google-button" class="btn mt-6 w-full rounded-2xl bg-slate-900 text-white font-extrabold text-sm h-[52px]"><i class="fa-brands fa-google mr-2"></i> Also share on Google</button>' : ""}
+          </div>`;
+        const successGoogle = document.getElementById("success-google-button");
+        if (successGoogle) successGoogle.addEventListener("click", openGoogleReview);
+      } catch (error) {
+        console.error("Feedback submit error:", error);
+        showToast("Couldn't send feedback. Please try again.");
+        button.disabled = false;
+        button.innerHTML = original;
+      }
+    });
+
+    function openGoogleReview() {
+      if (!googleReviewUrl) {
+        showToast("Google review link is not available yet.");
+        return;
+      }
+      window.open(googleReviewUrl, "_blank", "noopener,noreferrer");
+    }
+
+    document.getElementById("google-button").addEventListener("click", openGoogleReview);
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
+      }[char]));
+    }
+
+    loadShop();
+  </script>
+</body>
+</html>

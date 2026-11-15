@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        // 🚨 CRITICAL GATEKEEPER: Agar active shop ki ID nahi hai, toh login/index par bhej do
+        const urlParamsGate = new URLSearchParams(window.location.search);
+        const gateShopId = urlParamsGate.get('shop') || localStorage.getItem('BikriPage_active_shop');
+        if (!gateShopId) {
+            window.location.replace('index.html');
+        } else {
+            localStorage.setItem('BikriPage_active_shop', gateShopId);
+        }
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart Review Hub | BikriPage</title>
+
+    <!-- Tailwind, FontAwesome, HTML2Canvas & QRCode.js -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <!-- Firebase v8 SDKs (Same as BikriPage) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCWquftO39vqj83ZtYqtF_sDfkHVNpjd3k",
+            authDomain: "bikripage-3aba6.firebaseapp.com",
+            projectId: "bikripage-3aba6",
+            storageBucket: "bikripage-3aba6.firebasestorage.app",
+            messagingSenderId: "900882116436",
+            appId: "1:900882116436:web:8a521d0308347ddcccdc92",
+            measurementId: "G-ZP8L3S5R66"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+    </script>
+
+    <style>
+        :root { --ios-spring: cubic-bezier(0.25, 1, 0.5, 1); }
+        body { background-color: #F2F2F7; -webkit-tap-highlight-color: transparent; }
+        .glass-nav { background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .ios-card { background: #FFFFFF; border-radius: 24px; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04); }
+        .ios-input { background: #F7F7F9; border-radius: 16px; transition: all 0.3s var(--ios-spring); }
+        .ios-input:focus-within { background: #FFFFFF; box-shadow: 0 0 0 2px #2563EB; }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(16px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .animate-slide-up { animation: slideUp 0.45s var(--ios-spring) forwards; }
+
+        /* Standee Golden Border Effect */
+        .standee-frame {
+            background: #FFFFFF;
+            border: 6px solid #D4AF37;
+            box-shadow: inset 0 0 0 2px rgba(212, 175, 55, 0.2), 0 20px 40px rgba(0,0,0,0.12);
+        }
+    </style>
+</head>
+<body class="font-sans min-h-screen text-[#111827] pb-24">
+
+    <!-- ================= TOP HEADER ================= -->
+    <header class="h-[68px] glass-nav border-b border-[#E5E7EB] flex items-center justify-between px-4 sm:px-8 sticky top-0 z-40">
+        <div class="flex items-center gap-3 min-w-0">
+            <a href="dashboard.html" class="w-10 h-10 rounded-xl bg-[#F7F7F9] hover:bg-[#E5E7EB] flex items-center justify-center text-[#111827] active:scale-95 transition shrink-0 border border-[#E5E7EB]">
+                <i class="fas fa-arrow-left text-sm"></i>
+            </a>
+            <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                    <h1 id="header-shop-name" class="text-[15px] sm:text-[17px] font-black text-[#111827] tracking-tight truncate">Loading Store...</h1>
+                    <span class="bg-amber-50 text-amber-600 border border-amber-200 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">Review Hub</span>
+                </div>
+                <p class="text-[11px] text-[#6B7280] font-medium truncate">1-3★ Private Feedback • 4-5★ Google Boost</p>
+            </div>
+        </div>
+
+        <!-- ✨ QR SVG ICON BUTTON (Click karne par QR Modal khulega) ✨ -->
+        <button onclick="openQrModal()" title="Open Review QR Code" class="relative group bg-[#111827] hover:bg-black text-white px-3.5 sm:px-4 h-11 rounded-[14px] flex items-center gap-2.5 shadow-[0_4px_14px_rgba(17,24,39,0.2)] active:scale-95 transition shrink-0">
+            <!-- Custom Crisp QR SVG -->
+            <svg class="w-5 h-5 text-[#FBBF24] group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                <path d="M7 7h.01"></path>
+                <path d="M17 7h.01"></path>
+                <path d="M7 17h.01"></path>
+                <path d="M17 17h.01"></path>
+            </svg>
+            <span class="text-xs font-bold tracking-wide">Review QR</span>
+        </button>
+    </header>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 pt-6 space-y-6">
+
+        <!-- 1. HERO BANNER + QUICK QR TRIGGER -->
+        <div class="bg-[#111827] rounded-[28px] p-6 text-white relative overflow-hidden shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+            <div class="absolute -right-12 -top-12 w-52 h-52 bg-gradient-to-br from-amber-400 to-blue-500 opacity-20 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="relative z-10">
+                <div class="inline-flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full text-[11px] font-bold text-amber-300 mb-2.5">
+                    <i class="fas fa-shield-alt"></i> Smart Rating Shield Active
+                </div>
+                <h2 class="text-2xl font-black tracking-tight leading-tight">Grow Your 5-Star Google Rating ⭐</h2>
+                <p class="text-xs sm:text-sm text-gray-400 font-medium mt-1 max-w-md">
+                    4–5 star ratings go straight to Google with swipeable pre-filled reviews. 1–3 star complaints come privately to your inbox below.
+                </p>
+            </div>
+
+            <div class="relative z-10 flex gap-2.5 w-full sm:w-auto shrink-0">
+                <button onclick="openQrModal()" class="flex-1 sm:flex-initial bg-white text-[#111827] hover:bg-gray-100 font-black text-xs sm:text-sm px-5 h-12 rounded-[16px] flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
+                    <svg class="w-4 h-4 text-[#111827]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                        <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                        <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                        <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                    </svg>
+                    Show Standee QR
+                </button>
+                <button onclick="previewClientPage()" title="Test Customer Page" class="w-12 h-12 bg-white/10 hover:bg-white/20 text-white rounded-[16px] flex items-center justify-center active:scale-95 transition shrink-0 border border-white/10">
+                    <i class="fas fa-external-link-alt text-sm"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. GOOGLE REVIEW LINK CONFIGURATION -->
+        <div class="ios-card p-5 sm:p-6 border border-[#E5E7EB]">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                        <i class="fab fa-google"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-black text-[#111827]">Google Review Redirect Link</h3>
+                        <p class="text-[11px] text-[#6B7280] font-medium">4 & 5 star customers will be sent to this Google review page</p>
+                    </div>
+                </div>
+                <span id="link-status-badge" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 w-fit">Checking...</span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-2.5 mt-3">
+                <div class="flex-1 ios-input flex items-center px-4 h-12 border border-[#E5E7EB]">
+                    <i class="fas fa-link text-gray-400 text-xs mr-3"></i>
+                    <input type="url" id="google-review-url-input" placeholder="Paste your Google Business Review link (e.g. https://g.page/r/.../review)" class="w-full bg-transparent outline-none text-xs sm:text-sm font-bold text-[#111827]">
+                </div>
+                <button onclick="saveGoogleReviewLink(event)" class="bg-[#2563EB] hover:bg-blue-700 text-white font-bold text-xs sm:text-sm px-6 h-12 rounded-[16px] active:scale-95 transition shadow-sm flex items-center justify-center gap-2 shrink-0">
+                    <i class="fas fa-save"></i> Save Link
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. STATS OVERVIEW CARDS -->
+        <div class="grid grid-cols-3 gap-3 sm:gap-4">
+            <div class="ios-card p-4 border border-[#E5E7EB]">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-[#6B7280]">Total Feedback</p>
+                <h3 id="stat-total" class="text-2xl sm:text-3xl font-black text-[#111827] mt-1">0</h3>
+                <p class="text-[10px] text-gray-400 font-medium mt-1">1–3★ Private Msgs</p>
+            </div>
+
+            <div class="ios-card p-4 border border-rose-100 bg-rose-50/40">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-rose-600">Needs Action</p>
+                <h3 id="stat-unread" class="text-2xl sm:text-3xl font-black text-rose-600 mt-1">0</h3>
+                <p class="text-[10px] text-rose-400 font-medium mt-1">Pending review</p>
+            </div>
+
+            <div class="ios-card p-4 border border-amber-100 bg-amber-50/40">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-amber-700">Avg Low Score</p>
+                <h3 id="stat-avg" class="text-2xl sm:text-3xl font-black text-amber-600 mt-1">—</h3>
+                <p class="text-[10px] text-amber-500 font-medium mt-1">Internal rating</p>
+            </div>
+        </div>
+
+        <!-- 4. LIVE PRIVATE FEEDBACK INBOX (1-3 STARS) -->
+        <div class="ios-card p-5 sm:p-6 border border-[#E5E7EB]">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E5E7EB] mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg border border-amber-100">
+                        <i class="fas fa-comment-dots"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-lg font-black text-[#111827]">What We Can Improve</h3>
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                        </div>
+                        <p class="text-xs text-[#6B7280] font-medium">Real-time private feedback from 1 to 3 star ratings</p>
+                    </div>
+                </div>
+
+                <!-- Filter Buttons -->
+                <div class="flex items-center gap-2">
+                    <select id="feedback-filter" onchange="renderFeedbackList()" class="bg-[#F7F7F9] border border-[#E5E7EB] rounded-xl px-3.5 h-10 text-xs font-bold text-[#111827] outline-none cursor-pointer">
+                        <option value="all">All Messages</option>
+                        <option value="unread">Needs Action</option>
+                        <option value="resolved">Resolved</option>
+                        <option value="1">1 Star Only</option>
+                        <option value="2">2 Stars Only</option>
+                        <option value="3">3 Stars Only</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Feedback List Container -->
+            <div id="feedback-list" class="space-y-3.5">
+                <div class="text-center py-12">
+                    <i class="fas fa-circle-notch fa-spin text-2xl text-blue-600 mb-3"></i>
+                    <p class="text-xs font-bold text-gray-400">Syncing live feedback from Firebase...</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- =================================================================
+         ✨ QR CODE STANDEE MODAL (WITH SHARE, DOWNLOAD & COPY LINK) ✨
+    ================================================================== -->
+    <div id="qr-modal" class="fixed inset-0 z-50 hidden flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-300 opacity-0" onclick="closeQrModal()">
+        <div id="qr-modal-card" onclick="event.stopPropagation()" class="bg-[#F2F2F7] w-full sm:w-[430px] rounded-t-[28px] sm:rounded-[28px] shadow-2xl transform translate-y-full sm:translate-y-0 sm:scale-95 transition-transform duration-300 overflow-hidden flex flex-col max-h-[94vh]">
+            
+            <!-- Mobile Pull Bar -->
+            <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mt-3 sm:hidden"></div>
+
+            <!-- Modal Header -->
+            <div class="px-6 pt-4 pb-3 flex items-center justify-between border-b border-gray-200/80 bg-white">
+                <div>
+                    <h3 class="text-[16px] font-black text-[#111827]">Google Review Standee QR</h3>
+                    <p class="text-[11px] text-gray-500 font-medium">Print or share with customers</p>
+                </div>
+                <button onclick="closeQrModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 active:scale-90 transition">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Scrollable Standee Preview + Actions -->
+            <div class="p-5 overflow-y-auto space-y-5 flex flex-col items-center">
+                
+                <!-- ✨ PRINTABLE STANDEE CARD (Exact match to your photo) ✨ -->
+                <div id="printable-standee" class="standee-frame w-[290px] rounded-[28px] p-6 text-center flex flex-col items-center relative">
+                    
+                    <!-- Multi-color Google 'G' SVG -->
+                    <div class="w-14 h-14 mb-2 flex items-center justify-center">
+                        <svg viewBox="0 0 48 48" class="w-12 h-12">
+                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                        </svg>
+                    </div>
+
+                    <h2 class="text-[22px] font-black text-[#1F2937] leading-tight tracking-tight">Review us</h2>
+                    <div class="text-[24px] font-black leading-tight tracking-tight mb-2">
+                        <span class="text-[#1F2937]">on </span>
+                        <span class="text-[#4285F4]">G</span><span class="text-[#EA4335]">o</span><span class="text-[#FBBC05]">o</span><span class="text-[#4285F4]">g</span><span class="text-[#34A853]">l</span><span class="text-[#EA4335]">e</span>
+                    </div>
+
+                    <!-- 5 Golden Stars -->
+                    <div class="flex items-center justify-center gap-1.5 text-[#FBBF24] text-xl mb-3">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+
+                    <p class="text-[13px] font-extrabold text-[#111827]">Loved your time with us?</p>
+                    <p class="text-[11px] font-semibold text-gray-500 mb-3">Your feedback makes our day!</p>
+
+                    <div class="w-full h-px bg-gray-200 mb-3"></div>
+
+                    <!-- QR Code Box -->
+                    <div class="bg-white p-2.5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-center">
+                        <div id="standee-qr-container" class="w-[148px] h-[148px] flex items-center justify-center"></div>
+                    </div>
+
+                    <p class="text-[12px] font-extrabold text-[#111827] mt-2.5">Scan here</p>
+                    <p id="standee-shop-name" class="text-[10px] font-black uppercase tracking-widest text-[#D4AF37] mt-1 truncate max-w-[240px]">STORE NAME</p>
+                </div>
+
+                <!-- URL Preview Pill -->
+                <div class="w-full bg-white rounded-2xl border border-gray-200 p-2 flex items-center justify-between gap-2 shadow-sm">
+                    <div class="flex items-center gap-2 min-w-0 pl-2">
+                        <i class="fas fa-link text-blue-600 text-xs shrink-0"></i>
+                        <span id="client-url-display" class="text-xs font-bold text-gray-700 truncate select-all">client.html?shop=...</span>
+                    </div>
+                    <button onclick="copyClientLink()" class="bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold text-xs px-3.5 py-2 rounded-xl active:scale-95 transition shrink-0">
+                        Copy Link
+                    </button>
+                </div>
+
+                <!-- ✨ 3 ACTION BUTTONS BELOW QR: DOWNLOAD, SHARE, COPY LINK ✨ -->
+                <div class="grid grid-cols-3 gap-2.5 w-full">
+                    <!-- 1. Download Standee PNG -->
+                    <button onclick="downloadStandeeQr(event)" class="bg-[#111827] hover:bg-black text-white font-bold py-3.5 px-2 rounded-2xl text-xs flex flex-col items-center justify-center gap-1.5 shadow-md active:scale-95 transition">
+                        <i class="fas fa-download text-base text-amber-400"></i>
+                        <span>Download QR</span>
+                    </button>
+
+                    <!-- 2. Share Link (Native / WhatsApp) -->
+                    <button onclick="shareClientLink()" class="bg-[#16A34A] hover:bg-green-700 text-white font-bold py-3.5 px-2 rounded-2xl text-xs flex flex-col items-center justify-center gap-1.5 shadow-md active:scale-95 transition">
+                        <i class="fas fa-share-alt text-base"></i>
+                        <span>Share Link</span>
+                    </button>
+
+                    <!-- 3. Copy Link -->
+                    <button onclick="copyClientLink()" class="bg-white hover:bg-gray-50 text-[#111827] border border-gray-200 font-bold py-3.5 px-2 rounded-2xl text-xs flex flex-col items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
+                        <i class="fas fa-copy text-base text-blue-600"></i>
+                        <span>Copy Link</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ✨ iOS TOAST NOTIFICATION ✨ -->
+    <div id="ios-toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] bg-[#111827]/95 backdrop-blur-md text-white px-5 py-3 rounded-full shadow-xl text-xs font-bold flex items-center gap-2.5 transition-all duration-300 opacity-0 pointer-events-none translate-y-4">
+        <i class="fas fa-check-circle text-emerald-400 text-sm"></i>
+        <span id="ios-toast-text">Action completed</span>
+    </div>
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentShopId = urlParams.get('shop') || localStorage.getItem('BikriPage_active_shop');
+        let globalShopData = {};
+        let allFeedbackList = [];
+        let feedbackUnsubscribe = null;
+        let clientReviewUrl = "";
+
+        // Build exact client.html URL dynamically
+        function buildClientUrl() {
+            let baseUrl = window.location.href.split('?')[0];
+            if (baseUrl.includes('shopkeeper.html')) {
+                baseUrl = baseUrl.replace('shopkeeper.html', 'client.html');
+            } else {
+                baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1) + 'client.html';
+            }
+            return `${baseUrl}?shop=${encodeURIComponent(currentShopId)}`;
+        }
+
+        // Initialize Shopkeeper Page
+        async function initShopkeeperHub() {
+            clientReviewUrl = buildClientUrl();
+            document.getElementById('client-url-display').innerText = clientReviewUrl.replace(/^https?:\/\//, '');
+
+            try {
+                const doc = await db.collection('shops').doc(currentShopId).get();
+                if (doc.exists) {
+                    globalShopData = doc.data();
+                    const sName = globalShopData.shopName || "My Store";
+                    document.getElementById('header-shop-name').innerText = sName;
+                    document.getElementById('standee-shop-name').innerText = sName;
+
+                    // Pre-fill Google Review Link (or fallback to googleMapLink)
+                    const savedRevLink = globalShopData.googleReviewLink || globalShopData.googleMapLink || "";
+                    document.getElementById('google-review-url-input').value = savedRevLink;
+                    updateLinkBadge(savedRevLink);
+                }
+            } catch (err) {
+                console.error("Error loading shop details:", err);
+            }
+
+            // Start Real-time Listener for 1-3 Star Private Feedback
+            listenToPrivateFeedback();
+        }
+
+        function updateLinkBadge(link) {
+            const badge = document.getElementById('link-status-badge');
+            if (link && link.trim() !== "") {
+                badge.className = "text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 w-fit";
+                badge.innerHTML = `<i class="fas fa-check-circle mr-1"></i> Active & Synced`;
+            } else {
+                badge.className = "text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-50 text-amber-600 border border-amber-200 w-fit";
+                badge.innerHTML = `<i class="fas fa-exclamation-circle mr-1"></i> Link Not Set`;
+            }
+        }
+
+        // Save Google Review URL to shops/{shopId}
+        async function saveGoogleReviewLink(e) {
+            const input = document.getElementById('google-review-url-input');
+            const urlVal = input.value.trim();
+            const btn = e.currentTarget;
+            const origHtml = btn.innerHTML;
+
+            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Saving...`;
+            btn.disabled = true;
+
+            try {
+                await db.collection('shops').doc(currentShopId).set({
+                    googleReviewLink: urlVal
+                }, { merge: true });
+
+                globalShopData.googleReviewLink = urlVal;
+                updateLinkBadge(urlVal);
+                showToast("Google Review Link saved & synced!");
+            } catch (err) {
+                alert("Error saving link: " + err.message);
+            } finally {
+                btn.innerHTML = origHtml;
+                btn.disabled = false;
+            }
+        }
+
+        // Real-time Firestore listener for 1-3 Star Feedback
+        function listenToPrivateFeedback() {
+            if (feedbackUnsubscribe) feedbackUnsubscribe();
+
+            feedbackUnsubscribe = db.collection('shops')
+                .doc(currentShopId)
+                .collection('privateFeedback')
+                .orderBy('createdAt', 'desc')
+                .onSnapshot(snapshot => {
+                    allFeedbackList = [];
+                    snapshot.forEach(doc => {
+                        allFeedbackList.push({ id: doc.id, ...doc.data() });
+                    });
+                    updateFeedbackStats();
+                    renderFeedbackList();
+                }, err => {
+                    console.error("Feedback listener error:", err);
+                    document.getElementById('feedback-list').innerHTML = `
+                        <div class="text-center py-8 text-rose-500 text-xs font-bold">
+                            Error loading feedback: ${err.message}
+                        </div>`;
+                });
+        }
+
+        function updateFeedbackStats() {
+            const total = allFeedbackList.length;
+            const unread = allFeedbackList.filter(f => (f.status || 'unread') === 'unread').length;
+            
+            let avg = "—";
+            if (total > 0) {
+                const sum = allFeedbackList.reduce((acc, f) => acc + (Number(f.rating) || 0), 0);
+                avg = (sum / total).toFixed(1) + "★";
+            }
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-unread').innerText = unread;
+            document.getElementById('stat-avg').innerText = avg;
+        }
+
+        function renderFeedbackList() {
+            const container = document.getElementById('feedback-list');
+            const filterVal = document.getElementById('feedback-filter').value;
+
+            let filtered = allFeedbackList.filter(item => {
+                const status = item.status || 'unread';
+                if (filterVal === 'unread') return status === 'unread';
+                if (filterVal === 'resolved') return status === 'resolved';
+                if (filterVal === '1' || filterVal === '2' || filterVal === '3') {
+                    return String(item.rating) === filterVal;
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 bg-[#F7F7F9] rounded-[20px] border border-dashed border-gray-200">
+                        <div class="w-12 h-12 rounded-full bg-white text-gray-300 flex items-center justify-center mx-auto mb-3 shadow-sm">
+                            <i class="fas fa-smile-beam text-xl"></i>
+                        </div>
+                        <p class="text-sm font-bold text-[#111827]">No improvement messages here!</p>
+                        <p class="text-xs text-gray-400 mt-1">When a customer gives 1–3 stars, their private advice will appear here.</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map((item, idx) => {
+                const rating = Number(item.rating) || 1;
+                const isResolved = item.status === 'resolved';
+                
+                // Format Timestamp
+                let dateStr = "Just now";
+                if (item.createdAt && item.createdAt.toDate) {
+                    const dt = item.createdAt.toDate();
+                    dateStr = dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) + 
+                              " • " + dt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+                }
+
+                // Star Colors
+                let badgeStyle = "bg-rose-50 text-rose-600 border-rose-200";
+                if (rating === 2) badgeStyle = "bg-orange-50 text-orange-600 border-orange-200";
+                if (rating === 3) badgeStyle = "bg-amber-50 text-amber-700 border-amber-200";
+
+                let starsHtml = '';
+                for (let i = 1; i <= 5; i++) {
+                    starsHtml += `<i class="fas fa-star ${i <= rating ? 'text-amber-400' : 'text-gray-200'} text-xs"></i>`;
+                }
+
+                return `
+                <div class="animate-slide-up rounded-[20px] p-4 sm:p-5 border transition-all ${isResolved ? 'bg-[#F9FAFB] border-gray-200 opacity-75' : 'bg-white border-gray-200 shadow-sm'}" style="animation-delay: ${idx * 0.04}s">
+                    <div class="flex items-start justify-between gap-3 mb-3">
+                        <div class="flex items-center gap-2.5 flex-wrap">
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-black border ${badgeStyle}">
+                                ${rating}.0 ★
+                            </span>
+                            <div class="flex items-center gap-0.5">${starsHtml}</div>
+                            <span class="text-[11px] text-gray-400 font-semibold">${dateStr}</span>
+                        </div>
+
+                        <span class="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${isResolved ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}">
+                            ${isResolved ? 'Resolved' : 'New Feedback'}
+                        </span>
+                    </div>
+
+                    <div class="bg-[#F7F7F9] rounded-2xl p-3.5 border border-gray-100 mb-3">
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Customer Suggestion:</p>
+                        <p class="text-sm font-semibold text-[#111827] leading-relaxed whitespace-pre-line">${escapeHtml(item.message || 'No comment written.')}</p>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2">
+                        <button onclick="toggleResolveFeedback('${item.id}', '${isResolved ? 'unread' : 'resolved'}')" class="px-3.5 py-2 rounded-xl text-xs font-bold transition active:scale-95 flex items-center gap-1.5 ${isResolved ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200'}">
+                            <i class="fas ${isResolved ? 'fa-undo' : 'fa-check'}"></i>
+                            ${isResolved ? 'Mark Unread' : 'Mark Resolved'}
+                        </button>
+                        <button onclick="deleteFeedback('${item.id}')" class="w-9 h-9 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center transition active:scale-95">
+                            <i class="fas fa-trash-alt text-xs"></i>
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function toggleResolveFeedback(docId, newStatus) {
+            try {
+                await db.collection('shops')
+                    .doc(currentShopId)
+                    .collection('privateFeedback')
+                    .doc(docId)
+                    .update({ status: newStatus });
+                showToast(newStatus === 'resolved' ? "Marked as resolved!" : "Moved back to unread");
+            } catch (err) {
+                alert("Error updating status: " + err.message);
+            }
+        }
+
+        async function deleteFeedback(docId) {
+            if (!confirm("Delete this feedback message permanently?")) return;
+            try {
+                await db.collection('shops')
+                    .doc(currentShopId)
+                    .collection('privateFeedback')
+                    .doc(docId)
+                    .delete();
+                showToast("Feedback deleted");
+            } catch (err) {
+                alert("Error deleting: " + err.message);
+            }
+        }
+
+        // ================= QR MODAL & SHARE/DOWNLOAD/COPY FUNCTIONS =================
+        function openQrModal() {
+            const qrBox = document.getElementById('standee-qr-container');
+            qrBox.innerHTML = "";
+
+            new QRCode(qrBox, {
+                text: clientReviewUrl,
+                width: 148,
+                height: 148,
+                colorDark: "#111827",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            const modal = document.getElementById('qr-modal');
+            const card = document.getElementById('qr-modal-card');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('translate-y-full', 'sm:scale-95');
+            }, 10);
+        }
+
+        function closeQrModal() {
+            const modal = document.getElementById('qr-modal');
+            const card = document.getElementById('qr-modal-card');
+            modal.classList.add('opacity-0');
+            card.classList.add('translate-y-full', 'sm:scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function copyClientLink() {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(clientReviewUrl).then(() => {
+                    showToast("Review Link Copied to Clipboard!");
+                });
+            } else {
+                prompt("Copy your Review Link:", clientReviewUrl);
+            }
+        }
+
+        async function shareClientLink() {
+            const sName = globalShopData.shopName || "our store";
+            const shareText = `⭐ Rate your experience with ${sName}! Tap the link below to share your feedback:`;
+
+            if (navigator.share && window.location.protocol !== 'file:') {
+                try {
+                    await navigator.share({
+                        title: `${sName} - Review Us`,
+                        text: shareText,
+                        url: clientReviewUrl
+                    });
+                } catch (e) {}
+            } else {
+                const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText + "\n\n" + clientReviewUrl)}`;
+                window.open(waUrl, '_blank');
+            }
+        }
+
+        function downloadStandeeQr(e) {
+            const btn = e.currentTarget;
+            const orig = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin text-base"></i><span>Saving...</span>`;
+            btn.disabled = true;
+
+            const standeeEl = document.getElementById('printable-standee');
+            html2canvas(standeeEl, {
+                scale: 3,
+                backgroundColor: "#ffffff",
+                useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                const safeName = (globalShopData.shopName || 'Store').replace(/[^a-zA-Z0-9]/g, '_');
+                link.download = `${safeName}_Google_Review_Standee_QR.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showToast("HD Standee QR Downloaded!");
+            }).catch(err => {
+                alert("Download error: " + err.message);
+            }).finally(() => {
+                btn.innerHTML = orig;
+                btn.disabled = false;
+            });
+        }
+
+        function previewClientPage() {
+            window.open(clientReviewUrl, '_blank');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('ios-toast');
+            document.getElementById('ios-toast-text').innerText = msg;
+            toast.classList.remove('opacity-0', 'translate-y-4');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4');
+            }, 2600);
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        window.addEventListener('DOMContentLoaded', initShopkeeperHub);
+    </script>
+</body>
+</html>

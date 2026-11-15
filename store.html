@@ -894,6 +894,63 @@ button:active{transform:none!important}
 }
 </style>
 
+
+<style id="netaji-atelier-detail-polish-v8">
+/* Wishlist hearts: warm red icon, restrained blush surface */
+#products-grid .grid-item .nt-wishlist{
+  color:#c83f50!important;
+  background:#fff8f7!important;
+  border:1px solid #f0d8d8!important;
+  box-shadow:0 3px 10px rgba(151,48,61,.09)!important;
+}
+#products-grid .grid-item .nt-wishlist i{color:#c83f50!important}
+#products-grid .grid-item .nt-wishlist.is-saved{
+  color:#c52f45!important;background:#fff0f1!important;
+  border-color:#e9bfc5!important;
+}
+#products-grid .grid-item .nt-wishlist.is-saved i{color:#c52f45!important}
+/* Header shopping bag: match the plum + champagne identity */
+header h1>span{
+  background:linear-gradient(145deg,#554563,#392e43)!important;
+  color:#f8f3ea!important;
+  box-shadow:0 3px 10px rgba(57,46,67,.16)!important;
+}
+header h1>span i{color:#f8f3ea!important}
+header>button:last-child{
+  background:#f1edf2!important;border:1px solid #e4dce8!important;
+  color:#554563!important;box-shadow:none!important;
+}
+header>button:last-child>i{color:#554563!important}
+/* Footer: remove the leftover green wash */
+footer{
+  background:#f4f0f5!important;
+  border-top:1px solid #e8e0e9!important;
+}
+footer>div:first-child{color:#716779!important}
+footer>div:first-child i{color:#8a7892!important}
+footer p{color:#89818d!important}
+footer a{
+  background:#fffefa!important;border:1px solid #e7dfea!important;
+  box-shadow:0 5px 16px rgba(52,42,62,.045)!important;
+}
+footer a>div{
+  background:linear-gradient(145deg,#554563,#392e43)!important;
+  box-shadow:0 2px 7px rgba(57,46,67,.15)!important;
+}
+footer a span{
+  background:linear-gradient(90deg,#39313f,#62566c)!important;
+  background-clip:text!important;-webkit-background-clip:text!important;
+}
+footer a>i{color:#a49aa8!important}
+/* Avoid sudden card pop-in while scrolling: disable content-visibility skipping */
+#products-grid .grid-item{
+  content-visibility:visible!important;
+  contain:none!important;
+  contain-intrinsic-size:auto!important;
+}
+#products-grid img{content-visibility:visible!important}
+</style>
+
 </head>
 <body class="font-sans text-gray-800 pb-24 selection:bg-purple-200">
 

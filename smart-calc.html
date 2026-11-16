@@ -55,7 +55,6 @@
                     </h2>
                 </div>
                 
-                <!-- ✨ NAYA: Saved/Recent Items Chips With Delete Option -->
                 <div id="recent-items-container" class="flex gap-2 overflow-x-auto custom-scrollbar pb-3 mb-2 hidden">
                     <!-- Chips JS se aayenge -->
                 </div>
@@ -88,16 +87,34 @@
                         </div>
                     </div>
 
-                    <!-- Required Quantity -->
+                    <!-- 🚀 NAYA: Calculation Mode Toggle -->
+                    <div class="bg-gray-100 p-1 rounded-[12px] flex mb-1">
+                        <button type="button" onclick="setMode('qty')" id="btn-mode-qty" class="flex-1 py-1.5 text-[11px] uppercase tracking-wider font-bold bg-white shadow-sm rounded-[10px] text-gray-900 transition-all">By Quantity</button>
+                        <button type="button" onclick="setMode('amount')" id="btn-mode-amount" class="flex-1 py-1.5 text-[11px] uppercase tracking-wider font-bold text-gray-500 rounded-[10px] transition-all hover:text-gray-900">By Amount (₹)</button>
+                    </div>
+
+                    <!-- Required Quantity / Customer Pays -->
                     <div class="flex gap-3">
-                        <div class="flex-1">
+                        
+                        <!-- BY QUANTITY Input -->
+                        <div class="flex-1" id="input-container-qty">
                             <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 ml-1">Customer Wants</label>
                             <div class="ios-input-box !border-blue-200 !bg-blue-50/50 focus-within:!bg-white focus-within:!border-blue-500">
                                 <input type="number" inputmode="decimal" id="calc-qty" oninput="autoCalculate()" placeholder="e.g. 250" class="text-lg font-black text-blue-600">
                             </div>
                         </div>
+
+                        <!-- BY AMOUNT Input (Hidden initially) -->
+                        <div class="flex-1 hidden" id="input-container-amount">
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 ml-1">Customer Pays (₹)</label>
+                            <div class="ios-input-box !border-green-200 !bg-green-50/50 focus-within:!bg-white focus-within:!border-green-500">
+                                <span class="text-green-500 font-bold mr-2 border-r border-green-200 pr-2">₹</span>
+                                <input type="number" inputmode="decimal" id="calc-amount" oninput="autoCalculate()" placeholder="e.g. 50" class="text-lg font-black text-green-600">
+                            </div>
+                        </div>
+
                         <div class="w-[130px] shrink-0">
-                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 ml-1">In Unit</label>
+                            <label id="unit-label" class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 ml-1">In Unit</label>
                             <button type="button" onclick="openPicker('req')" class="ios-select-btn">
                                 <span id="display-req-unit">Grams</span>
                                 <i class="fas fa-chevron-down text-[10px] text-gray-400"></i>
@@ -106,13 +123,13 @@
                     </div>
 
                     <!-- Instant Result Box -->
-                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-[16px] p-4 flex justify-between items-center shadow-sm">
+                    <div id="result-box" class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-[16px] p-4 flex justify-between items-center shadow-sm transition-colors duration-300">
                         <div>
-                            <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Final Price</p>
+                            <p id="result-label" class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Final Price</p>
                             <p class="text-[11px] font-semibold text-blue-800 mt-1 opacity-80" id="calc-formula">0 x 0</p>
                         </div>
                         <div class="text-right">
-                            <span class="text-3xl font-black text-blue-700 tracking-tight" id="calc-result">₹0</span>
+                            <span class="text-3xl font-black text-blue-700 tracking-tight transition-colors duration-300" id="calc-result">₹0</span>
                         </div>
                     </div>
                 </div>
@@ -131,7 +148,6 @@
                     <span id="item-count" class="bg-purple-100 text-purple-600 text-[10px] font-black px-2.5 py-1 rounded-lg border border-purple-200">0 Items</span>
                 </div>
                 
-                <!-- Item List -->
                 <div class="flex-1 overflow-y-auto custom-scrollbar p-3 relative">
                     <div id="cart-empty" class="text-center py-16 opacity-60">
                         <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -143,7 +159,6 @@
                     <ul id="cart-list" class="space-y-2"></ul>
                 </div>
 
-                <!-- Footer Checkout Area -->
                 <div class="p-5 bg-white rounded-b-[24px] border-t border-gray-100 shrink-0 shadow-[0_-4px_20px_rgba(0,0,0,0.02)]">
                     <div class="flex justify-between items-end mb-4">
                         <div>
@@ -177,7 +192,7 @@
         </div>
     </div>
 
-    <!-- ✨ iOS STYLE CONFIRM MODAL (For History Delete) ✨ -->
+    <!-- iOS STYLE CONFIRM MODAL -->
     <div id="ios-confirm-modal" class="fixed inset-0 z-[150] hidden flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0">
         <div id="ios-confirm-card" class="bg-white/90 backdrop-blur-xl w-[270px] rounded-[14px] shadow-2xl transform scale-95 transition-transform duration-300 text-center overflow-hidden flex flex-col">
             <div class="p-4 pt-5 pb-4">
@@ -191,9 +206,7 @@
         </div>
     </div>
 
-    <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
-              // Data Configuration
         const unitData = {
             'kg': { label: 'Per Kg', icon: 'fas fa-balance-scale', subUnits: [{val: 'kg', label: 'Kg (Kilo)'}, {val: 'g', label: 'g (Grams)'}] },
             'liter': { label: 'Per Liter', icon: 'fas fa-tint', subUnits: [{val: 'liter', label: 'Ltr (Liter)'}, {val: 'ml', label: 'ML (Milli)'}] },
@@ -204,14 +217,17 @@
             'packet': { label: 'Per Packet', icon: 'fas fa-box-open', subUnits: [{val: 'packet', label: 'Packet'}] }
         };
 
-
-        // State Variables
         let currentRateKey = 'kg';
         let currentReqKey = 'g'; 
         let cart = [];
+        
         let currentCalculatedPrice = 0;
+        let currentCalculatedQty = 0; // Quantity tracker
+        let calcMode = 'qty'; // Default 'qty' (Wajan ke hisab se) ya 'amount' (Paise ke hisab se)
+
         let activePickerType = null;
         let savedHistory = JSON.parse(localStorage.getItem('SmartCalc_History')) || [];
+        let historyIndexToDelete = -1;
 
         window.onload = function() {
             updateUI();
@@ -221,6 +237,56 @@
         function goBack() {
             const shopId = localStorage.getItem('BikriPage_active_shop') || '';
             window.location.href = `dashboard.html?shop=${shopId}`;
+        }
+
+        // 🚀 NAYA: Mode Switcher (By Qty vs By Amount)
+        function setMode(mode) {
+            calcMode = mode;
+            const btnQty = document.getElementById('btn-mode-qty');
+            const btnAmount = document.getElementById('btn-mode-amount');
+            const containerQty = document.getElementById('input-container-qty');
+            const containerAmount = document.getElementById('input-container-amount');
+            const unitLabel = document.getElementById('unit-label');
+            
+            const resultBox = document.getElementById('result-box');
+            const resultLabel = document.getElementById('result-label');
+            const calcFormula = document.getElementById('calc-formula');
+            const calcResult = document.getElementById('calc-result');
+
+            if (mode === 'qty') {
+                btnQty.className = 'flex-1 py-1.5 text-[11px] uppercase tracking-wider font-bold bg-white shadow-sm rounded-[10px] text-gray-900 transition-all';
+                btnAmount.className = 'flex-1 py-1.5 text-[11px] uppercase tracking-wider font-bold text-gray-500 rounded-[10px] transition-all hover:text-gray-900';
+                
+                containerQty.classList.remove('hidden');
+                containerAmount.classList.add('hidden');
+                unitLabel.innerText = 'In Unit';
+                resultLabel.innerText = 'Final Price';
+                
+                resultBox.className = 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-[16px] p-4 flex justify-between items-center shadow-sm transition-colors duration-300';
+                resultLabel.className = 'text-[10px] font-black text-blue-500 uppercase tracking-widest';
+                calcFormula.className = 'text-[11px] font-semibold text-blue-800 mt-1 opacity-80';
+                calcResult.className = 'text-3xl font-black text-blue-700 tracking-tight transition-colors duration-300';
+
+                document.getElementById('calc-amount').value = '';
+                document.getElementById('calc-qty').focus();
+            } else {
+                btnAmount.className = 'flex-1 py-1.5 text-[11px] uppercase tracking-wider font-bold bg-white shadow-sm rounded-[10px] text-gray-900 transition-all';
+                btnQty.className = 'flex-1 py-1.5 text-[11px] uppercase tracking-wider font-bold text-gray-500 rounded-[10px] transition-all hover:text-gray-900';
+                
+                containerAmount.classList.remove('hidden');
+                containerQty.classList.add('hidden');
+                unitLabel.innerText = 'Result In';
+                resultLabel.innerText = 'Quantity to Give';
+                
+                resultBox.className = 'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100 rounded-[16px] p-4 flex justify-between items-center shadow-sm transition-colors duration-300';
+                resultLabel.className = 'text-[10px] font-black text-green-600 uppercase tracking-widest';
+                calcFormula.className = 'text-[11px] font-semibold text-green-800 mt-1 opacity-80';
+                calcResult.className = 'text-3xl font-black text-green-600 tracking-tight transition-colors duration-300';
+
+                document.getElementById('calc-qty').value = '';
+                document.getElementById('calc-amount').focus();
+            }
+            autoCalculate();
         }
 
         function renderHistoryChips() {
@@ -252,7 +318,12 @@
             document.getElementById('calc-name').value = item.name;
             document.getElementById('calc-rate').value = item.rate;
             selectUnit(item.rateKey, true);
-            document.getElementById('calc-qty').focus();
+            
+            if (calcMode === 'qty') {
+                document.getElementById('calc-qty').focus();
+            } else {
+                document.getElementById('calc-amount').focus();
+            }
         }
 
         function saveToHistory(name, rate, rateKey) {
@@ -264,30 +335,23 @@
             renderHistoryChips();
         }
 
-        let historyIndexToDelete = -1;
-
         function promptDeleteHistory(index) {
             historyIndexToDelete = index;
             const item = savedHistory[index];
-            
             document.getElementById('ios-confirm-message').innerText = `Do you want to remove '${item.name}' from your saved list?`;
-            
             const modal = document.getElementById('ios-confirm-modal');
             const card = document.getElementById('ios-confirm-card');
-            
             modal.classList.remove('hidden');
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
                 card.classList.remove('scale-95');
             }, 10);
-            
             document.getElementById('ios-confirm-btn').onclick = () => closeIosConfirm(true);
         }
 
         function closeIosConfirm(isConfirmed) {
             const modal = document.getElementById('ios-confirm-modal');
             const card = document.getElementById('ios-confirm-card');
-            
             modal.classList.add('opacity-0');
             card.classList.add('scale-95');
             setTimeout(() => modal.classList.add('hidden'), 300);
@@ -321,7 +385,7 @@
                     </button>`;
                 });
             } else if (type === 'req') {
-                title.innerText = 'Customer Wants In';
+                title.innerText = calcMode === 'qty' ? 'Customer Wants In' : 'Result In';
                 const availableSubUnits = unitData[currentRateKey].subUnits;
                 availableSubUnits.forEach(sub => {
                     let isSel = (currentReqKey === sub.val);
@@ -367,52 +431,83 @@
 
         function autoCalculate() {
             let rate = parseFloat(document.getElementById('calc-rate').value) || 0;
-            let qty = parseFloat(document.getElementById('calc-qty').value) || 0;
             let formulaText = "";
             currentCalculatedPrice = 0;
+            currentCalculatedQty = 0;
 
-            if (rate > 0 && qty > 0) {
-                if (currentRateKey === 'kg' && currentReqKey === 'g') { currentCalculatedPrice = (rate / 1000) * qty; formulaText = `(₹${rate} / 1000) x ${qty}g`; } 
-                else if (currentRateKey === 'liter' && currentReqKey === 'ml') { currentCalculatedPrice = (rate / 1000) * qty; formulaText = `(₹${rate} / 1000) x ${qty}ml`; } 
-                else if (currentRateKey === 'meter' && currentReqKey === 'cm') { currentCalculatedPrice = (rate / 100) * qty; formulaText = `(₹${rate} / 100) x ${qty}cm`; } 
-                else if (currentRateKey === 'dozen' && currentReqKey === 'pc') { currentCalculatedPrice = (rate / 12) * qty; formulaText = `(₹${rate} / 12) x ${qty}pcs`; } 
-                else {
-                    currentCalculatedPrice = rate * qty;
-                    let displayUnit = currentReqKey === 'pc' ? 'pcs' : currentReqKey;
-                    formulaText = `₹${rate} x ${qty} ${displayUnit}`;
+            let displayUnit = currentReqKey === 'pc' ? 'pcs' : currentReqKey;
+
+            if (calcMode === 'qty') {
+                let qty = parseFloat(document.getElementById('calc-qty').value) || 0;
+                currentCalculatedQty = qty;
+
+                if (rate > 0 && qty > 0) {
+                    if (currentRateKey === 'kg' && currentReqKey === 'g') { currentCalculatedPrice = (rate / 1000) * qty; formulaText = `(₹${rate} / 1000) x ${qty}g`; } 
+                    else if (currentRateKey === 'liter' && currentReqKey === 'ml') { currentCalculatedPrice = (rate / 1000) * qty; formulaText = `(₹${rate} / 1000) x ${qty}ml`; } 
+                    else if (currentRateKey === 'meter' && currentReqKey === 'cm') { currentCalculatedPrice = (rate / 100) * qty; formulaText = `(₹${rate} / 100) x ${qty}cm`; } 
+                    else if (currentRateKey === 'dozen' && currentReqKey === 'pc') { currentCalculatedPrice = (rate / 12) * qty; formulaText = `(₹${rate} / 12) x ${qty}pcs`; } 
+                    else {
+                        currentCalculatedPrice = rate * qty;
+                        formulaText = `₹${rate} x ${qty} ${displayUnit}`;
+                    }
                 }
-            }
 
-            document.getElementById('calc-result').innerText = '₹' + currentCalculatedPrice.toFixed(2).replace(/\.00$/, '');
-            document.getElementById('calc-formula').innerText = formulaText || "0 x 0";
+                document.getElementById('calc-result').innerText = '₹' + currentCalculatedPrice.toFixed(2).replace(/\.00$/, '');
+                document.getElementById('calc-formula').innerText = formulaText || "0 x 0";
+            
+            } else {
+                let amount = parseFloat(document.getElementById('calc-amount').value) || 0;
+                currentCalculatedPrice = amount; // Paise toh user ne bata hi diye
+
+                if (rate > 0 && amount > 0) {
+                    // Reverse calculation logic
+                    if (currentRateKey === 'kg' && currentReqKey === 'g') { currentCalculatedQty = amount / (rate / 1000); formulaText = `₹${amount} ÷ (₹${rate} / 1000g)`; } 
+                    else if (currentRateKey === 'liter' && currentReqKey === 'ml') { currentCalculatedQty = amount / (rate / 1000); formulaText = `₹${amount} ÷ (₹${rate} / 1000ml)`; } 
+                    else if (currentRateKey === 'meter' && currentReqKey === 'cm') { currentCalculatedQty = amount / (rate / 100); formulaText = `₹${amount} ÷ (₹${rate} / 100cm)`; } 
+                    else if (currentRateKey === 'dozen' && currentReqKey === 'pc') { currentCalculatedQty = amount / (rate / 12); formulaText = `₹${amount} ÷ (₹${rate} / 12pcs)`; } 
+                    else {
+                        currentCalculatedQty = amount / rate;
+                        formulaText = `₹${amount} ÷ ₹${rate} per ${displayUnit}`;
+                    }
+                }
+                
+                let formattedQty = parseFloat(currentCalculatedQty.toFixed(2));
+                let reqLabel = document.getElementById('display-req-unit').innerText;
+
+                document.getElementById('calc-result').innerText = amount > 0 ? `${formattedQty} ${reqLabel}` : `0 ${reqLabel}`;
+                document.getElementById('calc-formula').innerText = formulaText || "₹0 ÷ Rate";
+            }
         }
 
-                      function addCalculatedItem() {
-            if (currentCalculatedPrice <= 0) {
-                alert("Please enter a valid rate and quantity.");
+        function addCalculatedItem() {
+            if (currentCalculatedPrice <= 0 || currentCalculatedQty <= 0) {
+                alert("Please enter valid details to calculate!");
                 return;
             }
 
             let name = document.getElementById('calc-name').value.trim() || 'Item';
             let rate = document.getElementById('calc-rate').value;
-            let qty = document.getElementById('calc-qty').value;
             let reqLabel = document.getElementById('display-req-unit').innerText;
 
             let rateUnitLabel = unitData[currentRateKey].label.replace('Per ', '');
+            
+            // Format Quantity properly (e.g. "909.09 g" ya "250 g")
+            let displayQty = parseFloat(currentCalculatedQty.toFixed(2));
 
             let item = {
                 id: Date.now(),
                 name: name,
-                displayDesc: `${qty} ${reqLabel}`, 
+                displayDesc: `${displayQty} ${reqLabel}`, 
                 price: parseFloat(currentCalculatedPrice.toFixed(2)),
-                originalRate: parseFloat(rate),             // ✨ Dashboard को असली रेट भेजना (e.g. 70)
-                originalRateUnit: rateUnitLabel // ✨ Dashboard को रेट की यूनिट भेजना (e.g. Kg)
+                originalRate: parseFloat(rate),
+                originalRateUnit: rateUnitLabel 
             };
 
             cart.push(item);
             saveToHistory(name, rate, currentRateKey); 
             
             document.getElementById('calc-qty').value = ''; 
+            document.getElementById('calc-amount').value = ''; 
             autoCalculate();
             renderCart();
         }
@@ -468,6 +563,7 @@
             document.getElementById('calc-name').value = '';
             document.getElementById('calc-rate').value = '';
             document.getElementById('calc-qty').value = '';
+            document.getElementById('calc-amount').value = '';
             autoCalculate();
             renderCart();
         }

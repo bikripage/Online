@@ -3029,7 +3029,8 @@ async function checkoutCartInApp() {
     // ✨ NAYA: Save for next time
     localStorage.setItem('BikriPage_saved_name', custName);
     localStorage.setItem('BikriPage_saved_phone', custWhatsApp);
-    localStorage.setItem('BikriPage_saved_address', address);
+   localStorage.setItem('BikriPage_customer_phone', custWhatsApp);
+    localStorage.setItem('BikriPage_customer_name', custName); localStorage.setItem('BikriPage_saved_address', address);
     localStorage.setItem('BikriPage_saved_lat', document.getElementById('cart-lat').value || '');
     localStorage.setItem('BikriPage_saved_lng', document.getElementById('cart-lng').value || '');
 
@@ -3238,7 +3239,8 @@ async function submitOrder(e) {
     // ✨ NAYA: Customer details save kar lo taaki next time auto-fill ho jaye
     localStorage.setItem('BikriPage_saved_name', custName);
     localStorage.setItem('BikriPage_saved_phone', custWhatsApp);
-    localStorage.setItem('BikriPage_saved_address', address);
+   localStorage.setItem('BikriPage_customer_phone', custWhatsApp);
+    localStorage.setItem('BikriPage_customer_name', custName); localStorage.setItem('BikriPage_saved_address', address);
     localStorage.setItem('BikriPage_saved_lat', document.getElementById('order-lat').value || '');
     localStorage.setItem('BikriPage_saved_lng', document.getElementById('order-lng').value || '');
 

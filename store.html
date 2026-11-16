@@ -4411,6 +4411,165 @@ body.store-theme-active #products-grid .grid-item p.font-black{color:var(--store
 })();
 </script>
 
+
+<!-- BUSINESS THEME VISUAL LAYER v2: distinct storefront presentation per business -->
+<style id="store-business-theme-visuals-v2">
+/* All rules are scoped to the selected theme. Default remains untouched. */
+body[data-store-theme]:not([data-store-theme="default"]){--bt-accent:var(--store-theme-accent);--bt-soft:color-mix(in srgb,var(--store-theme-accent) 9%,white);--bt-line:color-mix(in srgb,var(--store-theme-accent) 18%,white)}
+body[data-store-theme]:not([data-store-theme="default"]) main>section:first-child{background:linear-gradient(145deg,var(--bt-soft),#fff 78%)!important;border-bottom:3px solid var(--bt-line)!important}
+body[data-store-theme]:not([data-store-theme="default"]) #profile-pic-ring{background:linear-gradient(145deg,var(--bt-accent),color-mix(in srgb,var(--bt-accent) 25%,white))!important}
+body[data-store-theme]:not([data-store-theme="default"]) #profile-category{background:var(--bt-soft)!important;color:var(--bt-accent)!important;border-color:var(--bt-line)!important}
+body[data-store-theme]:not([data-store-theme="default"]) #profile-map-link{background:var(--bt-soft)!important;color:var(--bt-accent)!important;border-color:var(--bt-line)!important}
+body[data-store-theme]:not([data-store-theme="default"]) #profile-delivery-banner>div{background:var(--bt-soft)!important;border:1px solid var(--bt-line)!important}
+body[data-store-theme]:not([data-store-theme="default"]) #profile-delivery-banner i{color:var(--bt-accent)!important}
+body[data-store-theme]:not([data-store-theme="default"]) #products-grid{background:linear-gradient(180deg,var(--bt-soft),#fff 180px)!important}
+body[data-store-theme]:not([data-store-theme="default"]) #products-grid .grid-item{border:1px solid var(--bt-line)!important;border-radius:18px!important;box-shadow:0 8px 22px color-mix(in srgb,var(--bt-accent) 9%,transparent)!important}
+body[data-store-theme]:not([data-store-theme="default"]) #products-grid .grid-item>.w-full.aspect-square{background:var(--bt-soft)!important}
+body[data-store-theme]:not([data-store-theme="default"]) #products-grid .grid-item .nt-add-cart,body[data-store-theme]:not([data-store-theme="default"]) #products-grid .grid-item button.add-to-cart-btn,body[data-store-theme]:not([data-store-theme="default"]) #product-details-page #detail-order-btn,body[data-store-theme]:not([data-store-theme="default"]) #cart-main-btn,body[data-store-theme]:not([data-store-theme="default"]) #main-order-btn{background:var(--bt-accent)!important;border-color:var(--bt-accent)!important;color:white!important}
+body[data-store-theme]:not([data-store-theme="default"]) #products-grid .grid-item p.font-black,body[data-store-theme]:not([data-store-theme="default"]) #detail-price{color:var(--bt-accent)!important}
+body[data-store-theme]:not([data-store-theme="default"]) main>div.px-5.py-4 h3{color:var(--bt-accent)!important}
+#business-theme-intro{margin:0 clamp(16px,4vw,42px) 18px;padding:18px;border-radius:20px;display:flex;align-items:center;gap:14px;background:var(--bt-accent);color:white;box-shadow:0 12px 28px color-mix(in srgb,var(--bt-accent) 20%,transparent)}
+#business-theme-intro .bt-icon{width:48px;height:48px;flex:0 0 48px;border-radius:15px;background:#ffffff24;display:grid;place-items:center;font-size:20px}
+#business-theme-intro .bt-kicker{font-size:9px;letter-spacing:.16em;font-weight:900;text-transform:uppercase;opacity:.78}
+#business-theme-intro .bt-title{font-size:17px;font-weight:900;line-height:1.2;margin-top:3px}
+#business-theme-intro .bt-copy{font-size:11px;line-height:1.45;opacity:.86;margin-top:4px}
+#business-theme-intro .bt-action{margin-left:auto;white-space:nowrap;border:1px solid #ffffff66;background:#ffffff20;border-radius:999px;padding:9px 11px;font-size:10px;font-weight:900;color:#fff}
+/* Retail / product-first */
+body[data-store-theme="retail"] #products-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+body[data-store-theme="retail"] #products-grid .grid-item{border-radius:10px!important;box-shadow:none!important}
+body[data-store-theme="retail"] #business-theme-intro{border-radius:12px}
+/* Restaurant: warm menu-board treatment */
+body[data-store-theme="restaurant"] main>section:first-child{background:linear-gradient(135deg,#fff4e8,#fffaf4)!important}
+body[data-store-theme="restaurant"] #products-grid .grid-item{border-radius:24px!important}
+body[data-store-theme="restaurant"] #products-grid .grid-item>.w-full.aspect-square{aspect-ratio:1.18!important}
+body[data-store-theme="restaurant"] #business-theme-intro{background:linear-gradient(110deg,#8c431b,#c47a38)}
+/* Clinic: clean medical blue */
+body[data-store-theme="clinic"] main>section:first-child{background:linear-gradient(135deg,#eaf6ff,#fff)!important}
+body[data-store-theme="clinic"] #products-grid .grid-item{border-radius:14px!important;box-shadow:0 4px 14px #1d6da510!important}
+body[data-store-theme="clinic"] #business-theme-intro{background:linear-gradient(110deg,#145b9a,#2f91cb)}
+/* Salon: soft editorial */
+body[data-store-theme="salon"] main>section:first-child{background:linear-gradient(135deg,#fff0f7,#fff)!important}
+body[data-store-theme="salon"] #profile-pic-ring{border-radius:50%!important}
+body[data-store-theme="salon"] #products-grid .grid-item{border-radius:26px!important}
+body[data-store-theme="salon"] #business-theme-intro{border-radius:28px;background:linear-gradient(110deg,#a83272,#dc79ad)}
+/* Repair: industrial blue-grey */
+body[data-store-theme="repair"] main>section:first-child{background:linear-gradient(135deg,#eaf1f7,#fff)!important}
+body[data-store-theme="repair"] #products-grid .grid-item{border-radius:8px!important;box-shadow:0 4px 12px #24465b12!important}
+body[data-store-theme="repair"] #business-theme-intro{border-radius:10px;background:linear-gradient(110deg,#244c6c,#527f9f)}
+/* Grocery: fresh green */
+body[data-store-theme="grocery"] main>section:first-child{background:linear-gradient(135deg,#eff9ed,#fff)!important}
+body[data-store-theme="grocery"] #products-grid .grid-item{border-radius:14px!important}
+body[data-store-theme="grocery"] #products-grid .grid-item>.w-full.aspect-square{aspect-ratio:1!important}
+body[data-store-theme="grocery"] #business-theme-intro{background:linear-gradient(110deg,#26733d,#69a94e)}
+/* Real estate: premium property cards */
+body[data-store-theme="realestate"] main>section:first-child{background:linear-gradient(135deg,#f5eee6,#fff)!important}
+body[data-store-theme="realestate"] #products-grid .grid-item{border-radius:22px!important;box-shadow:0 12px 26px #60452a12!important}
+body[data-store-theme="realestate"] #products-grid .grid-item>.w-full.aspect-square{aspect-ratio:1.3!important}
+body[data-store-theme="realestate"] #business-theme-intro{background:linear-gradient(110deg,#60472f,#a17a55)}
+/* Education: structured cards */
+body[data-store-theme="education"] main>section:first-child{background:linear-gradient(135deg,#edf5ff,#fff)!important}
+body[data-store-theme="education"] #products-grid .grid-item{border-radius:12px!important;border-top:4px solid var(--bt-accent)!important}
+body[data-store-theme="education"] #business-theme-intro{background:linear-gradient(110deg,#20558e,#4b8fc8)}
+/* Fitness: bold energetic */
+body[data-store-theme="fitness"] main>section:first-child{background:linear-gradient(135deg,#fff0f0,#fff)!important}
+body[data-store-theme="fitness"] #products-grid .grid-item{border-radius:12px!important;border-bottom:3px solid var(--bt-accent)!important}
+body[data-store-theme="fitness"] #business-theme-intro{background:linear-gradient(110deg,#9e2632,#e04d57)}
+/* Travel: airy */
+body[data-store-theme="travel"] main>section:first-child{background:linear-gradient(135deg,#e8fbfc,#fff)!important}
+body[data-store-theme="travel"] #products-grid .grid-item{border-radius:22px!important}
+body[data-store-theme="travel"] #products-grid .grid-item>.w-full.aspect-square{aspect-ratio:1.3!important}
+body[data-store-theme="travel"] #business-theme-intro{background:linear-gradient(110deg,#087b86,#27b3bd)}
+/* Pharmacy: clinical green */
+body[data-store-theme="pharmacy"] main>section:first-child{background:linear-gradient(135deg,#eaf8f1,#fff)!important}
+body[data-store-theme="pharmacy"] #products-grid .grid-item{border-radius:12px!important;box-shadow:0 3px 12px #16865c12!important}
+body[data-store-theme="pharmacy"] #business-theme-intro{background:linear-gradient(110deg,#14734e,#2bb27c)}
+/* Electronics: dark tech */
+body[data-store-theme="electronics"] main>section:first-child{background:linear-gradient(135deg,#ecebfa,#fff)!important}
+body[data-store-theme="electronics"] #products-grid .grid-item{border-radius:12px!important;background:#fbfaff!important}
+body[data-store-theme="electronics"] #business-theme-intro{background:linear-gradient(110deg,#28234f,#6758b4)}
+/* Fashion: magazine look */
+body[data-store-theme="fashion"] main>section:first-child{background:linear-gradient(135deg,#fff0f6,#fff)!important}
+body[data-store-theme="fashion"] #products-grid .grid-item{border-radius:4px!important;box-shadow:none!important;border:0!important}
+body[data-store-theme="fashion"] #products-grid .grid-item>.w-full.aspect-square{aspect-ratio:.82!important}
+body[data-store-theme="fashion"] #business-theme-intro{border-radius:4px;background:linear-gradient(110deg,#8f315e,#d36b9b)}
+/* Home services: warm */
+body[data-store-theme="homeservices"] main>section:first-child{background:linear-gradient(135deg,#fff4e7,#fff)!important}
+body[data-store-theme="homeservices"] #products-grid .grid-item{border-radius:20px!important}
+body[data-store-theme="homeservices"] #business-theme-intro{background:linear-gradient(110deg,#8c531c,#ca8a39)}
+/* Bakery: creamy */
+body[data-store-theme="bakery"] main>section:first-child{background:linear-gradient(135deg,#fff4e6,#fff)!important}
+body[data-store-theme="bakery"] #products-grid .grid-item{border-radius:24px!important;background:#fffaf3!important}
+body[data-store-theme="bakery"] #business-theme-intro{background:linear-gradient(110deg,#8c5427,#d59a58)}
+/* Automotive: performance */
+body[data-store-theme="automotive"] main>section:first-child{background:linear-gradient(135deg,#edf3f9,#fff)!important}
+body[data-store-theme="automotive"] #products-grid .grid-item{border-radius:10px!important}
+body[data-store-theme="automotive"] #business-theme-intro{border-radius:10px;background:linear-gradient(110deg,#1e4568,#477fa9)}
+/* Freelancer: minimal portfolio */
+body[data-store-theme="freelancer"] main>section:first-child{background:linear-gradient(135deg,#eaf8fb,#fff)!important}
+body[data-store-theme="freelancer"] #products-grid .grid-item{border-radius:18px!important;box-shadow:0 12px 28px #147b8b12!important}
+body[data-store-theme="freelancer"] #business-theme-intro{background:linear-gradient(110deg,#126b7c,#28a4b5)}
+/* Photography: gallery */
+body[data-store-theme="photography"] main>section:first-child{background:linear-gradient(135deg,#f1edf8,#fff)!important}
+body[data-store-theme="photography"] #products-grid .grid-item{border-radius:5px!important;border:0!important;box-shadow:none!important}
+body[data-store-theme="photography"] #products-grid .grid-item>.w-full.aspect-square{aspect-ratio:.9!important}
+body[data-store-theme="photography"] #business-theme-intro{border-radius:5px;background:linear-gradient(110deg,#392b59,#8063a8)}
+/* Furniture: natural premium */
+body[data-store-theme="furniture"] main>section:first-child{background:linear-gradient(135deg,#f5eee7,#fff)!important}
+body[data-store-theme="furniture"] #products-grid .grid-item{border-radius:18px!important;background:#fdfaf6!important}
+body[data-store-theme="furniture"] #products-grid .grid-item>.w-full.aspect-square{aspect-ratio:1.2!important}
+body[data-store-theme="furniture"] #business-theme-intro{background:linear-gradient(110deg,#65452f,#a77c58)}
+/* General business */
+body[data-store-theme="general"] main>section:first-child{background:linear-gradient(135deg,#edf7ef,#fff)!important}
+body[data-store-theme="general"] #products-grid .grid-item{border-radius:16px!important}
+body[data-store-theme="general"] #business-theme-intro{background:linear-gradient(110deg,#286342,#55966b)}
+@media(max-width:420px){#business-theme-intro{padding:14px;gap:10px}#business-theme-intro .bt-icon{width:42px;height:42px;flex-basis:42px}#business-theme-intro .bt-action{font-size:9px;padding:8px 9px}}
+</style>
+<script id="store-business-theme-visuals-v2-script">
+(function(){
+ const content={
+ retail:['fa-bag-shopping','CURATED COLLECTION','Explore products and latest offers','Shop Now'],
+ restaurant:['fa-utensils','FRESH FROM OUR KITCHEN','Explore the menu and order your favourites','View Menu'],
+ clinic:['fa-user-doctor','CARE & WELLNESS','Explore services and request an appointment','Book Visit'],
+ salon:['fa-spa','YOUR SELF-CARE SPACE','Discover treatments, packages and beauty services','Book Now'],
+ repair:['fa-screwdriver-wrench','REPAIR & SUPPORT','Find the right repair or maintenance service','Request Help'],
+ grocery:['fa-basket-shopping','FRESH EVERY DAY','Shop daily essentials and household needs','Shop Grocery'],
+ realestate:['fa-house','FIND YOUR NEXT SPACE','Explore properties and enquire about a visit','View Properties'],
+ education:['fa-graduation-cap','LEARN & GROW','Explore courses, batches and learning programs','Explore Courses'],
+ fitness:['fa-dumbbell','TRAIN WITH PURPOSE','Explore training plans and fitness programs','Join Now'],
+ travel:['fa-plane','YOUR NEXT JOURNEY','Discover destinations, trips and travel packages','Explore Trips'],
+ pharmacy:['fa-prescription-bottle-medical','HEALTH ESSENTIALS','Browse available health and wellness products','Browse Products'],
+ electronics:['fa-headphones','SMARTER TECHNOLOGY','Explore gadgets, devices and accessories','Explore Tech'],
+ fashion:['fa-shirt','THE LATEST EDIT','Discover styles, collections and new arrivals','Shop Collection'],
+ homeservices:['fa-house-chimney','HELP FOR YOUR HOME','Explore trusted home maintenance services','Book Service'],
+ bakery:['fa-cake-candles','BAKED WITH CARE','Discover freshly prepared treats and special orders','View Menu'],
+ automotive:['fa-car','AUTOMOTIVE CARE','Explore vehicle services and maintenance options','Book Service'],
+ freelancer:['fa-laptop','CREATIVE WORK & EXPERTISE','Explore services, work samples and ways to collaborate','Hire Me'],
+ photography:['fa-camera','MOMENTS THAT MATTER','Explore the portfolio and photography packages','View Gallery'],
+ furniture:['fa-couch','DESIGNED FOR YOUR SPACE','Explore furniture collections for every room','Explore Collection'],
+ general:['fa-briefcase','WELCOME TO OUR BUSINESS','Explore what we offer and get in touch','Contact Us']
+ };
+ const headings={retail:'Shop Products',restaurant:'Menu & Orders',clinic:'Clinic Services',salon:'Beauty Services',repair:'Repair Services',grocery:'Shop Groceries',realestate:'Featured Properties',education:'Courses & Programs',fitness:'Training Plans',travel:'Travel Packages',pharmacy:'Health Essentials',electronics:'Electronics',fashion:'Latest Collection',homeservices:'Home Services',bakery:'Freshly Baked',automotive:'Vehicle Services',freelancer:'My Services',photography:'Portfolio & Packages',furniture:'Furniture Collection',general:'Our Products & Services'};
+ function paint(id){
+   const old=document.getElementById('business-theme-intro'); if(old)old.remove();
+   const title=document.querySelector('main>div.px-5.py-4 h3');
+   if(id==='default'){if(title)title.textContent='Products';return;}
+   const c=content[id]; if(!c)return;
+   if(title)title.textContent=headings[id]||'Explore';
+   const target=document.querySelector('main>div.px-5.py-4'); if(!target)return;
+   const panel=document.createElement('section');panel.id='business-theme-intro';
+   panel.innerHTML=`<div class="bt-icon"><i class="fas ${c[0]}"></i></div><div class="min-w-0"><div class="bt-kicker">${c[1]}</div><div class="bt-title">${c[2]}</div></div><button class="bt-action" type="button">${c[3]} <i class="fas fa-arrow-right ml-1"></i></button>`;
+   panel.querySelector('button').addEventListener('click',()=>{const grid=document.getElementById('products-grid');if(grid)grid.scrollIntoView({behavior:'smooth',block:'start'});else if(typeof window.toggleCartModal==='function')window.toggleCartModal();});
+   target.parentNode.insertBefore(panel,target);
+ }
+ const originalLoad=window.loadStoreTheme;
+ window.loadStoreTheme=function(data){if(typeof originalLoad==='function')originalLoad(data);const id=(data&&data.storeTheme)||'default';paint(id);};
+ const originalApply=window.applyStoreTheme;
+ window.applyStoreTheme=async function(){await originalApply();const id=document.body.dataset.storeTheme||'default';paint(id);};
+ document.addEventListener('DOMContentLoaded',()=>{const id=document.body.dataset.storeTheme||'default';paint(id);});
+ window.addEventListener('store-data-ready',e=>{const id=(e.detail&&e.detail.storeTheme)||'default';paint(id);});
+})();
+</script>
+
 </body>
 </html>
 

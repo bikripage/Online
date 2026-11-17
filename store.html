@@ -981,6 +981,19 @@ footer a>i{color:#a49aa8!important}
 
     <main class="max-w-4xl mx-auto w-full bg-white min-h-screen flex flex-col">
 
+<!-- BIKRIPAGE STOREFRONT UPGRADE: full-site navigation, shopping guide, contact hub -->
+<section id="store-site-nav" class="site-nav-wrap" aria-label="Store navigation">
+  <div class="site-nav-inner">
+    <a href="#store-home" class="site-nav-brand"><span class="site-brand-mark"><i class="fas fa-store"></i></span><span id="site-nav-shop-name">OUR STORE</span></a>
+    <nav class="site-nav-links" aria-label="Main navigation">
+      <a href="#store-home">Home</a><a href="#store-catalog">Collection</a><a href="#store-reviews">Reviews</a><a href="#store-contact">Contact</a>
+    </nav>
+    <button class="site-nav-cta" type="button" onclick="document.getElementById('store-catalog').scrollIntoView({behavior:'smooth'})">Explore <i class="fas fa-arrow-right"></i></button>
+  </div>
+</section>
+<div id="store-home" class="site-announcement"><span class="site-live-dot"></span><span id="site-announcement-text">Welcome — explore our store and discover what we offer.</span></div>
+<div class="site-breadcrumb"><span>Home</span><i class="fas fa-chevron-right"></i><span id="site-breadcrumb-shop">Store</span></div>
+
         <!-- ✨ PROFILE SECTION ✨ -->
         <section class="px-5 pt-6 pb-6">
             <div class="flex items-center gap-5">
@@ -1050,7 +1063,8 @@ footer a>i{color:#a49aa8!important}
         <div class="w-full h-2 bg-[#F7F7F9]"></div>
        
 
-        <!-- SEARCH BAR & FILTER -->
+        <div id="store-catalog"></div>
+<!-- SEARCH BAR & FILTER -->
 <div class="px-5 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
     <h3 class="font-black text-gray-900 text-lg tracking-tight">Products</h3>
     
@@ -1083,7 +1097,7 @@ footer a>i{color:#a49aa8!important}
         <div class="w-full h-2 bg-[#F7F7F9]"></div>
 
           <!-- ✨ CUSTOMER REVIEWS (STORE LEVEL) ✨ -->
-        <div class="px-5 py-6">
+        <div id="store-reviews" class="px-5 py-6">
             <h3 class="font-black text-gray-900 text-lg tracking-tight mb-4">Ratings and reviews</h3>
             
             <!-- ✨ NAYA: Play Store Style Rating Bars ✨ -->
@@ -1110,12 +1124,32 @@ footer a>i{color:#a49aa8!important}
         </div>
 
 
+
+<!-- Professional store information area -->
+<section class="site-guide" aria-label="Shopping guide">
+  <div class="site-section-heading"><span class="site-eyebrow">A SIMPLE EXPERIENCE</span><h2>Shop with confidence</h2><p>Everything you need to explore this store, in one place.</p></div>
+  <div class="site-guide-grid">
+    <article class="site-guide-card"><span class="site-guide-icon"><i class="fas fa-magnifying-glass"></i></span><h3>Discover</h3><p>Browse the collection and use search or filters to find what you need.</p></article>
+    <article class="site-guide-card"><span class="site-guide-icon"><i class="fas fa-bag-shopping"></i></span><h3>Choose</h3><p>Open an item to view its details, then add it to your cart or start an order.</p></article>
+    <article class="site-guide-card"><span class="site-guide-icon"><i class="fas fa-comments"></i></span><h3>Connect</h3><p>Share your order details and contact the store for product or service questions.</p></article>
+  </div>
+</section>
+<section id="store-contact" class="site-contact">
+  <div class="site-contact-copy"><span class="site-eyebrow">WE’RE HERE TO HELP</span><h2>Let’s talk</h2><p>Have a question about an item, availability or an order? Get in touch with the store.</p>
+    <div class="site-contact-detail"><i class="fas fa-location-dot"></i><span id="site-contact-address">Visit or contact our store for more information.</span></div>
+    <div class="site-contact-actions"><button type="button" onclick="if(typeof openWhatsApp==='function'){trackEvent('whatsappClicks');openWhatsApp();}" class="site-contact-primary"><i class="fab fa-whatsapp"></i> Chat on WhatsApp</button><a id="site-contact-map" href="#" target="_blank" rel="noopener" class="site-contact-secondary hidden"><i class="fas fa-map-location-dot"></i> Get directions</a></div>
+  </div>
+  <div class="site-contact-art"><span class="site-contact-orbit orbit-one"></span><span class="site-contact-orbit orbit-two"></span><i class="fas fa-headset"></i><small>PERSONAL SUPPORT</small></div>
+</section>
+<div class="site-back-top"><button type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-arrow-up"></i> Back to top</button></div>
+
                              <!-- ✨ FOOTER ✨ -->
         <footer class="mt-12 pb-14 px-5 text-center bg-white">
           <div class="flex justify-center items-center gap-1.5 text-gray-400 mb-2 opacity-80"><i class="fas fa-shopping-bag text-[10px]"></i><span class="font-bold text-[12px] tracking-wide">BikriPage Storefront</span></div>
 
             <p class="text-[11px] font-semibold text-gray-400 opacity-80">&copy; 2026 <span id="footer-shop-name">Store</span></p>
             <p class="text-[9px] font-bold text-gray-400 mt-1 uppercase tracking-widest opacity-80">Proprietor: <span id="footer-owner-name">Owner</span></p>
+            <div class="site-footer-links"><a href="#store-home">Home</a><a href="#store-catalog">Shop</a><a href="#store-reviews">Reviews</a><a href="#store-contact">Contact</a></div>
             
             <!-- ✨ NAYA BUTTON (iOS Native + BikriPage Theme) ✨ -->
             <div class="mt-8 flex justify-center">
@@ -4569,6 +4603,184 @@ body[data-store-theme="general"] #business-theme-intro{background:linear-gradien
  window.applyStoreTheme=async function(){await originalApply();const id=document.body.dataset.storeTheme||'default';paint(id);};
  document.addEventListener('DOMContentLoaded',()=>{const id=document.body.dataset.storeTheme||'default';paint(id);});
  window.addEventListener('store-data-ready',e=>{const id=(e.detail&&e.detail.storeTheme)||'default';paint(id);});
+})();
+</script>
+
+
+<style id="bikripage-full-site-upgrade">
+:root{--site-accent:#554563;--site-accent-dark:#392e43;--site-soft:#f3eff5;--site-line:#e8e0e9;--site-ink:#292331;--site-muted:#77717d}
+html{scroll-padding-top:92px;scroll-behavior:smooth}
+.site-nav-wrap{position:sticky;top:69px;z-index:40;background:rgba(255,254,250,.97);border-bottom:1px solid var(--site-line);backdrop-filter:blur(14px)}
+.site-nav-inner{max-width:1220px;margin:auto;min-height:62px;padding:9px clamp(15px,4vw,42px);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.site-nav-brand{display:flex;align-items:center;gap:9px;min-width:0;text-decoration:none;color:var(--site-ink);font-size:11px;font-weight:900;letter-spacing:.12em}
+.site-nav-brand>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px}
+.site-brand-mark{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:var(--site-accent-dark);color:#fff}
+.site-nav-links{display:flex;align-items:center;gap:clamp(12px,2.4vw,28px)}
+.site-nav-links a{font-size:11px;font-weight:750;color:var(--site-muted);text-decoration:none;transition:color .2s}
+.site-nav-links a:hover{color:var(--site-accent)}
+.site-nav-cta,.site-contact-primary{border:0;border-radius:999px;padding:11px 16px;background:var(--site-accent-dark);color:#fff;font-size:11px;font-weight:850;display:flex;align-items:center;gap:9px;white-space:nowrap}
+.site-announcement{display:flex;align-items:center;justify-content:center;gap:9px;padding:9px 14px;background:var(--site-soft);color:var(--site-accent-dark);font-size:10px;font-weight:750;text-align:center}
+.site-live-dot{width:7px;height:7px;border-radius:50%;background:var(--site-accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--site-accent) 12%,transparent)}
+.site-breadcrumb{display:flex;align-items:center;gap:9px;padding:15px clamp(18px,5vw,58px) 0;color:#96909a;font-size:10px;font-weight:700}
+.site-breadcrumb i{font-size:8px;color:#b7b1ba}
+#store-catalog{scroll-margin-top:145px}#store-reviews,#store-contact{scroll-margin-top:145px}
+.site-guide{padding:clamp(28px,5vw,54px) clamp(17px,4vw,48px);background:linear-gradient(145deg,var(--site-soft),#fff 80%);border-top:1px solid var(--site-line);border-bottom:1px solid var(--site-line)}
+.site-section-heading{text-align:center;margin:0 auto 25px;max-width:520px}
+.site-eyebrow{display:block;color:var(--site-accent);font-size:9px;font-weight:900;letter-spacing:.18em;margin-bottom:9px}
+.site-section-heading h2,.site-contact h2{margin:0;color:var(--site-ink);font-size:clamp(24px,4vw,34px);font-weight:900;letter-spacing:-.055em}
+.site-section-heading p,.site-contact-copy>p{margin:9px 0 0;color:var(--site-muted);font-size:12px;line-height:1.7}
+.site-guide-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;max-width:1080px;margin:auto}
+.site-guide-card{padding:20px 18px;border:1px solid var(--site-line);border-radius:18px;background:#fff;box-shadow:0 7px 24px rgba(40,30,50,.035)}
+.site-guide-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--site-soft);color:var(--site-accent);font-size:15px}
+.site-guide-card h3{margin:14px 0 5px;color:var(--site-ink);font-size:14px;font-weight:850}
+.site-guide-card p{margin:0;color:var(--site-muted);font-size:11px;line-height:1.65}
+.site-contact{margin:clamp(22px,4vw,42px) clamp(14px,3vw,32px);padding:clamp(22px,4vw,42px);border-radius:24px;background:var(--site-soft);border:1px solid var(--site-line);display:grid;grid-template-columns:1.35fr .65fr;align-items:center;gap:24px;overflow:hidden}
+.site-contact-copy{min-width:0}.site-contact-copy>p{max-width:480px}
+.site-contact-detail{display:flex;align-items:flex-start;gap:10px;margin-top:20px;color:var(--site-ink);font-size:11px;font-weight:700;line-height:1.6}.site-contact-detail i{color:var(--site-accent);margin-top:2px}
+.site-contact-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}
+.site-contact-primary{cursor:pointer}.site-contact-secondary{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--site-line);border-radius:999px;padding:10px 15px;color:var(--site-accent-dark);background:#fff;font-size:11px;font-weight:800;text-decoration:none}
+.site-contact-art{height:170px;max-width:230px;width:100%;justify-self:center;border-radius:24px;background:linear-gradient(145deg,var(--site-accent),var(--site-accent-dark));color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:0 18px 38px color-mix(in srgb,var(--site-accent) 20%,transparent)}
+.site-contact-art>i{font-size:40px;z-index:1}.site-contact-art small{z-index:1;margin-top:12px;font-size:8px;letter-spacing:.2em;font-weight:900;color:rgba(255,255,255,.78)}
+.site-contact-orbit{position:absolute;border:1px solid rgba(255,255,255,.19);border-radius:50%;width:190px;height:190px}.orbit-one{transform:translate(48px,-55px)}.orbit-two{transform:translate(-60px,65px);width:130px;height:130px}
+.site-back-top{display:flex;justify-content:center;padding:0 15px 24px}.site-back-top button{border:1px solid var(--site-line);background:#fff;color:var(--site-accent);border-radius:999px;padding:10px 15px;font-size:10px;font-weight:800}
+.site-footer-links{display:flex;justify-content:center;flex-wrap:wrap;gap:18px;margin:20px 0 4px}.site-footer-links a{font-size:10px;font-weight:800;color:var(--site-accent);text-decoration:none}
+/* Each business theme now drives the entire site shell, not only product cards. */
+body[data-store-theme="retail"]{--site-accent:#315b9a;--site-accent-dark:#234575;--site-soft:#edf3fb;--site-line:#dce6f4}
+body[data-store-theme="restaurant"]{--site-accent:#b96b2c;--site-accent-dark:#87471c;--site-soft:#fbf1e8;--site-line:#efdfcf}
+body[data-store-theme="clinic"],body[data-store-theme="pharmacy"]{--site-accent:#2475b8;--site-accent-dark:#15558a;--site-soft:#edf6fc;--site-line:#dceaf5}
+body[data-store-theme="salon"],body[data-store-theme="fashion"]{--site-accent:#c64f91;--site-accent-dark:#913467;--site-soft:#fcf0f7;--site-line:#f0dce9}
+body[data-store-theme="repair"],body[data-store-theme="automotive"]{--site-accent:#3d6f9e;--site-accent-dark:#284e72;--site-soft:#eef4f8;--site-line:#dce7ef}
+body[data-store-theme="grocery"]{--site-accent:#438b43;--site-accent-dark:#2d672e;--site-soft:#eff7ed;--site-line:#deebd9}
+body[data-store-theme="realestate"],body[data-store-theme="furniture"]{--site-accent:#986b43;--site-accent-dark:#68462b;--site-soft:#f7f1eb;--site-line:#e9ded2}
+body[data-store-theme="education"]{--site-accent:#3278b8;--site-accent-dark:#205889;--site-soft:#eef5fb;--site-line:#dce8f3}
+body[data-store-theme="fitness"]{--site-accent:#d9434e;--site-accent-dark:#a72e39;--site-soft:#fff0f0;--site-line:#f1dddd}
+body[data-store-theme="travel"]{--site-accent:#1599a5;--site-accent-dark:#0b6872;--site-soft:#eaf8f8;--site-line:#d7eeee}
+body[data-store-theme="electronics"]{--site-accent:#6250a5;--site-accent-dark:#443477;--site-soft:#f1effa;--site-line:#e1dcf1}
+body[data-store-theme="homeservices"]{--site-accent:#b87528;--site-accent-dark:#805018;--site-soft:#fbf3e9;--site-line:#eee1cf}
+body[data-store-theme="bakery"]{--site-accent:#b97832;--site-accent-dark:#85501f;--site-soft:#fbf2e8;--site-line:#efdfcd}
+body[data-store-theme="freelancer"]{--site-accent:#168eaa;--site-accent-dark:#0e6277;--site-soft:#eaf7fa;--site-line:#d8edf1}
+body[data-store-theme="photography"]{--site-accent:#6b4a9b;--site-accent-dark:#49316e;--site-soft:#f2eef8;--site-line:#e4dcef}
+body[data-store-theme="general"]{--site-accent:#43845b;--site-accent-dark:#2c603f;--site-soft:#eff6f0;--site-line:#dceade}
+body[data-store-theme="default"]{--site-accent:#554563;--site-accent-dark:#392e43;--site-soft:#f3eff5;--site-line:#e8e0e9}
+@media(max-width:640px){.site-nav-wrap{top:69px}.site-nav-inner{min-height:54px}.site-nav-links{gap:12px}.site-nav-links a{font-size:10px}.site-nav-links a:nth-child(3){display:none}.site-nav-cta{padding:9px 11px;font-size:10px}.site-guide-grid{grid-template-columns:1fr;gap:9px}.site-guide-card{display:grid;grid-template-columns:40px 1fr;column-gap:12px;padding:14px}.site-guide-icon{grid-row:span 2}.site-guide-card h3{margin:0 0 3px}.site-contact{grid-template-columns:1fr;margin:18px 12px;padding:22px;border-radius:20px}.site-contact-art{display:none}.site-breadcrumb{padding-top:12px}}
+@media(max-width:380px){.site-nav-brand>span:last-child{max-width:90px}.site-nav-links{gap:9px}.site-nav-links a{font-size:9px}.site-nav-links a:nth-child(2){display:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.site-nav-links a{transition:none}}
+</style>
+<script id="bikripage-full-site-upgrade-script">
+(function(){
+ const $=id=>document.getElementById(id);
+ function syncStoreIdentity(){
+   const name=$('profile-shop-name')?.textContent?.trim();
+   if(name){if($('site-nav-shop-name'))$('site-nav-shop-name').textContent=name.toUpperCase();if($('site-breadcrumb-shop'))$('site-breadcrumb-shop').textContent=name;if($('site-announcement-text'))$('site-announcement-text').textContent='Welcome to '+name+' — explore our collection and offerings.';}
+   const address=$('profile-location');
+   if(address&&$('site-contact-address'))$('site-contact-address').textContent=address.innerText.trim()||'Visit or contact our store for more information.';
+   const map=$('profile-map-link');const mapOut=$('site-contact-map');
+   if(map&&map.href&&map.href!=='#'&&map.classList.contains('hidden')===false&&mapOut){mapOut.href=map.href;mapOut.classList.remove('hidden');}
+ }
+ document.addEventListener('DOMContentLoaded',()=>{syncStoreIdentity();const target=$('profile-shop-name');if(target&&window.MutationObserver)new MutationObserver(syncStoreIdentity).observe(target,{childList:true,subtree:true,characterData:true});const addr=$('profile-location');if(addr&&window.MutationObserver)new MutationObserver(syncStoreIdentity).observe(addr,{childList:true,subtree:true,characterData:true});});
+ window.addEventListener('store-data-ready',()=>setTimeout(syncStoreIdentity,0));
+ const originalTheme=window.loadStoreTheme;
+ if(typeof originalTheme==='function')window.loadStoreTheme=function(data){const out=originalTheme(data);setTimeout(syncStoreIdentity,0);return out;};
+})();
+</script>
+
+
+<style id="bikripage-real-theme-sites">
+/* Real theme-driven storefront layouts: imagery is sourced from the shop's own products. */
+#bp-theme-home{--bp-hero:#edf3ec;--bp-ink:#17251f;--bp-radius:24px;margin:0 0 22px;overflow:hidden;background:var(--bp-hero);color:var(--bp-ink)}
+#bp-theme-home .bp-hero{display:grid;grid-template-columns:1fr 1fr;min-height:390px;align-items:stretch}
+#bp-theme-home .bp-copy{padding:clamp(26px,5vw,66px);display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:14px}
+#bp-theme-home .bp-kicker{font-size:10px;font-weight:900;letter-spacing:.2em;text-transform:uppercase;opacity:.72}
+#bp-theme-home .bp-title{font-family:Georgia,serif;font-size:clamp(34px,5vw,62px);line-height:.99;letter-spacing:-.055em;font-weight:500;max-width:620px}
+#bp-theme-home .bp-description{font-size:13px;line-height:1.8;max-width:440px;opacity:.76}
+#bp-theme-home .bp-shop{border:0;border-radius:999px;padding:13px 20px;background:var(--bp-ink);color:white;font-size:11px;font-weight:850;cursor:pointer;margin-top:5px}
+#bp-theme-home .bp-visual{min-height:330px;position:relative;overflow:hidden;background:linear-gradient(135deg,#dce5d8,#b7c9b3)}
+#bp-theme-home .bp-visual img{width:100%;height:100%;position:absolute;inset:0;object-fit:cover}
+#bp-theme-home .bp-visual:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.08),transparent 45%);pointer-events:none}
+#bp-theme-home .bp-image-label{position:absolute;z-index:2;bottom:18px;left:18px;background:rgba(255,255,255,.9);padding:10px 13px;border-radius:12px;font-size:10px;font-weight:800;max-width:80%}
+#bp-theme-home .bp-feature-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:14px clamp(14px,3vw,32px) 24px;background:rgba(255,255,255,.55)}
+#bp-theme-home .bp-feature{position:relative;min-height:155px;border-radius:16px;overflow:hidden;background:#dce5d8}
+#bp-theme-home .bp-feature img{width:100%;height:100%;position:absolute;inset:0;object-fit:cover;transition:transform .5s}
+#bp-theme-home .bp-feature:hover img{transform:scale(1.05)}
+#bp-theme-home .bp-feature:after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,rgba(0,0,0,.65))}
+#bp-theme-home .bp-feature span{position:absolute;z-index:2;left:13px;right:10px;bottom:12px;color:white;font:500 17px Georgia,serif}
+#bp-theme-home .bp-feature:nth-child(2){transform:translateY(10px)}
+#bp-theme-home .bp-feature:nth-child(3){transform:translateY(20px)}
+#bp-theme-home.bp-no-products .bp-feature-row{display:none}
+#bp-theme-home.bp-no-products .bp-visual{background:radial-gradient(circle at 70% 30%,rgba(255,255,255,.7),transparent 30%),linear-gradient(135deg,var(--site-soft),var(--site-accent))}
+#bp-theme-home.bp-layout-gallery .bp-hero{grid-template-columns:.8fr 1.2fr}
+#bp-theme-home.bp-layout-gallery .bp-visual{min-height:440px}
+#bp-theme-home.bp-layout-gallery .bp-feature-row{grid-template-columns:1.3fr 1fr 1fr}
+#bp-theme-home.bp-layout-dark{background:#171b1b;color:#fff}
+#bp-theme-home.bp-layout-dark .bp-shop{background:#fff;color:#171b1b}
+#bp-theme-home.bp-layout-dark .bp-feature-row{background:#202727}
+#bp-theme-home.bp-layout-editorial .bp-hero{grid-template-columns:1fr 1fr;min-height:470px}
+#bp-theme-home.bp-layout-editorial .bp-visual{margin:18px;border-radius:20px;min-height:420px}
+#bp-theme-home.bp-layout-editorial .bp-feature{min-height:190px;border-radius:8px}
+#bp-theme-home.bp-layout-tiles .bp-hero{grid-template-columns:.85fr 1.15fr;min-height:350px}
+#bp-theme-home.bp-layout-tiles .bp-feature{min-height:130px;border-radius:12px}
+#bp-theme-home.bp-layout-soft .bp-hero{grid-template-columns:1.05fr .95fr}
+#bp-theme-home.bp-layout-soft .bp-visual{margin:18px;border-radius:24px}
+#bp-theme-home[data-theme="restaurant"],#bp-theme-home[data-theme="bakery"]{--bp-hero:#f8eee4;--bp-ink:#603719}
+#bp-theme-home[data-theme="salon"],#bp-theme-home[data-theme="fashion"]{--bp-hero:#f8eaf1;--bp-ink:#54233e}
+#bp-theme-home[data-theme="clinic"],#bp-theme-home[data-theme="pharmacy"]{--bp-hero:#eaf3fa;--bp-ink:#153d5a}
+#bp-theme-home[data-theme="grocery"]{--bp-hero:#edf4e7;--bp-ink:#264d2b}
+#bp-theme-home[data-theme="fitness"],#bp-theme-home[data-theme="automotive"],#bp-theme-home[data-theme="repair"]{--bp-hero:#202b32;--bp-ink:#fff}
+#bp-theme-home[data-theme="travel"]{--bp-hero:#e4f4f3;--bp-ink:#124b50}
+#bp-theme-home[data-theme="electronics"]{--bp-hero:#eeecf8;--bp-ink:#29234d}
+#bp-theme-home[data-theme="realestate"],#bp-theme-home[data-theme="furniture"]{--bp-hero:#f1e9df;--bp-ink:#4b3524}
+#bp-theme-home[data-theme="photography"]{--bp-hero:#24212b;--bp-ink:#fff}
+#bp-theme-home[data-theme="education"]{--bp-hero:#eaf1fa;--bp-ink:#1d3e63}
+#bp-theme-home[data-theme="homeservices"]{--bp-hero:#f5eee3;--bp-ink:#573c20}
+#bp-theme-home[data-theme="freelancer"]{--bp-hero:#e8f4f6;--bp-ink:#17444e}
+#bp-theme-home[data-theme="retail"]{--bp-hero:#edf1f8;--bp-ink:#1e3458}
+@media(max-width:680px){#bp-theme-home{margin-bottom:16px}#bp-theme-home .bp-hero,#bp-theme-home.bp-layout-gallery .bp-hero,#bp-theme-home.bp-layout-editorial .bp-hero,#bp-theme-home.bp-layout-tiles .bp-hero,#bp-theme-home.bp-layout-soft .bp-hero{grid-template-columns:1fr;min-height:0}#bp-theme-home .bp-copy{padding:27px 22px 22px;order:1}#bp-theme-home .bp-visual{order:2;min-height:260px}#bp-theme-home.bp-layout-editorial .bp-visual,#bp-theme-home.bp-layout-soft .bp-visual{margin:0;border-radius:0;min-height:260px}#bp-theme-home .bp-feature-row{gap:8px;padding:10px 10px 22px}#bp-theme-home .bp-feature{min-height:115px;border-radius:11px}#bp-theme-home .bp-feature:nth-child(2),#bp-theme-home .bp-feature:nth-child(3){transform:none}#bp-theme-home .bp-feature span{font-size:12px;left:8px;bottom:8px}#bp-theme-home .bp-title{font-size:clamp(34px,10vw,48px)}}
+</style>
+<script id="bikripage-real-theme-sites-script">
+(()=>{
+ const themes={
+  default:['A better way to shop','Discover something you’ll love','Explore our collection, find your favourites and connect with us.','EXPLORE THE STORE','soft'],
+  retail:['The everyday edit','Good finds. Great choices.','Browse a thoughtfully selected range of products for every day.','SHOP THE COLLECTION','editorial'],
+  restaurant:['Made fresh. Served with care.','A little something delicious','Explore our menu and discover what’s fresh from our kitchen.','VIEW THE MENU','gallery'],
+  clinic:['Your health, our priority','Care that puts you first','Explore our services and connect with our care team.','EXPLORE SERVICES','soft'],
+  salon:['Feel good in your own skin','Your moment of self-care','Discover beauty services and treatments made around you.','DISCOVER SERVICES','editorial'],
+  repair:['Reliable help. Right when you need it.','Repairs made simpler','Explore our services and get the support your device or home needs.','REQUEST SERVICE','dark'],
+  grocery:['Fresh choices for every day','Bring home the good stuff','Explore daily essentials and fresh picks from our store.','SHOP GROCERIES','tiles'],
+  realestate:['Find a place to call yours','Spaces with possibility','Explore available properties and enquire about your next move.','EXPLORE PROPERTIES','editorial'],
+  education:['Learn something that moves you','Build skills for what’s next','Explore learning programs, courses and ways to get started.','EXPLORE COURSES','soft'],
+  fitness:['Stronger starts here','Make every day count','Explore training plans and services built to keep you moving.','START TRAINING','dark'],
+  travel:['The world is waiting','Your next story starts here','Discover journeys, destinations and travel experiences.','EXPLORE TRIPS','gallery'],
+  pharmacy:['Everyday wellness, made easier','Care for the everyday','Browse health essentials and wellness products available here.','BROWSE PRODUCTS','soft'],
+  electronics:['Make room for better tech','Smart choices. Smarter living.','Explore devices, accessories and technology for your everyday.','EXPLORE TECH','tiles'],
+  fashion:['Find your next favourite','A style that feels like you','Explore the latest pieces and discover your own signature look.','SHOP THE EDIT','editorial'],
+  homeservices:['A helping hand for your home','Make home work better','Find practical services and trusted help for your space.','BOOK A SERVICE','tiles'],
+  bakery:['A little joy, freshly baked','Made to make your day','Discover fresh bakes, treats and something special for every occasion.','VIEW THE MENU','gallery'],
+  automotive:['Ready for every road','Care for the miles ahead','Explore vehicle care, maintenance and automotive services.','BOOK SERVICE','dark'],
+  freelancer:['Good work starts here','Ideas into thoughtful work','Explore services, past work and ways we can work together.','VIEW SERVICES','editorial'],
+  photography:['Stories worth keeping','Moments, beautifully remembered','Explore selected work and photography services.','VIEW GALLERY','gallery'],
+  furniture:['Make space for living','Designed around your home','Explore furniture and pieces that bring your space together.','EXPLORE COLLECTION','editorial'],
+  general:['Welcome. Take a look around.','Everything you need, in one place','Explore what we offer and get in touch with our team.','EXPLORE NOW','soft']
+ };
+ const $=id=>document.getElementById(id);
+ let lastKey='';
+ function getProducts(){const grid=$('products-grid');if(!grid)return[];return [...grid.querySelectorAll('.grid-item')].filter(c=>c.querySelector('img')?.src).slice(0,3).map(c=>({img:c.querySelector('img').src,name:c.querySelector('h4')?.textContent?.trim()||'Explore this item'}));}
+ function render(){
+  const id=document.body.dataset.storeTheme||'default',data=themes[id]||themes.default;
+  const target=document.querySelector('main>div.px-5.py-4');if(!target)return;
+  const products=getProducts();const shop=$('profile-shop-name')?.textContent?.trim()||'Our Store';
+  const key=id+'|'+shop+'|'+products.map(x=>x.img).join('|');if(key===lastKey)return;lastKey=key;
+  let home=$('bp-theme-home');if(!home){home=document.createElement('section');home.id='bp-theme-home';target.parentNode.insertBefore(home,target);}
+  home.dataset.theme=id;home.className='bp-layout-'+data[4]+(products.length?'':' bp-no-products');
+  const mainImage=products[0]?.img||'';
+  const feature=products.length?products.map((p,i)=>`<div class="bp-feature"><img src="${p.img.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" alt="${p.name.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" loading="lazy"><span>${p.name.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span></div>`).join(''):'';
+  home.innerHTML=`<div class="bp-hero"><div class="bp-copy"><span class="bp-kicker">${data[3]}</span><h2 class="bp-title">${data[0]}</h2><p class="bp-description">${data[2]}</p><button class="bp-shop" type="button">${data[3]} <i class="fas fa-arrow-right" style="margin-left:8px"></i></button></div><div class="bp-visual">${mainImage?`<img src="${mainImage.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" alt="${shop.replace(/"/g,'&quot;')} featured product" loading="lazy">`:''}<span class="bp-image-label">${shop.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span></div></div><div class="bp-feature-row">${feature}</div>`;
+  home.querySelector('.bp-shop').onclick=()=>target.scrollIntoView({behavior:'smooth',block:'start'});
+ }
+ const watch=()=>{const grid=$('products-grid');if(grid&&window.MutationObserver)new MutationObserver(()=>{lastKey='';render()}).observe(grid,{childList:true,subtree:true});};
+ document.addEventListener('DOMContentLoaded',()=>{render();watch();setTimeout(render,900);setTimeout(render,2200);});
+ window.addEventListener('store-data-ready',()=>{lastKey='';setTimeout(render,100);setTimeout(render,1000);});
+ const old=window.loadStoreTheme;if(typeof old==='function')window.loadStoreTheme=function(data){const r=old(data);lastKey='';setTimeout(render,0);return r;};
+ const oldApply=window.applyStoreTheme;if(typeof oldApply==='function')window.applyStoreTheme=async function(){const r=await oldApply();lastKey='';render();return r;};
 })();
 </script>
 

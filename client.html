@@ -17,15 +17,56 @@
     body { background:#f3f5f9; color:var(--ink); font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
     .glass { background:rgba(255,255,255,.88); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
     .panel { background:#fff; border:1px solid var(--line); border-radius:26px; box-shadow:0 12px 35px rgba(15,23,42,.055); }
-    .star { color:#d5dbe4; transition:transform .18s ease,color .18s ease; }
-    .star.active { color:#f5ad24; }
-    .star:active { transform:scale(.88); }
+    
     .btn { transition:transform .18s ease,background .18s ease,box-shadow .18s ease; }
     .btn:active { transform:scale(.98); }
     .fade-up { animation:fadeUp .45s cubic-bezier(.2,.8,.2,1) both; }
     @keyframes fadeUp { from {opacity:0;transform:translateY(14px)} to {opacity:1;transform:translateY(0)} }
     .safe-bottom { padding-bottom:max(24px,env(safe-area-inset-bottom)); }
     textarea { resize:vertical; }
+
+    /* Custom Range Slider */
+    .custom-range {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 12px;
+      background: linear-gradient(to right, #f43f5e, #f97316, #facc15, #84cc16, #10b981);
+      border-radius: 10px;
+      outline: none;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .custom-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid #1e293b;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      transition: transform 0.1s ease;
+    }
+    .custom-range::-webkit-slider-thumb:active {
+      transform: scale(1.2);
+      border-color: #2563eb;
+    }
+    .custom-range::-moz-range-thumb {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid #1e293b;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+
+    /* Emoji Pop Animation */
+    .emoji-pop { animation: popBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    @keyframes popBounce { 
+      0% { transform: scale(0.3); opacity: 0; } 
+      60% { transform: scale(1.15); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; } 
+    }
   </style>
 </head>
 <body class="min-h-screen">
@@ -57,30 +98,32 @@
     </section>
 
     <section id="main-card" class="panel p-5 sm:p-7 fade-up">
-      <div class="flex items-center gap-3 pb-5 border-b border-slate-100">
-        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
-          <i class="fa-regular fa-face-smile"></i>
+      <!-- New Draggable Slider Area -->
+      <div class="py-2 text-center border-b border-slate-100 pb-8">
+        
+        <!-- Dynamic Emoji Display -->
+        <div class="h-[90px] flex items-center justify-center mb-2">
+          <div id="emoji-display" class="text-[75px] drop-shadow-sm transition-colors duration-300">
+             <!-- Placeholder, JS will inject emoji -->
+          </div>
         </div>
-        <div class="min-w-0 flex-1">
-          <p class="text-sm font-extrabold text-slate-900">Rate your experience</p>
-          <p class="text-xs text-slate-500 mt-0.5">Choose a rating from 1 to 5 stars</p>
+
+        <p id="rating-label" class="text-[15px] font-black mb-6 transition-colors">Drag to rate us</p>
+        
+        <!-- The Range Slider -->
+        <div class="px-2">
+          <input type="range" id="experience-slider" class="custom-range" min="1" max="5" step="1" value="5">
+          <div class="flex justify-between text-[11px] font-extrabold text-slate-400 mt-4 px-1 uppercase tracking-wider">
+            <span>Poor</span>
+            <span>Excellent</span>
+          </div>
         </div>
       </div>
 
-      <div class="py-7 text-center">
-        <div id="star-picker" class="flex justify-center gap-2 sm:gap-3" role="group" aria-label="Choose your rating">
-          <button class="star text-[39px] sm:text-[43px]" type="button" data-rating="1" aria-label="1 star"><i class="fa-solid fa-star"></i></button>
-          <button class="star text-[39px] sm:text-[43px]" type="button" data-rating="2" aria-label="2 stars"><i class="fa-solid fa-star"></i></button>
-          <button class="star text-[39px] sm:text-[43px]" type="button" data-rating="3" aria-label="3 stars"><i class="fa-solid fa-star"></i></button>
-          <button class="star text-[39px] sm:text-[43px]" type="button" data-rating="4" aria-label="4 stars"><i class="fa-solid fa-star"></i></button>
-          <button class="star text-[39px] sm:text-[43px]" type="button" data-rating="5" aria-label="5 stars"><i class="fa-solid fa-star"></i></button>
-        </div>
-        <p id="rating-label" class="text-sm font-bold text-slate-400 mt-3">Tap a star to rate us</p>
-      </div>
-
-      <div id="feedback-area" class="hidden border-t border-slate-100 pt-5">
+      <!-- Feedback & Action Area -->
+      <div id="feedback-area" class="pt-6">
         <div class="flex justify-between items-center mb-2">
-          <label for="customer-message" class="block text-sm font-extrabold text-slate-900">Anything you'd like us to know?</label>
+          <label id="msg-label" for="customer-message" class="block text-sm font-extrabold text-slate-900">Anything you'd like us to know?</label>
           <button id="next-msg-btn" type="button" class="hidden text-[11px] bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-bold hover:bg-blue-100 transition-colors">
             <i class="fa-solid fa-arrows-rotate"></i> Change
           </button>
@@ -89,19 +132,23 @@
         <textarea id="customer-message" rows="4" maxlength="1000" placeholder="Write your feedback here…" class="w-full rounded-2xl bg-slate-50 border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none p-4 text-sm text-slate-800 placeholder:text-slate-400"></textarea>
         
         <div class="flex items-center justify-between mt-2 mb-5">
-          <span class="text-[10px] text-slate-400">Please don't include sensitive personal information.</span>
+          <span class="text-[10px] text-slate-400">Please don't include sensitive info.</span>
           <span id="char-count" class="text-[10px] text-slate-400">0/1000</span>
         </div>
 
         <button id="dynamic-submit" type="button" class="btn w-full rounded-2xl bg-slate-900 hover:bg-black text-white font-extrabold text-sm h-[52px] flex items-center justify-center gap-2 shadow-lg shadow-slate-900/10">
-          <i id="submit-icon" class="fa-regular fa-paper-plane"></i> <span id="submit-text">Send feedback to the store</span>
+          <i id="submit-icon" class="fa-regular fa-paper-plane"></i> <span id="submit-text">Send feedback</span>
         </button>
+
+        <!-- Note about Google 5-Star -->
+        <p id="google-note" class="hidden text-[11px] text-center text-slate-500 mt-4 font-bold bg-slate-50 rounded-lg py-2">
+          <i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> Note: On Google, you'll need to tap the 5-stars manually.
+        </p>
       </div>
     </section>
 
     <footer class="text-center pt-7">
       <p class="text-[10px] text-slate-400 font-medium">Powered by <span class="font-black text-slate-600">BikriPage</span></p>
-      <p class="text-[10px] text-slate-400 mt-1">Thank you for taking a moment to help us grow.</p>
     </footer>
   </main>
 
@@ -134,7 +181,7 @@
     const params = new URLSearchParams(window.location.search);
     const shopId = (params.get("shop") || "").trim();
     let shopData = {};
-    let selectedRating = 0;
+    let selectedRating = 5; // Default rating set to 5
     let googleReviewUrl = "";
 
     const positiveReviews = [
@@ -146,12 +193,13 @@
     ];
     let currentReviewIndex = -1;
 
-    const ratingLabels = {
-      1: "We're sorry — tell us how we can improve.",
-      2: "Thanks for your honesty. What could be better?",
-      3: "Thanks! Tell us how we can improve.",
-      4: "Glad you had a good experience!",
-      5: "That's wonderful! Thank you for your support."
+    // Emoji Settings map
+    const ratingConfigs = {
+      1: { text: "Very Poor", msgLabel: "What went wrong?", emoji: "fa-solid fa-face-angry text-rose-500" },
+      2: { text: "Poor", msgLabel: "What can we improve?", emoji: "fa-solid fa-face-frown text-orange-500" },
+      3: { text: "Average", msgLabel: "How can we do better?", emoji: "fa-solid fa-face-meh text-amber-400" },
+      4: { text: "Good", msgLabel: "What did you like?", emoji: "fa-solid fa-face-smile text-lime-500" },
+      5: { text: "Excellent!", msgLabel: "Share your experience", emoji: "fa-solid fa-face-grin-stars text-emerald-500" }
     };
 
     function showToast(message) {
@@ -159,7 +207,7 @@
       document.getElementById("toast-text").textContent = message;
       toast.classList.remove("opacity-0", "translate-y-5");
       clearTimeout(showToast.timer);
-      showToast.timer = setTimeout(() => toast.classList.add("opacity-0", "translate-y-5"), 2600);
+      showToast.timer = setTimeout(() => toast.classList.add("opacity-0", "translate-y-5"), 2800);
     }
 
     function showFatal(message) {
@@ -195,16 +243,15 @@
 
         document.title = `Share Your Experience | ${shopName}`;
         document.getElementById("header-shop-name").textContent = shopName;
-        document.getElementById("hero-shop-name").textContent = `Tell ${shopName} how they did. Your honest feedback helps the store improve.`;
+        document.getElementById("hero-shop-name").textContent = `Tell ${shopName} how they did.`;
         document.getElementById("loading-screen").classList.add("hidden");
       } catch (error) {
-        showFatal("We couldn't load the store details right now. Please try again later.");
+        showFatal("We couldn't load the store details right now.");
       }
     }
 
     function setRandomReview() {
       let newIndex = currentReviewIndex;
-      // Loop tab tak chalega jab tak naya index purane wale se alag na ho jaye
       while (newIndex === currentReviewIndex) {
         newIndex = Math.floor(Math.random() * positiveReviews.length);
       }
@@ -214,60 +261,70 @@
       textarea.dispatchEvent(new Event("input"));
     }
 
-    function selectRating(rating) {
+    function updateUI(rating) {
       selectedRating = rating;
-      document.querySelectorAll("#star-picker .star").forEach(button => {
-        const value = Number(button.dataset.rating);
-        button.classList.toggle("active", value <= rating);
-      });
+      const config = ratingConfigs[rating];
       
-      document.getElementById("rating-label").textContent = ratingLabels[rating];
-      document.getElementById("rating-label").className = "text-sm font-bold mt-3 " + (rating <= 3 ? "text-rose-600" : "text-emerald-600");
-      document.getElementById("feedback-area").classList.remove("hidden");
+      // Animate Emoji
+      const emojiContainer = document.getElementById("emoji-display");
+      emojiContainer.innerHTML = `<i class="${config.emoji} emoji-pop inline-block"></i>`;
+      
+      // Update Texts
+      const ratingLabel = document.getElementById("rating-label");
+      ratingLabel.textContent = config.text;
+      ratingLabel.className = "text-[18px] font-black mb-6 " + (rating <= 3 ? "text-rose-600" : "text-emerald-600");
+      
+      document.getElementById("msg-label").textContent = config.msgLabel;
 
+      // Update Form Actions based on Good vs Bad
       const submitBtn = document.getElementById("dynamic-submit");
       const submitIcon = document.getElementById("submit-icon");
       const submitText = document.getElementById("submit-text");
       const nextBtn = document.getElementById("next-msg-btn");
       const textarea = document.getElementById("customer-message");
+      const googleNote = document.getElementById("google-note");
 
       if (rating >= 4) {
         nextBtn.classList.remove("hidden");
-        // Agar textarea khali hai ya koi prefilled message pehle se hai, tabhi change kare
+        googleNote.classList.remove("hidden"); // Show note for Google
+        
         if (!textarea.value || positiveReviews.includes(textarea.value)) {
-          if (currentReviewIndex === -1) {
-            setRandomReview();
-          } else {
+          if (currentReviewIndex === -1) setRandomReview();
+          else {
             textarea.value = positiveReviews[currentReviewIndex];
             textarea.dispatchEvent(new Event("input"));
           }
         }
-        submitIcon.className = "fa-regular fa-copy";
+        submitIcon.className = "fa-solid fa-copy";
         submitText.textContent = "Copy & Continue to Google";
         submitBtn.className = "btn w-full rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm h-[52px] flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20";
       } else {
         nextBtn.classList.add("hidden");
-        // Agar prefilled message tha, toh usko hata do kyunki rating 1-3 hai
+        googleNote.classList.add("hidden"); // Hide note
+
         if (positiveReviews.includes(textarea.value)) {
           textarea.value = "";
           textarea.dispatchEvent(new Event("input"));
         }
-        submitIcon.className = "fa-regular fa-paper-plane";
-        submitText.textContent = "Send feedback to the store";
+        submitIcon.className = "fa-solid fa-paper-plane";
+        submitText.textContent = "Send feedback to store";
         submitBtn.className = "btn w-full rounded-2xl bg-slate-900 hover:bg-black text-white font-extrabold text-sm h-[52px] flex items-center justify-center gap-2 shadow-lg shadow-slate-900/10";
       }
-      document.getElementById("feedback-area").scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
-    document.querySelectorAll("#star-picker .star").forEach(button => {
-      button.addEventListener("click", () => selectRating(Number(button.dataset.rating)));
+    // Initialize the slider logic
+    const slider = document.getElementById("experience-slider");
+    slider.addEventListener("input", (e) => {
+      updateUI(Number(e.target.value));
     });
+
+    // Run once on load to set the default state to 5
+    updateUI(5);
 
     document.getElementById("customer-message").addEventListener("input", event => {
       document.getElementById("char-count").textContent = `${event.target.value.length}/1000`;
     });
 
-    // Change button pe click hone par random function call hoga
     document.getElementById("next-msg-btn").addEventListener("click", setRandomReview);
 
     function openGoogleReview() {
@@ -279,11 +336,6 @@
     }
 
     document.getElementById("dynamic-submit").addEventListener("click", async () => {
-      if (!selectedRating) {
-        showToast("Please select a star rating first.");
-        return;
-      }
-
       const button = document.getElementById("dynamic-submit");
       const message = document.getElementById("customer-message").value.trim();
 
@@ -291,7 +343,7 @@
         if (message) {
           try {
             await navigator.clipboard.writeText(message);
-            showToast("Review copied! Redirecting to Google...");
+            showToast("Text Copied! Select 5 stars on Google too.");
           } catch (e) {
             console.error("Copy failed", e);
           }
@@ -300,7 +352,7 @@
         button.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Redirecting...';
         setTimeout(() => {
           openGoogleReview();
-          selectRating(selectedRating); 
+          updateUI(selectedRating); // Reset button UI
         }, 1500);
 
       } else {
@@ -320,8 +372,8 @@
           document.getElementById("main-card").innerHTML = `
             <div class="text-center py-8 fade-up">
               <div class="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mx-auto mb-4"><i class="fa-solid fa-check"></i></div>
-              <h2 class="text-xl font-black text-slate-900">Thank you for your feedback!</h2>
-              <p class="text-sm text-slate-500 leading-relaxed mt-2">Your message has been sent directly to the store.</p>
+              <h2 class="text-xl font-black text-slate-900">Thank you!</h2>
+              <p class="text-sm text-slate-500 leading-relaxed mt-2">Your feedback has been sent to the store owner directly to help us improve.</p>
             </div>`;
         } catch (error) {
           showToast("Couldn't send feedback. Please try again.");

@@ -1441,16 +1441,28 @@
                     <div id="customer-suggestion-box" class="absolute top-[70px] left-0 w-full bg-white border border-[#E5E7EB] rounded-[12px] shadow-xl z-50 hidden max-h-40 overflow-y-auto custom-scrollbar divide-y divide-[#F7F7F9]"></div>
                 </div>
 
-                <div class="bg-[#F7F7F9] border border-[#E5E7EB] rounded-[16px] p-4 mb-6">
-                    <label class="text-[11px] text-[#6B7280] font-bold uppercase tracking-wider mb-2 block border-b border-[#E5E7EB] pb-2">Add Product</label>
+                                <!-- ✨ NEW: Smart Search & Add Product Section ✨ -->
+                <div class="bg-[#F7F7F9] border border-[#E5E7EB] rounded-[16px] p-4 mb-6 relative">
+                    <label class="text-[11px] text-[#6B7280] font-bold uppercase tracking-wider mb-2 block border-b border-[#E5E7EB] pb-2">Search & Add Product</label>
                     <div class="flex flex-col sm:flex-row items-center gap-3">
-                        <select id="bill-product-select" class="w-full sm:flex-1 bg-white border border-[#E5E7EB] rounded-[12px] px-3 py-2.5 text-[#111827] text-sm font-semibold outline-none focus:border-[#A855F7] transition cursor-pointer"></select>
+                        <div class="w-full sm:flex-1 relative">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="bill-product-search" oninput="showProductSuggestions()" autocomplete="off" placeholder="Type item name to search..." class="w-full bg-white border border-[#E5E7EB] rounded-[12px] pl-10 pr-3 py-2.5 text-[#111827] text-sm font-semibold outline-none focus:border-[#A855F7] transition">
+                            
+                            <!-- Suggestions Dropdown Box -->
+                            <div id="product-suggestion-box" class="absolute top-[110%] left-0 w-full bg-white border border-gray-200 rounded-[12px] shadow-xl z-50 hidden max-h-48 overflow-y-auto custom-scrollbar divide-y divide-gray-100">
+                                <!-- JS items aayenge yahan -->
+                            </div>
+                        </div>
                         <div class="flex gap-3 w-full sm:w-auto">
+                            <!-- Hidden ID to store selected product -->
+                            <input type="hidden" id="selected-product-id">
                             <input type="number" id="bill-qty-input" value="1" min="1" class="w-20 bg-white border border-[#E5E7EB] rounded-[12px] px-2 py-2.5 text-[#111827] text-sm font-bold text-center outline-none focus:border-[#A855F7]">
-                            <button type="button" onclick="addItemToDraftBill()" class="flex-1 sm:w-auto bg-[#111827] text-white font-bold px-5 py-2.5 rounded-[12px] text-sm active:scale-95 transition shadow-md">Add</button>
+                            <button type="button" onclick="addItemToDraftBill()" class="flex-1 sm:w-auto bg-[#111827] hover:bg-black text-white font-bold px-5 py-2.5 rounded-[12px] text-sm active:scale-95 transition shadow-md whitespace-nowrap">Add</button>
                         </div>
                     </div>
                 </div>
+
 
                 <div class="mb-6 bg-white border border-[#E5E7EB] rounded-[16px] overflow-hidden">
                     <table class="w-full text-left text-sm">
@@ -3133,9 +3145,7 @@ else if(o.status === 'accepted') {
  
             const md = document.getElementById('bill-pay-mode'); md.value='UPI (Online)'; md.disabled=false;
             
-            const prodSel = document.getElementById('bill-product-select');
-            prodSel.innerHTML = storeProducts.length === 0 ? '<option disabled selected>No products</option>' : '<option disabled selected>Select a Product</option>' + storeProducts.map(p => `<option value="${p.id}">${p.name} - ₹${p.price}</option>`).join('');
-            
+         
             populateTrackerDropdown(); renderDraftBill();
             const mdObj = document.getElementById('create-bill-modal'); mdObj.classList.remove('hidden'); setTimeout(() => mdObj.classList.add('opacity-100'), 10);
         }
@@ -3172,13 +3182,99 @@ function toggleNewBillDateField() {
         function selectCustSugg(n, p) { document.getElementById('bill-cust-name').value=n; document.getElementById('bill-cust-phone').value=p; document.getElementById('customer-suggestion-box').classList.add('hidden'); }
         document.addEventListener('click', e => { if(!e.target.closest('#bill-customer-fields')) { let bx = document.getElementById('customer-suggestion-box'); if(bx) bx.classList.add('hidden'); } });
 
-        function addItemToDraftBill() {
-            const sel = document.getElementById('bill-product-select'); const qInp = document.getElementById('bill-qty-input');
-            if(!sel.value) return alert("Select product!"); const prod = storeProducts.find(p => p.id === sel.value); if(!prod) return;
-            let qty = parseInt(qInp.value)||1; let ex = draftBillItems.find(i => i.id === prod.id);
-            if(ex) { ex.qty += qty; ex.total = ex.qty * ex.price; } else { draftBillItems.push({ id: prod.id, name: prod.name, price: prod.price, qty: qty, total: prod.price * qty }); }
-            sel.value = ""; qInp.value = "1"; renderDraftBill();
+                // ==========================================
+        // ✨ SMART PRODUCT SEARCH LOGIC IN BILLING ✨
+        // ==========================================
+        function showProductSuggestions() {
+            const input = document.getElementById('bill-product-search');
+            const box = document.getElementById('product-suggestion-box');
+            const searchVal = input.value.toLowerCase().trim();
+            
+            if (!searchVal) {
+                box.classList.add('hidden');
+                document.getElementById('selected-product-id').value = "";
+                return;
+            }
+
+            // Filter products matching search
+            const matches = storeProducts.filter(p => p.name.toLowerCase().includes(searchVal));
+
+            if (matches.length === 0) {
+                box.innerHTML = `<div class="px-4 py-3 text-gray-500 text-xs text-center">No item found</div>`;
+                box.classList.remove('hidden');
+                return;
+            }
+
+            // Render list
+            box.innerHTML = matches.map(p => `
+                <div onclick="selectProductForBill('${p.id}', '${p.name.replace(/'/g, "\\'")}')" class="px-4 py-2.5 hover:bg-purple-50 cursor-pointer flex justify-between items-center transition-colors">
+                    <span class="text-sm font-bold text-gray-900 truncate pr-2">${p.name}</span>
+                    <span class="text-xs font-black text-green-600 bg-green-50 px-2 py-0.5 rounded border border-green-100 shrink-0">₹${p.price}</span>
+                </div>
+            `).join('');
+            
+            box.classList.remove('hidden');
         }
+
+        function selectProductForBill(id, name) {
+            document.getElementById('selected-product-id').value = id;
+            document.getElementById('bill-product-search').value = name;
+            document.getElementById('product-suggestion-box').classList.add('hidden');
+            // Seedha Qty par focus le jao fast entry ke liye
+            document.getElementById('bill-qty-input').focus();
+        }
+
+        // Bahar click karne par suggestion box band ho jaye
+        document.addEventListener('click', e => { 
+            const box = document.getElementById('product-suggestion-box');
+            const input = document.getElementById('bill-product-search');
+            if (box && !box.contains(e.target) && e.target !== input) {
+                box.classList.add('hidden'); 
+            } 
+        });
+
+        // Purane function ko naye search field ke hisaab se update kiya
+        function addItemToDraftBill() {
+            const prodId = document.getElementById('selected-product-id').value;
+            const searchInput = document.getElementById('bill-product-search');
+            const qInp = document.getElementById('bill-qty-input');
+            
+            if(!prodId) {
+                // Agar user ne manually kuch likha hai par select nahi kiya
+                alert("Please select a product from the list first!");
+                searchInput.focus();
+                return;
+            }
+            
+            const prod = storeProducts.find(p => p.id === prodId); 
+            if(!prod) return;
+            
+            let qty = parseInt(qInp.value) || 1; 
+            let ex = draftBillItems.find(i => i.id === prod.id);
+            
+            if(ex) { 
+                ex.qty += qty; 
+                ex.total = ex.qty * ex.price; 
+            } else { 
+                draftBillItems.push({ 
+                    id: prod.id, 
+                    name: prod.name, 
+                    price: prod.price, 
+                    qty: qty, 
+                    unit: prod.unit || 'pcs',
+                    total: prod.price * qty 
+                }); 
+            }
+            
+            // Reset for next item
+            document.getElementById('selected-product-id').value = "";
+            searchInput.value = ""; 
+            qInp.value = "1"; 
+            
+            renderDraftBill();
+            searchInput.focus(); // Next item search ke liye taiyar
+        }
+
 
         function removeDraftItem(id) { draftBillItems = draftBillItems.filter(i => i.id !== id); renderDraftBill(); }
 

@@ -1443,6 +1443,38 @@
         </div>
     </div>
 
+    <!-- DEDICATED LISTED PRODUCTS PAGE: add items first, then proceed to invoice details -->
+    <div id="listed-products-page" class="fixed inset-0 z-[10000] hidden bg-[#F4F5F7] flex flex-col">
+        <div class="shrink-0 bg-white border-b border-gray-200 px-4 py-4 flex items-center gap-3 shadow-sm">
+            <button type="button" onclick="closeListedProductsPage()" class="w-10 h-10 rounded-full bg-gray-100 text-gray-700 flex items-center justify-center"><i class="fas fa-arrow-left"></i></button>
+            <div class="min-w-0 flex-1">
+                <h2 class="text-lg font-extrabold text-gray-900">Listed Products</h2>
+                <p class="text-xs text-gray-500">Add items from your inventory</p>
+            </div>
+            <span class="text-xs font-bold text-green-700 bg-green-50 px-3 py-2 rounded-full">New Bill</span>
+        </div>
+        <div class="px-4 pt-4 pb-2 bg-[#F4F5F7] shrink-0">
+            <div class="relative">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input id="full-catalog-search" type="search" oninput="renderFullCatalog()" placeholder="Search your products..." class="w-full h-12 bg-white border border-gray-200 rounded-xl pl-11 pr-4 text-sm font-semibold outline-none focus:border-green-500 shadow-sm">
+            </div>
+            <div class="flex items-center justify-between mt-3 px-1">
+                <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Your inventory</p>
+                <p class="text-xs font-semibold text-gray-500"><span id="listed-products-count">0</span> products</p>
+            </div>
+        </div>
+        <div id="full-visual-catalog" class="flex-1 min-h-0 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 content-start gap-3 px-4 py-3 custom-scrollbar"></div>
+        <div class="shrink-0 bg-white border-t border-gray-200 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,0.06)]">
+            <div class="flex items-center justify-between gap-3 mb-3">
+                <div class="min-w-0">
+                    <p class="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Cart · <span id="cart-item-count">0</span> items</p>
+                    <p id="cart-total-amount" class="font-black text-xl text-gray-900">₹0</p>
+                </div>
+                <button type="button" onclick="proceedFromListedProducts()" id="listed-products-proceed" disabled class="shrink-0 bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold px-7 h-12 rounded-xl shadow-md active:scale-[.98] transition">Proceed <i class="fas fa-arrow-right ml-2"></i></button>
+            </div>
+        </div>
+    </div>
+
     <!-- CREATE BILL MODAL -->
     <div id="create-bill-modal" class="fixed inset-0 bg-[#F4F5F7] z-[9990] hidden opacity-0 transition-opacity duration-200 flex items-stretch justify-center">
         <div class="bg-white w-full h-[100dvh] sm:h-[96vh] sm:my-auto sm:max-w-5xl sm:rounded-[24px] shadow-2xl border border-[#E5E7EB] flex flex-col overflow-hidden">
@@ -1452,24 +1484,6 @@
             </div>
             
             <div class="px-4 sm:px-6 py-5 overflow-y-auto flex-1 custom-scrollbar space-y-6">
-                <!-- Listed products: dedicated billing page catalog -->
-                <section class="rounded-2xl border border-gray-200 bg-gray-50 p-4 sm:p-5">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-                        <div>
-                            <h4 class="font-extrabold text-gray-900 text-base"><i class="fas fa-box-open text-green-600 mr-2"></i>Listed Products</h4>
-                            <p class="text-xs text-gray-500 mt-1">Select products from your inventory to add them to this bill</p>
-                        </div>
-                        <div class="relative w-full sm:w-72">
-                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input id="full-catalog-search" type="search" oninput="renderFullCatalog()" placeholder="Search your products..." class="w-full h-11 bg-white border border-gray-200 rounded-xl pl-10 pr-3 text-sm font-semibold outline-none focus:border-green-500">
-                        </div>
-                    </div>
-                    <div id="full-visual-catalog" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[36vh] overflow-y-auto custom-scrollbar pr-1"></div>
-                    <div id="active-cart-bar" class="hidden mt-4 rounded-xl bg-gray-900 text-white p-3 flex items-center justify-between gap-3">
-                        <div class="min-w-0"><p class="text-[10px] uppercase tracking-wider text-gray-300 font-bold">Selected items <span id="cart-item-count">0</span></p><p id="cart-total-amount" class="font-black text-lg">₹0</p></div>
-                        <button type="button" onclick="document.getElementById('bill-customer-fields').scrollIntoView({behavior:'smooth',block:'start'})" class="shrink-0 bg-green-500 text-white text-xs font-bold px-4 py-3 rounded-lg">Continue <i class="fas fa-arrow-down ml-1"></i></button>
-                    </div>
-                </section>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2 relative" id="bill-customer-fields">
                     <div>
                         <label class="text-[11px] text-[#6B7280] font-bold uppercase tracking-wider mb-1.5 block">Customer Name </label>
@@ -3149,6 +3163,37 @@ else if(o.status === 'accepted') {
             select.innerHTML = html;
         }
 
+        function openListedProductsPage() {
+            // Start a fresh listed-products bill; the selected items remain in draftBillItems for invoice details.
+            draftBillItems = [];
+            const search = document.getElementById('full-catalog-search');
+            if (search) search.value = '';
+            const page = document.getElementById('listed-products-page');
+            if (!page) return;
+            page.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            const count = document.getElementById('listed-products-count');
+            if (count) count.innerText = storeProducts.length;
+            renderFullCatalog();
+            updateCartBar();
+        }
+
+        function closeListedProductsPage() {
+            const page = document.getElementById('listed-products-page');
+            if (page) page.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function proceedFromListedProducts() {
+            if (!draftBillItems.length) {
+                alert('Please add at least one product first.');
+                return;
+            }
+            closeListedProductsPage();
+            // Opens the separate invoice details screen; selected products are retained.
+            openCreateBillModal();
+        }
+
                      function openCreateBillModal() {
             document.getElementById('bill-cust-name').value='';
             document.getElementById('bill-delivery-status').value='Processing';
@@ -3660,7 +3705,13 @@ async function processImage(fileInput) {
             const searchInput = document.getElementById('full-catalog-search');
             const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : "";
             
-            if(!container || storeProducts.length === 0) return;
+            if(!container) return;
+            const count = document.getElementById('listed-products-count');
+            if (count) count.innerText = storeProducts.length;
+            if(storeProducts.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-10 bg-white rounded-2xl border border-gray-200 text-gray-500 text-sm font-semibold">No products in your inventory yet.</div>`;
+                return;
+            }
             
             const filtered = storeProducts.filter(p => p.name.toLowerCase().includes(searchVal));
             
@@ -3738,17 +3789,13 @@ async function processImage(fileInput) {
             const bar = document.getElementById('active-cart-bar');
             const countEl = document.getElementById('cart-item-count');
             const totalEl = document.getElementById('cart-total-amount');
-            
-            if(draftBillItems.length > 0) {
-                let totalItems = draftBillItems.reduce((sum, item) => sum + item.qty, 0);
-                let totalAmt = draftBillItems.reduce((sum, item) => sum + item.total, 0);
-                
-                countEl.innerText = totalItems;
-                totalEl.innerText = "₹" + totalAmt;
-                bar.classList.remove('hidden');
-            } else {
-                bar.classList.add('hidden');
-            }
+            const proceedBtn = document.getElementById('listed-products-proceed');
+            const totalItems = draftBillItems.reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
+            const totalAmt = draftBillItems.reduce((sum, item) => sum + (Number(item.total) || 0), 0);
+            if (countEl) countEl.innerText = totalItems;
+            if (totalEl) totalEl.innerText = "₹" + totalAmt;
+            if (bar) bar.classList.toggle('hidden', draftBillItems.length === 0);
+            if (proceedBtn) proceedBtn.disabled = draftBillItems.length === 0;
         }
 
           function renderAdminProducts() {
@@ -10830,7 +10877,7 @@ function trackEvent(eventType) {
             <div class="p-4 bg-white space-y-3">
                 
                 <!-- Option 1: Listed Products -->
-                <button onclick="closeBillingChoiceModal(); setTimeout(openCreateBillModal, 300);" class="w-full bg-white border border-gray-200 rounded-[16px] p-4 flex items-center gap-4 hover:bg-gray-50 active:bg-gray-100 transition-colors shadow-sm text-left group">
+                <button onclick="closeBillingChoiceModal(); setTimeout(openListedProductsPage, 300);" class="w-full bg-white border border-gray-200 rounded-[16px] p-4 flex items-center gap-4 hover:bg-gray-50 active:bg-gray-100 transition-colors shadow-sm text-left group">
                     <div class="w-12 h-12 rounded-[12px] bg-green-50 text-green-600 flex items-center justify-center text-xl shrink-0 group-active:scale-95 transition-transform">
                         <i class="fas fa-box-open"></i>
                     </div>

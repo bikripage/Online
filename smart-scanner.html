@@ -55,7 +55,8 @@
   <main class="flex-1 max-w-xl mx-auto w-full px-4 pt-5 pb-24">
     <!-- Camera Section -->
     <section class="panel p-2 mb-5">
-      <div id="reader" class="bg-slate-900 min-h-[200px] flex items-center justify-center relative">
+      <!-- Min height badha di taaki square box achhe se dikhe -->
+      <div id="reader" class="bg-slate-900 min-h-[250px] flex items-center justify-center relative">
          <div id="scan-overlay" class="absolute inset-0 border-4 border-purple-500 rounded-[18px] z-10 pointer-events-none hidden opacity-80"></div>
       </div>
       <div class="p-3 text-center">
@@ -377,15 +378,18 @@
         }
     }
 
-    // Start Barcode Scanner
+    // Start Barcode Scanner (UPDATED: 30 FPS, SQUARE BOX)
     function startScanner() {
       const html5QrCode = new Html5Qrcode("reader");
       const statusText = document.getElementById("camera-status");
       
       const config = { 
-        fps: 10, 
-        qrbox: { width: 250, height: 100 }, 
-        aspectRatio: 1.0
+        fps: 30, // 3x Faster scanning
+        qrbox: { width: 250, height: 250 }, // Square box for scanning from any angle
+        aspectRatio: 1.0,
+        experimentalFeatures: {
+            useBarCodeDetectorIfSupported: true // Native fast scanner support
+        }
       };
 
       html5QrCode.start({ facingMode: "environment" }, config, 
@@ -396,7 +400,7 @@
           
           addToBill(decodedText);
         },
-        (errorMessage) => {}
+        (errorMessage) => {} // Ignoring frame errors
       ).then(() => {
           statusText.innerHTML = '<i class="fa-solid fa-camera mr-1"></i> Scan barcode to add item';
       }).catch(err => {

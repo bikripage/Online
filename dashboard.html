@@ -830,48 +830,11 @@
             <h3 class="text-xl font-bold text-[#111827] flex items-center gap-2">
                 <div class="w-10 h-10 bg-[#DCFCE7] text-[#16A34A] rounded-[12px] flex items-center justify-center"><i class="fas fa-file-invoice-dollar"></i></div>Billing System
             </h3>
-            <button onclick="openBillingChoiceModal()" class="w-full sm:w-auto bg-[#16A34A] hover:bg-[#15803D] text-white text-sm font-bold px-5 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm">
+            <button onclick="openCreateBillModal()" class="w-full sm:w-auto bg-[#16A34A] hover:bg-[#15803D] text-white text-sm font-bold px-5 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm">
                 <i class="fas fa-plus"></i> New Bill
             </button>
         </div>
         
-        <!-- 2. FULL WIDTH STOREFRONT FOR BILLING -->
-        <div class="bg-gray-50 border border-gray-200 rounded-[20px] p-4 mb-8">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-                <div>
-                    <h4 class="font-black text-gray-900 text-[15px]"><i class="fas fa-store text-purple-600 mr-1.5"></i> Quick Add to Cart</h4>
-                    <p class="text-[11px] text-gray-500 font-semibold mt-0.5">Select items directly to create a bill</p>
-                </div>
-                <div class="relative w-full sm:w-[250px]">
-                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" id="full-catalog-search" oninput="renderFullCatalog()" placeholder="Search products..." class="w-full bg-white border border-gray-300 rounded-[12px] pl-9 pr-3 py-2 text-sm font-bold outline-none focus:border-purple-500 transition shadow-sm">
-                </div>
-            </div>
-
-            <!-- Visual Grid -->
-            <div id="full-visual-catalog" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[300px] overflow-y-auto custom-scrollbar pr-1 pb-1">
-                <!-- JS Items Will Load Here -->
-            </div>
-
-            <!-- Active Cart Bar -->
-            <div id="active-cart-bar" class="hidden mt-4 bg-gray-900 rounded-[14px] p-3 flex justify-between items-center shadow-lg border border-gray-700 animate-slide-up">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white relative">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span id="cart-item-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-gray-900">0</span>
-                    </div>
-                    <div>
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Cart Total</p>
-                        <p id="cart-total-amount" class="text-[16px] font-black text-white leading-tight">₹0</p>
-                    </div>
-                </div>
-                <button onclick="proceedToCheckout()" class="bg-green-500 hover:bg-green-600 text-white font-bold text-xs px-4 py-2.5 rounded-[10px] active:scale-95 transition flex items-center gap-1.5 shadow-sm">
-    Proceed to Checkout <i class="fas fa-arrow-right"></i>
-</button>
-
-            </div>
-        </div>
-
         <!-- 3. Search and Recent Bills -->
         <div class="flex flex-col sm:flex-row gap-3 mb-6">
             <div class="relative flex-1">
@@ -1481,15 +1444,33 @@
     </div>
 
     <!-- CREATE BILL MODAL -->
-    <div id="create-bill-modal" class="fixed inset-0 bg-[#111827]/40 backdrop-blur-sm z-[90] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
-        <div class="bg-white rounded-[24px] shadow-2xl border border-[#E5E7EB] w-full max-w-xl max-h-[95vh] flex flex-col overflow-hidden">
-            <div class="px-6 py-4 border-b border-[#E5E7EB] flex justify-between items-center bg-[#F7F7F9] shrink-0">
+    <div id="create-bill-modal" class="fixed inset-0 bg-[#F4F5F7] z-[9990] hidden opacity-0 transition-opacity duration-200 flex items-stretch justify-center">
+        <div class="bg-white w-full h-[100dvh] sm:h-[96vh] sm:my-auto sm:max-w-5xl sm:rounded-[24px] shadow-2xl border border-[#E5E7EB] flex flex-col overflow-hidden">
+            <div class="px-4 sm:px-6 py-4 border-b border-[#E5E7EB] flex justify-between items-center bg-white shrink-0">
                 <h3 class="text-lg font-bold text-[#111827]"><i class="fas fa-file-invoice text-[#16A34A] mr-2"></i> New Invoice</h3>
                 <button onclick="closeCreateBillModal()" class="text-[#6B7280] hover:text-[#111827] transition bg-white w-8 h-8 rounded-full flex items-center justify-center shadow-sm border border-[#E5E7EB]"><i class="fas fa-times"></i></button>
             </div>
             
-            <div class="p-6 overflow-y-auto flex-1 custom-scrollbar">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 relative" id="bill-customer-fields">
+            <div class="px-4 sm:px-6 py-5 overflow-y-auto flex-1 custom-scrollbar space-y-6">
+                <!-- Listed products: dedicated billing page catalog -->
+                <section class="rounded-2xl border border-gray-200 bg-gray-50 p-4 sm:p-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                        <div>
+                            <h4 class="font-extrabold text-gray-900 text-base"><i class="fas fa-box-open text-green-600 mr-2"></i>Listed Products</h4>
+                            <p class="text-xs text-gray-500 mt-1">Select products from your inventory to add them to this bill</p>
+                        </div>
+                        <div class="relative w-full sm:w-72">
+                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input id="full-catalog-search" type="search" oninput="renderFullCatalog()" placeholder="Search your products..." class="w-full h-11 bg-white border border-gray-200 rounded-xl pl-10 pr-3 text-sm font-semibold outline-none focus:border-green-500">
+                        </div>
+                    </div>
+                    <div id="full-visual-catalog" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[36vh] overflow-y-auto custom-scrollbar pr-1"></div>
+                    <div id="active-cart-bar" class="hidden mt-4 rounded-xl bg-gray-900 text-white p-3 flex items-center justify-between gap-3">
+                        <div class="min-w-0"><p class="text-[10px] uppercase tracking-wider text-gray-300 font-bold">Selected items <span id="cart-item-count">0</span></p><p id="cart-total-amount" class="font-black text-lg">₹0</p></div>
+                        <button type="button" onclick="document.getElementById('bill-customer-fields').scrollIntoView({behavior:'smooth',block:'start'})" class="shrink-0 bg-green-500 text-white text-xs font-bold px-4 py-3 rounded-lg">Continue <i class="fas fa-arrow-down ml-1"></i></button>
+                    </div>
+                </section>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2 relative" id="bill-customer-fields">
                     <div>
                         <label class="text-[11px] text-[#6B7280] font-bold uppercase tracking-wider mb-1.5 block">Customer Name </label>
                         <input type="text" id="bill-cust-name" oninput="showCustomerSuggestions()" autocomplete="off" placeholder="e.g. Satyam" class="w-full bg-[#F7F7F9] border border-[#E5E7EB] rounded-[12px] px-4 py-2.5 text-[#111827] text-sm font-semibold focus:border-[#A855F7] outline-none transition">
@@ -1502,13 +1483,8 @@
                     <div id="customer-suggestion-box" class="absolute top-[70px] left-0 w-full bg-white border border-[#E5E7EB] rounded-[12px] shadow-xl z-50 hidden max-h-40 overflow-y-auto custom-scrollbar divide-y divide-[#F7F7F9]"></div>
                 </div>
 
-                         
-
-                </div>
-
-
-                <div class="mb-6 bg-white border border-[#E5E7EB] rounded-[16px] overflow-hidden">
-                    <table class="w-full text-left text-sm">
+                <div class="mb-6 bg-white border border-[#E5E7EB] rounded-[16px] overflow-x-auto">
+                    <table class="w-full min-w-[520px] text-left text-sm">
                         <thead class="bg-[#F7F7F9] text-[#6B7280] text-[10px] uppercase font-bold tracking-wider border-b border-[#E5E7EB]">
                             <tr><th class="py-3 pl-4">Item</th><th class="py-3 text-center">Qty</th><th class="py-3 text-right">Price</th><th class="py-3 text-right pr-4">Total</th><th></th></tr>
                         </thead>
@@ -1517,7 +1493,7 @@
                     <div id="draft-bill-empty" class="text-center py-6 text-sm text-[#9CA3AF] italic bg-white">No items added yet.</div>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
                     <div>
                         <label class="text-[11px] text-[#6B7280] font-bold uppercase tracking-wider mb-1.5 block">Payment Status</label>
                         <select id="bill-pay-status" onchange="handlePaymentStatusChange()" class="w-full bg-[#F7F7F9] border border-[#E5E7EB] rounded-[12px] px-3 py-2.5 text-[#111827] text-sm font-semibold outline-none transition cursor-pointer">
@@ -1538,7 +1514,7 @@
                 </div>
 
                                 <!-- ✨ NAYA: Advance Box added & grid changed to 3 columns ✨ -->
-                <div class="grid grid-cols-3 gap-3 mb-4">
+                <div class="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
                     <div>
                         <label class="text-[9px] sm:text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-1 block">Discount (₹)</label>
                         <input type="number" id="bill-discount" value="0" min="0" oninput="renderDraftBill()" class="w-full bg-[#F7F7F9] border border-[#E5E7EB] rounded-[12px] px-3 py-2 text-[#111827] text-sm font-semibold outline-none transition focus:border-purple-500">
@@ -1554,7 +1530,7 @@
                 </div>
 
                 
-                                <div class="grid grid-cols-2 gap-4 mb-6">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
                     <!-- नया Delivery Status ड्रॉपडाउन -->
                                         <div class="relative">
                         <label class="text-[11px] text-[#6B7280] font-bold uppercase tracking-wider mb-1.5 block">Delivery Status</label>
@@ -1582,7 +1558,7 @@
                 </div>
             </div>
 
-                                <div class="p-4 border-t border-[#E5E7EB] bg-white shrink-0 w-full z-10">
+                                <div class="p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t border-[#E5E7EB] bg-white shrink-0 w-full z-10">
             <button onclick="saveBillOnly(event)" class="w-full bg-[#16A34A] hover:bg-[#15803D] text-white font-bold h-12 rounded-[12px] transition text-sm flex justify-center items-center shadow-md cursor-pointer block">
                 Save Bill
             </button>
@@ -3188,15 +3164,28 @@ else if(o.status === 'accepted') {
  
             const md = document.getElementById('bill-pay-mode'); md.value='UPI (Online)'; md.disabled=false;
             
-            populateTrackerDropdown(); 
+            populateTrackerDropdown();
+            const catalogSearch = document.getElementById('full-catalog-search');
+            if (catalogSearch) catalogSearch.value = '';
+            renderFullCatalog();
             renderDraftBill();
-            
-            const mdObj = document.getElementById('create-bill-modal'); mdObj.classList.remove('hidden'); setTimeout(() => mdObj.classList.add('opacity-100'), 10);
+            updateCartBar();
+
+            const mdObj = document.getElementById('create-bill-modal');
+            mdObj.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            const scrollArea = mdObj.querySelector('.overflow-y-auto');
+            if (scrollArea) scrollArea.scrollTop = 0;
+            setTimeout(() => mdObj.classList.add('opacity-100'), 10);
         }
 
 
 
-        function closeCreateBillModal() { const mdObj = document.getElementById('create-bill-modal'); mdObj.classList.remove('opacity-100'); setTimeout(() => mdObj.classList.add('hidden'), 300); }
+        function closeCreateBillModal() {
+            const mdObj = document.getElementById('create-bill-modal');
+            mdObj.classList.remove('opacity-100');
+            setTimeout(() => { mdObj.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 200);
+        }
         
         function handlePaymentStatusChange() {
             const stat = document.getElementById('bill-pay-status').value; const md = document.getElementById('bill-pay-mode');
@@ -3741,6 +3730,7 @@ async function processImage(fileInput) {
             if ("vibrate" in navigator) navigator.vibrate(40);
             
             renderFullCatalog();
+            renderDraftBill();
             updateCartBar();
         }
 

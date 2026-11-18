@@ -1441,26 +1441,23 @@
                     <div id="customer-suggestion-box" class="absolute top-[70px] left-0 w-full bg-white border border-[#E5E7EB] rounded-[12px] shadow-xl z-50 hidden max-h-40 overflow-y-auto custom-scrollbar divide-y divide-[#F7F7F9]"></div>
                 </div>
 
-                                <!-- ✨ NEW: Smart Search & Add Product Section ✨ -->
-                <div class="bg-[#F7F7F9] border border-[#E5E7EB] rounded-[16px] p-4 mb-6 relative">
-                    <label class="text-[11px] text-[#6B7280] font-bold uppercase tracking-wider mb-2 block border-b border-[#E5E7EB] pb-2">Search & Add Product</label>
-                    <div class="flex flex-col sm:flex-row items-center gap-3">
-                        <div class="w-full sm:flex-1 relative">
-                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" id="bill-product-search" oninput="showProductSuggestions()" autocomplete="off" placeholder="Type item name to search..." class="w-full bg-white border border-[#E5E7EB] rounded-[12px] pl-10 pr-3 py-2.5 text-[#111827] text-sm font-semibold outline-none focus:border-[#A855F7] transition">
-                            
-                            <!-- Suggestions Dropdown Box -->
-                            <div id="product-suggestion-box" class="absolute top-[110%] left-0 w-full bg-white border border-gray-200 rounded-[12px] shadow-xl z-50 hidden max-h-48 overflow-y-auto custom-scrollbar divide-y divide-gray-100">
-                                <!-- JS items aayenge yahan -->
-                            </div>
-                        </div>
-                        <div class="flex gap-3 w-full sm:w-auto">
-                            <!-- Hidden ID to store selected product -->
-                            <input type="hidden" id="selected-product-id">
-                            <input type="number" id="bill-qty-input" value="1" min="1" class="w-20 bg-white border border-[#E5E7EB] rounded-[12px] px-2 py-2.5 text-[#111827] text-sm font-bold text-center outline-none focus:border-[#A855F7]">
-                            <button type="button" onclick="addItemToDraftBill()" class="flex-1 sm:w-auto bg-[#111827] hover:bg-black text-white font-bold px-5 py-2.5 rounded-[12px] text-sm active:scale-95 transition shadow-md whitespace-nowrap">Add</button>
-                        </div>
-                    </div>
+                           <!-- ✨ NAYA: VISUAL STOREFRONT CATALOG FOR BILLING ✨ -->
+<div class="bg-[#F7F7F9] border border-[#E5E7EB] rounded-[16px] p-3 sm:p-4 mb-6">
+    <div class="flex justify-between items-center mb-3">
+        <label class="text-[11px] text-[#6B7280] font-bold uppercase tracking-wider"><i class="fas fa-store text-purple-500 mr-1"></i> Tap to Add Items</label>
+        <!-- Live Search for Catalog -->
+        <div class="relative w-[140px] sm:w-[200px]">
+            <i class="fas fa-search absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 text-[10px]"></i>
+            <input type="text" id="catalog-search-input" oninput="renderBillingCatalog()" placeholder="Search catalog..." class="w-full bg-white border border-[#E5E7EB] rounded-[8px] pl-7 pr-2 py-1.5 text-xs font-semibold outline-none focus:border-[#A855F7] transition shadow-sm">
+        </div>
+    </div>
+    
+    <!-- Visual Product Grid (Mini Storefront) -->
+    <div id="billing-visual-catalog" class="grid grid-cols-2 gap-2 sm:gap-3 max-h-[240px] overflow-y-auto custom-scrollbar pr-1 pb-1">
+        <!-- JS Items Will Load Here -->
+    </div>
+</div>
+
                 </div>
 
 
@@ -3129,26 +3126,31 @@ else if(o.status === 'accepted') {
             select.innerHTML = html;
         }
 
-        function openCreateBillModal() {
+                function openCreateBillModal() {
             draftBillItems = []; document.getElementById('bill-cust-name').value='';
             document.getElementById('bill-delivery-status').value='Processing';
-                        document.getElementById('bill-delivery-date').value = '';
+            document.getElementById('bill-delivery-date').value = '';
             document.getElementById('bill-delivery-date').classList.add('hidden');
             document.getElementById('bill-delivery-date').classList.remove('block');
             
-             document.getElementById('bill-cust-phone').value='';
-            document.getElementById('bill-qty-input').value='1'; document.getElementById('bill-pay-status').value='Paid';
-                        // ✨ NAYA: Reset advance field
+            document.getElementById('bill-cust-phone').value='';
+            document.getElementById('bill-pay-status').value='Paid';
             document.getElementById('bill-discount').value='0'; 
             document.getElementById('bill-delivery').value='0';
             document.getElementById('bill-advance').value='0';
  
             const md = document.getElementById('bill-pay-mode'); md.value='UPI (Online)'; md.disabled=false;
             
-         
-            populateTrackerDropdown(); renderDraftBill();
+            populateTrackerDropdown(); 
+            
+            // ✨ NAYA: Modal khulte hi catalog aur draft bill load karna
+            if(document.getElementById('catalog-search-input')) document.getElementById('catalog-search-input').value = "";
+            renderBillingCatalog(); 
+            renderDraftBill();
+            
             const mdObj = document.getElementById('create-bill-modal'); mdObj.classList.remove('hidden'); setTimeout(() => mdObj.classList.add('opacity-100'), 10);
         }
+
 
         function closeCreateBillModal() { const mdObj = document.getElementById('create-bill-modal'); mdObj.classList.remove('opacity-100'); setTimeout(() => mdObj.classList.add('hidden'), 300); }
         
@@ -12027,6 +12029,124 @@ setTimeout(loadAppSecurityDetails, 2500);
                 }
             }, 1500); // 1.5 seconds ka buffer time
         });
+        // ==========================================
+        // ✨ MINI STOREFRONT CATALOG LOGIC ✨
+        // ==========================================
+        function renderBillingCatalog() {
+            const container = document.getElementById('billing-visual-catalog');
+            const searchInput = document.getElementById('catalog-search-input');
+            const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : "";
+            
+            if(!container) return;
+            
+            const filtered = storeProducts.filter(p => p.name.toLowerCase().includes(searchVal));
+            
+            if(filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-2 text-center py-6 bg-white rounded-[12px] border border-gray-100 text-gray-400 text-xs font-semibold">No items found</div>`;
+                return;
+            }
+            
+            container.innerHTML = filtered.map(p => {
+                // Agar product pe photo nahi hai toh default box icon lagayenge
+                let imgSrc = p.image ? p.image : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="%239CA3AF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>';
+                
+                return `
+                <div class="bg-white border border-gray-200 rounded-[12px] p-2 flex flex-col justify-between hover:border-[#A855F7] hover:shadow-md transition cursor-pointer active:scale-95 shadow-sm group" onclick="quickAddItemToBill('${p.id}')">
+                    <div class="flex gap-2 items-center mb-2">
+                        <div class="w-11 h-11 rounded-[8px] bg-gray-50 border border-gray-100 shrink-0 flex items-center justify-center overflow-hidden">
+                            <img src="${imgSrc}" class="w-full h-full ${p.image ? 'object-cover' : 'object-contain p-2'}">
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h5 class="text-[11px] font-bold text-gray-900 leading-tight line-clamp-2">${p.name}</h5>
+                            <div class="flex items-center gap-1.5 mt-1">
+                                <p class="text-[11px] text-[#16A34A] font-black">₹${p.price}</p>
+                                ${p.mrp && p.mrp > p.price ? `<p class="text-[9px] text-gray-400 font-bold line-through">₹${p.mrp}</p>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="w-full bg-slate-900 group-hover:bg-[#A855F7] text-white text-[10px] font-bold py-1.5 rounded-[8px] transition-colors"><i class="fas fa-plus"></i> Add to Cart</button>
+                </div>`;
+            }).join('');
+        }
+
+        function quickAddItemToBill(prodId) {
+            const prod = storeProducts.find(p => p.id === prodId); 
+            if(!prod) return;
+            
+            let ex = draftBillItems.find(i => i.id === prod.id);
+            if(ex) { 
+                ex.qty += 1; 
+                ex.total = ex.qty * ex.price; 
+            } else { 
+                draftBillItems.unshift({ // unshift naye item ko list ke upar rakhega
+                    id: prod.id, 
+                    name: prod.name, 
+                    price: prod.price, 
+                    qty: 1, 
+                    unit: prod.unit || 'pcs',
+                    total: prod.price 
+                }); 
+            }
+            
+            // Haptic Feedback (Phone vibrate karega click par)
+            if ("vibrate" in navigator) navigator.vibrate(50);
+            
+            renderDraftBill();
+        }
+
+        // Qty Update from Cart
+        function updateDraftQty(id, change) {
+            let item = draftBillItems.find(i => i.id === id);
+            if (item) {
+                item.qty += change;
+                if (item.qty <= 0) {
+                    draftBillItems = draftBillItems.filter(i => i.id !== id);
+                } else {
+                    item.total = item.qty * item.price;
+                }
+                renderDraftBill();
+            }
+        }
+
+        // Updated Render Draft Bill (With Plus/Minus Buttons)
+        function renderDraftBill() {
+            const tb = document.getElementById('draft-bill-items-list'); const em = document.getElementById('draft-bill-empty'); const tot = document.getElementById('draft-bill-total');
+            let itemTot = 0;
+            if(draftBillItems.length === 0) { tb.innerHTML = ''; em.style.display='block'; tot.innerText='₹0'; return; }
+            em.style.display='none';
+            
+            tb.innerHTML = draftBillItems.map(i => { 
+                itemTot += i.total; 
+                let priceDisplay = i.rateUnit ? `₹${parseFloat(i.price).toFixed(2)}${i.rateUnit}` : `₹${parseFloat(i.price).toFixed(2)}`;
+                
+                // Cart Item UI with Plus/Minus
+                return `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="py-2.5 pl-4 text-[#111827] font-semibold">
+                        <div class="truncate max-w-[120px] sm:max-w-[180px]">${i.name}</div>
+                        <div class="text-[9px] text-gray-500 mt-0.5">${priceDisplay}</div>
+                    </td>
+                    <td class="py-2.5 text-center">
+                        <div class="flex items-center justify-center gap-1.5 bg-white border border-gray-200 rounded-[6px] p-0.5 shadow-sm inline-flex">
+                            <button type="button" onclick="updateDraftQty('${i.id}', -1)" class="w-5 h-5 flex items-center justify-center bg-gray-50 hover:bg-rose-50 text-rose-500 rounded-[4px] active:scale-90 transition"><i class="fas fa-minus text-[8px]"></i></button>
+                            <span class="text-[11px] font-black text-slate-900 w-4 text-center">${i.qty}</span>
+                            <button type="button" onclick="updateDraftQty('${i.id}', 1)" class="w-5 h-5 flex items-center justify-center bg-gray-50 hover:bg-green-50 text-green-600 rounded-[4px] active:scale-90 transition"><i class="fas fa-plus text-[8px]"></i></button>
+                        </div>
+                    </td>
+                    <td class="py-2.5 text-right pr-4 text-[#16A34A] font-bold text-[13px]">₹${i.total}</td>
+                    <td class="py-2.5 text-center pr-2">
+                        <button type="button" onclick="removeDraftItem('${i.id}')" class="text-rose-400 hover:text-rose-600 w-6 h-6 flex items-center justify-center bg-rose-50 rounded-full active:scale-90 transition"><i class="fas fa-times text-[10px]"></i></button>
+                    </td>
+                </tr>`; 
+            }).join('');
+            
+            let disc = parseInt(document.getElementById('bill-discount').value)||0; 
+            let del = parseInt(document.getElementById('bill-delivery').value)||0;
+            let adv = parseInt(document.getElementById('bill-advance').value)||0;
+            
+            let gt = Math.max(0, itemTot - disc + del - adv); 
+            tot.innerText = `₹${gt}`;
+        }
 
     </script>
 

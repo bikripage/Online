@@ -1430,7 +1430,7 @@
             <div class="p-6 overflow-y-auto flex-1 custom-scrollbar">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 relative" id="bill-customer-fields">
                     <div>
-                        <label class="text-[11px] text-[#6B7280] font-bold uppercase tracking-wider mb-1.5 block">Customer Name *</label>
+                        <label class="text-[11px] text-[#6B7280] font-bold uppercase tracking-wider mb-1.5 block">Customer Name </label>
                         <input type="text" id="bill-cust-name" oninput="showCustomerSuggestions()" autocomplete="off" placeholder="e.g. Satyam" class="w-full bg-[#F7F7F9] border border-[#E5E7EB] rounded-[12px] px-4 py-2.5 text-[#111827] text-sm font-semibold focus:border-[#A855F7] outline-none transition">
                     </div>
                     <div>
@@ -3212,14 +3212,21 @@ function toggleNewBillDateField() {
         }
 
 
-        async function saveBillProcess(isSend) {
-            const n = document.getElementById('bill-cust-name').value.trim(); const p = document.getElementById('bill-cust-phone').value.trim();
-            if(!n) return alert("Enter Customer Name"); if(draftBillItems.length === 0) return alert("Add items!");
+                async function saveBillProcess(isSend) {
+            // Naya logic: Agar naam khali hai toh "Walk-in Customer" dal do
+            let rawName = document.getElementById('bill-cust-name').value.trim();
+            const n = rawName === "" ? "Walk-in Customer" : rawName;
+            
+            const p = document.getElementById('bill-cust-phone').value.trim();
+            
+            if(draftBillItems.length === 0) return alert("Add items!");
             if(isSend && !p) { if(!confirm("No phone provided. Cannot WhatsApp. Save anyway?")) return; isSend = false; }
             
             const btn = event.currentTarget; const orig = btn.innerHTML; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`; btn.disabled = true;
             
             let disc = parseInt(document.getElementById('bill-discount').value)||0; 
+           
+
             let del = parseInt(document.getElementById('bill-delivery').value)||0;
             let adv = parseInt(document.getElementById('bill-advance').value)||0;
             

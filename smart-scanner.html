@@ -311,6 +311,19 @@
         updateBillUI();
     }
 
+    // New Function for Quantity Control (+ / -)
+    function updateQty(code, change) {
+        let item = billItems.find(i => i.code === code);
+        if (item) {
+            item.qty += change;
+            if (item.qty <= 0) {
+                // Remove if quantity becomes 0 or less
+                billItems = billItems.filter(i => i.code !== code);
+            }
+            updateBillUI();
+        }
+    }
+
     // PREMIUM CART UI UPDATE
     function updateBillUI() {
       const container = document.getElementById("bill-items-container");
@@ -335,18 +348,26 @@
       [...billItems].reverse().forEach((item) => {
         container.innerHTML += `
           <div class="cart-item bg-slate-50 border border-slate-100 rounded-[18px] p-3.5 flex justify-between items-center hover:shadow-sm transition">
-            <div class="flex items-center gap-3.5 flex-1 min-w-0 pr-2">
-              <div class="w-10 h-10 rounded-[12px] bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-black shrink-0">
-                ${item.qty}
-              </div>
-              <div class="min-w-0">
-                <h4 class="text-[#111827] font-bold text-[14px] leading-tight truncate">${item.name}</h4>
-                <p class="text-[11px] font-bold text-slate-400 mt-1">₹${item.price} / ${item.unit}</p>
-              </div>
+            
+            <!-- Quantity Control (+/-) Box -->
+            <div class="flex flex-col items-center gap-1 shrink-0 bg-white border border-purple-100 rounded-[10px] p-1 shadow-sm">
+                <button onclick="updateQty('${item.code}', 1)" class="w-7 h-6 text-purple-600 hover:bg-purple-50 rounded-[6px] flex items-center justify-center transition active:scale-90">
+                    <i class="fas fa-plus text-[10px]"></i>
+                </button>
+                <span class="text-sm font-black text-[#111827] px-2 leading-none">${item.qty}</span>
+                <button onclick="updateQty('${item.code}', -1)" class="w-7 h-6 text-purple-600 hover:bg-purple-50 rounded-[6px] flex items-center justify-center transition active:scale-90">
+                    <i class="fas fa-minus text-[10px]"></i>
+                </button>
             </div>
-            <div class="flex items-center gap-3 shrink-0">
+            
+            <div class="min-w-0 flex-1 px-3">
+              <h4 class="text-[#111827] font-bold text-[14px] leading-tight truncate">${item.name}</h4>
+              <p class="text-[11px] font-bold text-slate-400 mt-1">₹${item.price} / ${item.unit}</p>
+            </div>
+
+            <div class="flex flex-col items-end gap-2 shrink-0">
               <p class="text-[16px] font-black text-slate-900">₹${item.price * item.qty}</p>
-              <div class="flex flex-col gap-1.5">
+              <div class="flex gap-2 mt-1">
                   <button onclick="editBillItem('${item.code}')" class="w-7 h-7 bg-white border border-slate-200 rounded-[8px] text-slate-400 hover:text-purple-600 flex items-center justify-center transition shadow-sm active:scale-95">
                     <i class="fas fa-pen text-[10px]"></i>
                   </button>

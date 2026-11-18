@@ -11923,6 +11923,46 @@ setTimeout(loadAppSecurityDetails, 2500);
         </div>
     </div>
 
+        // ==========================================
+        // 🚀 SCANNER SE AANE WALE DATA KO PAKADNE KA LOGIC
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            // Thoda time dete hain taaki storeProducts load ho jayein
+            setTimeout(() => {
+                const urlParams = new URLSearchParams(window.location.search);
+                
+                if (urlParams.get('action') === 'new_invoice') {
+                    // Local Storage se scanner ka bheja data nikalo
+                    let scannedDataRaw = localStorage.getItem('BikriPage_Scanner_Invoice');
+                    
+                    if (scannedDataRaw) {
+                        try {
+                            let scannedData = JSON.parse(scannedDataRaw);
+                            
+                            if (scannedData && scannedData.fromScanner && scannedData.items && scannedData.items.length > 0) {
+                                // 1. Bill modal kholo
+                                openCreateBillModal();
+                                
+                                // 2. Scanner ke items ko draft me set karo
+                                draftBillItems = scannedData.items;
+                                
+                                // 3. UI update karo
+                                renderDraftBill();
+                                
+                                // 4. Data transfer hone ke baad usko storage se uda do (taaki baar baar load na ho)
+                                localStorage.removeItem('BikriPage_Scanner_Invoice');
+                                
+                                // 5. URL se "?action=new_invoice" ko hata do bina page refresh kiye
+                                window.history.replaceState({}, document.title, window.location.pathname + "?shop=" + currentShopId);
+                                
+                            }
+                        } catch (e) {
+                            console.error("Scanner data parse error:", e);
+                        }
+                    }
+                }
+            }, 1500); // 1.5 seconds ka buffer time
+        });
 
 </body>
 </html>

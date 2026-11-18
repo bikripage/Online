@@ -865,9 +865,10 @@
                         <p id="cart-total-amount" class="text-[16px] font-black text-white leading-tight">₹0</p>
                     </div>
                 </div>
-                <button onclick="openBillingChoiceModal()" class="bg-green-500 hover:bg-green-600 text-white font-bold text-xs px-4 py-2.5 rounded-[10px] active:scale-95 transition flex items-center gap-1.5 shadow-sm">
-                    Proceed to Bill <i class="fas fa-arrow-right"></i>
-                </button>
+                <button onclick="proceedToCheckout()" class="bg-green-500 hover:bg-green-600 text-white font-bold text-xs px-4 py-2.5 rounded-[10px] active:scale-95 transition flex items-center gap-1.5 shadow-sm">
+    Proceed to Checkout <i class="fas fa-arrow-right"></i>
+</button>
+
             </div>
         </div>
 
@@ -1581,11 +1582,12 @@
                 </div>
             </div>
 
-                        <div class="p-4 border-t border-[#E5E7EB] bg-white shrink-0">
-                <button onclick="saveBillOnly(event)" class="w-full bg-[#16A34A] hover:bg-[#15803D] text-white font-bold py-3.5 rounded-[12px] transition text-sm flex justify-center items-center shadow-md">
-                    Save
-                </button>
-            </div>
+                                <div class="p-4 border-t border-[#E5E7EB] bg-white shrink-0 w-full z-10">
+            <button onclick="saveBillOnly(event)" class="w-full bg-[#16A34A] hover:bg-[#15803D] text-white font-bold h-12 rounded-[12px] transition text-sm flex justify-center items-center shadow-md cursor-pointer block">
+                Save Bill
+            </button>
+        </div>
+
 
         </div>
     </div>
@@ -12286,6 +12288,57 @@ setTimeout(loadAppSecurityDetails, 2500);
             
             let gt = Math.max(0, itemTot - disc + del - adv); 
             tot.innerText = `₹${gt}`;
+        }
+        // ==========================================
+        // ✨ CHECKOUT LOGIC (FROM VISUAL STOREFRONT) ✨
+        // ==========================================
+        function proceedToCheckout() {
+            if (draftBillItems.length === 0) {
+                alert("Please add items to cart first!");
+                return;
+            }
+
+            // Reset customer and payment fields
+            document.getElementById('bill-cust-name').value = '';
+            document.getElementById('bill-cust-phone').value = '';
+            document.getElementById('bill-pay-status').value = 'Paid';
+            document.getElementById('bill-discount').value = '0'; 
+            document.getElementById('bill-delivery').value = '0';
+            document.getElementById('bill-advance').value = '0';
+            const md = document.getElementById('bill-pay-mode'); 
+            md.value = 'UPI (Online)'; 
+            md.disabled = false;
+            
+            document.getElementById('bill-delivery-status').value = 'Processing';
+            document.getElementById('bill-delivery-date').classList.add('hidden');
+            
+            populateTrackerDropdown(); 
+            renderDraftBill(); // Ye cart table ko bhara hua dikhayega
+
+            // MODAL SE SEARCH BAR CHHUPANA
+            // Kyunki user ne bahar storefront se select kar liya hai, to andar ka search hata denge
+            const searchBox = document.querySelector('#create-bill-modal .bg-\\[\\#F7F7F9\\].mb-6');
+            if(searchBox && searchBox.innerText.includes('Tap to Add Items')) {
+                searchBox.style.display = 'none';
+            }
+
+            // Modal Open karna
+            const mdObj = document.getElementById('create-bill-modal'); 
+            mdObj.classList.remove('hidden'); 
+            setTimeout(() => mdObj.classList.add('opacity-100'), 10);
+        }
+
+        // IMPORTANT: Agar user normal "New Bill" button se modal khole, toh search box wapas dikhana padega
+        const originalOpenCreateBillModal = openCreateBillModal; // Purane function ko backup liya
+        openCreateBillModal = function() {
+            // Search box wapas visible karo
+            const searchBox = document.querySelector('#create-bill-modal .bg-\\[\\#F7F7F9\\].mb-6');
+            if(searchBox) {
+                searchBox.style.display = 'block';
+            }
+            
+            // Ab purana logic call karo
+            originalOpenCreateBillModal();
         }
 
     </script>

@@ -821,58 +821,78 @@
                             </div>
                         </div>
 
-                     <!-- ✨ TAB 3: BILLING ✨ -->
+                <!-- ✨ TAB 3: BILLING ✨ -->
 <div id="tab-billing" class="tab-content hidden space-y-8 pb-24">
 
-                            <div class="ios-card p-6 sm:p-8 border border-[#E5E7EB]">
-                                                          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                                    <h3 class="text-xl font-bold text-[#111827] flex items-center gap-2">
-                                        <div class="w-10 h-10 bg-[#DCFCE7] text-[#16A34A] rounded-[12px] flex items-center justify-center"><i class="fas fa-file-invoice-dollar"></i></div>Billing System
-                                    </h3>
-                                </div>
-                                
-                                <!-- ✨ NAYA: FULL WIDTH STOREFRONT FOR BILLING ✨ -->
-                                <div class="bg-gray-50 border border-gray-200 rounded-[20px] p-4 mb-8">
-                                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-                                        <div>
-                                            <h4 class="font-black text-gray-900 text-[15px]"><i class="fas fa-store text-purple-600 mr-1.5"></i> Quick Add to Cart</h4>
-                                            <p class="text-[11px] text-gray-500 font-semibold mt-0.5">Select items directly to create a bill</p>
-                                        </div>
-                                        <div class="relative w-full sm:w-[250px]">
-                                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                            <input type="text" id="full-catalog-search" oninput="renderFullCatalog()" placeholder="Search products..." class="w-full bg-white border border-gray-300 rounded-[12px] pl-9 pr-3 py-2 text-sm font-bold outline-none focus:border-purple-500 transition shadow-sm">
-                                        </div>
-                                    </div>
+    <div class="ios-card p-6 sm:p-8 border border-[#E5E7EB]">
+        <!-- 1. Billing System Header aur wapas laya gaya 'New Bill' Button -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <h3 class="text-xl font-bold text-[#111827] flex items-center gap-2">
+                <div class="w-10 h-10 bg-[#DCFCE7] text-[#16A34A] rounded-[12px] flex items-center justify-center"><i class="fas fa-file-invoice-dollar"></i></div>Billing System
+            </h3>
+            <button onclick="openBillingChoiceModal()" class="w-full sm:w-auto bg-[#16A34A] hover:bg-[#15803D] text-white text-sm font-bold px-5 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm">
+                <i class="fas fa-plus"></i> New Bill
+            </button>
+        </div>
+        
+        <!-- 2. FULL WIDTH STOREFRONT FOR BILLING -->
+        <div class="bg-gray-50 border border-gray-200 rounded-[20px] p-4 mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                <div>
+                    <h4 class="font-black text-gray-900 text-[15px]"><i class="fas fa-store text-purple-600 mr-1.5"></i> Quick Add to Cart</h4>
+                    <p class="text-[11px] text-gray-500 font-semibold mt-0.5">Select items directly to create a bill</p>
+                </div>
+                <div class="relative w-full sm:w-[250px]">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="full-catalog-search" oninput="renderFullCatalog()" placeholder="Search products..." class="w-full bg-white border border-gray-300 rounded-[12px] pl-9 pr-3 py-2 text-sm font-bold outline-none focus:border-purple-500 transition shadow-sm">
+                </div>
+            </div>
 
-                                    <!-- Visual Grid -->
-                                    <div id="full-visual-catalog" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[300px] overflow-y-auto custom-scrollbar pr-1 pb-1">
-                                        <!-- JS Items Will Load Here -->
-                                    </div>
+            <!-- Visual Grid -->
+            <div id="full-visual-catalog" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[300px] overflow-y-auto custom-scrollbar pr-1 pb-1">
+                <!-- JS Items Will Load Here -->
+            </div>
 
-                                    <!-- Active Cart Bar (Floating inside this section) -->
-                                    <div id="active-cart-bar" class="hidden mt-4 bg-gray-900 rounded-[14px] p-3 flex justify-between items-center shadow-lg border border-gray-700 animate-slide-up">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white relative">
-                                                <i class="fas fa-shopping-cart"></i>
-                                                <span id="cart-item-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-gray-900">0</span>
-                                            </div>
-                                            <div>
-                                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Cart Total</p>
-                                                <p id="cart-total-amount" class="text-[16px] font-black text-white leading-tight">₹0</p>
-                                            </div>
-                                        </div>
-                                        <button onclick="openBillingChoiceModal()" class="bg-green-500 hover:bg-green-600 text-white font-bold text-xs px-4 py-2.5 rounded-[10px] active:scale-95 transition flex items-center gap-1.5 shadow-sm">
-                                            Proceed to Bill <i class="fas fa-arrow-right"></i>
-                                        </button>
-                                    </div>
-                                </div>
+            <!-- Active Cart Bar -->
+            <div id="active-cart-bar" class="hidden mt-4 bg-gray-900 rounded-[14px] p-3 flex justify-between items-center shadow-lg border border-gray-700 animate-slide-up">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white relative">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cart-item-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-gray-900">0</span>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Cart Total</p>
+                        <p id="cart-total-amount" class="text-[16px] font-black text-white leading-tight">₹0</p>
+                    </div>
+                </div>
+                <button onclick="openBillingChoiceModal()" class="bg-green-500 hover:bg-green-600 text-white font-bold text-xs px-4 py-2.5 rounded-[10px] active:scale-95 transition flex items-center gap-1.5 shadow-sm">
+                    Proceed to Bill <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
 
-                                <div class="flex flex-col sm:flex-row gap-3 mb-6"><div class="relative flex-1"><i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]"></i><input type="text" id="admin-search-order" onkeyup="renderAdminBills()" placeholder="Search Order ID or Name..." class="w-full ios-input pl-11 pr-4 text-sm font-semibold outline-none"></div><select id="admin-filter-status" onchange="renderAdminBills()" class="w-full sm:w-40 ios-input px-4 text-xs font-bold tracking-wide outline-none cursor-pointer"><option value="All">ALL STATUS</option><option value="Paid">PAID</option><option value="Unpaid">UNPAID</option><option value="Delivered">DELIVERED</option><option value="Processing">PROCESSING</option><option value="Cancelled">CANCELLED</option></select></div>
-                                <div class="flex justify-between items-center border-b border-[#E5E7EB] pb-2 mb-4"><h4 class="text-[11px] text-[#6B7280] uppercase tracking-wider font-bold">Recent Bills</h4><span id="admin-total-orders" class="text-xs font-bold text-[#2563EB] bg-[#E0E7FF] px-2 py-0.5 rounded-full">0</span></div>
-                            <div id="admin-bills-list" class="flex flex-col gap-3 p-1"></div>
-
-                            </div>
-                        </div>
+        <!-- 3. Search and Recent Bills -->
+        <div class="flex flex-col sm:flex-row gap-3 mb-6">
+            <div class="relative flex-1">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]"></i>
+                <input type="text" id="admin-search-order" onkeyup="renderAdminBills()" placeholder="Search Order ID or Name..." class="w-full ios-input pl-11 pr-4 text-sm font-semibold outline-none">
+            </div>
+            <select id="admin-filter-status" onchange="renderAdminBills()" class="w-full sm:w-40 ios-input px-4 text-xs font-bold tracking-wide outline-none cursor-pointer">
+                <option value="All">ALL STATUS</option>
+                <option value="Paid">PAID</option>
+                <option value="Unpaid">UNPAID</option>
+                <option value="Delivered">DELIVERED</option>
+                <option value="Processing">PROCESSING</option>
+                <option value="Cancelled">CANCELLED</option>
+            </select>
+        </div>
+        <div class="flex justify-between items-center border-b border-[#E5E7EB] pb-2 mb-4">
+            <h4 class="text-[11px] text-[#6B7280] uppercase tracking-wider font-bold">Recent Bills</h4>
+            <span id="admin-total-orders" class="text-xs font-bold text-[#2563EB] bg-[#E0E7FF] px-2 py-0.5 rounded-full">0</span>
+        </div>
+        <div id="admin-bills-list" class="flex flex-col gap-3 p-1"></div>
+    </div>
+</div>
 
                     <!-- ✨ TAB 4: CUSTOMERS ✨ -->
 <div id="tab-crm" class="tab-content hidden space-y-8 pb-24">
@@ -3641,7 +3661,7 @@ async function processImage(fileInput) {
         reader.readAsDataURL(file);
     });
 }
-        // ==========================================
+                // ==========================================
         // ✨ FULL WIDTH STOREFRONT CATALOG LOGIC ✨
         // ==========================================
         function renderFullCatalog() {
@@ -3659,7 +3679,10 @@ async function processImage(fileInput) {
             }
             
             container.innerHTML = filtered.map(p => {
-                let imgSrc = p.image ? p.image : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="%239CA3AF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>';
+                // FIXED: Agar image na ho toh HTML theek se close hogi, quotes sahi lagenge
+                let imgTag = p.image 
+                    ? `<img src="${p.image}" class="w-full h-full object-cover">` 
+                    : `<div class="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300"><i class="fas fa-box text-3xl"></i></div>`;
                 
                 // Check if already in draft to show quantity on card
                 let existingItem = draftBillItems.find(i => i.id === p.id);
@@ -3677,7 +3700,7 @@ async function processImage(fileInput) {
                 <div class="bg-white border border-gray-200 rounded-[16px] p-2.5 flex flex-col justify-between hover:border-purple-300 hover:shadow-md transition shadow-sm">
                     <div class="flex flex-col gap-2 mb-1">
                         <div class="w-full h-24 sm:h-28 rounded-[10px] bg-gray-50 border border-gray-100 overflow-hidden relative">
-                            <img src="${imgSrc}" class="w-full h-full ${p.image ? 'object-cover' : 'object-contain p-4'}">
+                            ${imgTag}
                             ${p.mrp && p.mrp > p.price ? `<div class="absolute top-1.5 right-1.5 bg-red-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded shadow-sm">${Math.round(((p.mrp - p.price)/p.mrp)*100)}% OFF</div>` : ''}
                         </div>
                         <div class="min-w-0">
@@ -3692,6 +3715,7 @@ async function processImage(fileInput) {
                 </div>`;
             }).join('');
         }
+
 
         function updateStorefrontQty(prodId, change) {
             const prod = storeProducts.find(p => p.id === prodId); 

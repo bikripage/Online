@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101827">
+  <title>Smart Scanner POS | BikriPage</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <style>
+    :root { --ink:#111827; --blue:#007aff; }
+    * { -webkit-tap-highlight-color:transparent; }
+    body { background:#f2f2f7; color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif; }
+    
+    .glass { background:rgba(255,255,255,0.8); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); }
+    .panel { background:#fff; border-radius:24px; box-shadow:0 8px 30px rgba(0,0,0,0.04); border:1px solid rgba(0,0,0,0.02); }
+    
+    .btn { transition:all .2s cubic-bezier(0.25, 1, 0.5, 1); }
+    .btn:active { transform:scale(.95); opacity:0.9; }
+
+    #reader { width: 100%; border-radius: 18px; overflow: hidden; border: none !important; }
+    #reader video { object-fit: cover; border-radius: 18px; }
+    
+    .bill-item { animation: slideIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(-15px); } to { opacity: 1; transform: translateX(0); } }
+
+    .modal-enter { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    @keyframes popIn { 0% { opacity: 0; transform: scale(0.9) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col relative">
+
+  <header class="glass sticky top-0 z-30 border-b border-slate-200/50">
+    <div class="max-w-xl mx-auto px-5 h-[66px] flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-[14px] bg-purple-50 text-purple-600 flex items-center justify-center text-lg">
+          <i class="fas fa-barcode"></i>
+        </div>
+        <div>
+          <p class="font-bold text-sm text-slate-900">Smart POS</p>
+          <p class="text-[11px] text-slate-500 font-medium">BikriPage Fast Billing</p>
+        </div>
+      </div>
+      <span id="cart-badge" class="bg-rose-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">0 Items</span>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-xl mx-auto w-full px-4 pt-5 pb-24">
+    <!-- Camera Section -->
+    <section class="panel p-2 mb-5">
+      <div id="reader" class="bg-slate-900 min-h-[200px] flex items-center justify-center relative">
+         <div id="scan-overlay" class="absolute inset-0 border-4 border-purple-500 rounded-[18px] z-10 pointer-events-none hidden opacity-80"></div>
+      </div>
+      <div class="p-3 text-center">
+        <p id="camera-status" class="text-[13px] font-bold text-slate-600"><i class="fa-solid fa-camera mr-1"></i> Starting Scanner...</p>
+      </div>
+    </section>
+
+    <!-- Billing Section -->
+    <section class="panel p-5">
+      <div class="flex justify-between items-end mb-4 border-b border-slate-100 pb-3">
+        <h2 class="text-[17px] font-extrabold text-slate-900">Current Bill</h2>
+        <p class="text-xs font-bold text-slate-400">Total: <span id="bill-total" class="text-lg text-slate-900 ml-1">₹0</span></p>
+      </div>
+      
+      <div id="bill-items-container" class="space-y-3 min-h-[100px]">
+        <p id="empty-state" class="text-[13px] text-center text-slate-400 font-medium py-6">Scan an item to add it to the bill.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Checkout Bar -->
+  <div class="fixed bottom-0 left-0 right-0 glass border-t border-slate-200/60 px-4 py-4 pb-8 z-40">
+    <div class="max-w-xl mx-auto flex gap-3">
+      <button onclick="clearBill()" class="btn w-1/3 rounded-[16px] bg-slate-100 text-slate-700 font-bold text-[15px] h-[52px]">
+        Clear
+      </button>
+      <button id="save-bill-btn" onclick="saveFinalBill()" class="btn w-2/3 rounded-[16px] bg-purple-600 hover:bg-purple-700 text-white font-bold text-[15px] h-[52px] flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30">
+        <i class="fa-solid fa-check-circle"></i> Save Bill
+      </button>
+    </div>
+  </div>
+
+  <!-- Add/Edit Item Modal -->
+  <div id="item-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-[24px] p-6 w-full max-w-sm shadow-2xl modal-enter">
+      <div class="flex justify-between items-center mb-5">
+        <h3 id="modal-title" class="text-[18px] font-extrabold text-slate-900">New Item Found</h3>
+        <button onclick="closeModal()" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="text-[12px] font-bold text-slate-500 ml-1">Barcode</label>
+          <input type="text" id="modal-barcode" disabled class="w-full bg-slate-50 border border-slate-200 rounded-[14px] p-3 text-[14px] text-slate-500 font-medium mt-1">
+        </div>
+        <div>
+          <label class="text-[12px] font-bold text-slate-500 ml-1">Item Name</label>
+          <input type="text" id="modal-name" placeholder="e.g. Parle G" class="w-full bg-white border border-slate-300 focus:border-purple-500 rounded-[14px] p-3 text-[15px] font-bold text-slate-900 outline-none mt-1 shadow-inner">
+        </div>
+        <div class="flex gap-3">
+            <div class="flex-1">
+              <label class="text-[12px] font-bold text-slate-500 ml-1">MRP (₹)</label>
+              <input type="number" id="modal-mrp" placeholder="0" class="w-full bg-white border border-slate-300 focus:border-purple-500 rounded-[14px] p-3 text-[15px] font-bold text-slate-900 outline-none mt-1 shadow-inner">
+            </div>
+            <div class="flex-1">
+              <label class="text-[12px] font-bold text-slate-500 ml-1">Sell Price (₹)</label>
+              <input type="number" id="modal-rate" placeholder="0" class="w-full bg-white border border-slate-300 focus:border-purple-500 rounded-[14px] p-3 text-[15px] font-bold text-slate-900 outline-none mt-1 shadow-inner">
+            </div>
+        </div>
+      </div>
+
+      <button id="save-item-btn" onclick="saveItemToFirebase()" class="btn w-full mt-6 rounded-[16px] bg-slate-900 text-white font-bold text-[15px] h-[52px] shadow-lg">
+        Save to Inventory & Bill
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // --- FIREBASE INITIALIZATION ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyCWquftO39vqj83ZtYqtF_sDfkHVNpjd3k",
+      authDomain: "bikripage-3aba6.firebaseapp.com",
+      projectId: "bikripage-3aba6",
+      storageBucket: "bikripage-3aba6.firebasestorage.app",
+      messagingSenderId: "900882116436",
+      appId: "1:900882116436:web:8a521d0308347ddcccdc92",
+      measurementId: "G-ZP8L3S5R66"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentShopId = urlParams.get('shop');
+
+    if(!currentShopId) {
+        alert("Shop ID missing. Please open from Dashboard.");
+        window.close();
+    }
+
+    let billItems = [];
+    let lastScannedCode = "";
+    let isEditing = false;
+    let editingProductId = ""; // To track firebase doc ID if editing
+
+    function playBeep() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(800, ctx.currentTime);
+        osc.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.1);
+      } catch(e) {} // Ignore audio context errors if user hasn't interacted yet
+    }
+
+    // Checking Database for Scanned Item
+    async function addToBill(code) {
+      if(lastScannedCode === code) return; 
+      lastScannedCode = code;
+      setTimeout(() => { lastScannedCode = ""; }, 2500);
+      playBeep();
+
+      try {
+          // Look up product by barcode
+          const snapshot = await db.collection('shops').doc(currentShopId).collection('products').where('barcode', '==', code).get();
+          
+          if (snapshot.empty) {
+              // Item not found, open modal to register it
+              openModal(code, "", "", "", false);
+          } else {
+              // Item found!
+              let doc = snapshot.docs[0];
+              let itemData = doc.data();
+              
+              // Check if already in bill to increase qty
+              let existing = billItems.find(i => i.code === code);
+              if(existing) {
+                  existing.qty += 1;
+              } else {
+                  billItems.push({ 
+                      id: doc.id,
+                      code: code, 
+                      name: itemData.name, 
+                      price: itemData.price, 
+                      qty: 1,
+                      unit: itemData.unit || 'pcs'
+                  });
+              }
+              updateBillUI();
+          }
+      } catch(e) {
+          console.error("Error searching barcode:", e);
+      }
+    }
+
+    // Modal Functions
+    function openModal(code, name, mrp, rate, editMode, docId = "") {
+      isEditing = editMode;
+      editingProductId = docId;
+      document.getElementById("modal-title").textContent = editMode ? "Edit Item Details" : "New Item Found";
+      document.getElementById("modal-barcode").value = code;
+      document.getElementById("modal-name").value = name;
+      document.getElementById("modal-mrp").value = mrp || rate;
+      document.getElementById("modal-rate").value = rate;
+      
+      document.getElementById("item-modal").classList.remove("hidden");
+    }
+
+    function closeModal() {
+      document.getElementById("item-modal").classList.add("hidden");
+    }
+
+    async function saveItemToFirebase() {
+      const code = document.getElementById("modal-barcode").value;
+      const name = document.getElementById("modal-name").value.trim();
+      const mrp = Number(document.getElementById("modal-mrp").value);
+      const rate = Number(document.getElementById("modal-rate").value);
+
+      if(!name || rate <= 0) return alert("Please enter valid Name and Rate");
+      if(rate > mrp) return alert("Selling Price cannot be greater than MRP!");
+
+      const btn = document.getElementById('save-item-btn');
+      const origText = btn.innerText;
+      btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
+      btn.disabled = true;
+
+      try {
+          if(isEditing && editingProductId) {
+              // Update existing product in inventory
+              await db.collection('shops').doc(currentShopId).collection('products').doc(editingProductId).update({
+                  name: name, mrp: mrp, price: rate
+              });
+              // Update in bill
+              billItems.forEach(item => {
+                  if(item.code === code) { item.name = name; item.price = rate; }
+              });
+          } else {
+              // Add New product to inventory!
+              let newProd = {
+                  name: name,
+                  mrp: mrp,
+                  price: rate,
+                  barcode: code,
+                  qtySize: 1,
+                  unit: 'pcs',
+                  timestamp: firebase.firestore.FieldValue.serverTimestamp()
+              };
+              let docRef = await db.collection('shops').doc(currentShopId).collection('products').add(newProd);
+              
+              // Add to current bill
+              billItems.push({ id: docRef.id, code: code, name: name, price: rate, qty: 1, unit: 'pcs' });
+          }
+
+          closeModal();
+          updateBillUI();
+      } catch(e) {
+          alert("Error saving product: " + e.message);
+      } finally {
+          btn.innerText = origText;
+          btn.disabled = false;
+      }
+    }
+
+    async function editBillItem(code) {
+      // Find in DB to get real document ID
+      const snapshot = await db.collection('shops').doc(currentShopId).collection('products').where('barcode', '==', code).get();
+      if(!snapshot.empty) {
+          let doc = snapshot.docs[0];
+          let data = doc.data();
+          openModal(code, data.name, data.mrp, data.price, true, doc.id);
+      }
+    }
+
+    // UI Updates
+    function updateBillUI() {
+      const container = document.getElementById("bill-items-container");
+      const emptyState = document.getElementById("empty-state");
+      
+      if(billItems.length > 0) {
+        if(emptyState) emptyState.style.display = "none";
+      } else {
+        container.innerHTML = '<p id="empty-state" class="text-[13px] text-center text-slate-400 font-medium py-6">Scan an item to add it to the bill.</p>';
+        document.getElementById("bill-total").textContent = "₹0";
+        document.getElementById("cart-badge").textContent = "0 Items";
+        return;
+      }
+
+      let totalAmount = billItems.reduce((sum, current) => sum + (current.price * current.qty), 0);
+      document.getElementById("bill-total").textContent = "₹" + totalAmount;
+      document.getElementById("cart-badge").textContent = billItems.reduce((sum, cur) => sum + cur.qty, 0) + " Items";
+
+      container.innerHTML = "";
+      [...billItems].reverse().forEach((item, index) => {
+        container.innerHTML += `
+          <div class="bill-item flex justify-between items-center bg-slate-50 p-3 rounded-[14px] border border-slate-100">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold">
+                ${item.qty}
+              </div>
+              <div>
+                <p class="text-[14px] font-bold text-slate-900">${item.name}</p>
+                <p class="text-[11px] font-medium text-slate-500">₹${item.price} / ${item.unit}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <p class="text-[15px] font-extrabold text-slate-900">₹${item.price * item.qty}</p>
+              <button onclick="editBillItem('${item.code}')" class="w-7 h-7 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-purple-600 hover:border-purple-600 flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-pen text-[10px]"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function clearBill() {
+      billItems = [];
+      updateBillUI();
+    }
+
+    async function saveFinalBill() {
+        if(billItems.length === 0) return alert("Please scan items first!");
+
+        const btn = document.getElementById('save-bill-btn');
+        const origText = btn.innerHTML;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
+        btn.disabled = true;
+
+        let totalAmount = billItems.reduce((sum, current) => sum + (current.price * current.qty), 0);
+        const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+        // Map items for the bill structure
+        let finalItems = billItems.map(item => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            qty: item.qty,
+            unit: item.unit,
+            total: item.price * item.qty
+        }));
+
+        let newBill = { 
+            date: dateStr, 
+            customerName: "Walk-in Customer", 
+            customerPhone: "N/A", 
+            items: finalItems, 
+            discount: 0, 
+            delivery: 0,
+            advance: 0, 
+            grandTotal: totalAmount, 
+            payStatus: 'Paid', 
+            payMode: 'Cash (Offline)', 
+            deliveryStatus: 'Delivered', 
+            timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+        };
+
+        try {
+            await db.collection('shops').doc(currentShopId).collection('bills').add(newBill);
+            alert("✅ POS Bill Saved Successfully!");
+            clearBill();
+        } catch(e) {
+            alert("Error saving bill: " + e.message);
+        } finally {
+            btn.innerHTML = origText;
+            btn.disabled = false;
+        }
+    }
+
+    // Start Barcode Scanner
+    function startScanner() {
+      const html5QrCode = new Html5Qrcode("reader");
+      const statusText = document.getElementById("camera-status");
+      
+      const config = { 
+        fps: 10, 
+        qrbox: { width: 250, height: 100 }, 
+        aspectRatio: 1.0
+      };
+
+      html5QrCode.start({ facingMode: "environment" }, config, 
+        (decodedText) => {
+          const overlay = document.getElementById("scan-overlay");
+          overlay.classList.remove("hidden");
+          setTimeout(() => overlay.classList.add("hidden"), 300);
+          
+          addToBill(decodedText);
+        },
+        (errorMessage) => {}
+      ).then(() => {
+          statusText.innerHTML = '<i class="fa-solid fa-camera mr-1"></i> Scan barcode to add item';
+      }).catch(err => {
+        console.error("Camera error:", err);
+        statusText.innerHTML = '<span class="text-red-500">Camera error. Please allow permissions.</span>';
+      });
+    }
+
+    window.onload = () => {
+      startScanner();
+    };
+  </script>
+</body>
+</html>

@@ -176,7 +176,7 @@
     const params = new URLSearchParams(window.location.search);
     const shopId = (params.get("shop") || "").trim();
     let shopData = {};
-    let selectedRating = 5; 
+    let selectedRating = 0; // Initialize to 0 so the first updateUI(5) triggers correctly
     let googleReviewUrl = "";
 
     const positiveReviews = [
@@ -259,7 +259,12 @@
         
         const loader = document.getElementById("loading-screen");
         loader.classList.add("opacity-0", "pointer-events-none");
-        setTimeout(() => loader.classList.add("hidden"), 500);
+        
+        // Timeout ke baad UI update call karte hain taki element load ho jaye
+        setTimeout(() => {
+          loader.classList.add("hidden");
+          updateUI(5); // Force initial render with 5 rating
+        }, 500);
 
       } catch (error) {
         showFatal("We couldn't load the store details right now.");
@@ -283,7 +288,7 @@
     }
 
     function updateUI(rating) {
-      if(selectedRating === rating && document.getElementById("emoji-display").innerHTML !== "") return;
+      if(selectedRating === rating) return; // Ignore if rating is the same
       
       selectedRating = rating;
       const config = ratingConfigs[rating];
@@ -292,6 +297,7 @@
       const emojiContainer = document.getElementById("emoji-display");
       emojiContainer.style.filter = config.shadow;
       
+      // Clears the container before adding new image to trigger animation
       emojiContainer.innerHTML = ''; 
       setTimeout(() => {
         emojiContainer.innerHTML = `<img src="${config.img}" alt="rating" class="w-24 h-24 object-contain smooth-enter" />`;
@@ -349,8 +355,6 @@
     slider.addEventListener("input", (e) => {
       updateUI(Number(e.target.value));
     });
-
-    updateUI(5);
 
     document.getElementById("customer-message").addEventListener("input", event => {
       document.getElementById("char-count").textContent = `${event.target.value.length}/1000`;

@@ -12,23 +12,22 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
   <style>
-    :root { --ink:#111827; --muted:#64748b; --line:#e8edf3; --blue:#007aff; /* iOS Blue */ }
+    :root { --ink:#111827; --muted:#64748b; --line:#e8edf3; --blue:#007aff; }
     * { -webkit-tap-highlight-color:transparent; }
     body { background:#f2f2f7; color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif; }
     
-    /* iOS Glass Effect */
     .glass { background:rgba(255,255,255,0.75); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); }
     .panel { background:#fff; border-radius:24px; box-shadow:0 8px 30px rgba(0,0,0,0.04); border:1px solid rgba(0,0,0,0.02); }
     
     .btn { transition:all .2s cubic-bezier(0.25, 1, 0.5, 1); }
-    .btn:active { transform:scale(.95); opacity:0.9; }
+    .btn:active { transform:scale(.97); opacity:0.9; }
     
     .fade-up { animation:fadeUp .6s cubic-bezier(0.16, 1, 0.3, 1) both; }
     @keyframes fadeUp { from {opacity:0;transform:translateY(20px)} to {opacity:1;transform:translateY(0)} }
     .safe-bottom { padding-bottom:max(24px,env(safe-area-inset-bottom)); }
     textarea { resize:vertical; transition: border-color 0.3s ease, background 0.3s ease; }
 
-    /* iOS Style Range Slider */
+    /* Custom Range Slider */
     .custom-range {
       -webkit-appearance: none;
       width: 100%;
@@ -45,30 +44,23 @@
       border-radius: 50%;
       background: #ffffff;
       cursor: pointer;
-      /* iOS toggle thumb shadow */
       box-shadow: 0 3px 8px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.16), 0 3px 1px -2px rgba(0,0,0,0.2);
       border: 0.5px solid rgba(0,0,0,0.04);
-      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: transform 0.2s ease;
     }
     .custom-range::-webkit-slider-thumb:active {
-      transform: scale(1.15); /* iOS haptic expansion */
+      transform: scale(1.1); 
     }
 
-    /* True Apple Spring Animation for Emojis */
-    .ios-emoji-pop { 
-      display: inline-block;
-      line-height: 1;
-      font-size: 85px; /* Big native emoji size */
-      animation: appleSpring 0.6s cubic-bezier(0.25, 1.2, 0.3, 1) forwards; 
+    /* Elegant Slide & Fade Animation for 3D Emojis */
+    .smooth-enter { 
+      animation: smoothSlideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; 
     }
-    @keyframes appleSpring { 
-      0% { transform: scale(0.3); opacity: 0; filter: blur(8px); } 
-      50% { transform: scale(1.12); filter: blur(0); }
-      75% { transform: scale(0.92); }
-      100% { transform: scale(1); opacity: 1; filter: blur(0); } 
+    @keyframes smoothSlideUp { 
+      0% { opacity: 0; transform: translateY(15px) scale(0.95); } 
+      100% { opacity: 1; transform: translateY(0) scale(1); } 
     }
 
-    /* Form fade in transition */
     .form-transition { animation: smoothFade 0.4s ease forwards; }
     @keyframes smoothFade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
   </style>
@@ -94,7 +86,7 @@
   <main class="max-w-xl mx-auto px-4 pt-7 pb-12 safe-bottom">
     <section class="fade-up text-center mb-6" style="animation-delay: 0.1s;">
       <div class="inline-flex items-center gap-2 bg-white rounded-full px-3.5 py-2 text-[11px] font-semibold text-slate-500 shadow-sm mb-4 border border-slate-100">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
         Your opinion matters
       </div>
       <h1 class="text-[32px] leading-[1.15] font-extrabold tracking-tight text-slate-900">How was your<br><span style="color: var(--blue);">experience?</span></h1>
@@ -102,19 +94,17 @@
     </section>
 
     <section id="main-card" class="panel p-5 sm:p-7 fade-up" style="animation-delay: 0.2s;">
-      <!-- Draggable Slider Area -->
       <div class="py-3 text-center border-b border-slate-100/80 pb-8">
         
-        <!-- Dynamic Emoji Display (Native OS Emojis) -->
+        <!-- Dynamic 3D Emoji Display -->
         <div class="h-[110px] flex items-center justify-center mb-1">
           <div id="emoji-display" class="transition-all duration-300">
-             <!-- Placeholder, JS will inject native emoji -->
+             <!-- Placeholder, JS will inject 3D emoji image -->
           </div>
         </div>
 
         <p id="rating-label" class="text-[17px] font-bold mb-7 transition-all duration-300">Drag to rate us</p>
         
-        <!-- The Range Slider -->
         <div class="px-2 relative group">
           <input type="range" id="experience-slider" class="custom-range relative z-10" min="1" max="5" step="1" value="5">
           <div class="flex justify-between text-[11px] font-bold text-slate-400 mt-5 px-1 uppercase tracking-widest">
@@ -124,7 +114,6 @@
         </div>
       </div>
 
-      <!-- Feedback & Action Area -->
       <div id="feedback-area" class="pt-6 form-transition">
         <div class="flex justify-between items-center mb-3">
           <label id="msg-label" for="customer-message" class="block text-[15px] font-bold text-slate-900 transition-colors duration-300">Anything you'd like us to know?</label>
@@ -144,9 +133,8 @@
           <i id="submit-icon" class="fa-regular fa-paper-plane transition-transform"></i> <span id="submit-text">Send feedback</span>
         </button>
 
-        <!-- Note about Google 5-Star (iOS Style Card) -->
         <div id="google-note" class="hidden mt-4 bg-blue-50/50 border border-blue-100 rounded-[14px] p-3 flex items-start gap-3 form-transition">
-          <i class="fa-solid fa-circle-info text-[#007aff] mt-0.5 animate-pulse"></i>
+          <i class="fa-solid fa-circle-info text-[#007aff] mt-0.5"></i>
           <p class="text-[12px] text-slate-600 font-medium leading-snug">
             On Google, you'll need to manually tap the 5-stars to complete your review.
           </p>
@@ -206,23 +194,24 @@
       "Fantastic variety and fair prices. My go-to shop from now on.",
       "Excellent customer support. They patiently answered all my questions.",
       "Very genuine and honest pricing. Hard to find such good stores nowadays.",
-      "Always a pleasure shopping here. Consistently great service.",
-      "The product quality exceeded my expectations. Will bring my friends here too!",
-      "Neat and well-organized shop. Found exactly what I was looking for instantly.",
-      "A wonderful local business that truly cares about its customers. 10/10.",
-      "Perfect place for daily needs. Reliable, fast, and always welcoming.",
-      "Outstanding! Friendly vibes, great stock, and very reasonable rates."
+      "Always a pleasure shopping here. Consistently great service."
     ];
     let currentReviewIndex = -1;
 
-    // Real Native Emojis with iOS-style Soft Shadows
+    // Premium 3D Emojis (Microsoft Fluent Design) URLs
     const ratingConfigs = {
-      1: { text: "Very Poor", msgLabel: "What went wrong?", emoji: "😡", shadow: "drop-shadow(0 12px 16px rgba(255, 59, 48, 0.25))" },
-      2: { text: "Poor", msgLabel: "What can we improve?", emoji: "😞", shadow: "drop-shadow(0 12px 16px rgba(255, 149, 0, 0.25))" },
-      3: { text: "Average", msgLabel: "How can we do better?", emoji: "😐", shadow: "drop-shadow(0 12px 16px rgba(255, 204, 0, 0.25))" },
-      4: { text: "Good", msgLabel: "What did you like?", emoji: "😊", shadow: "drop-shadow(0 12px 16px rgba(52, 199, 89, 0.25))" },
-      5: { text: "Excellent!", msgLabel: "Share your experience", emoji: "🤩", shadow: "drop-shadow(0 12px 16px rgba(16, 185, 129, 0.3))" }
+      1: { text: "Very Poor", msgLabel: "What went wrong?", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Enraged%20Face.png", shadow: "drop-shadow(0 12px 16px rgba(255, 59, 48, 0.25))" },
+      2: { text: "Poor", msgLabel: "What can we improve?", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Disappointed%20Face.png", shadow: "drop-shadow(0 12px 16px rgba(255, 149, 0, 0.25))" },
+      3: { text: "Average", msgLabel: "How can we do better?", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Neutral%20Face.png", shadow: "drop-shadow(0 12px 16px rgba(255, 204, 0, 0.25))" },
+      4: { text: "Good", msgLabel: "What did you like?", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Smiling%20Face%20with%20Smiling%20Eyes.png", shadow: "drop-shadow(0 12px 16px rgba(52, 199, 89, 0.25))" },
+      5: { text: "Excellent!", msgLabel: "Share your experience", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Star-Struck.png", shadow: "drop-shadow(0 12px 16px rgba(16, 185, 129, 0.3))" }
     };
+
+    // Preload images for smooth transition
+    Object.values(ratingConfigs).forEach(config => {
+      const preloadImg = new Image();
+      preloadImg.src = config.img;
+    });
 
     function showToast(message) {
       const toast = document.getElementById("toast");
@@ -287,7 +276,6 @@
       textarea.value = positiveReviews[currentReviewIndex];
       textarea.dispatchEvent(new Event("input"));
       
-      // Haptic-like visual feedback on textarea
       textarea.classList.add("scale-[0.99]", "bg-[#007aff]/5");
       setTimeout(() => {
         textarea.classList.remove("scale-[0.99]", "bg-[#007aff]/5");
@@ -300,16 +288,15 @@
       selectedRating = rating;
       const config = ratingConfigs[rating];
       
-      // Native Emoji with Apple Spring Animation
+      // Injecting 3D Image with Slide-Up Fade Animation
       const emojiContainer = document.getElementById("emoji-display");
       emojiContainer.style.filter = config.shadow;
       
       emojiContainer.innerHTML = ''; 
       setTimeout(() => {
-        emojiContainer.innerHTML = `<span class="ios-emoji-pop">${config.emoji}</span>`;
+        emojiContainer.innerHTML = `<img src="${config.img}" alt="rating" class="w-24 h-24 object-contain smooth-enter" />`;
       }, 10);
       
-      // Texts
       const ratingLabel = document.getElementById("rating-label");
       ratingLabel.textContent = config.text;
       ratingLabel.className = "text-[17px] font-bold mb-7 transition-colors duration-300 " + (rating <= 3 ? "text-[#ff3b30]" : "text-[#34c759]");
@@ -343,7 +330,6 @@
         }
         submitIcon.className = "fa-solid fa-copy";
         submitText.textContent = "Copy & Continue to Google";
-        // iOS Blue Button
         submitBtn.className = "btn w-full rounded-[18px] bg-[#007aff] text-white font-bold text-[15px] h-[54px] flex items-center justify-center gap-2 shadow-[0_6px_20px_rgba(0,122,255,0.25)]";
       } else {
         nextBtn.classList.add("hidden");

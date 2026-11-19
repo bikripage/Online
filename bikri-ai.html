@@ -1,408 +1,226 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bikri AI | BikriPage</title>
-<meta name="theme-color" content="#f7f7fb">
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script >
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7f7fb"><title>Bikri AI | BikriPage</title>
+<script src="https://cdn.tailwindcss.com"></script><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script><script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script><script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <style>
-:root{--ink:#171827;--muted:#7b8090;--line:#e9eaf0;--violet:#6656d9;--violet2:#8a78f2}
-*{box-sizing:border-box}body{font-family:Inter,system-ui,sans-serif;background:#f6f7fb;color:var(--ink);-webkit-tap-highlight-color:transparent}
-.panel{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 8px 30px rgba(20,25,40,.045)}
-.mode{border:1px solid var(--line);background:#fff;color:#626879;border-radius:13px;padding:11px 15px;font-size:13px;font-weight:800;transition:.2s}
-.mode.active{background:var(--ink);color:#fff;border-color:var(--ink);box-shadow:0 5px 14px #17182720}
-.mic{width:88px;height:88px;border-radius:28px;background:linear-gradient(145deg,var(--violet2),#4d49c9);color:#fff;display:grid;place-items:center;box-shadow:0 12px 28px #6250d240;transition:.2s}
-.mic:active{transform:scale(.95)}.mic.listening{animation:pulse 1.35s infinite}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 #7765e540,0 12px 28px #6250d240}50%{box-shadow:0 0 0 13px #7765e500,0 12px 28px #6250d240}}
-.field{width:100%;height:48px;border:1px solid #e4e6ec;border-radius:13px;padding:0 13px;font-size:14px;outline:none;background:#fff}
-.field:focus{border-color:#8b7ae8;box-shadow:0 0 0 3px #8b7ae81f}
-.chip{border:1px solid #e7e5f4;background:#faf9ff;color:#5b4db1;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:750}
-.stat{background:#f8f8fb;border:1px solid #ececf2;border-radius:16px;padding:15px}
-.bubble{padding:11px 13px;border-radius:14px;font-size:13px;line-height:1.55;max-width:92%;white-space:pre-wrap;overflow-wrap:anywhere}
-.bubble.user{background:#f0edff;color:#40358d;margin-left:auto;border-bottom-right-radius:5px}
-.bubble.assistant{background:#f5f6f8;color:#303746;margin-right:auto;border-bottom-left-radius:5px}
-#activity{max-height:260px;overflow:auto;scrollbar-width:thin}
-button:disabled{opacity:.55;cursor:not-allowed}
-@media(min-width:900px){.workspace{max-width:1180px;margin:auto}}
-</style>
-</head>
-<body class="min-h-screen">
-<header class="sticky top-0 z-20 bg-white/85 backdrop-blur-xl border-b border-gray-200">
- <div class="max-w-6xl mx-auto px-4 sm:px-6 h-[68px] flex items-center justify-between">
-  <div class="flex items-center gap-3">
-   <a id="back-dashboard" href="dashboard.html" class="w-10 h-10 rounded-xl bg-gray-100 grid place-items-center text-gray-700" aria-label="Back to dashboard">
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-   </a>
-   <div class="w-10 h-10 rounded-[14px] bg-gradient-to-br from-violet-500 to-indigo-700 text-white grid place-items-center shadow-md shadow-violet-200">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v2M5.6 5.6 7 7M3 12h2m14 0h2m-3.6-6.4L17 7M12 19v2"/><path d="M8 15.5a5 5 0 1 1 8 0c-.8.7-1 1.3-1 2.5H9c0-1.2-.2-1.8-1-2.5Z"/><path d="M9.5 21h5"/></svg>
-   </div>
-   <div><div class="font-black tracking-tight text-[17px]">Bikri AI</div><div id="shop-name" class="text-[10px] text-gray-500 font-semibold tracking-wide">BIKRIPAGE ASSISTANT</div></div>
-  </div>
-  <div class="flex items-center gap-2 text-xs font-bold text-gray-500"><span id="status-dot" class="w-2 h-2 rounded-full bg-gray-300"></span><span id="status">Connecting...</span></div>
- </div>
-</header>
-
-<main class="workspace px-4 sm:px-6 py-6 sm:py-8">
- <section class="mb-6">
-  <p class="text-[10px] font-black tracking-[.2em] text-violet-600 uppercase">Your business assistant</p>
-  <h1 class="text-2xl sm:text-3xl font-black tracking-tight mt-1">A smarter way to manage your shop.</h1>
-  <p class="text-sm text-gray-500 mt-2">Apni sales, customer khata aur billing ko Hindi ya English mein voice se manage karein.</p>
- </section>
-
- <section class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">
-  <div class="stat"><p class="text-[10px] uppercase tracking-wider font-black text-gray-400">Total bills</p><p id="stat-bills" class="text-2xl font-black mt-1">—</p></div>
-  <div class="stat"><p class="text-[10px] uppercase tracking-wider font-black text-gray-400">Unpaid amount</p><p id="stat-due" class="text-xl sm:text-2xl font-black text-rose-600 mt-1">₹—</p></div>
-  <div class="stat col-span-2 sm:col-span-1"><p class="text-[10px] uppercase tracking-wider font-black text-gray-400">Products loaded</p><p id="stat-products" class="text-2xl font-black mt-1">—</p></div>
- </section>
-
- <section class="panel p-4 sm:p-5">
-  <div class="flex flex-wrap gap-2 mb-5">
-   <button id="mode-khata" class="mode active" onclick="setMode('khata')">Voice Khata</button>
-   <button id="mode-billing" class="mode" onclick="setMode('billing')">Voice Billing</button>
-  </div>
-  <div class="grid grid-cols-1 lg:grid-cols-[1.1fr_.9fr] gap-5">
-   <div class="rounded-[20px] bg-[#f8f8fc] border border-[#ececf3] p-5 sm:p-7 flex flex-col items-center text-center">
-    <div id="mode-label" class="text-[10px] font-black tracking-[.18em] uppercase text-violet-600 mb-4">VOICE KHATA</div>
-    <button id="mic" class="mic" onclick="toggleListening()" aria-label="Start voice assistant">
-     <svg width="33" height="33" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"/></svg>
-    </button>
-    <h2 id="main-prompt" class="text-lg font-black mt-4">Tap and ask about your khata</h2>
-    <p id="sub-prompt" class="text-xs text-gray-500 mt-1 max-w-sm">Try: “Aaj kitna udhar hai?” or “Ramesh ka hisaab batao”.</p>
-    <div id="transcript" class="min-h-[46px] w-full mt-4 rounded-xl bg-white border border-gray-200 px-3 py-3 text-sm text-gray-500">Your voice command will appear here.</div>
-    <div class="flex items-center gap-2 mt-4 text-[10px] font-bold text-gray-500"><span class="w-2 h-2 rounded-full bg-violet-500"></span>Hindi and English voice commands</div>
-   </div>
-   <div class="flex flex-col gap-4">
-    <div class="rounded-[18px] border border-gray-200 p-4">
-     <div class="flex items-center justify-between mb-3"><h3 class="font-black text-sm">Try saying</h3><span class="text-[10px] text-gray-400 font-bold">QUICK COMMANDS</span></div>
-     <div id="examples" class="flex flex-wrap gap-2">
-      <button class="chip" onclick="runExample('Aaj kitna udhar hai')">Aaj kitna udhar hai?</button>
-      <button class="chip" onclick="runExample('Total sale kitni hui')">Total sale kitni hui?</button>
-      <button class="chip" onclick="runExample('Ramesh ka hisaab batao')">Ramesh ka hisaab</button>
-     </div>
-    </div>
-    <div class="rounded-[18px] border border-gray-200 p-4">
-     <div class="flex items-center justify-between mb-3"><h3 class="font-black text-sm">Assistant activity</h3><button onclick="clearActivity()" class="text-[11px] font-bold text-violet-600">Clear</button></div>
-     <div id="activity" class="space-y-2"><p class="text-center text-xs text-gray-400 py-5">Your activity will appear here.</p></div>
-    </div>
-   </div>
-  </div>
-  <div class="mt-5 flex gap-2">
-   <input id="command" class="field flex-1" type="text" placeholder="Type a command..." onkeydown="if(event.key==='Enter')sendCommand()">
-   <button onclick="sendCommand()" class="px-5 rounded-xl bg-[#202235] text-white text-sm font-bold active:scale-95">Send</button>
-  </div>
- </section>
-
- <section id="billing-panel" class="panel p-4 sm:p-5 mt-5 hidden">
-  <div class="flex items-center justify-between gap-3 mb-4"><div><h3 class="font-black text-base">Current voice bill</h3><p class="text-xs text-gray-500 mt-1">Review details before saving to your BikriPage bills.</p></div><button onclick="clearDraft()" class="text-xs font-bold text-rose-600">Clear bill</button></div>
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-   <input id="customer-name" class="field" placeholder="Customer name">
-   <input id="customer-phone" class="field" placeholder="Customer mobile number" inputmode="numeric">
-  </div>
-  <div class="grid grid-cols-1 sm:grid-cols-[1fr_110px] gap-2 mb-3">
-   <select id="product-select" class="field"><option value="">Choose a product</option></select>
-   <input id="product-qty" class="field" type="number" min="1" value="1" placeholder="Qty">
-  </div>
-  <button onclick="addSelectedProduct()" class="w-full sm:w-auto px-5 py-3 rounded-xl bg-violet-600 text-white text-xs font-black">Add selected product</button>
-  <div class="overflow-x-auto mt-4">
-   <table class="w-full text-sm"><thead><tr class="text-left text-[10px] uppercase tracking-wider text-gray-400 border-b"><th class="py-2">Product</th><th class="py-2 text-center">Qty</th><th class="py-2 text-right">Amount</th><th></th></tr></thead><tbody id="draft-items"><tr><td colspan="4" class="py-6 text-center text-xs text-gray-400">No products added yet.</td></tr></tbody></table>
-  </div>
-  <div class="flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 mt-3 pt-4">
-   <div><div class="text-[10px] uppercase font-black tracking-wider text-gray-400">Bill total</div><div id="bill-total" class="text-2xl font-black mt-1">₹0</div></div>
-   <div class="flex flex-wrap gap-2">
-    <select id="pay-status" class="field !w-auto"><option>Paid</option><option>Unpaid</option></select>
-    <select id="pay-mode" class="field !w-auto"><option>Cash</option><option>UPI (Online)</option><option>Card</option><option>Other</option></select>
-    <button id="save-bill" onclick="saveBill()" class="px-5 py-3 rounded-xl bg-[#202235] text-white text-xs font-black">Save bill</button>
-   </div>
-  </div>
- </section>
-
- <p class="text-center text-[10px] text-gray-400 font-medium mt-6">Bikri AI reads and writes only to the current shop's existing BikriPage records.</p>
-</main>
+:root{--ink:#171827;--muted:#7b8090;--line:#e9eaf0;--violet:#6656d9;--violet2:#8a78f2}*{box-sizing:border-box}body{font-family:Inter,system-ui,sans-serif;background:#f6f7fb;color:var(--ink);-webkit-tap-highlight-color:transparent}.panel{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 8px 30px rgba(20,25,40,.045)}.mode{border:1px solid var(--line);background:#fff;color:#626879;border-radius:13px;padding:11px 15px;font-size:13px;font-weight:800}.mode.active{background:var(--ink);color:#fff;border-color:var(--ink)}.mic{width:88px;height:88px;border-radius:28px;background:linear-gradient(145deg,var(--violet2),#4d49c9);color:#fff;display:grid;place-items:center;box-shadow:0 12px 28px #6250d240;transition:.2s}.mic.listening{animation:pulse 1.35s infinite}@keyframes pulse{50%{box-shadow:0 0 0 13px #7765e500,0 12px 28px #6250d240}}.field{width:100%;height:48px;border:1px solid #e4e6ec;border-radius:13px;padding:0 13px;font-size:14px;outline:none;background:#fff}.field:focus{border-color:#8b7ae8;box-shadow:0 0 0 3px #8b7ae81f}.chip{border:1px solid #e7e5f4;background:#faf9ff;color:#5b4db1;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:750}.stat{background:#f8f8fb;border:1px solid #ececf2;border-radius:16px;padding:15px}.bubble{padding:11px 13px;border-radius:14px;font-size:13px;line-height:1.55;max-width:95%;white-space:pre-wrap;overflow-wrap:anywhere}.bubble.user{background:#f0edff;color:#40358d;margin-left:auto;border-bottom-right-radius:5px}.bubble.assistant{background:#f5f6f8;color:#303746;margin-right:auto;border-bottom-left-radius:5px}#activity{max-height:340px;overflow:auto;scrollbar-width:thin}button:disabled{opacity:.55;cursor:not-allowed}@media(min-width:900px){.workspace{max-width:1180px;margin:auto}}
+</style></head><body class="min-h-screen">
+<header class="sticky top-0 z-20 bg-white/85 backdrop-blur-xl border-b border-gray-200"><div class="max-w-6xl mx-auto px-4 sm:px-6 h-[68px] flex items-center justify-between"><div class="flex items-center gap-3"><a id="back-dashboard" href="dashboard.html" class="w-10 h-10 rounded-xl bg-gray-100 grid place-items-center text-gray-700">←</a><div class="w-10 h-10 rounded-[14px] bg-gradient-to-br from-violet-500 to-indigo-700 text-white grid place-items-center font-black text-xl">✦</div><div><div class="font-black tracking-tight text-[17px]">Bikri AI</div><div id="shop-name" class="text-[10px] text-gray-500 font-semibold tracking-wide">FREE BUSINESS INTELLIGENCE</div></div></div><div class="flex items-center gap-2 text-xs font-bold text-gray-500"><span id="status-dot" class="w-2 h-2 rounded-full bg-gray-300"></span><span id="status">Connecting...</span></div></div></header>
+<main class="workspace px-4 sm:px-6 py-6 sm:py-8"><section class="mb-6"><p class="text-[10px] font-black tracking-[.2em] text-violet-600 uppercase">Your business assistant</p><h1 class="text-2xl sm:text-3xl font-black tracking-tight mt-1">Your free, intelligent shop assistant.</h1><p class="text-sm text-gray-500 mt-2">Apni shop se normal insaan ki tarah baat karein. Bikri AI aapka business samajhta hai.</p></section>
+<section class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5"><div class="stat"><p class="text-[10px] uppercase tracking-wider font-black text-gray-400">Total bills loaded</p><p id="stat-bills" class="text-2xl font-black mt-1">—</p></div><div class="stat"><p class="text-[10px] uppercase tracking-wider font-black text-gray-400">Unpaid amount</p><p id="stat-due" class="text-xl sm:text-2xl font-black text-rose-600 mt-1">₹—</p></div><div class="stat col-span-2 sm:col-span-1"><p class="text-[10px] uppercase tracking-wider font-black text-gray-400">Products loaded</p><p id="stat-products" class="text-2xl font-black mt-1">—</p></div></section>
+<section class="panel p-4 sm:p-5"><div class="flex flex-wrap gap-2 mb-5"><button id="mode-khata" class="mode active" onclick="setMode('khata')">Voice Khata</button><button id="mode-billing" class="mode" onclick="setMode('billing')">Voice Billing</button></div><div class="grid grid-cols-1 lg:grid-cols-[1.1fr_.9fr] gap-5"><div class="rounded-[20px] bg-[#f8f8fc] border border-[#ececf3] p-5 sm:p-7 flex flex-col items-center text-center"><div id="mode-label" class="text-[10px] font-black tracking-[.18em] uppercase text-violet-600 mb-4">BIKRI AI</div><button id="mic" class="mic" onclick="toggleListening()" aria-label="Start voice assistant"><span class="text-3xl">🎙</span></button><h2 id="main-prompt" class="text-lg font-black mt-4">Ask anything about your shop</h2><p id="sub-prompt" class="text-xs text-gray-500 mt-1 max-w-sm">Try: “Aaj kitni sale hui?” or “Ramesh ka hisaab batao”.</p><div id="transcript" class="min-h-[46px] w-full mt-4 rounded-xl bg-white border border-gray-200 px-3 py-3 text-sm text-gray-500">Your voice command will appear here.</div><div class="flex items-center gap-2 mt-4 text-[10px] font-bold text-gray-500"><span class="w-2 h-2 rounded-full bg-violet-500"></span>Hindi · Hinglish · English</div></div><div class="flex flex-col gap-4"><div class="rounded-[18px] border border-gray-200 p-4"><div class="flex items-center justify-between mb-3"><h3 class="font-black text-sm">Try asking</h3><span class="text-[10px] text-gray-400 font-bold">SMART PROMPTS</span></div><div id="examples" class="flex flex-wrap gap-2"><button class="chip" onclick="runExample('Aaj kitni sale hui?')">Aaj ki sale?</button><button class="chip" onclick="runExample('Total udhar kitna hai?')">Total udhar?</button><button class="chip" onclick="runExample('Ramesh ka hisaab batao')">Ramesh ka hisaab</button><button class="chip" onclick="runExample('Meri sales ka analysis karo aur suggestions do')">Business analysis</button></div></div><div class="rounded-[18px] border border-gray-200 p-4"><div class="flex items-center justify-between mb-3"><h3 class="font-black text-sm">Conversation</h3><button onclick="clearActivity()" class="text-[11px] font-bold text-violet-600">Clear</button></div><div id="activity" class="space-y-2"><p class="text-center text-xs text-gray-400 py-5">Your conversation will appear here.</p></div><p id="memory-status" class="text-[10px] text-gray-400 mt-3">Permanent shop memory: connecting…</p></div></div></div><div class="mt-5 flex gap-2"><input id="command" class="field flex-1" type="text" placeholder="Ask Bikri AI anything..." onkeydown="if(event.key==='Enter')sendCommand()"><button id="send-btn" onclick="sendCommand()" class="px-5 rounded-xl bg-[#202235] text-white text-sm font-bold">Send</button></div></section>
+<section id="billing-panel" class="panel p-4 sm:p-5 mt-5 hidden"><div class="flex items-center justify-between gap-3 mb-4"><div><h3 class="font-black text-base">Current bill</h3><p class="text-xs text-gray-500 mt-1">AI can add products; review before saving.</p></div><button onclick="clearDraft()" class="text-xs font-bold text-rose-600">Clear bill</button></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3"><input id="customer-name" class="field" placeholder="Customer name"><input id="customer-phone" class="field" placeholder="Customer mobile number" inputmode="numeric"></div><div class="grid grid-cols-1 sm:grid-cols-[1fr_110px] gap-2 mb-3"><select id="product-select" class="field"><option value="">Choose a product</option></select><input id="product-qty" class="field" type="number" min="0.01" step="any" value="1" placeholder="Qty"></div><button onclick="addSelectedProduct()" class="w-full sm:w-auto px-5 py-3 rounded-xl bg-violet-600 text-white text-xs font-black">Add selected product</button><div class="overflow-x-auto mt-4"><table class="w-full text-sm"><thead><tr class="text-left text-[10px] uppercase tracking-wider text-gray-400 border-b"><th class="py-2">Product</th><th class="py-2 text-center">Qty</th><th class="py-2 text-right">Amount</th><th></th></tr></thead><tbody id="draft-items"><tr><td colspan="4" class="py-6 text-center text-xs text-gray-400">No products added yet.</td></tr></tbody></table></div><div class="flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 mt-3 pt-4"><div><div class="text-[10px] uppercase font-black tracking-wider text-gray-400">Bill total</div><div id="bill-total" class="text-2xl font-black mt-1">₹0</div></div><div class="flex flex-wrap gap-2"><select id="pay-status" class="field !w-auto"><option>Paid</option><option>Unpaid</option></select><select id="pay-mode" class="field !w-auto"><option>Cash</option><option>UPI (Online)</option><option>Card</option><option>Other</option></select><button id="save-bill" onclick="saveBill()" class="px-5 py-3 rounded-xl bg-[#202235] text-white text-xs font-black">Save bill</button></div></div></section><p class="text-center text-[10px] text-gray-400 font-medium mt-6">Bikri AI runs free in your browser. No AI API, no paid model. Permanent memory syncs to the current shop's Firestore records.</p></main>
 <script>
 const firebaseConfig={apiKey:"AIzaSyCWquftO39vqj83ZtYqtF_sDfkHVNpjd3k",authDomain:"bikripage-3aba6.firebaseapp.com",projectId:"bikripage-3aba6",storageBucket:"bikripage-3aba6.firebasestorage.app",messagingSenderId:"900882116436",appId:"1:900882116436:web:8a521d0308347ddcccdc92",measurementId:"G-ZP8L3S5R66"};
-if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
-const db=firebase.firestore(),auth=firebase.auth();
-const params=new URLSearchParams(location.search);
-const currentShopId=params.get('shop')||localStorage.getItem('BikriPage_active_shop');
-if(!currentShopId){location.replace('index.html');}
-else{localStorage.setItem('BikriPage_active_shop',currentShopId);document.getElementById('back-dashboard').href='dashboard.html?shop='+encodeURIComponent(currentShopId);}
+if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);const db=firebase.firestore(),auth=firebase.auth();
+const params=new URLSearchParams(location.search);const currentShopId=params.get('shop')||localStorage.getItem('BikriPage_active_shop');if(!currentShopId)location.replace('index.html');else{localStorage.setItem('BikriPage_active_shop',currentShopId);document.getElementById('back-dashboard').href='dashboard.html?shop='+encodeURIComponent(currentShopId)}
+const $=id=>document.getElementById(id),money=n=>'₹'+(Number(n)||0).toLocaleString('en-IN',{maximumFractionDigits:2}),clean=s=>String(s||'').toLowerCase().normalize('NFKC').replace(/[.,!?।]/g,' ').replace(/\s+/g,' ').trim();
+let shopData={},products=[],bills=[],customers=[],draft=[],mode='khata',recognition=null,listening=false,busy=false,conversation=[],memory=[];
 
-let shopData={},products=[],bills=[],customers=[],draft=[],mode='khata',recognition=null,listening=false;
-const $=id=>document.getElementById(id);
-const money=n=>'₹'+(Number(n)||0).toLocaleString('en-IN',{maximumFractionDigits:2});
-const clean=s=>String(s||'').toLowerCase().replace(/[.,!?।]/g,' ').replace(/\s+/g,' ').trim();
+function setStatus(t,on=false){$('status').textContent=t;$('status-dot').className='w-2 h-2 rounded-full '+(on?'bg-violet-500 animate-pulse':'bg-gray-300')}
+function log(t,who='assistant'){const box=$('activity'),empty=box.querySelector('.text-center');if(empty)empty.remove();const el=document.createElement('div');el.className='bubble '+(who==='user'?'user':'assistant');el.textContent=t;box.appendChild(el);box.scrollTop=box.scrollHeight}
+function speak(t){if(!('speechSynthesis'in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang=/[\u0900-\u097F]/.test(t)?'hi-IN':'en-IN';u.rate=1;window.speechSynthesis.speak(u)}
+function reply(t,voice=true){$('transcript').textContent=t;log(t);if(voice)speak(t)}
+function setMode(m){mode=m;$('mode-khata').classList.toggle('active',m==='khata');$('mode-billing').classList.toggle('active',m==='billing');$('mode-label').textContent=m==='khata'?'BUSINESS ASSISTANT':'VOICE BILLING';$('main-prompt').textContent=m==='khata'?'Ask anything about your shop':'Speak naturally to create a bill';$('sub-prompt').textContent=m==='khata'?'Sales, khata, customers, inventory, reports, suggestions.':'Say product names, quantities, customer details or payment status.';$('billing-panel').classList.toggle('hidden',m!=='billing')}
+function clearActivity(){$('activity').innerHTML='<p class="text-center text-xs text-gray-400 py-5">Your conversation will appear here.</p>';conversation=[];saveMemory()}
+function runExample(t){$('command').value=t;sendCommand()}
+function updateStats(){$('stat-bills').textContent=bills.length;$('stat-products').textContent=products.length;const due=bills.filter(b=>String(b.payStatus||'').toLowerCase()==='unpaid').reduce((s,b)=>s+(Number(b.grandTotal)||0),0);$('stat-due').textContent=money(due)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderProducts(){$('product-select').innerHTML='<option value="">Choose a product</option>'+products.map(p=>`<option value="${esc(p.id)}">${esc(p.name||'Unnamed')} · ${money(p.price)}</option>`).join('')}
+function renderDraft(){const body=$('draft-items');if(!draft.length){body.innerHTML='<tr><td colspan="4" class="py-6 text-center text-xs text-gray-400">No products added yet.</td></tr>';$('bill-total').textContent='₹0';return}body.innerHTML=draft.map((x,i)=>`<tr class="border-b border-gray-50"><td class="py-3 font-semibold">${esc(x.name)}<div class="text-[10px] text-gray-400">${money(x.price)} / ${esc(x.unit||'pcs')}</div></td><td class="py-3 text-center">${x.qty}</td><td class="py-3 text-right font-bold">${money(x.total)}</td><td class="py-3 text-right"><button onclick="removeItem(${i})" class="text-rose-500 font-bold px-2">×</button></td></tr>`).join('');$('bill-total').textContent=money(draft.reduce((s,x)=>s+x.total,0))}
+function addProduct(p,qty=1){qty=Number(qty);if(!p||!Number.isFinite(qty)||qty<=0||qty>100000)return;const old=draft.find(x=>x.id===p.id);if(old){old.qty+=qty;old.total=old.qty*old.price}else draft.push({id:p.id,name:p.name,price:Number(p.price)||0,qty,unit:p.unit||'pcs',total:(Number(p.price)||0)*qty});renderDraft()}
+function addSelectedProduct(){const p=products.find(x=>x.id===$('product-select').value);if(!p){reply('Pehle product select karein.');return}addProduct(p,$('product-qty').value);reply(`${$('product-qty').value} ${p.name} bill mein add kar diya.`)}function removeItem(i){draft.splice(i,1);renderDraft()}
+function clearDraft(){if(!confirm('Current draft bill clear karna hai?'))return;draft=[];renderDraft()}
+function dateToday(b){const t=b.timestamp;if(t&&typeof t.toDate==='function')return t.toDate().toDateString()===new Date().toDateString();if(t&&t.seconds)return new Date(t.seconds*1000).toDateString()===new Date().toDateString();return b.date===new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}
+function buildSnapshot(){return {shop:{name:shopData.shopName||'Shop',currency:'INR'},products:products.slice(0,500).map(p=>({id:p.id,name:p.name,price:Number(p.price)||0,unit:p.unit||'pcs',stock:p.stock??p.quantity??null,category:p.category||''})),bills:bills.slice(0,300).map(b=>({id:b.id,date:b.date||'',customerName:b.customerName||'',customerPhone:b.customerPhone||'',grandTotal:Number(b.grandTotal)||0,payStatus:b.payStatus||'',payMode:b.payMode||'',items:(b.items||[]).slice(0,30).map(i=>({name:i.name,qty:Number(i.qty)||0,price:Number(i.price)||0,total:Number(i.total)||0})),timestamp:timestampISO(b.timestamp)})),customers:customers.slice(0,300).map(c=>({id:c.id,name:c.name||c.customerName||'',phone:c.phone||c.mobile||'',due:Number(c.due??c.balance)||0})),draft:{customerName:$('customer-name').value,customerPhone:$('customer-phone').value,items:draft,total:draft.reduce((s,x)=>s+x.total,0),payStatus:$('pay-status').value,payMode:$('pay-mode').value}}}
+function timestampISO(t){try{if(t&&t.toDate)return t.toDate().toISOString();if(t&&t.seconds)return new Date(t.seconds*1000).toISOString();return ''}catch(e){return ''}}
 
-// Smart Word-to-Number converter (Hinglish + English)
-const numWords={ek:1,one:1,do:2,two:2,teen:3,three:3,char:4,chaar:4,four:4,paanch:5,panch:5,five:5,chhe:6,che:6,six:6,saat:7,seven:7,aath:8,eight:8,nau:9,nine:9,das:10,ten:10};
-function normalizeNumbers(str){
-  return str.split(' ').map(w=>numWords[w]!==undefined?numWords[w]:w).join(' ');
+// ================= FREE BIKRI BUSINESS BRAIN =================
+// No OpenAI/Gemini/API calls. Rules, calculations and memory run in the browser.
+// Permanent memory is saved under shops/{shopId}/aiMemory/{profile|chat} in Firestore.
+const memoryRef=()=>db.collection('shops').doc(currentShopId).collection('aiMemory');
+const memoryProfileRef=()=>memoryRef().doc('profile');
+const memoryChatRef=()=>memoryRef().doc('chat');
+let memoryReady=false, lastIntent=null, lastCustomerQuery='';
+const MAX_CHAT=30, MAX_FACTS=80;
+
+function safeText(v,max=300){return String(v??'').replace(/[<>]/g,'').trim().slice(0,max)}
+function rememberFact(text,category='general'){
+  const note=safeText(text,240); if(!note)return;
+  const key=clean(note);
+  memory=memory.filter(x=>clean(x.note)!==key);
+  memory.push({note,category,at:new Date().toISOString()});
+  memory=memory.slice(-MAX_FACTS);
+  persistMemory().catch(e=>console.warn('Memory save:',e));
 }
-
-// Smart Fuzzy Matcher (Spelling thodi galat ho tab bhi match karega)
+async function loadMemory(){
+  memory=[];conversation=[];memoryReady=false;
+  try{
+    const [p,c]=await Promise.all([memoryProfileRef().get(),memoryChatRef().get()]);
+    if(p.exists){const d=p.data()||{};memory=Array.isArray(d.facts)?d.facts.slice(-MAX_FACTS):[]}
+    if(c.exists){const d=c.data()||{};conversation=Array.isArray(d.messages)?d.messages.slice(-MAX_CHAT):[]}
+    conversation.forEach(m=>{if(m&&m.role&&m.content)log(String(m.content),m.role==='user'?'user':'assistant')});
+    memoryReady=true;
+    $('memory-status').textContent=`Permanent shop memory active · ${memory.length} saved notes · synced with this shop`;
+  }catch(e){
+    console.error('Firestore memory unavailable:',e);
+    memoryReady=false;
+    $('memory-status').textContent='Memory could not sync. Check Firestore rules for shops/{shopId}/aiMemory.';
+    // Keep current session functional, but do not pretend cloud persistence worked.
+    memory=[];conversation=[];
+  }
+}
+async function persistMemory(){
+  if(!currentShopId || !auth.currentUser) return;
+  const now=firebase.firestore.FieldValue.serverTimestamp();
+  await Promise.all([
+    memoryProfileRef().set({facts:memory.slice(-MAX_FACTS),updatedAt:now,updatedBy:auth.currentUser.uid},{merge:true}),
+    memoryChatRef().set({messages:conversation.slice(-MAX_CHAT),updatedAt:now,updatedBy:auth.currentUser.uid},{merge:true})
+  ]);
+  if(memoryReady)$('memory-status').textContent=`Permanent shop memory active · ${memory.length} saved notes · synced`;
+}
+function addTurn(role,content){
+  conversation.push({role,content:safeText(content,1800),at:new Date().toISOString()});
+  conversation=conversation.slice(-MAX_CHAT);
+  persistMemory().catch(e=>{console.warn(e);$('memory-status').textContent='Could not save memory. Check Firestore rules.'});
+}
+function clearActivity(){
+  if(!confirm('Conversation history clear karni hai? Saved business preferences memory mein rahengi.'))return;
+  $('activity').innerHTML='<p class="text-center text-xs text-gray-400 py-5">Your conversation will appear here.</p>';
+  conversation=[];persistMemory().catch(console.warn);
+}
+function normalizeHindiNumbers(s){
+  const map={ek:'1',एक:'1',do:'2',दो:'2',teen:'3',तीन:'3',char:'4',chaar:'4',चार:'4',paanch:'5',पांच:'5',पाँच:'5',chhe:'6',छह:'6',che:'6',saat:'7',सात:'7',aath:'8',आठ:'8',nau:'9',नौ:'9',das:'10',दस:'10'};
+  return String(s).split(/\s+/).map(w=>map[w]??w).join(' ');
+}
 function similarity(a,b){
-  a=clean(a);b=clean(b);
-  if(!a||!b)return 0;
-  if(a===b)return 1;
-  if(b.includes(a)||a.includes(b))return 0.85;
-  const aw=a.split(' '),bw=b.split(' ');
-  let hits=0;
-  aw.forEach(w=>{if(w.length>1&&bw.some(x=>x.includes(w)||w.includes(x)))hits++;});
-  return hits/Math.max(aw.length,bw.length);
+  a=clean(a);b=clean(b);if(!a||!b)return 0;if(a===b)return 1;
+  if(a.includes(b)||b.includes(a))return .88;
+  const aa=a.split(' ').filter(x=>x.length>1),bb=b.split(' ').filter(x=>x.length>1);
+  if(!aa.length||!bb.length)return 0;
+  const hits=aa.filter(x=>bb.some(y=>x===y||x.includes(y)||y.includes(x))).length;
+  return hits/Math.max(aa.length,bb.length);
 }
-function bestMatch(query,list,key){
-  let best=null,bestScore=0;
-  list.forEach(item=>{
-    const sc=similarity(query,item[key]);
-    if(sc>bestScore){bestScore=sc;best=item;}
+function bestMatchLocal(q,arr,getter){
+  let best=null,score=0;for(const x of arr){const s=similarity(q,getter(x)||'');if(s>score){score=s;best=x}}
+  return score>=.42?best:null;
+}
+function todayBills(){
+  const today=new Date().toDateString();
+  return bills.filter(b=>{
+    const t=b.timestamp;
+    if(t&&typeof t.toDate==='function')return t.toDate().toDateString()===today;
+    if(t&&t.seconds)return new Date(t.seconds*1000).toDateString()===today;
+    return b.date===new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
   });
-  return bestScore>=0.45?best:null;
 }
-
-function setStatus(t,active=false){$('status').textContent=t;$('status-dot').className='w-2 h-2 rounded-full '+(active?'bg-violet-500 animate-pulse':'bg-gray-300');}
-function log(text,who='assistant'){const box=$('activity');const empty=box.querySelector('.text-center');if(empty)empty.remove();const el=document.createElement('div');el.className='bubble '+(who==='user'?'user':'assistant');el.textContent=text;box.appendChild(el);box.scrollTop=box.scrollHeight;}
-function speak(text){if(!('speechSynthesis'in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='hi-IN';u.rate=1.0;window.speechSynthesis.speak(u);}
-function reply(text,voice=true){$('transcript').textContent=text;log(text);if(voice)speak(text);}
-
-function updateStats(){
-  $('stat-bills').textContent=bills.length;
-  $('stat-products').textContent=products.length;
-  const due=bills.filter(b=>String(b.payStatus||'').toLowerCase()==='unpaid').reduce((s,b)=>s+(Number(b.grandTotal)||0),0);
-  $('stat-due').textContent=money(due);
+function billTotal(list){return list.reduce((s,b)=>s+(Number(b.grandTotal)||0),0)}
+function getCustomerBills(name){
+  const q=clean(name);
+  return bills.filter(b=>similarity(q,b.customerName||'')>=.45||clean(b.customerName).includes(q));
 }
-function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function escapeAttr(s){return escapeHtml(s);}
-function renderProducts(){
-  const select=$('product-select');
-  select.innerHTML='<option value="">Choose a product</option>'+products.map(p=>`<option value="${escapeAttr(p.id)}">${escapeHtml(p.name)} · ${money(p.price)}</option>`).join('');
+function customerReport(name){
+  const rows=getCustomerBills(name);
+  if(!rows.length)return `${name} ke naam se koi bill nahi mila. Customer ka naam ya mobile number dobara check karein.`;
+  const due=rows.filter(b=>clean(b.payStatus)==='unpaid');
+  return `${rows[0].customerName||name} ke ${rows.length} bills mile. Total billing ${money(billTotal(rows))}, unpaid ${money(billTotal(due))}, paid bills ${rows.length-due.length}.`;
 }
-function renderDraft(){
-  const body=$('draft-items');
-  if(!draft.length){body.innerHTML='<tr><td colspan="4" class="py-6 text-center text-xs text-gray-400">No products added yet.</td></tr>';$('bill-total').textContent='₹0';return;}
-  body.innerHTML=draft.map((x,i)=>`<tr class="border-b border-gray-50"><td class="py-3 font-semibold">${escapeHtml(x.name)}<div class="text-[10px] text-gray-400">${money(x.price)} / ${escapeHtml(x.unit||'pcs')}</div></td><td class="py-3 text-center">${x.qty}</td><td class="py-3 text-right font-bold">${money(x.total)}</td><td class="py-3 text-right"><button onclick="removeItem(${i})" class="text-rose-500 font-bold px-2">×</button></td></tr>`).join('');
-  $('bill-total').textContent=money(draft.reduce((s,x)=>s+x.total,0));
+function productStock(p){const n=p.stock??p.quantity??p.qty??p.stockQty;return n===undefined||n===null||n===''?null:Number(n)}
+function businessSummary(){
+  const today=todayBills(),unpaid=bills.filter(b=>clean(b.payStatus)==='unpaid');
+  const total=billTotal(bills),todayTotal=billTotal(today),due=billTotal(unpaid);
+  const low=products.filter(p=>productStock(p)!==null&&productStock(p)<=5);
+  const top={};
+  bills.forEach(b=>(b.items||[]).forEach(i=>{const k=i.name||'Unknown';top[k]=(top[k]||0)+(Number(i.qty)||0)}));
+  const topItems=Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  return `Aapki shop ka snapshot:\n• Aaj ${today.length} bills, sale ${money(todayTotal)}\n• Total loaded bills ${bills.length}, total billing ${money(total)}\n• ${unpaid.length} unpaid bills, pending ${money(due)}\n• Products ${products.length}, low-stock products ${low.length}${low.length?': '+low.slice(0,8).map(p=>p.name+' ('+productStock(p)+')').join(', '):''}\n• Top selling items by recorded quantity: ${topItems.length?topItems.map(x=>x[0]+' ('+x[1]+')').join(', '):'abhi enough item data nahi hai'}\nNote: Total billing ko profit na samjhein. Profit ke liye cost price aur expenses chahiye.`;
 }
-function addProduct(p,qty=1){
-  if(!p)return;
-  qty=Math.max(1,Number(qty)||1);
-  const old=draft.find(x=>x.id===p.id);
-  if(old){old.qty+=qty;old.total=old.qty*old.price;}
-  else draft.push({id:p.id,name:p.name,price:Number(p.price)||0,qty,unit:p.unit||'pcs',total:(Number(p.price)||0)*qty});
-  renderDraft();
+function parseQty(t){const m=t.match(/(?:^|\s)(\d+(?:\.\d+)?)(?=\s|$)/);return m?Number(m[1]):1}
+function findProductFromText(t){
+  const cleaned=t.replace(/\b(add|karo|kar|do|please|product|item|pcs|piece|pieces|kg|kilo|packet|quantity|qty|bill|mein|me|daalo|dalo|jodo|mujhe|aur|ek|gram|litre|liter)\b/g,' ').replace(/\b\d+(?:\.\d+)?\b/g,' ').replace(/\s+/g,' ').trim();
+  return {query:cleaned,product:bestMatchLocal(cleaned,products,p=>p.name||'')};
 }
-function addSelectedProduct(){const p=products.find(x=>x.id===$('product-select').value);if(!p){reply('Pehle product select karein.');return;}addProduct(p,$('product-qty').value);reply(`${$('product-qty').value} ${p.name} bill mein add kar diya.`);}
-function removeItem(i){draft.splice(i,1);renderDraft();}
-function clearDraft(){if(!confirm('Current draft bill clear karna hai?'))return;draft=[];renderDraft();}
-
-function dateToday(b){
-  const t=b.timestamp;
-  if(t&&typeof t.toDate==='function')return t.toDate().toDateString()===new Date().toDateString();
-  if(t&&t.seconds)return new Date(t.seconds*1000).toDateString()===new Date().toDateString();
-  return b.date===new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+function replyAndRemember(q,a){
+  $('transcript').textContent=a;log(a);speak(a);addTurn('user',q);addTurn('assistant',a);
 }
-
-function customerSummary(name){
-  const matchedCust=bestMatch(name,bills.map(b=>({customerName:b.customerName||''})),'customerName');
-  const target=matchedCust?clean(matchedCust.customerName):clean(name);
-  const list=bills.filter(b=>clean(b.customerName).includes(target)||similarity(target,b.customerName)>=0.5);
-  if(!list.length)return `${name} ke naam se koi bill nahi mila.`;
-  const displayName=list[0].customerName||name;
-  const spent=list.reduce((s,b)=>s+(Number(b.grandTotal)||0),0);
-  const due=list.filter(b=>String(b.payStatus||'').toLowerCase()==='unpaid').reduce((s,b)=>s+(Number(b.grandTotal)||0),0);
-  return `${displayName} ke ${list.length} bills hain. Total ${money(spent)} aur pending udhar ${money(due)} hai.`;
-}
-
-function setMode(next){
-  mode=next;
-  $('mode-khata').classList.toggle('active',mode==='khata');
-  $('mode-billing').classList.toggle('active',mode==='billing');
-  $('mode-label').textContent=mode==='khata'?'VOICE KHATA':'VOICE BILLING';
-  $('main-prompt').textContent=mode==='khata'?'Tap and ask about your khata':'Tap and speak to create a bill';
-  $('sub-prompt').textContent=mode==='khata'?'Try: "Aaj kitna udhar hai?" ya "Ramesh ka hisaab"':'Try: "2 [product name]" ya "Customer Ramesh" ya "Save bill"';
-  $('billing-panel').classList.toggle('hidden',mode!=='billing');
-  $('examples').innerHTML=mode==='khata'
-    ?`<button class="chip" onclick="runExample('Aaj kitna udhar hai')">Aaj kitna udhar hai?</button><button class="chip" onclick="runExample('Aaj ki sale batao')">Aaj ki sale</button><button class="chip" onclick="runExample('Ramesh ka hisaab')">Ramesh ka hisaab</button>`
-    :`<button class="chip" onclick="runExample('Bill banao')">Bill banao</button><button class="chip" onclick="runExample('Customer Ramesh')">Customer set karo</button><button class="chip" onclick="runExample('Save bill')">Save bill</button>`;
-}
-
-function runExample(t){$('command').value=t;sendCommand();}
-function clearActivity(){$('activity').innerHTML='<p class="text-center text-xs text-gray-400 py-5">Your activity will appear here.</p>';}
-function sendCommand(){const t=$('command').value.trim();if(!t)return;$('command').value='';log(t,'user');$('transcript').textContent=t;handleCommand(t);}
-
-// ================= SMART INTENT ENGINE =================
-function handleCommand(raw){
-  const t=normalizeNumbers(clean(raw));
-
-  // 1. Universal Khata Queries (Kisi bhi mode me puchh sakte ho)
-  if(/(udhar|udhaar|unpaid|pending|baaki|baki|due)/.test(t) && !/(set|mark|status|bill)/.test(t)){
-    const unpaidBills=bills.filter(b=>String(b.payStatus||'').toLowerCase()==='unpaid');
-    const due=unpaidBills.reduce((s,b)=>s+(Number(b.grandTotal)||0),0);
-    reply(`Aapke ${unpaidBills.length} unpaid bills hain. Total pending udhar ${money(due)} hai.`);
-    return;
+function freeBrain(q){
+  const raw=String(q||'').trim(),t=clean(normalizeHindiNumbers(raw));
+  if(!t)return 'Boliye, main aapki shop ke records aur billing mein madad karunga.';
+  // Recall / memory commands
+  if(/(tumhe yaad|yaad hai|remember|meri preference|maine kya kaha)/.test(t)){
+    const facts=memory.slice(-12).map(x=>x.note).filter(Boolean);
+    return facts.length?'Mujhe aapki saved baatein yaad hain:\n• '+facts.join('\n• '):'Abhi tak koi personal business preference save nahi hui. Aap keh sakte hain: "Yaad rakhna ki..."';
   }
-  if(/(sale|bikri|kamai|earning)/.test(t)){
-    const list=/(aaj|today)/.test(t)?bills.filter(dateToday):bills;
-    const total=list.reduce((s,b)=>s+(Number(b.grandTotal)||0),0);
-    reply(`${/(aaj|today)/.test(t)?'Aaj':'Total'} ${list.length} bills bane hain. Kul sale ${money(total)} hai.`);
-    return;
+  const rememberMatch=raw.match(/(?:yaad rakhna|remember that|note that|save preference)\s+(.+)/i);
+  if(rememberMatch){rememberFact(rememberMatch[1],'preference');return `Theek hai, maine ye baat shop ki permanent memory mein save karne ki koshish ki: ${rememberMatch[1]}.`}
+  // Contextual follow-up resolution
+  if(/^(aur|phir|difference|kitna difference|compare|uska|iska|kal|aaj)$/.test(t)&&lastIntent==='sales'){
+    return 'Aap kis period se compare karna chahte hain—kal, pichhla hafta ya pichhla mahina?';
   }
-  if(/(kitne bill|total bill|bill count)/.test(t)){
-    reply(`Aapke records mein total ${bills.length} bills hain.`);
-    return;
+  // Shop-wide summary and analytics
+  if(/(business analysis|analysis|report|summary|business kaisa|meri shop|shop ka haal|performance|suggestion|sujhav)/.test(t))return businessSummary()+'\n\nSuggestion: low-stock items ko verify karein, unpaid customers ko follow-up karein aur daily sales ko same weekday se compare karein.';
+  if(/(aaj|today).*(sale|bikri|earning|kamai)|(sale|bikri|earning|kamai).*(aaj|today)/.test(t)){
+    lastIntent='sales';const rows=todayBills();return `Aaj ${rows.length} bills bane hain aur recorded sale ${money(billTotal(rows))} hai.`;
   }
-  if(/(hisaab|hisab|history|khata|kitna dena)/.test(t)){
-    const name=t.replace(/\b(customer|ka|ki|ke|hisaab|hisab|history|khata|batao|batana|dikhao|kitna|dena|hai|baki|baaki)\b/g,' ').replace(/\s+/g,' ').trim();
-    reply(name?customerSummary(name):'Kis customer ka hisaab dekhna hai? Naam boliye.');
-    return;
+  if(/(kal|yesterday).*(sale|bikri)|(sale|bikri).*(kal|yesterday)/.test(t)){
+    const d=new Date();d.setDate(d.getDate()-1);const rows=bills.filter(b=>{const x=b.timestamp;const dt=x&&x.toDate?x.toDate():x&&x.seconds?new Date(x.seconds*1000):null;return dt&&dt.toDateString()===d.toDateString()});lastIntent='sales';return `Kal ${rows.length} bills mile. Recorded sale ${money(billTotal(rows))} hai.`;
   }
-
-  // 2. Billing Controls (Auto-switch to Billing mode)
-  if(/(bill banao|new bill|create bill|naya bill|invoice|start bill)/.test(t)){
-    setMode('billing');
-    reply('Voice billing ready hai. Product ka naam aur quantity boliye.');
-    return;
+  if(/(sale|bikri|earning|kamai|total billing)/.test(t)){lastIntent='sales';return `Loaded records ke hisaab se total ${bills.length} bills ki billing ${money(billTotal(bills))} hai. Ye revenue/billing hai, profit nahi.`}
+  if(/(udhar|udhaar|unpaid|pending|baaki|baki|due)/.test(t)&&!/(paid|payment kar|mark)/.test(t)){
+    const rows=bills.filter(b=>clean(b.payStatus)==='unpaid');return `${rows.length} unpaid bills hain. Total pending amount ${money(billTotal(rows))} hai.`;
   }
-  if(/(save bill|bill save|save karo|complete|final)/.test(t)){
-    setMode('billing');
-    saveBill();
-    return;
+  if(/(kitne bill|total bill|bill count)/.test(t))return `Aapke loaded records mein ${bills.length} bills hain.`;
+  if(/(sabse mehnga|highest price|most expensive)/.test(t)){const p=[...products].sort((a,b)=>(Number(b.price)||0)-(Number(a.price)||0))[0];return p?`${p.name} sabse mehnga listed product hai: ${money(p.price)}.`:'Product price data available nahi hai.'}
+  if(/(saste|cheapest|sabse sasta|lowest price)/.test(t)){const p=[...products].sort((a,b)=>(Number(a.price)||0)-(Number(b.price)||0))[0];return p?`${p.name} sabse sasta listed product hai: ${money(p.price)}.`:'Product price data available nahi hai.'}
+  if(/(kam stock|low stock|stock kam|stock alert|out of stock)/.test(t)){
+    const low=products.filter(p=>productStock(p)!==null&&productStock(p)<=5);
+    return low.length?`5 ya usse kam stock wale products:\n${low.map(p=>`• ${p.name}: ${productStock(p)} ${p.unit||'units'}`).join('\n')}`:'Known stock fields ke hisaab se 5 ya usse kam stock wala product nahi mila. Stock field unavailable ho sakti hai.';
   }
-  if(/(clear bill|naya shuru|reset bill)/.test(t)){
-    draft=[];renderDraft();
-    reply('Bill clear kar diya gaya hai.');
-    return;
+  if(/(top customer|best customer|sabse zyada kharid|loyal customer)/.test(t)){
+    const totals={};bills.forEach(b=>{const n=b.customerName||'Walk-in';totals[n]=(totals[n]||0)+(Number(b.grandTotal)||0)});
+    const top=Object.entries(totals).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    return top.length?'Top customers by recorded billing:\n'+top.map((x,i)=>`${i+1}. ${x[0]} — ${money(x[1])}`).join('\n'):'Customer billing data available nahi hai.';
   }
-  if(/(total kitna|bill total|kitna hua)/.test(t) && mode==='billing'){
-    const sum=draft.reduce((s,x)=>s+x.total,0);
-    reply(`Abhi bill ka total ${money(sum)} hua hai.`);
-    return;
+  // Customer-specific khata
+  const customerCue=t.match(/(?:customer|grahak)\s+(.+)|(.+?)\s+(?:ka|ki|ke)\s+(?:hisaab|hisab|khata|udhar|balance)/);
+  if(customerCue){const name=(customerCue[1]||customerCue[2]||'').trim();lastCustomerQuery=name;lastIntent='customer';return customerReport(name)}
+  if(lastIntent==='customer'&&/(iska|uska|kitna|detail|details|again|dobara)/.test(t)&&lastCustomerQuery)return customerReport(lastCustomerQuery);
+  if(/(hisaab|hisab|customer|grahak|khata)/.test(t)){
+    const name=raw.replace(/(ka hisaab|ki hisaab|ke hisaab|ka khata|ki khata|customer|grahak|batao|dikhao)/ig,'').trim();
+    if(name.length>1){lastCustomerQuery=name;lastIntent='customer';return customerReport(name)}
+    return 'Kis customer ka hisaab chahiye? Customer ka naam boliye.';
   }
-  if(/(paid|payment ho gaya|cash mil gaya)/.test(t) && mode==='billing'){
-    $('pay-status').value='Paid';
-    reply('Payment status Paid set kar diya.');
-    return;
-  }
-  if(/(unpaid|udhar|udhaar|credit)/.test(t) && mode==='billing'){
-    $('pay-status').value='Unpaid';
-    reply('Payment status Unpaid set kar diya.');
-    return;
-  }
-
-  // 3. Phone Number Detect
+  // Billing flow
+  if(/(bill banao|new bill|create bill|naya bill|invoice|start bill)/.test(t)){setMode('billing');return 'Naya bill ready hai. Customer ka naam aur product ki quantity boliye, jaise "Ramesh ke liye 2 atta".'}
+  if(/(save bill|bill save|bill jama|save karo)/.test(t)){setMode('billing');return 'Bill save karne ke liye neeche Save bill button dabayein. Final save se pehle confirmation aayega.'}
+  if(/(clear bill|naya shuru|reset bill)/.test(t)){setMode('billing');if(confirm('Current draft bill clear karein?')){draft=[];renderDraft();return 'Draft bill clear kar diya.'}return 'Draft bill ko nahi badla.'}
+  if(/(total kitna|bill total|kitna hua)/.test(t)&&mode==='billing')return `Current draft bill total ${money(draft.reduce((s,x)=>s+x.total,0))} hai.`;
+  if(/(paid|payment ho gaya|cash mil gaya)/.test(t)&&mode==='billing'){$('pay-status').value='Paid';return 'Draft bill ka payment status Paid set kar diya.'}
+  if(/(udhar|unpaid|credit)/.test(t)&&mode==='billing'){$('pay-status').value='Unpaid';return 'Draft bill ka payment status Unpaid set kar diya.'}
   const phone=raw.match(/(?:\+?91[\s-]?)?[6-9]\d{9}/);
-  if(phone){
-    setMode('billing');
-    $('customer-phone').value=phone[0].replace(/\D/g,'').slice(-10);
-    reply('Customer ka mobile number set kar diya.');
-    return;
-  }
-
-  // 4. Customer Name Detect
-  const custMatch=t.match(/(?:customer|naam|name)\s+(.+)/i);
-  if(custMatch){
-    setMode('billing');
-    const cName=custMatch[1].replace(/\b(ka|ki|hai|set|kar|do|bill|mein|me)\b/g,' ').trim();
-    if(cName){$('customer-name').value=cName;reply(`Customer ${cName} set kar diya.`);return;}
-  }
-
-  // 5. Smart Product Auto-Detect (Bina "add karo" bole bhi product pehchan lega)
-  const qtyMatch=t.match(/\b(\d+(?:\.\d+)?)\b/);
-  const qty=qtyMatch?Number(qtyMatch[1]):1;
-  const prodQuery=t.replace(/\b(add|karo|kar|do|please|product|item|pcs|piece|pieces|kg|kilo|packet|quantity|qty|bill|mein|me|daalo|dalo|jodo|mujhe|aur|ek)\b/g,' ').replace(/\b\d+(?:\.\d+)?\b/g,' ').replace(/\s+/g,' ').trim();
-
-  if(prodQuery.length>=2){
-    const matchedProd=bestMatch(prodQuery,products,'name');
-    if(matchedProd){
-      setMode('billing');
-      addProduct(matchedProd,qty);
-      reply(`${qty} ${matchedProd.name} bill mein add kar diya. Amount ${money(matchedProd.price*qty)}.`);
-      return;
-    }
-    // Agar product nahi mila toh check karo kya ye kisi existing customer ka naam hai?
-    const matchedCust=bestMatch(prodQuery,bills.map(b=>({customerName:b.customerName||''})),'customerName');
-    if(matchedCust && mode==='khata'){
-      reply(customerSummary(matchedCust.customerName));
-      return;
-    }
-  }
-
-  reply(mode==='khata'
-    ?'Samajh nahi aaya. Boliye: "Aaj ki sale", "Total udhar", ya "[Customer Name] ka hisaab".'
-    :`"${prodQuery||raw}" inventory mein nahi mila. Product ka sahi naam boliye.`);
+  if(phone){setMode('billing');$('customer-phone').value=phone[0].replace(/\D/g,'').slice(-10);return 'Customer mobile number draft bill mein set kar diya.'}
+  const nameMatch=raw.match(/(?:customer|naam|name)\s+(.+)/i);
+  if(nameMatch){setMode('billing');$('customer-name').value=safeText(nameMatch[1],100);return `Customer ${$('customer-name').value} set kar diya.`}
+  // Product matching; only add if a real catalog match exists.
+  const found=findProductFromText(t);
+  if(found.product){setMode('billing');const qty=parseQty(t);addProduct(found.product,qty);return `${qty} ${found.product.name} draft bill mein add kar diya. Amount ${money((Number(found.product.price)||0)*qty)}.`}
+  if(/(help|madad|kya kar sakte|what can you do)/.test(t))return 'Main sales, unpaid khata, customer billing history, product prices, low stock, top customers, business summary aur draft bill mein products add kar sakta hoon. Example: "Aaj ki sale", "Ramesh ka hisaab", "2 chawal add karo", "low stock dikhao".';
+  return `Main is baat ko abhi confidently identify nahi kar paya: "${raw}". Aap ise thoda aur detail mein bol sakte hain? Main galat customer, product ya amount guess nahi karunga.`;
 }
-
-async function saveBill(){
-  if(!draft.length){reply('Bill khali hai, pehle product add karein.');return;}
-  if(!confirm(`Bill save karein?\n\nCustomer: ${$('customer-name').value||'Walk-in Customer'}\nTotal: ${$('bill-total').textContent}\nPayment: ${$('pay-status').value}`))return;
-  const btn=$('save-bill');btn.disabled=true;btn.textContent='Saving...';
+async function sendCommand(){const q=$('command').value.trim();if(!q||busy)return;$('command').value='';await askAI(q)}
+async function askAI(q){
+  if(busy)return;busy=true;$('send-btn').disabled=true;setStatus('Thinking...',true);$('transcript').textContent=q;log(q,'user');
   try{
-    const subtotal=draft.reduce((s,x)=>s+x.total,0);
-    const bill={date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}),customerName:$('customer-name').value.trim()||'Walk-in Customer',customerPhone:$('customer-phone').value.trim()||'N/A',items:draft.map(x=>({...x})),discount:0,delivery:0,advance:0,grandTotal:subtotal,payStatus:$('pay-status').value,payMode:$('pay-mode').value,deliveryStatus:'Processing',timestamp:firebase.firestore.FieldValue.serverTimestamp()};
-    const doc=await db.collection('shops').doc(currentShopId).collection('bills').add(bill);
-    bills.unshift({...bill,id:doc.id,timestamp:new Date()});
-    updateStats();draft=[];renderDraft();$('customer-name').value='';$('customer-phone').value='';
-    reply('Bill successfully save ho gaya.');
-  }catch(e){console.error(e);reply('Bill save nahi ho paya: '+(e.message||'Dobara try karein.'));}
-  finally{btn.disabled=false;btn.textContent='Save bill';}
+    const answer=freeBrain(q);
+    $('transcript').textContent=answer;log(answer);speak(answer);
+    addTurn('user',q);addTurn('assistant',answer);
+    setStatus('Free intelligence active');
+  }catch(e){console.error(e);reply('Maaf kijiye, command process nahi ho paya: '+(e.message||'unknown error'),false);setStatus('Local engine issue')}
+  finally{busy=false;$('send-btn').disabled=false}
 }
-
-function toggleListening(){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){reply('Is browser mein voice support nahi hai. Chrome use karein.',false);return;}
-  if(listening&&recognition){recognition.stop();return;}
-  recognition=new SR();
-  recognition.lang='en-IN'; // Hinglish + English product names ke liye best
-  recognition.interimResults=true;
-  recognition.continuous=false;
-  recognition.maxAlternatives=1;
-  recognition.onstart=()=>{listening=true;$('mic').classList.add('listening');setStatus('Listening...',true);$('transcript').textContent='Sun raha hoon... boliye';};
-  recognition.onresult=e=>{
-    let interim='',final='';
-    for(let i=e.resultIndex;i<e.results.length;i++){
-      if(e.results[i].isFinal)final+=e.results[i][0].transcript;
-      else interim+=e.results[i][0].transcript;
-    }
-    $('transcript').textContent=final||interim||'Sun raha hoon...';
-    if(final.trim()){log(final,'user');handleCommand(final);}
-  };
-  recognition.onerror=e=>{
-    setStatus('Voice issue');
-    if(e.error==='not-allowed')reply('Mic permission allow karein.',false);
-    else if(e.error==='no-speech')$('transcript').textContent='Kuch sunai nahi diya, dobara tap karein.';
-  };
-  recognition.onend=()=>{listening=false;$('mic').classList.remove('listening');setStatus('Ready when you are');};
-  try{recognition.start();}catch(e){setStatus('Ready when you are');}
-}
-
-async function loadShop(){
-  try{
-    setStatus('Loading shop data...',true);
-    const doc=await db.collection('shops').doc(currentShopId).get();
-    if(!doc.exists)throw new Error('Shop record nahi mila.');
-    shopData=doc.data()||{};
-    $('shop-name').textContent=shopData.shopName||'YOUR SHOP';
-    const [ps,bs,cs]=await Promise.all([
-      db.collection('shops').doc(currentShopId).collection('products').get(),
-      db.collection('shops').doc(currentShopId).collection('bills').get(),
-      db.collection('shops').doc(currentShopId).collection('customers').get()
-    ]);
-    products=ps.docs.map(d=>({id:d.id,...d.data()}));
-    bills=bs.docs.map(d=>({id:d.id,...d.data()}));
-    customers=cs.docs.map(d=>({id:d.id,...d.data()}));
-    renderProducts();updateStats();setStatus('Connected to your shop');
-  }catch(e){console.error(e);setStatus('Connection issue');reply('Shop data load nahi ho paya: '+e.message,false);}
-}
-auth.onAuthStateChanged(user=>{
-  if(!user){setStatus('Login required');reply('Pehle BikriPage dashboard mein login karein.',false);return;}
-  if(currentShopId)loadShop();
-});
-</script>
-
-</body>
-</html>
+async function saveBill(){if(!draft.length){reply('Bill khali hai, pehle product add karein.');return}const total=draft.reduce((s,x)=>s+x.total,0);if(!confirm(`Bill save karein?\n\nCustomer: ${$('customer-name').value||'Walk-in Customer'}\nTotal: ${money(total)}\nPayment: ${$('pay-status').value}`))return;const btn=$('save-bill');btn.disabled=true;btn.textContent='Saving...';try{const bill={date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}),customerName:$('customer-name').value.trim()||'Walk-in Customer',customerPhone:$('customer-phone').value.trim()||'N/A',items:draft.map(x=>({...x})),discount:0,delivery:0,advance:0,grandTotal:total,payStatus:$('pay-status').value,payMode:$('pay-mode').value,deliveryStatus:'Processing',timestamp:firebase.firestore.FieldValue.serverTimestamp()};const doc=await db.collection('shops').doc(currentShopId).collection('bills').add(bill);bills.unshift({...bill,id:doc.id,timestamp:new Date()});updateStats();draft=[];renderDraft();$('customer-name').value='';$('customer-phone').value='';reply('Bill successfully save ho gaya. Bill ID: '+doc.id)}catch(e){console.error(e);reply('Bill save nahi ho paya: '+(e.message||'Dobara try karein.'))}finally{btn.disabled=false;btn.textContent='Save bill'}}
+function toggleListening(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){reply('Is browser mein voice support nahi hai. Chrome use karein.',false);return}if(listening&&recognition){recognition.stop();return}recognition=new SR();recognition.lang='hi-IN';recognition.interimResults=true;recognition.continuous=false;recognition.maxAlternatives=3;recognition.onstart=()=>{listening=true;$('mic').classList.add('listening');setStatus('Listening...',true);$('transcript').textContent='Sun raha hoon... boliye'};recognition.onresult=e=>{let interim='',final='';for(let i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)final+=e.results[i][0].transcript;else interim+=e.results[i][0].transcript}$('transcript').textContent=final||interim||'Sun raha hoon...';if(final.trim())askAI(final.trim())};recognition.onerror=e=>{setStatus('Voice issue');if(e.error==='not-allowed')reply('Mic permission allow karein.',false);else if(e.error==='no-speech')$('transcript').textContent='Kuch sunai nahi diya, dobara tap karein.'};recognition.onend=()=>{listening=false;$('mic').classList.remove('listening');if(!busy)setStatus('Ready when you are')};try{recognition.start()}catch(e){setStatus('Ready when you are')}}
+async function loadShop(){try{setStatus('Loading shop data...',true);const doc=await db.collection('shops').doc(currentShopId).get();if(!doc.exists)throw new Error('Shop record nahi mila.');shopData=doc.data()||{};$('shop-name').textContent=shopData.shopName||'YOUR SHOP';const [ps,bs,cs]=await Promise.all([db.collection('shops').doc(currentShopId).collection('products').get(),db.collection('shops').doc(currentShopId).collection('bills').orderBy('timestamp','desc').limit(500).get().catch(()=>db.collection('shops').doc(currentShopId).collection('bills').get()),db.collection('shops').doc(currentShopId).collection('customers').get()]);products=ps.docs.map(d=>({id:d.id,...d.data()}));bills=bs.docs.map(d=>({id:d.id,...d.data()}));customers=cs.docs.map(d=>({id:d.id,...d.data()}));renderProducts();updateStats();await loadMemory();setStatus('Free intelligence ready')}catch(e){console.error(e);setStatus('Connection issue');reply('Shop data load nahi ho paya: '+e.message,false)}}
+auth.onAuthStateChanged(user=>{if(!user){setStatus('Login required');reply('Pehle BikriPage dashboard mein login karein.',false);return}if(currentShopId)loadShop()});
+</script></body></html>

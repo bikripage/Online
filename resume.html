@@ -420,6 +420,33 @@
       padding: 2px 6px; border-radius: 6px; margin-left: 6px; text-transform: uppercase;
     }
 
+    /* iOS CONFIRM ALERT MODAL */
+    .ios-alert-backdrop {
+      position: fixed; inset: 0; z-index: 150; background: rgba(17, 24, 39, 0.48);
+      backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+    }
+    .ios-alert-backdrop.open { opacity: 1; pointer-events: auto; }
+    .ios-alert-box {
+      width: 100%; max-width: 290px; background: rgba(255,255,255,0.96);
+      border-radius: 16px; overflow: hidden; text-align: center;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.22);
+      transform: scale(0.94); transition: transform 0.2s ease;
+    }
+    .ios-alert-backdrop.open .ios-alert-box { transform: scale(1); }
+    .ios-alert-body { padding: 20px 18px 16px; }
+    .ios-alert-title { font-size: 16px; font-weight: 750; color: var(--ink); margin-bottom: 6px; }
+    .ios-alert-msg { font-size: 13px; color: var(--muted); line-height: 1.4; }
+    .ios-alert-actions { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid rgba(0,0,0,0.09); }
+    .ios-alert-btn {
+      padding: 12px 10px; font-size: 15px; font-weight: 600; color: var(--ios-blue);
+      transition: background 0.14s ease;
+    }
+    .ios-alert-btn:active { background: rgba(0,0,0,0.05); }
+    .ios-alert-btn.cancel { font-weight: 500; color: var(--muted); border-right: 1px solid rgba(0,0,0,0.09); }
+    .ios-alert-btn.danger { color: var(--ios-red); font-weight: 700; }
+
     /* PRINT A4 */
     @page { size: A4 portrait; margin: 0; }
     @media print {
@@ -475,11 +502,13 @@
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;"><div class="card-title">Smart CV Studio</div><span id="plan-status-pill" class="plan-pill">Basic</span></div>
             <div class="card-sub">Sabhi 8 sections + Covering Letter 100% editable</div>
           </div>
-          <div style="display:flex; gap:5px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
-            <button type="button" class="btn-soft" style="padding:5px 10px; color:var(--ios-blue); background:rgba(0,122,255,0.10); border-color:rgba(0,122,255,0.18);" onclick="saveAsDefault()">Save Default</button>
-            <button type="button" class="btn-muted" onclick="resetToTemplate()">Default</button>
-            <button type="button" class="btn-soft" style="padding:5px 10px; color:var(--ios-red); background:rgba(255,59,48,0.10); border-color:rgba(255,59,48,0.18);" onclick="clearAllData()">Clear</button>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding-top:2px;">
+          <div style="display:flex; gap:6px; align-items:center;">
+            <button type="button" class="btn-soft" style="padding:6px 11px; color:var(--ios-blue); background:rgba(0,122,255,0.10); border-color:rgba(0,122,255,0.18);" onclick="saveAsDefault()">Save Default</button>
+            <button type="button" class="btn-soft" style="padding:6px 11px; color:var(--ink); background:var(--input-bg);" onclick="resetToTemplate()">Default</button>
           </div>
+          <button type="button" class="btn-soft" style="padding:6px 12px; color:var(--ios-red); background:rgba(255,59,48,0.09); border-color:rgba(255,59,48,0.20);" onclick="clearAllData()">Clear All</button>
         </div>
         <div class="segmented full-grid cols-2">
           <button id="edit-mode-cv" type="button" class="seg-btn active" onclick="setEditTab('cv')">CV (8 Sections)</button>
@@ -734,6 +763,20 @@
 
       <div style="text-align:center; font-size:11px; color:var(--muted); line-height:1.4;">
         BikriPage <strong>Plus</strong> &amp; <strong>Pro</strong> store owners get unlimited free exports.
+      </div>
+    </div>
+  </div>
+
+  <!-- iOS CONFIRMATION ALERT MODAL -->
+  <div id="ios-confirm-modal" class="ios-alert-backdrop no-print" onclick="if(event.target===this) closeIosConfirm(false)">
+    <div class="ios-alert-box" role="alertdialog" aria-modal="true">
+      <div class="ios-alert-body">
+        <div id="ios-confirm-title" class="ios-alert-title">Are you sure?</div>
+        <div id="ios-confirm-msg" class="ios-alert-msg"></div>
+      </div>
+      <div class="ios-alert-actions">
+        <button type="button" class="ios-alert-btn cancel" onclick="closeIosConfirm(false)">Cancel</button>
+        <button id="ios-confirm-ok" type="button" class="ios-alert-btn" onclick="closeIosConfirm(true)">Yes</button>
       </div>
     </div>
   </div>
@@ -1144,7 +1187,42 @@
       window.updExp = function (i, k, v) { state.data.experience[i][k] = v; renderPreview(); save(); };
       window.updExpBullets = function (i, v) { state.data.experience[i].bullets = v.split('\n').map(function (x) { return x.trim(); }).filter(Boolean); renderPreview(); save(); };
 
-      window.saveAsDefault = function () {
+      let _confirmResolver = null;
+      function showIosConfirm(title, msg, okText, isDanger) {
+        return new Promise(function (resolve) {
+          _confirmResolver = resolve;
+          const tEl = document.getElementById('ios-confirm-title');
+          const mEl = document.getElementById('ios-confirm-msg');
+          const okEl = document.getElementById('ios-confirm-ok');
+          const modal = document.getElementById('ios-confirm-modal');
+          if (tEl) tEl.textContent = title;
+          if (mEl) mEl.textContent = msg;
+          if (okEl) {
+            okEl.textContent = okText || 'Yes';
+            okEl.classList.toggle('danger', Boolean(isDanger));
+          }
+          if (modal) modal.classList.add('open');
+        });
+      }
+
+      window.closeIosConfirm = function (confirmed) {
+        const modal = document.getElementById('ios-confirm-modal');
+        if (modal) modal.classList.remove('open');
+        if (_confirmResolver) {
+          const fn = _confirmResolver;
+          _confirmResolver = null;
+          fn(Boolean(confirmed));
+        }
+      };
+
+      window.saveAsDefault = async function () {
+        const ok = await showIosConfirm(
+          'Save as Default?',
+          'Are you sure you want to save this resume as your Default template? Purana default replace ho jayega.',
+          'Yes, Save',
+          false
+        );
+        if (!ok) return;
         try {
           const snapshot = JSON.parse(JSON.stringify(state.data));
           localStorage.setItem(CUSTOM_DEFAULT_KEY, JSON.stringify(snapshot));
@@ -1174,7 +1252,14 @@
         }
       };
 
-      window.clearAllData = function () {
+      window.clearAllData = async function () {
+        const ok = await showIosConfirm(
+          'Clear All Fields?',
+          'Are you sure you want to clear all details? Aapka current form data khali ho jayega.',
+          'Yes, Clear',
+          true
+        );
+        if (!ok) return;
         state.data = {
           name: '',
           address: '',

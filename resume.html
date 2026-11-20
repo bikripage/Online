@@ -475,9 +475,10 @@
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;"><div class="card-title">Smart CV Studio</div><span id="plan-status-pill" class="plan-pill">Basic</span></div>
             <div class="card-sub">Sabhi 8 sections + Covering Letter 100% editable</div>
           </div>
-          <div style="display:flex; gap:5px; align-items:center;">
+          <div style="display:flex; gap:5px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+            <button type="button" class="btn-soft" style="padding:5px 10px; color:var(--ios-blue); background:rgba(0,122,255,0.10); border-color:rgba(0,122,255,0.18);" onclick="saveAsDefault()">Save Default</button>
             <button type="button" class="btn-muted" onclick="resetToTemplate()">Default</button>
-            <button type="button" class="btn-soft" style="padding:5px 11px; color:var(--ios-red); background:rgba(255,59,48,0.10); border-color:rgba(255,59,48,0.18);" onclick="clearAllData()">Clear</button>
+            <button type="button" class="btn-soft" style="padding:5px 10px; color:var(--ios-red); background:rgba(255,59,48,0.10); border-color:rgba(255,59,48,0.18);" onclick="clearAllData()">Clear</button>
           </div>
         </div>
         <div class="segmented full-grid cols-2">
@@ -571,8 +572,18 @@
             <span class="acc-chevron">▾</span>
           </button>
           <div class="acc-body">
-            <div id="exp-list" style="display:flex; flex-direction:column; gap:8px;"></div>
-            <button type="button" class="btn-soft" style="width:100%;" onclick="addExp()">+ Add Experience</button>
+            <div class="segmented full-grid cols-2">
+              <button id="exp-mode-exp" type="button" class="seg-btn active" onclick="setExpMode(false)">Experienced</button>
+              <button id="exp-mode-fresher" type="button" class="seg-btn" onclick="setExpMode(true)">Fresher</button>
+            </div>
+            <div id="exp-experienced-wrap" style="display:flex; flex-direction:column; gap:8px;">
+              <div id="exp-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+              <button type="button" class="btn-soft" style="width:100%;" onclick="addExp()">+ Add Experience</button>
+            </div>
+            <div id="exp-fresher-wrap" class="hidden" style="display:flex; flex-direction:column; gap:6px;">
+              <label class="field-label">Fresher Summary (About your readiness &amp; goal)</label>
+              <textarea id="f-fresher-note" rows="4" class="ios-textarea" placeholder="Currently seeking my first professional opportunity as a Data Entry Operator. I am eager to apply my computer knowledge, learn new systems, and perform assigned tasks with accuracy, dedication, and responsibility." oninput="upd('fresherNote', this.value)"></textarea>
+            </div>
           </div>
         </div>
 
@@ -842,6 +853,7 @@
       };
 
       const STORAGE_KEY = 'smart_cv_locked_studio_v1';
+      const CUSTOM_DEFAULT_KEY = 'smart_cv_custom_default_v1';
 
       function getDefaultData() {
         return {
@@ -869,6 +881,8 @@
             'Time Management',
             'Problem Solving'
           ],
+          isFresher: false,
+          fresherNote: 'Currently seeking my first professional opportunity as a Data Entry Operator. I am eager to apply my computer knowledge, learn new systems, and perform assigned tasks with accuracy, dedication, and responsibility.',
           experience: [
             {
               role: 'Content Writer (Intern)',
@@ -923,7 +937,11 @@
         docMode: (saved && saved.docMode) || 'cv',
         mobileView: 'edit',
         editTab: 'cv',
-        data: (saved && saved.data) ? Object.assign({ showPhoto: true }, saved.data) : getDefaultData()
+        data: (saved && saved.data) ? Object.assign({
+          showPhoto: true,
+          isFresher: false,
+          fresherNote: 'Currently seeking my first professional opportunity as a Data Entry Operator. I am eager to apply my computer knowledge, learn new systems, and perform assigned tasks with accuracy, dedication, and responsibility.'
+        }, saved.data) : getDefaultData()
       };
 
       function save() {
@@ -1102,13 +1120,58 @@
         }).join('');
       }
       window.addExp = function () { state.data.experience.push({ role: '', company: '', duration: '', bullets: [] }); renderExpEditor(); renderPreview(); save(); };
+      function syncExpModeUI() {
+        const isF = Boolean(state.data.isFresher);
+        const bExp = document.getElementById('exp-mode-exp');
+        const bFr = document.getElementById('exp-mode-fresher');
+        const wExp = document.getElementById('exp-experienced-wrap');
+        const wFr = document.getElementById('exp-fresher-wrap');
+        if (bExp) bExp.classList.toggle('active', !isF);
+        if (bFr) bFr.classList.toggle('active', isF);
+        if (wExp) wExp.classList.toggle('hidden', isF);
+        if (wFr) wFr.classList.toggle('hidden', !isF);
+      }
+
+      window.setExpMode = function (isFresher) {
+        state.data.isFresher = Boolean(isFresher);
+        syncExpModeUI();
+        renderPreview();
+        save();
+        toast(isFresher ? 'Fresher mode active' : 'Experienced mode active');
+      };
+
       window.delExp = function (i) { state.data.experience.splice(i, 1); renderExpEditor(); renderPreview(); save(); };
       window.updExp = function (i, k, v) { state.data.experience[i][k] = v; renderPreview(); save(); };
       window.updExpBullets = function (i, v) { state.data.experience[i].bullets = v.split('\n').map(function (x) { return x.trim(); }).filter(Boolean); renderPreview(); save(); };
 
+      window.saveAsDefault = function () {
+        try {
+          const snapshot = JSON.parse(JSON.stringify(state.data));
+          localStorage.setItem(CUSTOM_DEFAULT_KEY, JSON.stringify(snapshot));
+          toast('Saved as your Default!');
+        } catch (e) {
+          toast('Could not save default (storage full)');
+        }
+      };
+
       window.resetToTemplate = function () {
-        state.data = getDefaultData();
-        syncForm(); renderPreview(); save(); toast('Locked template restored');
+        let custom = null;
+        try {
+          const raw = localStorage.getItem(CUSTOM_DEFAULT_KEY);
+          if (raw) custom = JSON.parse(raw);
+        } catch (e) { custom = null; }
+
+        if (custom) {
+          state.data = Object.assign({
+            showPhoto: true,
+            isFresher: false,
+            fresherNote: ''
+          }, custom);
+          syncForm(); renderPreview(); save(); toast('Your saved Default restored');
+        } else {
+          state.data = getDefaultData();
+          syncForm(); renderPreview(); save(); toast('Locked template restored');
+        }
       };
 
       window.clearAllData = function () {
@@ -1126,6 +1189,8 @@
           objective: '',
           education: [{ qual: '', board: '', year: '', pct: '' }],
           skills: [],
+          isFresher: Boolean(state.data.isFresher),
+          fresherNote: '',
           experience: [{ role: '', company: '', duration: '', bullets: [] }],
           achievements: [],
           hobbies: '',
@@ -1232,7 +1297,7 @@
             }
             toast('Payment successful! Opening PDF...');
             if (window.innerWidth < 980) setMobileView('preview');
-            setTimeout(function () { window.print(); }, 350);
+            setTimeout(function () { executeSingleExport(); }, 350);
           }
         };
 
@@ -1243,10 +1308,34 @@
         rzp.open();
       };
 
+      function relockAfterExport() {
+        if (billing.isPremium) return;
+        billing.unlocked = { cv: false, cl: false, both: false };
+        renderPreview();
+      }
+
+      function executeSingleExport() {
+        if (!billing.isPremium) {
+          let locked = false;
+          const doLock = function () {
+            if (locked) return;
+            locked = true;
+            window.removeEventListener('afterprint', doLock);
+            relockAfterExport();
+          };
+          window.addEventListener('afterprint', doLock);
+          window.print();
+          // Fallback for mobile browsers that do not fire afterprint reliably
+          setTimeout(doLock, 1200);
+        } else {
+          window.print();
+        }
+      }
+
       window.printResume = function () {
         if (isDocUnlocked(state.docMode)) {
           if (window.innerWidth < 980) setMobileView('preview');
-          setTimeout(function () { window.print(); }, 180);
+          setTimeout(function () { executeSingleExport(); }, 180);
         } else {
           openPaywall(state.docMode);
         }
@@ -1288,7 +1377,17 @@
       }
 
       function expBlockHtml(d) {
-        return d.experience.map(function (e) {
+        const validExps = (d.experience || []).filter(function (e) {
+          return (e.role && e.role.trim()) || (e.company && e.company.trim()) || (e.bullets && e.bullets.length);
+        });
+        if (d.isFresher || validExps.length === 0) {
+          const note = (d.fresherNote || '').trim();
+          return '<div style="margin-bottom:4px;">' +
+            '<div style="font-size:13.2px; font-weight:750; color:var(--r-ink); margin-bottom:4px;">Fresher</div>' +
+            (note ? '<p style="font-size:var(--d-text); line-height:var(--d-lh); color:var(--r-body);">' + esc(note) + '</p>' : '') +
+          '</div>';
+        }
+        return validExps.map(function (e) {
           return '<div style="margin-bottom:8px;">' +
             '<div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px;">' +
               '<div style="font-size:13.2px; font-weight:700; color:var(--r-ink);">' + esc(e.role) + '</div>' +
@@ -1516,7 +1615,9 @@
         set('cl-p1', cl.p1); set('cl-p2', cl.p2); set('cl-p3', cl.p3);
         set('cl-closing', cl.closing); set('cl-signoff', cl.signoff); set('cl-enclosure', cl.enclosure);
 
+        set('f-fresher-note', d.fresherNote);
         syncPhotoToggleUI();
+        syncExpModeUI();
         renderEduEditor();
         renderSkillsEditor();
         renderExpEditor();

@@ -413,9 +413,9 @@
             <div class="card-title">Locked CV + Cover Letter Studio</div>
             <div class="card-sub">Sabhi 8 sections + Covering Letter 100% editable</div>
           </div>
-          <div style="display:flex; gap:4px;">
+          <div style="display:flex; gap:5px; align-items:center;">
             <button type="button" class="btn-muted" onclick="resetToTemplate()">Default</button>
-            <button type="button" class="btn-soft" style="padding:5px 9px;" onclick="exportJSON()">Backup</button>
+            <button type="button" class="btn-soft" style="padding:5px 11px; color:var(--ios-red); background:rgba(255,59,48,0.10); border-color:rgba(255,59,48,0.18);" onclick="clearAllData()">Clear</button>
           </div>
         </div>
         <div class="segmented full-grid cols-2">
@@ -908,13 +908,48 @@
         syncForm(); renderPreview(); save(); toast('Locked template restored');
       };
 
-      window.exportJSON = function () {
-        const blob = new Blob([JSON.stringify(state.data, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = (state.data.name || 'CV').replace(/\s+/g, '_') + '_Backup.json';
-        a.click();
-        toast('Backup JSON downloaded');
+      window.clearAllData = function () {
+        state.data = {
+          name: '',
+          address: '',
+          phone: '',
+          email: '',
+          dob: '',
+          gender: '',
+          nationality: '',
+          languages: '',
+          showPhoto: state.data.showPhoto !== false,
+          photo: '',
+          objective: '',
+          education: [{ qual: '', board: '', year: '', pct: '' }],
+          skills: [],
+          experience: [{ role: '', company: '', duration: '', bullets: [] }],
+          achievements: [],
+          hobbies: '',
+          interest: '',
+          strengths: '',
+          declaration: '',
+          declDate: '',
+          declPlace: '',
+          signature: '',
+          coverLetter: {
+            to: '',
+            subject: '',
+            salutation: '',
+            p1: '',
+            p2: '',
+            p3: '',
+            closing: '',
+            signoff: '',
+            enclosure: ''
+          }
+        };
+        const skillInp = document.getElementById('new-skill');
+        if (skillInp) skillInp.value = '';
+        syncForm();
+        renderPreview();
+        save();
+        toast('All fields cleared');
       };
 
       window.printResume = function () {

@@ -50,10 +50,18 @@
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
     }
     .brand-group { display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
+    .btn-back {
+      height: 34px; padding: 0 11px 0 8px; border-radius: 10px;
+      background: rgba(118,118,128,0.12); color: var(--ink);
+      display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+      font-size: 13px; font-weight: 650; transition: background 0.15s ease, transform 0.12s ease;
+    }
+    .btn-back:active { transform: scale(0.95); background: rgba(118,118,128,0.22); }
     .brand-badge {
       width: 34px; height: 34px; border-radius: 10px; background: #1C1C1E; color: #FFF;
-      display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px;
+      display: none; align-items: center; justify-content: center; font-weight: 800; font-size: 13px;
     }
+    @media (min-width: 980px) { .brand-badge { display: flex; } }
     .brand-title { display: none; font-size: 15px; font-weight: 700; letter-spacing: -0.02em; }
 
     .segmented {
@@ -374,6 +382,12 @@
   <header class="app-header no-print">
     <div class="header-inner">
       <div class="brand-group">
+        <button type="button" class="btn-back" onclick="goBack()" aria-label="Go Back">
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          <span>Back</span>
+        </button>
         <div class="brand-badge">CV</div>
         <span class="brand-title">Smart CV Studio</span>
       </div>
@@ -430,12 +444,21 @@
             </div>
             <div><label class="field-label">Address</label><input id="f-address" class="ios-input" oninput="upd('address', this.value)" /></div>
             <div><label class="field-label">Languages Known</label><input id="f-languages" class="ios-input" oninput="upd('languages', this.value)" /></div>
-            <div style="display:flex; align-items:center; justify-content:space-between; background:var(--input-bg); padding:8px 10px; border-radius:11px;">
-              <span style="font-size:12px; font-weight:600; color:var(--muted);">Passport Photo</span>
-              <div style="display:flex; gap:6px;">
-                <input id="photo-input" type="file" accept="image/*" class="hidden" onchange="uploadPhoto(event)" />
-                <button type="button" class="btn-soft" style="background:#FFF; padding:5px 10px;" onclick="document.getElementById('photo-input').click()">Upload</button>
-                <button type="button" class="btn-danger" onclick="clearPhoto()">Remove</button>
+            <div style="background:var(--input-bg); padding:10px 11px; border-radius:12px; display:flex; flex-direction:column; gap:9px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                <span style="font-size:12.5px; font-weight:650; color:var(--ink);">Show Profile Photo</span>
+                <div class="segmented" style="padding:2px;">
+                  <button id="photo-yes" type="button" class="seg-btn active" style="padding:4px 12px; font-size:11.5px;" onclick="setShowPhoto(true)">Yes</button>
+                  <button id="photo-no" type="button" class="seg-btn" style="padding:4px 12px; font-size:11.5px;" onclick="setShowPhoto(false)">No</button>
+                </div>
+              </div>
+              <div id="photo-upload-controls" style="display:flex; align-items:center; justify-content:space-between; padding-top:6px; border-top:1px solid rgba(0,0,0,0.06);">
+                <span style="font-size:11.5px; font-weight:500; color:var(--muted);">Passport Photo</span>
+                <div style="display:flex; gap:6px;">
+                  <input id="photo-input" type="file" accept="image/*" class="hidden" onchange="uploadPhoto(event)" />
+                  <button type="button" class="btn-soft" style="background:#FFF; padding:5px 11px;" onclick="document.getElementById('photo-input').click()">Upload</button>
+                  <button type="button" class="btn-danger" onclick="clearPhoto()">Remove</button>
+                </div>
               </div>
             </div>
           </div>
@@ -627,6 +650,7 @@
           gender: 'Male',
           nationality: 'Indian',
           languages: 'Hindi, English',
+          showPhoto: true,
           photo: '',
           objective: 'To secure a challenging position in a reputed organization where I can contribute my skills and knowledge, learn new things and grow professionally while making a positive impact.',
           education: [
@@ -696,7 +720,7 @@
         docMode: (saved && saved.docMode) || 'cv',
         mobileView: 'edit',
         editTab: 'cv',
-        data: (saved && saved.data) ? saved.data : getDefaultData()
+        data: (saved && saved.data) ? Object.assign({ showPhoto: true }, saved.data) : getDefaultData()
       };
 
       function save() {
@@ -719,6 +743,33 @@
       }
 
       /* NAVIGATION & CONTROLS */
+      window.goBack = function () {
+        if (window.history.length > 1) {
+          window.history.back();
+        } else if (document.referrer) {
+          window.location.href = document.referrer;
+        } else {
+          window.location.href = './';
+        }
+      };
+
+      function syncPhotoToggleUI() {
+        const show = state.data.showPhoto !== false;
+        const bYes = document.getElementById('photo-yes');
+        const bNo = document.getElementById('photo-no');
+        const ctrl = document.getElementById('photo-upload-controls');
+        if (bYes) bYes.classList.toggle('active', show);
+        if (bNo) bNo.classList.toggle('active', !show);
+        if (ctrl) ctrl.classList.toggle('hidden', !show);
+      }
+
+      window.setShowPhoto = function (show) {
+        state.data.showPhoto = Boolean(show);
+        syncPhotoToggleUI();
+        renderPreview();
+        save();
+        toast(show ? 'Profile photo shown' : 'Profile photo hidden');
+      };
       window.setMobileView = function (v) {
         state.mobileView = v;
         document.getElementById('tab-edit').classList.toggle('active', v === 'edit');
@@ -792,6 +843,8 @@
         const r = new FileReader();
         r.onload = function () {
           state.data.photo = String(r.result || '');
+          state.data.showPhoto = true;
+          syncPhotoToggleUI();
           renderPreview(); save(); toast('Photo uploaded');
         };
         r.readAsDataURL(file);
@@ -881,6 +934,7 @@
 
       /* SHARED CV BLOCKS */
       function photoBoxHtml(d) {
+        if (d.showPhoto === false) return '';
         return '<div class="photo-frame">' +
           (d.photo ? '<img src="' + d.photo + '" alt="Photo" />' : '<svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 20a7 7 0 0114 0"/></svg><span style="margin-top:4px;">(Photo)</span>') +
         '</div>';
@@ -1131,6 +1185,7 @@
         set('cl-p1', cl.p1); set('cl-p2', cl.p2); set('cl-p3', cl.p3);
         set('cl-closing', cl.closing); set('cl-signoff', cl.signoff); set('cl-enclosure', cl.enclosure);
 
+        syncPhotoToggleUI();
         renderEduEditor();
         renderSkillsEditor();
         renderExpEditor();

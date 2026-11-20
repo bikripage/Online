@@ -9,6 +9,12 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <!-- Razorpay Checkout SDK -->
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <!-- QRCode Generator -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- Curated Google Fonts (graceful offline fallback) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Roboto+Slab:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -244,7 +250,77 @@
       transform-origin: top left;
     }
     .a4-sheet.density-compact { --d-pad: 28px; --d-gap: 11px; --d-text: 11.4px; --d-lh: 1.4; }
+    .a4-sheet.font-sans { --r-font: "Inter", var(--font-sans); }
+    .a4-sheet.font-jakarta { --r-font: "Plus Jakarta Sans", var(--font-sans); }
     .a4-sheet.font-serif { --r-font: var(--font-serif); }
+    .a4-sheet.font-editorial { --r-font: "Playfair Display", Georgia, serif; }
+    .a4-sheet.font-slab { --r-font: "Roboto Slab", Georgia, serif; }
+
+    /* SCROLLABLE PILL STRIPS & CUSTOM COLOR PICKER */
+    .pill-strip {
+      display: flex; align-items: center; gap: 6px; overflow-x: auto;
+      padding: 3px; background: rgba(118,118,128,0.12); border-radius: 12px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .pill-strip .seg-btn {
+      flex-shrink: 0; border-radius: 9px; padding: 6px 12px; font-size: 11.5px;
+    }
+    .custom-color-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      background: var(--input-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 7px 10px;
+    }
+    .color-pick-group { display: flex; align-items: center; gap: 10px; }
+    .color-pick-item {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 650; color: var(--muted); cursor: pointer;
+    }
+    .color-pick-item input[type="color"] {
+      -webkit-appearance: none; appearance: none;
+      width: 26px; height: 26px; border: 1.5px solid rgba(0,0,0,0.15);
+      border-radius: 999px; background: transparent; cursor: pointer;
+      padding: 0; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+    .color-pick-item input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0; border-radius: 999px;
+    }
+    .color-pick-item input[type="color"]::-webkit-color-swatch {
+      border: none; border-radius: 999px;
+    }
+    .color-pick-item input[type="color"]::-moz-color-swatch {
+      border: none; border-radius: 999px;
+    }
+
+    /* LAYOUT 6: MINIMAL SWISS */
+    .lay-minimal { padding: calc(var(--d-pad) + 4px) 46px; display: flex; flex-direction: column; gap: var(--d-gap); }
+    .min-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--r-border); }
+    .min-name { font-size: 32px; font-weight: 800; letter-spacing: -0.03em; color: var(--r-primary); line-height: 1.1; }
+    .min-sub { font-size: 11.8px; color: var(--r-muted); margin-top: 6px; line-height: 1.5; }
+    .lay-minimal .cv-sec-head { border-bottom: none; padding-bottom: 0; margin-bottom: 6px; font-size: 10.5px; letter-spacing: 0.16em; color: var(--r-secondary); }
+    .lay-minimal .cv-sec-num { display: none; }
+    .lay-minimal section { padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.06); }
+    .lay-minimal section:first-of-type { border-top: none; padding-top: 0; }
+
+    /* LAYOUT 7: TIMELINE MODERN */
+    .lay-timeline { padding: var(--d-pad) 40px; display: flex; flex-direction: column; gap: var(--d-gap); }
+    .tl-header {
+      background: var(--r-tint); border-left: 5px solid var(--r-primary);
+      border-radius: 0 14px 14px 0; padding: 18px 22px;
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    }
+    .tl-track {
+      position: relative; padding-left: 24px;
+      border-left: 2px solid var(--r-border);
+      display: flex; flex-direction: column; gap: var(--d-gap);
+    }
+    .tl-node { position: relative; }
+    .tl-node::before {
+      content: ""; position: absolute; left: -31px; top: 3px;
+      width: 12px; height: 12px; border-radius: 999px;
+      background: #FFF; border: 3px solid var(--r-primary);
+    }
+    .lay-timeline .cv-sec-head { border-bottom: none; margin-bottom: 5px; }
+    .lay-timeline .cv-sec-num { display: none; }
 
     /* Shared CV Elements */
     .cv-doc-title {
@@ -447,6 +523,34 @@
     .ios-alert-btn.cancel { font-weight: 500; color: var(--muted); border-right: 1px solid rgba(0,0,0,0.09); }
     .ios-alert-btn.danger { color: var(--ios-red); font-weight: 700; }
 
+    /* SHARE BUTTON & QR POSTER MODAL */
+    .btn-share-icon {
+      width: 36px; height: 36px; border-radius: 11px;
+      background: rgba(0, 122, 255, 0.10); color: var(--ios-blue);
+      border: 1px solid rgba(0, 122, 255, 0.18);
+      display: inline-flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: transform 0.12s ease, background 0.15s ease;
+    }
+    .btn-share-icon:active { transform: scale(0.93); background: rgba(0, 122, 255, 0.18); }
+
+    .qr-poster-preview {
+      width: 100%; max-width: 280px; margin: 0 auto;
+      border-radius: 18px; overflow: hidden;
+      box-shadow: 0 12px 30px rgba(17, 24, 39, 0.18);
+      border: 1px solid rgba(0,0,0,0.08);
+      display: block; background: #111827;
+    }
+    .share-link-box {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--input-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 8px 10px;
+    }
+    .share-link-text {
+      flex: 1; min-width: 0; font-size: 11.5px; font-weight: 600; color: var(--muted);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .share-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
     /* PRINT A4 */
     @page { size: A4 portrait; margin: 0; }
     @media print {
@@ -502,6 +606,11 @@
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;"><div class="card-title">Smart CV Studio</div><span id="plan-status-pill" class="plan-pill">Basic</span></div>
             <div class="card-sub">Sabhi 8 sections + Covering Letter 100% editable</div>
           </div>
+          <button type="button" class="btn-share-icon" onclick="openShareModal()" aria-label="Share QR &amp; Link" title="Share QR &amp; Link">
+            <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13" />
+            </svg>
+          </button>
         </div>
         <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding-top:2px;">
           <div style="display:flex; gap:6px; align-items:center;">
@@ -688,28 +797,48 @@
           <button id="doc-both" type="button" class="seg-btn" onclick="setDocMode('both')">Both (2 Pages)</button>
         </div>
 
-        <!-- 5 Aesthetic Layouts -->
-        <div class="segmented full-grid cols-5">
+        <!-- 7 Aesthetic Layouts -->
+        <div class="pill-strip no-scrollbar" role="radiogroup" aria-label="Layouts">
           <button id="lay-classic" type="button" class="seg-btn active" onclick="setLayout('classic')">Classic</button>
           <button id="lay-executive" type="button" class="seg-btn" onclick="setLayout('executive')">Exec</button>
           <button id="lay-split" type="button" class="seg-btn" onclick="setLayout('split')">Split</button>
           <button id="lay-bento" type="button" class="seg-btn" onclick="setLayout('bento')">Bento</button>
           <button id="lay-formal" type="button" class="seg-btn" onclick="setLayout('formal')">Formal</button>
+          <button id="lay-minimal" type="button" class="seg-btn" onclick="setLayout('minimal')">Minimal</button>
+          <button id="lay-timeline" type="button" class="seg-btn" onclick="setLayout('timeline')">Timeline</button>
         </div>
 
-        <!-- 12 Aesthetic Color Combinations -->
+        <!-- 12 Preset + Custom Color Combinations -->
         <div id="swatch-strip" class="swatch-strip no-scrollbar"></div>
 
-        <!-- Density & Font -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-          <div class="segmented full-grid cols-2">
-            <button id="den-balanced" type="button" class="seg-btn active" onclick="setDensity('balanced')">Balanced</button>
-            <button id="den-compact" type="button" class="seg-btn" onclick="setDensity('compact')">Compact</button>
+        <!-- Custom Dual-Color Picker -->
+        <div class="custom-color-bar">
+          <span style="font-size:11.5px; font-weight:700; color:var(--ink);">Custom Colors</span>
+          <div class="color-pick-group">
+            <label class="color-pick-item">
+              <span>Primary</span>
+              <input id="pick-primary" type="color" value="#1B2A4A" oninput="applyCustomColors()" />
+            </label>
+            <label class="color-pick-item">
+              <span>Accent</span>
+              <input id="pick-secondary" type="color" value="#4A6FA5" oninput="applyCustomColors()" />
+            </label>
           </div>
-          <div class="segmented full-grid cols-2">
-            <button id="fnt-sans" type="button" class="seg-btn active" onclick="setFont('sans')">Modern Sans</button>
-            <button id="fnt-serif" type="button" class="seg-btn" onclick="setFont('serif')">Classic Serif</button>
-          </div>
+        </div>
+
+        <!-- 5 Curated Fonts -->
+        <div class="pill-strip no-scrollbar" role="radiogroup" aria-label="Fonts">
+          <button id="fnt-sans" type="button" class="seg-btn active" onclick="setFont('sans')">Inter Sans</button>
+          <button id="fnt-jakarta" type="button" class="seg-btn" onclick="setFont('jakarta')">Jakarta</button>
+          <button id="fnt-serif" type="button" class="seg-btn" onclick="setFont('serif')">Classic Serif</button>
+          <button id="fnt-editorial" type="button" class="seg-btn" onclick="setFont('editorial')">Playfair</button>
+          <button id="fnt-slab" type="button" class="seg-btn" onclick="setFont('slab')">Roboto Slab</button>
+        </div>
+
+        <!-- Density -->
+        <div class="segmented full-grid cols-2">
+          <button id="den-balanced" type="button" class="seg-btn active" onclick="setDensity('balanced')">Balanced Spacing</button>
+          <button id="den-compact" type="button" class="seg-btn" onclick="setDensity('compact')">Compact Spacing</button>
         </div>
       </div>
 
@@ -764,6 +893,52 @@
       <div style="text-align:center; font-size:11px; color:var(--muted); line-height:1.4;">
         BikriPage <strong>Plus</strong> &amp; <strong>Pro</strong> store owners get unlimited free exports.
       </div>
+    </div>
+  </div>
+
+  <!-- SHARE QR TEMPLATE & LINK MODAL -->
+  <div id="share-qr-modal" class="pay-backdrop no-print" onclick="if(event.target===this) closeShareModal()">
+    <div class="pay-sheet" role="dialog" aria-modal="true" aria-label="Share Resume Studio">
+      <div class="pay-handle"></div>
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
+        <div>
+          <h3 style="font-size:17px; font-weight:800; letter-spacing:-0.02em;">Share Resume Studio</h3>
+          <p style="font-size:12px; color:var(--muted); margin-top:2px;">BikriPage branded QR poster download ya share karein</p>
+        </div>
+        <button type="button" onclick="closeShareModal()" style="width:30px; height:30px; border-radius:999px; background:var(--input-bg); font-size:18px; color:var(--muted);">&times;</button>
+      </div>
+
+      <!-- Hidden QR generator mount -->
+      <div id="qr-hidden-mount" class="hidden"></div>
+
+      <!-- Rendered BikriPage Branded QR Poster Image -->
+      <img id="qr-poster-img" src="" alt="BikriPage Resume Studio QR Poster" class="qr-poster-preview" />
+
+      <!-- Link Copy Bar -->
+      <div class="share-link-box">
+        <span id="share-link-display" class="share-link-text">https://bikripage.github.io/Online/resume.html</span>
+        <button type="button" class="btn-soft" style="padding:5px 10px; background:#FFF; font-size:11.5px;" onclick="copyStudioLink()">Copy</button>
+      </div>
+
+      <!-- Primary Actions: Share Anywhere + Download QR -->
+      <div class="share-actions-grid">
+        <button type="button" class="btn-primary" style="height:44px; font-size:13px;" onclick="shareQrAndLink()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13" />
+          </svg>
+          <span>Share QR &amp; Link</span>
+        </button>
+        <button type="button" class="btn-soft" style="height:44px; font-size:13px; background:#111827; color:#FFF; border:none;" onclick="downloadQrPoster()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+          </svg>
+          <span>Download QR</span>
+        </button>
+      </div>
+
+      <button type="button" class="btn-soft" style="width:100%; height:42px; background:#ECFDF5; color:#15803D; border-color:#BBF7D0; font-size:13px;" onclick="shareStudioWhatsApp()">
+        <span>Share Link on WhatsApp</span>
+      </button>
     </div>
   </div>
 
@@ -974,7 +1149,8 @@
       const saved = loadSaved();
       const state = {
         layout: (saved && saved.layout) || 'classic',
-        theme: (saved && THEMES[saved.theme]) ? saved.theme : 'midnight',
+        theme: (saved && (THEMES[saved.theme] || saved.theme === 'custom')) ? saved.theme : 'midnight',
+        customTheme: (saved && saved.customTheme) ? saved.customTheme : { primary: '#1B2A4A', secondary: '#4A6FA5' },
         density: (saved && saved.density) || 'balanced',
         font: (saved && saved.font) || 'sans',
         docMode: (saved && saved.docMode) || 'cv',
@@ -1065,16 +1241,48 @@
         renderPreview(); save();
       };
 
+      function computeTintHex(hex) {
+        const h = String(hex || '#1B2A4A').replace('#', '');
+        if (h.length !== 6) return '#F0F4FA';
+        const r = Math.round(parseInt(h.slice(0, 2), 16) * 0.08 + 255 * 0.92);
+        const g = Math.round(parseInt(h.slice(2, 4), 16) * 0.08 + 255 * 0.92);
+        const b = Math.round(parseInt(h.slice(4, 6), 16) * 0.08 + 255 * 0.92);
+        return '#' + [r, g, b].map(function (v) { return v.toString(16).padStart(2, '0'); }).join('');
+      }
+
+      function hexToBorderRgba(hex) {
+        const h = String(hex || '#1B2A4A').replace('#', '');
+        if (h.length !== 6) return 'rgba(27,42,74,0.16)';
+        return 'rgba(' + parseInt(h.slice(0, 2), 16) + ',' + parseInt(h.slice(2, 4), 16) + ',' + parseInt(h.slice(4, 6), 16) + ',0.18)';
+      }
+
       window.setLayout = function (l) {
         state.layout = l;
-        ['classic', 'executive', 'split', 'bento', 'formal'].forEach(function (k) {
-          document.getElementById('lay-' + k).classList.toggle('active', k === l);
+        ['classic', 'executive', 'split', 'bento', 'formal', 'minimal', 'timeline'].forEach(function (k) {
+          const el = document.getElementById('lay-' + k);
+          if (el) el.classList.toggle('active', k === l);
         });
         renderPreview(); save();
       };
 
       window.setTheme = function (k) {
         state.theme = k;
+        if (k !== 'custom' && THEMES[k]) {
+          const pIn = document.getElementById('pick-primary');
+          const sIn = document.getElementById('pick-secondary');
+          if (pIn) pIn.value = THEMES[k].primary;
+          if (sIn) sIn.value = THEMES[k].secondary;
+        }
+        renderSwatches();
+        renderPreview(); save();
+      };
+
+      window.applyCustomColors = function () {
+        const pIn = document.getElementById('pick-primary');
+        const sIn = document.getElementById('pick-secondary');
+        if (!pIn || !sIn) return;
+        state.customTheme = { primary: pIn.value, secondary: sIn.value };
+        state.theme = 'custom';
         renderSwatches();
         renderPreview(); save();
       };
@@ -1088,8 +1296,10 @@
 
       window.setFont = function (f) {
         state.font = f;
-        document.getElementById('fnt-sans').classList.toggle('active', f === 'sans');
-        document.getElementById('fnt-serif').classList.toggle('active', f === 'serif');
+        ['sans', 'jakarta', 'serif', 'editorial', 'slab'].forEach(function (k) {
+          const el = document.getElementById('fnt-' + k);
+          if (el) el.classList.toggle('active', k === f);
+        });
         renderPreview(); save();
       };
 
@@ -1426,9 +1636,297 @@
         }
       };
 
+      /* BIKRIPAGE BRANDED QR POSTER & SHARE CONTROLLER */
+      let qrPosterCache = { dataUrl: '', blob: null, url: '' };
+
+      function getStudioShareUrl() {
+        const href = String(window.location.href || '').split('#')[0];
+        if (href.startsWith('http://') || href.startsWith('https://')) {
+          return href;
+        }
+        return 'https://bikripage.github.io/Online/resume.html';
+      }
+
+      function rrect(ctx, x, y, w, h, r) {
+        const rad = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + rad, y);
+        ctx.arcTo(x + w, y, x + w, y + h, rad);
+        ctx.arcTo(x + w, y + h, x, y + h, rad);
+        ctx.arcTo(x, y + h, x, y, rad);
+        ctx.arcTo(x, y, x + w, y, rad);
+        ctx.closePath();
+      }
+
+      function generateQrCanvas(url) {
+        return new Promise(function (resolve) {
+          const mount = document.getElementById('qr-hidden-mount');
+          if (!mount || typeof QRCode === 'undefined') { resolve(null); return; }
+          mount.innerHTML = '';
+          new QRCode(mount, {
+            text: url,
+            width: 340,
+            height: 340,
+            colorDark: '#0F172A',
+            colorLight: '#FFFFFF',
+            correctLevel: QRCode.CorrectLevel.M
+          });
+          setTimeout(function () {
+            const qrCanvas = mount.querySelector('canvas');
+            const qrImg = mount.querySelector('img');
+            if (qrCanvas) { resolve(qrCanvas); return; }
+            if (qrImg && qrImg.src) {
+              const im = new Image();
+              im.onload = function () { resolve(im); };
+              im.onerror = function () { resolve(null); };
+              im.src = qrImg.src;
+              return;
+            }
+            resolve(null);
+          }, 80);
+        });
+      }
+
+      async function buildBikriPageQrPoster(url) {
+        const W = 720, H = 960;
+        const c = document.createElement('canvas');
+        c.width = W; c.height = H;
+        const ctx = c.getContext('2d');
+
+        // 1. Clean Light-iOS BikriPage Pearl Background
+        const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+        bgGrad.addColorStop(0, '#F8FAFF');
+        bgGrad.addColorStop(0.5, '#FFFFFF');
+        bgGrad.addColorStop(1, '#F1F5FF');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, W, H);
+
+        // Soft Pastel Ambient Glows (matching BikriPage website)
+        const g1 = ctx.createRadialGradient(90, 90, 10, 90, 90, 300);
+        g1.addColorStop(0, 'rgba(59, 130, 246, 0.16)');
+        g1.addColorStop(1, 'rgba(59, 130, 246, 0)');
+        ctx.fillStyle = g1;
+        ctx.fillRect(0, 0, W, H);
+
+        const g2 = ctx.createRadialGradient(W - 80, H - 120, 10, W - 80, H - 120, 320);
+        g2.addColorStop(0, 'rgba(139, 92, 246, 0.15)');
+        g2.addColorStop(1, 'rgba(139, 92, 246, 0)');
+        ctx.fillStyle = g2;
+        ctx.fillRect(0, 0, W, H);
+
+        // Subtle Dot Grid Pattern (from BikriPage index.html)
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.22)';
+        for (let gx = 24; gx < W; gx += 32) {
+          for (let gy = 24; gy < H; gy += 32) {
+            ctx.beginPath();
+            ctx.arc(gx, gy, 1.3, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        // Top Vibrant Accent Ribbon
+        const topBar = ctx.createLinearGradient(0, 0, W, 0);
+        topBar.addColorStop(0, '#2563EB');
+        topBar.addColorStop(0.5, '#4F46E5');
+        topBar.addColorStop(1, '#9333EA');
+        ctx.fillStyle = topBar;
+        ctx.fillRect(0, 0, W, 12);
+
+        // 2. BikriPage 3D Brand Badge + Dark Crisp Title
+        const bx = 224, by = 58, bs = 52;
+        const badgeGrad = ctx.createLinearGradient(bx, by, bx + bs, by + bs);
+        badgeGrad.addColorStop(0, '#3B82F6');
+        badgeGrad.addColorStop(0.5, '#4F46E5');
+        badgeGrad.addColorStop(1, '#7C3AED');
+        rrect(ctx, bx, by, bs, bs, 15);
+        ctx.fillStyle = badgeGrad;
+        ctx.fill();
+
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '900 29px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('B', bx + bs / 2, by + bs / 2 + 2);
+
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#0F172A';
+        ctx.font = '900 34px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText('BikriPage', bx + bs + 14, by + bs / 2 + 2);
+
+        // 3. Headline
+        ctx.textAlign = 'center';
+        rrect(ctx, W / 2 - 156, 134, 312, 32, 16);
+        ctx.fillStyle = '#EFF6FF';
+        ctx.fill();
+        ctx.strokeStyle = '#DBEAFE';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.fillStyle = '#2563EB';
+        ctx.font = '800 13.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText('SMART CV & COVER LETTER STUDIO', W / 2, 151);
+
+        ctx.fillStyle = '#0F172A';
+        ctx.font = '800 31px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText('2 Minute Me Resume Banayein', W / 2, 206);
+
+        // 4. Elevated White QR Card with Soft Shadow
+        const cardX = 118, cardY = 246, cardW = 484, cardH = 492;
+        ctx.save();
+        ctx.shadowColor = 'rgba(15, 23, 42, 0.10)';
+        ctx.shadowBlur = 32;
+        ctx.shadowOffsetY = 12;
+        rrect(ctx, cardX, cardY, cardW, cardH, 34);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fill();
+        ctx.restore();
+
+        rrect(ctx, cardX, cardY, cardW, cardH, 34);
+        ctx.strokeStyle = 'rgba(15, 23, 42, 0.08)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Corner Scanner Brackets inside White Card
+        const qx = W / 2 - 170, qy = cardY + 46, qs = 340, br = 28;
+        ctx.strokeStyle = '#2563EB';
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        // Top-Left
+        ctx.beginPath(); ctx.moveTo(qx - 14, qy + br); ctx.lineTo(qx - 14, qy - 14); ctx.lineTo(qx + br, qy - 14); ctx.stroke();
+        // Top-Right
+        ctx.beginPath(); ctx.moveTo(qx + qs - br, qy - 14); ctx.lineTo(qx + qs + 14, qy - 14); ctx.lineTo(qx + qs + 14, qy + br); ctx.stroke();
+        // Bottom-Left
+        ctx.beginPath(); ctx.moveTo(qx - 14, qy + qs - br); ctx.lineTo(qx - 14, qy + qs + 14); ctx.lineTo(qx + br, qy + qs + 14); ctx.stroke();
+        // Bottom-Right
+        ctx.beginPath(); ctx.moveTo(qx + qs - br, qy + qs + 14); ctx.lineTo(qx + qs + 14, qy + qs + 14); ctx.lineTo(qx + qs + 14, qy + qs - br); ctx.stroke();
+
+        // Draw QR Code
+        const qrSrc = await generateQrCanvas(url);
+        if (qrSrc) {
+          ctx.drawImage(qrSrc, qx, qy, qs, qs);
+        }
+
+        // Scan CTA Pill inside Card
+        rrect(ctx, W / 2 - 140, cardY + 418, 280, 44, 22);
+        const ctaGrad = ctx.createLinearGradient(W / 2 - 140, 0, W / 2 + 140, 0);
+        ctaGrad.addColorStop(0, '#2563EB');
+        ctaGrad.addColorStop(1, '#4F46E5');
+        ctx.fillStyle = ctaGrad;
+        ctx.fill();
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '800 17px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText('SCAN TO CREATE CV', W / 2, cardY + 441);
+
+        // 5. Feature Chips Row
+        const pills = ['7 Layouts', 'Custom Colors', 'Instant A4 PDF'];
+        const pW = 172, pGap = 14;
+        const startX = (W - (pW * 3 + pGap * 2)) / 2;
+        pills.forEach(function (label, idx) {
+          const px = startX + idx * (pW + pGap);
+          rrect(ctx, px, 774, pW, 44, 22);
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fill();
+          ctx.strokeStyle = '#E2E8F0';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          ctx.fillStyle = '#334155';
+          ctx.font = '700 15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+          ctx.fillText(label, px + pW / 2, 797);
+        });
+
+        // 6. Clean Dark Footer Strip
+        rrect(ctx, 48, 852, W - 96, 74, 20);
+        ctx.fillStyle = '#0F172A';
+        ctx.fill();
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '700 17px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        const cleanUrl = url.replace(/^https?:\/\//, '');
+        ctx.fillText(cleanUrl.length > 42 ? cleanUrl.slice(0, 42) + '...' : cleanUrl, W / 2, 879);
+        ctx.fillStyle = '#94A3B8';
+        ctx.font = '700 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText('POWERED BY BIKRIPAGE', W / 2, 906);
+
+        const dataUrl = c.toDataURL('image/png');
+        const blob = await new Promise(function (res) { c.toBlob(res, 'image/png'); });
+        return { dataUrl: dataUrl, blob: blob };
+      }
+
+      window.openShareModal = async function () {
+        const url = getStudioShareUrl();
+        const modal = document.getElementById('share-qr-modal');
+        const linkEl = document.getElementById('share-link-display');
+        const imgEl = document.getElementById('qr-poster-img');
+        if (linkEl) linkEl.textContent = url;
+        if (modal) modal.classList.add('open');
+
+        if (!qrPosterCache.dataUrl || qrPosterCache.url !== url) {
+          const res = await buildBikriPageQrPoster(url);
+          qrPosterCache = { dataUrl: res.dataUrl, blob: res.blob, url: url };
+        }
+        if (imgEl && qrPosterCache.dataUrl) imgEl.src = qrPosterCache.dataUrl;
+      };
+
+      window.closeShareModal = function () {
+        const modal = document.getElementById('share-qr-modal');
+        if (modal) modal.classList.remove('open');
+      };
+
+      window.copyStudioLink = function () {
+        const url = getStudioShareUrl();
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(url).then(function () { toast('Link copied!'); });
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = url; document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); toast('Link copied!'); } catch (e) {}
+          document.body.removeChild(ta);
+        }
+      };
+
+      window.downloadQrPoster = function () {
+        if (!qrPosterCache.dataUrl) { toast('Preparing QR poster...'); return; }
+        const a = document.createElement('a');
+        a.href = qrPosterCache.blob ? URL.createObjectURL(qrPosterCache.blob) : qrPosterCache.dataUrl;
+        a.download = 'BikriPage_Resume_Studio_QR.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        toast('BikriPage QR Poster downloaded!');
+      };
+
+      window.shareQrAndLink = async function () {
+        const url = getStudioShareUrl();
+        const shareText = 'Apna professional Resume & Covering Letter 2 minute me banayein BikriPage Smart CV Studio par: ' + url;
+        try {
+          if (navigator.share) {
+            if (qrPosterCache.blob && navigator.canShare) {
+              const file = new File([qrPosterCache.blob], 'BikriPage_Resume_Studio_QR.png', { type: 'image/png' });
+              if (navigator.canShare({ files: [file] })) {
+                await navigator.share({ title: 'BikriPage Smart CV Studio', text: shareText, files: [file] });
+                return;
+              }
+            }
+            await navigator.share({ title: 'BikriPage Smart CV Studio', text: shareText, url: url });
+            return;
+          }
+        } catch (e) {
+          if (e && e.name === 'AbortError') return;
+        }
+        copyStudioLink();
+      };
+
+      window.shareStudioWhatsApp = function () {
+        const url = getStudioShareUrl();
+        const msg = '*BikriPage Smart CV Studio*\n\nApna professional Resume & Covering Letter 2 minute me banayein (5 Layouts + 12 Aesthetic Colors):\n' + url;
+        window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+      };
+
       /* SWATCHES */
       function renderSwatches() {
-        document.getElementById('swatch-strip').innerHTML = Object.keys(THEMES).map(function (k) {
+        const ct = state.customTheme || { primary: '#1B2A4A', secondary: '#4A6FA5' };
+        let customBtn = '<button type="button" class="swatch-item' + (state.theme === 'custom' ? ' active' : '') + '" onclick="setTheme(\'custom\')">' +
+          '<span class="swatch-disc" style="background:linear-gradient(135deg,' + esc(ct.primary) + ' 50%,' + esc(ct.secondary) + ' 50%);"><span class="swatch-dot"></span></span>' +
+          '<span class="swatch-label">Custom</span></button>';
+        document.getElementById('swatch-strip').innerHTML = customBtn + Object.keys(THEMES).map(function (k) {
           const t = THEMES[k];
           return '<button type="button" class="swatch-item' + (state.theme === k ? ' active' : '') + '" onclick="setTheme(\'' + k + '\')">' +
             '<span class="swatch-disc" style="background:linear-gradient(135deg,' + t.primary + ' 50%,' + t.secondary + ' 50%);"><span class="swatch-dot"></span></span>' +
@@ -1602,6 +2100,60 @@
           '</div></div>';
         }
 
+        if (state.layout === 'minimal') {
+          return '<div class="lay-minimal">' +
+            '<header class="min-header">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<div style="font-size:10px; font-weight:800; letter-spacing:0.2em; color:var(--r-secondary); text-transform:uppercase; margin-bottom:4px;">Curriculum Vitae</div>' +
+                '<h1 class="min-name">' + esc(d.name) + '</h1>' +
+                '<div class="min-sub">' + esc(d.phone) + ' &nbsp;·&nbsp; ' + esc(d.email) + '<br/>' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:130px 10px 1fr;">' +
+              '<span class="kv-label">Date of Birth</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+              '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
+              '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
+              '<span class="kv-label">Languages</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span></div>') +
+            sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            sec(4, 'Skills', '<ul class="skills-2col">' + d.skills.map(function (s) { return '<li><span class="dot"></span><span>' + esc(s) + '</span></li>'; }).join('') + '</ul>') +
+            sec(5, 'Experience', expBlockHtml(d)) +
+            sec(6, 'Achievements', achBlockHtml(d)) +
+            sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'timeline') {
+          const tlSec = function (title, body) {
+            return '<div class="tl-node"><div class="cv-sec-head"><span>' + title + '</span></div>' + body + '</div>';
+          };
+          return '<div class="lay-timeline">' +
+            '<header class="tl-header">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<div style="font-size:10px; font-weight:800; letter-spacing:0.16em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae (CV)</div>' +
+                '<h1 style="font-size:28px; font-weight:850; color:var(--r-primary); margin-top:2px;">' + esc(d.name) + '</h1>' +
+                '<div style="font-size:12px; color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
+                '<div style="font-size:11.5px; color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="tl-track">' +
+              tlSec('Personal Details', '<div class="kv-grid" style="grid-template-columns:130px 10px 1fr;">' +
+                '<span class="kv-label">Date of Birth</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+                '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
+                '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
+                '<span class="kv-label">Languages</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span></div>') +
+              tlSec('Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+              tlSec('Educational Qualification', eduTableHtml(d)) +
+              tlSec('Skills', '<ul class="skills-2col">' + d.skills.map(function (s) { return '<li><span class="dot"></span><span>' + esc(s) + '</span></li>'; }).join('') + '</ul>') +
+              tlSec('Experience', expBlockHtml(d)) +
+              tlSec('Achievements', achBlockHtml(d)) +
+              tlSec('Hobbies, Interest &amp; Strengths', extraPersonalKV(d)) +
+              tlSec('Declaration', declHtml(d)) +
+            '</div>' +
+          '</div>';
+        }
+
         // DEFAULT: CLASSIC INDIAN CV (EXACT LOCKED ORDER)
         return '<div class="lay-classic">' +
           '<div class="cv-doc-title">Curriculum Vitae (CV)</div>' +
@@ -1644,12 +2196,25 @@
       }
 
       function applyThemeStyle(el) {
-        const t = THEMES[state.theme] || THEMES.midnight;
+        let t;
+        if (state.theme === 'custom' && state.customTheme) {
+          t = {
+            primary: state.customTheme.primary,
+            secondary: state.customTheme.secondary,
+            tint: computeTintHex(state.customTheme.primary)
+          };
+        } else {
+          t = THEMES[state.theme] || THEMES.midnight;
+        }
         el.style.setProperty('--r-primary', t.primary);
         el.style.setProperty('--r-secondary', t.secondary);
         el.style.setProperty('--r-tint', t.tint);
+        el.style.setProperty('--r-border', hexToBorderRgba(t.primary));
         el.classList.toggle('density-compact', state.density === 'compact');
-        el.classList.toggle('font-serif', state.font === 'serif');
+        ['font-sans', 'font-jakarta', 'font-serif', 'font-editorial', 'font-slab'].forEach(function (cls) {
+          el.classList.remove(cls);
+        });
+        el.classList.add('font-' + (state.font || 'sans'));
       }
 
       function renderPreview() {
@@ -1709,6 +2274,15 @@
       }
 
       function init() {
+        const pIn = document.getElementById('pick-primary');
+        const sIn = document.getElementById('pick-secondary');
+        if (state.theme === 'custom' && state.customTheme) {
+          if (pIn) pIn.value = state.customTheme.primary;
+          if (sIn) sIn.value = state.customTheme.secondary;
+        } else if (THEMES[state.theme]) {
+          if (pIn) pIn.value = THEMES[state.theme].primary;
+          if (sIn) sIn.value = THEMES[state.theme].secondary;
+        }
         renderSwatches();
         syncForm();
         setDocMode(state.docMode);

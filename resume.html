@@ -100,7 +100,7 @@
 
     /* WORKSPACE */
     .workspace { max-width: 1400px; margin: 0 auto; padding: 14px 12px 72px; display: block; }
-    .edit-pane, .preview-pane { display: flex; flex-direction: column; gap: 12px; }
+    .edit-pane, .preview-pane { display: flex; flex-direction: column; gap: 12px; min-width: 0; width: 100%; }
     .preview-pane { align-items: center; }
 
     @media (min-width: 980px) {
@@ -108,11 +108,11 @@
       .mobile-view-switch { display: none !important; }
       .header-inner { padding: 12px 24px; }
       .workspace {
-        display: grid; grid-template-columns: 440px 1fr; gap: 24px;
+        display: grid; grid-template-columns: minmax(360px, 430px) minmax(0, 1fr); gap: 24px;
         padding: 20px 24px 48px; align-items: start;
       }
-      .edit-pane { display: flex !important; max-height: calc(100vh - 90px); overflow-y: auto; padding-right: 4px; }
-      .preview-pane { display: flex !important; position: sticky; top: 76px; }
+      .edit-pane { display: flex !important; max-height: calc(100vh - 90px); overflow-y: auto; padding-right: 4px; min-width: 0; }
+      .preview-pane { display: flex !important; position: sticky; top: 76px; min-width: 0; max-width: 100%; }
     }
 
     /* CARDS & INPUTS */
@@ -608,7 +608,10 @@
           </div>
           <button type="button" class="btn-share-icon" onclick="openShareModal()" aria-label="Share QR &amp; Link" title="Share QR &amp; Link">
             <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13" />
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <path stroke-linecap="round" d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" />
             </svg>
           </button>
         </div>
@@ -924,7 +927,10 @@
       <div class="share-actions-grid">
         <button type="button" class="btn-primary" style="height:44px; font-size:13px;" onclick="shareQrAndLink()">
           <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13" />
+            <circle cx="18" cy="5" r="3" />
+            <circle cx="6" cy="12" r="3" />
+            <circle cx="18" cy="19" r="3" />
+            <path stroke-linecap="round" d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" />
           </svg>
           <span>Share QR &amp; Link</span>
         </button>
@@ -2238,7 +2244,9 @@
 
       function scaleAllSheets() {
         const outer = document.getElementById('preview-scale-outer');
-        const availW = outer.clientWidth || (window.innerWidth - 24);
+        if (!outer) return;
+        const rectW = Math.floor(outer.getBoundingClientRect().width);
+        const availW = rectW > 0 ? rectW : (outer.clientWidth || (window.innerWidth - 24));
         if (availW <= 0) return;
         const scale = Math.min(1, availW / 794);
         outer.querySelectorAll('.sheet-scale-box').forEach(function (box) {

@@ -251,7 +251,6 @@
       overflow: hidden;
       transform-origin: top left;
     }
-    .a4-sheet.density-compact { --d-pad: 28px; --d-gap: 11px; --d-text: 11.4px; --d-lh: 1.4; }
     .sheet-content {
       display: flow-root;
       width: 100%;
@@ -302,6 +301,30 @@
     .a4-sheet.auto-fit-compact .cl-header { padding-bottom: 12px; }
     .a4-sheet.auto-fit-compact .cl-sender-name { font-size: 23px; }
     .a4-sheet.auto-fit-compact .cl-subject { padding: 9px 13px; }
+
+    .a4-sheet.auto-fit-compact .lay-nordic { padding: 28px 38px; }
+    .a4-sheet.auto-fit-compact .nordic-head { padding: 15px 18px; }
+    .a4-sheet.auto-fit-compact .lay-editorial { padding: 28px 38px; }
+    .a4-sheet.auto-fit-compact .ed-masthead { padding: 10px 0; }
+    .a4-sheet.auto-fit-compact .lay-vogue { padding: 26px 38px; }
+    .a4-sheet.auto-fit-compact .vogue-obj { padding: 9px 13px; }
+    .a4-sheet.auto-fit-compact .ribbon-body { padding: 28px 32px; gap: 12px; }
+    .a4-sheet.auto-fit-compact .lay-monogram { padding: 28px 36px; }
+    .a4-sheet.auto-fit-compact .hz-banner { padding: 20px 34px; }
+    .a4-sheet.auto-fit-compact .hz-body { padding: 26px 34px; gap: 12px; }
+    .a4-sheet.auto-fit-compact .lay-metro { padding: 26px 32px; }
+    .a4-sheet.auto-fit-compact .aura-top { padding: 22px 36px 14px; }
+    .a4-sheet.auto-fit-compact .aura-body { padding: 14px 36px 26px; gap: 11px; }
+    .a4-sheet.auto-fit-compact .lay-glass { padding: 20px 22px; gap: 9px; }
+    .a4-sheet.auto-fit-compact .glass-card { padding: 11px 14px; }
+    .a4-sheet.auto-fit-compact .lay-prism { padding: 24px 32px; gap: 11px; }
+    .a4-sheet.auto-fit-compact .prism-card { padding: 10px 13px; }
+    .a4-sheet.auto-fit-compact .lay-luxe { padding: 26px 38px; gap: 11px; }
+    .a4-sheet.auto-fit-compact .luxe-head { padding-bottom: 11px; }
+    .a4-sheet.auto-fit-compact .lay-diplomat { padding: 20px 28px; }
+    .a4-sheet.auto-fit-compact .dip-head { padding: 11px 14px; }
+    .a4-sheet.auto-fit-compact .lay-zenith { padding: 20px 26px; gap: 11px; }
+    .a4-sheet.auto-fit-compact .zen-hero { padding: 17px 20px; }
     .a4-sheet.font-sans { --r-font: "Inter", var(--font-sans); }
     .a4-sheet.font-jakarta { --r-font: "Plus Jakarta Sans", var(--font-sans); }
     .a4-sheet.font-serif { --r-font: var(--font-serif); }
@@ -373,6 +396,206 @@
     }
     .lay-timeline .cv-sec-head { border-bottom: none; margin-bottom: 5px; }
     .lay-timeline .cv-sec-num { display: none; }
+
+    /* LAYOUT 8: NORDIC AIR */
+    .lay-nordic { padding: var(--d-pad) 44px; display: flex; flex-direction: column; gap: var(--d-gap); }
+    .nordic-head {
+      background: var(--r-tint); border-radius: 18px; padding: 20px 24px;
+      display: flex; justify-content: space-between; align-items: center; gap: 18px;
+      border: 1px solid var(--r-border);
+    }
+    .nordic-name { font-size: 28px; font-weight: 800; color: var(--r-primary); letter-spacing: -0.025em; }
+    .nordic-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .nordic-chip {
+      font-size: 11px; font-weight: 600; color: var(--r-primary);
+      background: #FFF; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--r-border);
+    }
+    .lay-nordic .cv-sec-head { border-bottom: none; margin-bottom: 6px; font-size: 11.5px; letter-spacing: 0.1em; }
+    .lay-nordic .cv-sec-num { border-radius: 999px; background: var(--r-secondary); }
+
+    /* LAYOUT 9: EDITORIAL MAGAZINE */
+    .lay-editorial { padding: var(--d-pad) 44px; display: flex; flex-direction: column; gap: var(--d-gap); }
+    .ed-masthead {
+      text-align: center; padding-bottom: 14px;
+      border-top: 3px solid var(--r-primary); border-bottom: 1px solid var(--r-primary);
+      padding-top: 14px; position: relative;
+    }
+    .ed-masthead::after {
+      content: ""; display: block; height: 1px; background: var(--r-border); margin-top: 12px;
+    }
+    .ed-kicker { font-size: 10px; font-weight: 800; letter-spacing: 0.24em; text-transform: uppercase; color: var(--r-secondary); }
+    .ed-name { font-size: 32px; font-weight: 800; color: var(--r-primary); letter-spacing: 0.02em; margin-top: 4px; }
+    .ed-meta { font-size: 11.5px; color: var(--r-muted); margin-top: 5px; }
+    .ed-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .lay-editorial .cv-sec-head { border-bottom: 1px solid var(--r-primary); font-size: 11px; letter-spacing: 0.14em; }
+    .lay-editorial .cv-sec-num { display: none; }
+
+    /* LAYOUT 10: VOGUE LUXE */
+    .lay-vogue { padding: var(--d-pad) 44px; display: flex; flex-direction: column; gap: var(--d-gap); border-top: 7px solid var(--r-primary); }
+    .vogue-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; padding-bottom: 14px; border-bottom: 1.5px solid var(--r-primary); }
+    .vogue-kicker { font-size: 9.5px; font-weight: 800; letter-spacing: 0.28em; text-transform: uppercase; color: var(--r-secondary); margin-bottom: 4px; }
+    .vogue-name { font-size: 33px; font-weight: 800; letter-spacing: -0.02em; color: var(--r-primary); line-height: 1.06; }
+    .vogue-sub { font-size: 11.5px; color: var(--r-muted); margin-top: 6px; }
+    .vogue-obj {
+      background: var(--r-tint); border-left: 3.5px solid var(--r-secondary);
+      padding: 11px 16px; border-radius: 0 10px 10px 0;
+    }
+    .vogue-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .vogue-pill {
+      font-size: 11.2px; font-weight: 600; color: var(--r-primary);
+      padding: 4px 10px; border-radius: 6px; background: var(--r-tint); border: 1px solid var(--r-border);
+    }
+    .lay-vogue .cv-sec-head { border-bottom: 1px solid var(--r-border); font-size: 10.8px; letter-spacing: 0.16em; color: var(--r-primary); }
+    .lay-vogue .cv-sec-num { display: none; }
+
+    /* LAYOUT 11: RIBBON EDGE */
+    .lay-ribbon { display: grid; grid-template-columns: 18px 1fr; min-height: 1123px; }
+    .ribbon-bar { background: linear-gradient(180deg, var(--r-primary) 0%, var(--r-secondary) 100%); }
+    .ribbon-body { padding: var(--d-pad) 38px; display: flex; flex-direction: column; gap: var(--d-gap); }
+    .ribbon-head {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+      padding-bottom: 12px; border-bottom: 2px solid var(--r-tint);
+    }
+    .lay-ribbon .cv-sec-head { border-bottom: 1px dashed var(--r-border); }
+
+    /* LAYOUT 12: MONOGRAM STUDIO */
+    .lay-monogram { padding: var(--d-pad) 42px; display: flex; flex-direction: column; gap: var(--d-gap); }
+    .mono-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 14px; border-bottom: 2px solid var(--r-primary); }
+    .mono-left { display: flex; align-items: center; gap: 15px; min-width: 0; }
+    .mono-badge {
+      width: 62px; height: 62px; border-radius: 16px; background: var(--r-primary); color: #FFF;
+      display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 850;
+      letter-spacing: 0.04em; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    .lay-monogram .cv-sec-head { border-bottom: none; background: var(--r-tint); padding: 5px 10px; border-radius: 7px; }
+    .lay-monogram .cv-sec-num { background: var(--r-secondary); }
+
+    /* LAYOUT 13: HORIZON GRADIENT */
+    .lay-horizon { display: flex; flex-direction: column; min-height: 1123px; }
+    .hz-banner {
+      background: linear-gradient(135deg, var(--r-primary) 0%, var(--r-secondary) 100%);
+      color: #FFF; padding: 26px 40px; display: flex; justify-content: space-between; align-items: center; gap: 18px;
+    }
+    .hz-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .hz-pill {
+      background: rgba(255,255,255,0.16); color: #FFF; font-size: 11px; font-weight: 600;
+      padding: 3px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.28);
+    }
+    .hz-body { padding: var(--d-pad) 40px; display: flex; flex-direction: column; gap: var(--d-gap); }
+    .lay-horizon .cv-sec-head { border-bottom: 1.5px solid var(--r-border); }
+
+    /* LAYOUT 14: METRO GRID */
+    .lay-metro { padding: var(--d-pad) 38px; display: flex; flex-direction: column; gap: var(--d-gap); }
+    .metro-top { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: stretch; }
+    .metro-id {
+      background: var(--r-primary); color: #FFF; padding: 18px 22px; border-radius: 6px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .metro-id h1 { font-size: 26px; font-weight: 850; letter-spacing: -0.02em; }
+    .metro-id .sub { font-size: 11.8px; opacity: 0.9; margin-top: 4px; }
+    .metro-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .lay-metro .cv-sec-head {
+      background: var(--r-primary); color: #FFF; padding: 4px 10px; border-bottom: none; border-radius: 4px; font-size: 11px;
+    }
+    .lay-metro .cv-sec-num { background: rgba(255,255,255,0.22); }
+
+    /* LAYOUT 15: AURA SOFT */
+    .lay-aura { display: flex; flex-direction: column; min-height: 1123px; }
+    .aura-top {
+      background: linear-gradient(180deg, var(--r-tint) 0%, #FFFFFF 100%);
+      padding: 30px 42px 18px; border-bottom: 1px solid var(--r-border);
+      display: flex; justify-content: space-between; align-items: center; gap: 18px;
+    }
+    .aura-name { font-size: 30px; font-weight: 850; letter-spacing: -0.03em; color: var(--r-primary); line-height: 1.1; }
+    .aura-bar {
+      display: inline-flex; flex-wrap: wrap; gap: 8px; margin-top: 9px;
+      background: #FFF; border: 1px solid var(--r-border); border-radius: 10px;
+      padding: 6px 12px; font-size: 11.4px; font-weight: 600; color: var(--r-body);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    .aura-body { padding: 18px 42px var(--d-pad); display: flex; flex-direction: column; gap: var(--d-gap); }
+    .lay-aura .cv-sec-head { border-bottom: none; margin-bottom: 6px; padding-bottom: 0; font-size: 11.5px; letter-spacing: 0.09em; }
+    .lay-aura .cv-sec-num { background: var(--r-tint); color: var(--r-primary); border: 1px solid var(--r-border); border-radius: 6px; }
+
+    /* LAYOUT 16: FROSTED iOS CARDS */
+    .lay-glass { padding: 26px 28px; display: flex; flex-direction: column; gap: 12px; background: linear-gradient(180deg, var(--r-tint) 0%, #FFFFFF 42%); min-height: 1123px; }
+    .glass-card {
+      background: rgba(255,255,255,0.94); border: 1px solid var(--r-border);
+      border-radius: 16px; padding: 14px 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .glass-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+    .glass-pill {
+      display: inline-block; padding: 4px 10px; border-radius: 999px;
+      background: var(--r-tint); color: var(--r-primary); font-size: 11.2px; font-weight: 650;
+      border: 1px solid var(--r-border);
+    }
+    .lay-glass .cv-sec-head { border-bottom: none; margin-bottom: 6px; padding-bottom: 0; }
+    .lay-glass .cv-sec-num { border-radius: 999px; }
+
+    /* LAYOUT 17: PRISM ARCHITECT */
+    .lay-prism { padding: 30px 38px; display: flex; flex-direction: column; gap: var(--d-gap); position: relative; }
+    .prism-accent {
+      height: 6px; border-radius: 999px;
+      background: linear-gradient(90deg, var(--r-primary) 0%, var(--r-secondary) 60%, var(--r-tint) 100%);
+    }
+    .prism-head { display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+    .prism-name { font-size: 29px; font-weight: 850; letter-spacing: -0.025em; color: var(--r-primary); }
+    .prism-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .prism-card {
+      background: #FFF; border: 1px solid var(--r-border); border-top: 3px solid var(--r-secondary);
+      border-radius: 10px; padding: 12px 15px;
+    }
+    .prism-card.soft { background: var(--r-tint); border-top-color: var(--r-primary); }
+    .lay-prism .cv-sec-head { border-bottom: none; margin-bottom: 6px; padding-bottom: 0; font-size: 11.4px; }
+    .lay-prism .cv-sec-num { background: var(--r-primary); border-radius: 5px; }
+
+    /* LAYOUT 18: LUXE SIGNATURE */
+    .lay-luxe { padding: var(--d-pad) 44px; display: flex; flex-direction: column; gap: var(--d-gap); }
+    .luxe-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 18px;
+      padding-bottom: 14px; border-bottom: 2px solid var(--r-primary);
+    }
+    .luxe-title-block { border-left: 4px solid var(--r-secondary); padding-left: 14px; flex: 1; min-width: 0; }
+    .luxe-name { font-size: 30px; font-weight: 850; color: var(--r-primary); letter-spacing: -0.02em; line-height: 1.08; }
+    .luxe-meta { font-size: 11.8px; color: var(--r-body); margin-top: 5px; }
+    .lay-luxe .cv-sec-head {
+      border-bottom: none; padding-bottom: 0; margin-bottom: 7px;
+      font-size: 11px; letter-spacing: 0.14em; color: var(--r-primary);
+    }
+    .lay-luxe .cv-sec-head span:last-child {
+      background: var(--r-tint); padding: 3px 10px; border-radius: 999px; border: 1px solid var(--r-border);
+    }
+    .lay-luxe .cv-sec-num { display: none; }
+
+    /* LAYOUT 19: DIPLOMAT FRAME */
+    .lay-diplomat { padding: 26px 34px; min-height: 1123px; display: flex; flex-direction: column; }
+    .dip-outer {
+      border-top: 5px solid var(--r-primary); border-bottom: 5px solid var(--r-primary);
+      padding: 18px 8px; display: flex; flex-direction: column; gap: var(--d-gap); flex: 1;
+    }
+    .dip-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 18px;
+      padding: 14px 18px; background: var(--r-tint); border-top: 1px solid var(--r-border); border-bottom: 1px solid var(--r-border);
+    }
+    .lay-diplomat .cv-sec-head { border-bottom: 1.5px solid var(--r-primary); font-size: 11.8px; }
+    .lay-diplomat .cv-sec-num { background: var(--r-primary); border-radius: 3px; }
+
+    /* LAYOUT 20: ZENITH MODERN */
+    .lay-zenith { padding: 26px 32px; display: flex; flex-direction: column; gap: var(--d-gap); }
+    .zen-hero {
+      background: var(--r-primary); color: #FFF; border-radius: 18px; padding: 22px 26px;
+      display: flex; justify-content: space-between; align-items: center; gap: 18px;
+    }
+    .zen-hero h1 { font-size: 27px; font-weight: 850; letter-spacing: -0.025em; }
+    .zen-tag {
+      display: inline-block; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.16em;
+      background: rgba(255,255,255,0.16); color: #FFF; padding: 3px 9px; border-radius: 999px; margin-bottom: 6px;
+    }
+    .zen-meta { font-size: 11.8px; opacity: 0.9; margin-top: 5px; }
+    .zen-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .zen-panel { border: 1px solid var(--r-border); border-radius: 12px; padding: 12px 14px; background: #FAFAFC; }
+    .lay-zenith .cv-sec-head { border-bottom: none; margin-bottom: 6px; padding-bottom: 0; }
+    .lay-zenith .cv-sec-num { background: var(--r-secondary); border-radius: 6px; }
 
     /* Shared CV Elements */
     .cv-doc-title {
@@ -867,7 +1090,7 @@
           <button id="doc-both" type="button" class="seg-btn" onclick="setDocMode('both')">Both (2 Pages)</button>
         </div>
 
-        <!-- 7 Aesthetic Layouts -->
+        <!-- 20 Aesthetic Premium Layouts -->
         <div class="pill-strip no-scrollbar" role="radiogroup" aria-label="Layouts">
           <button id="lay-classic" type="button" class="seg-btn active" onclick="setLayout('classic')">Classic</button>
           <button id="lay-executive" type="button" class="seg-btn" onclick="setLayout('executive')">Exec</button>
@@ -876,6 +1099,19 @@
           <button id="lay-formal" type="button" class="seg-btn" onclick="setLayout('formal')">Formal</button>
           <button id="lay-minimal" type="button" class="seg-btn" onclick="setLayout('minimal')">Minimal</button>
           <button id="lay-timeline" type="button" class="seg-btn" onclick="setLayout('timeline')">Timeline</button>
+          <button id="lay-nordic" type="button" class="seg-btn" onclick="setLayout('nordic')">Nordic</button>
+          <button id="lay-editorial" type="button" class="seg-btn" onclick="setLayout('editorial')">Editorial</button>
+          <button id="lay-vogue" type="button" class="seg-btn" onclick="setLayout('vogue')">Vogue</button>
+          <button id="lay-ribbon" type="button" class="seg-btn" onclick="setLayout('ribbon')">Ribbon</button>
+          <button id="lay-monogram" type="button" class="seg-btn" onclick="setLayout('monogram')">Monogram</button>
+          <button id="lay-horizon" type="button" class="seg-btn" onclick="setLayout('horizon')">Horizon</button>
+          <button id="lay-metro" type="button" class="seg-btn" onclick="setLayout('metro')">Metro</button>
+          <button id="lay-aura" type="button" class="seg-btn" onclick="setLayout('aura')">Aura</button>
+          <button id="lay-glass" type="button" class="seg-btn" onclick="setLayout('glass')">Frosted</button>
+          <button id="lay-prism" type="button" class="seg-btn" onclick="setLayout('prism')">Prism</button>
+          <button id="lay-luxe" type="button" class="seg-btn" onclick="setLayout('luxe')">Luxe</button>
+          <button id="lay-diplomat" type="button" class="seg-btn" onclick="setLayout('diplomat')">Diplomat</button>
+          <button id="lay-zenith" type="button" class="seg-btn" onclick="setLayout('zenith')">Zenith</button>
         </div>
 
         <!-- 12 Preset + Custom Color Combinations -->
@@ -905,11 +1141,6 @@
           <button id="fnt-slab" type="button" class="seg-btn" onclick="setFont('slab')">Roboto Slab</button>
         </div>
 
-        <!-- Density -->
-        <div class="segmented full-grid cols-2">
-          <button id="den-balanced" type="button" class="seg-btn active" onclick="setDensity('balanced')">Balanced Spacing</button>
-          <button id="den-compact" type="button" class="seg-btn" onclick="setDensity('compact')">Compact Spacing</button>
-        </div>
       </div>
 
       <!-- AUTO-SCALED A4 SHEETS -->
@@ -934,7 +1165,7 @@
         <button id="pay-opt-cv" type="button" class="pay-opt" onclick="selectPayTier('cv')">
           <div>
             <div class="pay-opt-title">Resume / CV Only</div>
-            <div class="pay-opt-sub">1-Page Clean A4 PDF (All 5 Layouts)</div>
+            <div class="pay-opt-sub">1-Page Clean A4 PDF (All 20 Layouts)</div>
           </div>
           <div class="pay-opt-price">₹19</div>
         </button>
@@ -1221,10 +1452,9 @@
 
       const saved = loadSaved();
       const state = {
-        layout: (saved && saved.layout) || 'classic',
+        layout: (saved && saved.layout && ['classic', 'executive', 'split', 'bento', 'formal', 'minimal', 'timeline', 'nordic', 'editorial', 'vogue', 'ribbon', 'monogram', 'horizon', 'metro', 'aura', 'glass', 'prism', 'luxe', 'diplomat', 'zenith'].indexOf(saved.layout) !== -1) ? saved.layout : 'classic',
         theme: (saved && (THEMES[saved.theme] || saved.theme === 'custom')) ? saved.theme : 'midnight',
         customTheme: (saved && saved.customTheme) ? saved.customTheme : { primary: '#1B2A4A', secondary: '#4A6FA5' },
-        density: (saved && saved.density) || 'balanced',
         font: (saved && saved.font) || 'sans',
         docMode: (saved && saved.docMode) || 'cv',
         mobileView: 'edit',
@@ -1334,7 +1564,7 @@
 
       window.setLayout = function (l) {
         state.layout = l;
-        ['classic', 'executive', 'split', 'bento', 'formal', 'minimal', 'timeline'].forEach(function (k) {
+        ['classic', 'executive', 'split', 'bento', 'formal', 'minimal', 'timeline', 'nordic', 'editorial', 'vogue', 'ribbon', 'monogram', 'horizon', 'metro', 'aura', 'glass', 'prism', 'luxe', 'diplomat', 'zenith'].forEach(function (k) {
           const el = document.getElementById('lay-' + k);
           if (el) el.classList.toggle('active', k === l);
         });
@@ -1360,13 +1590,6 @@
         state.customTheme = { primary: pIn.value, secondary: sIn.value };
         state.theme = 'custom';
         renderSwatches();
-        renderPreview(); save();
-      };
-
-      window.setDensity = function (d) {
-        state.density = d;
-        document.getElementById('den-balanced').classList.toggle('active', d === 'balanced');
-        document.getElementById('den-compact').classList.toggle('active', d === 'compact');
         renderPreview(); save();
       };
 
@@ -1906,7 +2129,7 @@
         ctx.fillText('SCAN TO CREATE CV', W / 2, cardY + 441);
 
         // 5. Feature Chips Row
-        const pills = ['7 Layouts', 'Custom Colors', 'Instant A4 PDF'];
+        const pills = ['20 Layouts', 'Custom Colors', 'Instant A4 PDF'];
         const pW = 172, pGap = 14;
         const startX = (W - (pW * 3 + pGap * 2)) / 2;
         pills.forEach(function (label, idx) {
@@ -2005,7 +2228,7 @@
 
       window.shareStudioWhatsApp = function () {
         const url = getStudioShareUrl();
-        const msg = '*BikriPage Smart CV Studio*\n\nApna professional Resume & Covering Letter 2 minute me banayein (5 Layouts + 12 Aesthetic Colors):\n' + url;
+        const msg = '*BikriPage Smart CV Studio*\n\nApna professional Resume & Covering Letter 2 minute me banayein (20 Layouts + 12 Aesthetic Colors):\n' + url;
         window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
       };
 
@@ -2092,7 +2315,7 @@
           '</div>';
       }
 
-      /* 5 CV LAYOUT RENDERERS */
+      /* 20 CV LAYOUT RENDERERS */
       function buildCVHtml(d) {
         const sec = function (n, title, body) {
           return '<section><div class="cv-sec-head"><span class="cv-sec-num">' + n + '</span><span>' + title + '</span></div>' + body + '</section>';
@@ -2243,6 +2466,367 @@
           '</div>';
         }
 
+
+        if (state.layout === 'nordic') {
+          return '<div class="lay-nordic">' +
+            '<header class="nordic-head">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<div style="font-size:10px; font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 class="nordic-name">' + esc(d.name) + '</h1>' +
+                '<div style="font-size:11.8px; color:var(--r-muted); margin-top:3px;">' + esc(d.address) + '</div>' +
+                '<div class="nordic-chips">' +
+                  '<span class="nordic-chip">' + esc(d.phone) + '</span>' +
+                  '<span class="nordic-chip">' + esc(d.email) + '</span>' +
+                '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:135px 10px 1fr;">' +
+              '<span class="kv-label">Date of Birth</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+              '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
+              '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
+              '<span class="kv-label">Languages</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span></div>') +
+            sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            sec(4, 'Skills', '<ul class="skills-2col">' + d.skills.map(function (s) { return '<li><span class="dot"></span><span>' + esc(s) + '</span></li>'; }).join('') + '</ul>') +
+            sec(5, 'Experience', expBlockHtml(d)) +
+            sec(6, 'Achievements', achBlockHtml(d)) +
+            sec(7, 'Hobbies, Interest &amp; Strengths', extraPersonalKV(d)) +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'editorial') {
+          return '<div class="lay-editorial">' +
+            '<header class="ed-masthead">' +
+              '<div class="ed-kicker">Curriculum Vitae</div>' +
+              '<h1 class="ed-name">' + esc(d.name) + '</h1>' +
+              '<div class="ed-meta">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
+            '</header>' +
+            sec(1, 'Personal Profile', '<div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px;">' +
+              '<div class="kv-grid" style="grid-template-columns:135px 10px 1fr;">' +
+                '<span class="kv-label">Date of Birth</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+                '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
+                '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
+                '<span class="kv-label">Languages Known</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span></div>' +
+              photoBoxHtml(d) + '</div>') +
+            sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="ed-2col">' +
+              sec(4, 'Skills', '<ul class="cv-bullets">' + d.skills.map(function (s) { return '<li><span class="dot"></span><span>' + esc(s) + '</span></li>'; }).join('') + '</ul>') +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+            '</div>' +
+            sec(5, 'Experience', expBlockHtml(d)) +
+            sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'vogue') {
+          return '<div class="lay-vogue">' +
+            '<header class="vogue-head">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<div class="vogue-kicker">Curriculum Vitae</div>' +
+                '<h1 class="vogue-name">' + esc(d.name) + '</h1>' +
+                '<div class="vogue-sub">' + esc(d.phone) + ' &nbsp;·&nbsp; ' + esc(d.email) + ' &nbsp;·&nbsp; ' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="vogue-obj">' + sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') + '</div>' +
+            sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:135px 10px 1fr;">' +
+              '<span class="kv-label">Date of Birth</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+              '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
+              '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
+              '<span class="kv-label">Languages Known</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span></div>') +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            sec(4, 'Skills', '<div class="vogue-pills">' + d.skills.map(function (s) { return '<span class="vogue-pill">' + esc(s) + '</span>'; }).join('') + '</div>') +
+            sec(5, 'Experience', expBlockHtml(d)) +
+            sec(6, 'Achievements', achBlockHtml(d)) +
+            sec(7, 'Hobbies, Interest &amp; Strengths', extraPersonalKV(d)) +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'ribbon') {
+          return '<div class="lay-ribbon">' +
+            '<div class="ribbon-bar"></div>' +
+            '<div class="ribbon-body">' +
+              '<header class="ribbon-head">' +
+                '<div style="flex:1; min-width:0;">' +
+                  '<div style="font-size:10.5px; font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                  '<h1 style="font-size:30px; font-weight:850; color:var(--r-primary); margin-top:2px;">' + esc(d.name) + '</h1>' +
+                  '<div style="font-size:12px; color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
+                  '<div style="font-size:11.5px; color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+                '</div>' + photoBoxHtml(d) +
+              '</header>' +
+              sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:135px 10px 1fr;">' +
+                '<span class="kv-label">Date of Birth</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+                '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
+                '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
+                '<span class="kv-label">Languages Known</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span></div>') +
+              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+              sec(3, 'Educational Qualification', eduTableHtml(d)) +
+              sec(4, 'Skills', '<ul class="skills-2col">' + d.skills.map(function (s) { return '<li><span class="dot"></span><span>' + esc(s) + '</span></li>'; }).join('') + '</ul>') +
+              sec(5, 'Experience', expBlockHtml(d)) +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+              sec(7, 'Hobbies, Interest &amp; Strengths', extraPersonalKV(d)) +
+              sec(8, 'Declaration', declHtml(d)) +
+            '</div>' +
+          '</div>';
+        }
+
+        if (state.layout === 'monogram') {
+          const initials = (d.name || 'CV').trim().split(/\s+/).map(function (w) { return w[0] || ''; }).join('').slice(0, 2).toUpperCase() || 'CV';
+          return '<div class="lay-monogram">' +
+            '<header class="mono-head">' +
+              '<div class="mono-left">' +
+                '<div class="mono-badge">' + esc(initials) + '</div>' +
+                '<div style="min-width:0;">' +
+                  '<h1 style="font-size:27px; font-weight:850; color:var(--r-primary); line-height:1.1;">' + esc(d.name) + '</h1>' +
+                  '<div style="font-size:12px; color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
+                  '<div style="font-size:11.5px; color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+                '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:135px 10px 1fr;">' +
+              '<span class="kv-label">Date of Birth</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+              '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
+              '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
+              '<span class="kv-label">Languages Known</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span></div>') +
+            sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            sec(4, 'Skills', '<ul class="skills-2col">' + d.skills.map(function (s) { return '<li><span class="dot"></span><span>' + esc(s) + '</span></li>'; }).join('') + '</ul>') +
+            sec(5, 'Experience', expBlockHtml(d)) +
+            sec(6, 'Achievements', achBlockHtml(d)) +
+            sec(7, 'Hobbies, Interest &amp; Strengths', extraPersonalKV(d)) +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'horizon') {
+          return '<div class="lay-horizon">' +
+            '<header class="hz-banner">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<div style="font-size:10px; font-weight:800; letter-spacing:0.2em; opacity:0.85; text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 style="font-size:29px; font-weight:850; margin-top:3px;">' + esc(d.name) + '</h1>' +
+                '<div style="font-size:12px; opacity:0.9; margin-top:4px;">' + esc(d.address) + '</div>' +
+                '<div class="hz-pills">' +
+                  '<span class="hz-pill">' + esc(d.phone) + '</span>' +
+                  '<span class="hz-pill">' + esc(d.email) + '</span>' +
+                '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="hz-body">' +
+              sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:135px 10px 1fr;">' +
+                '<span class="kv-label">Date of Birth</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+                '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
+                '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
+                '<span class="kv-label">Languages Known</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span></div>') +
+              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+              sec(3, 'Educational Qualification', eduTableHtml(d)) +
+              sec(4, 'Skills', '<ul class="skills-2col">' + d.skills.map(function (s) { return '<li><span class="dot"></span><span>' + esc(s) + '</span></li>'; }).join('') + '</ul>') +
+              sec(5, 'Experience', expBlockHtml(d)) +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+              sec(7, 'Hobbies, Interest &amp; Strengths', extraPersonalKV(d)) +
+              sec(8, 'Declaration', declHtml(d)) +
+            '</div>' +
+          '</div>';
+        }
+
+        if (state.layout === 'metro') {
+          return '<div class="lay-metro">' +
+            '<div class="metro-top">' +
+              '<div class="metro-id">' +
+                '<div style="font-size:10px; font-weight:800; letter-spacing:0.18em; opacity:0.8; text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1>' + esc(d.name) + '</h1>' +
+                '<div class="sub">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + '</div>' +
+                '<div class="sub">' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</div>' +
+            sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:135px 10px 1fr;">' +
+              '<span class="kv-label">Date of Birth</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+              '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
+              '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
+              '<span class="kv-label">Languages Known</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span></div>') +
+            sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="metro-2col">' +
+              sec(4, 'Skills', '<ul class="cv-bullets">' + d.skills.map(function (s) { return '<li><span class="dot"></span><span>' + esc(s) + '</span></li>'; }).join('') + '</ul>') +
+              sec(5, 'Experience', expBlockHtml(d)) +
+            '</div>' +
+            '<div class="metro-2col">' +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+              sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
+            '</div>' +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'aura') {
+          return '<div class="lay-aura">' +
+            '<header class="aura-top">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<div style="font-size:10px; font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 class="aura-name">' + esc(d.name) + '</h1>' +
+                '<div style="font-size:11.6px; color:var(--r-muted); margin-top:3px;">' + esc(d.address) + '</div>' +
+                '<div class="aura-bar"><span>' + esc(d.phone) + '</span><span style="color:var(--r-secondary);">•</span><span>' + esc(d.email) + '</span></div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="aura-body">' +
+              sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:135px 10px 1fr;">' +
+                '<span class="kv-label">Date of Birth</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+                '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
+                '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
+                '<span class="kv-label">Languages Known</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span></div>') +
+              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+              sec(3, 'Educational Qualification', eduTableHtml(d)) +
+              sec(4, 'Skills', '<ul class="skills-2col">' + d.skills.map(function (s) { return '<li><span class="dot"></span><span>' + esc(s) + '</span></li>'; }).join('') + '</ul>') +
+              sec(5, 'Experience', expBlockHtml(d)) +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+              sec(7, 'Hobbies, Interest &amp; Strengths', extraPersonalKV(d)) +
+              sec(8, 'Declaration', declHtml(d)) +
+            '</div>' +
+          '</div>';
+        }
+
+        if (state.layout === 'glass') {
+          return '<div class="lay-glass">' +
+            '<div class="glass-card glass-head">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<div style="font-size:10px; font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 style="font-size:28px; font-weight:850; color:var(--r-primary); margin-top:2px;">' + esc(d.name) + '</h1>' +
+                '<div style="font-size:12px; color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
+                '<div style="font-size:11.5px; color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</div>' +
+            '<div class="glass-card">' + sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:135px 10px 1fr;">' +
+              '<span class="kv-label">Date of Birth</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+              '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
+              '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
+              '<span class="kv-label">Languages Known</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span></div>') + '</div>' +
+            '<div class="glass-card">' + sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') + '</div>' +
+            '<div class="glass-card">' + sec(3, 'Educational Qualification', eduTableHtml(d)) + '</div>' +
+            '<div class="glass-card">' + sec(4, 'Skills', '<div style="display:flex; flex-wrap:wrap; gap:6px;">' + d.skills.map(function (s) { return '<span class="glass-pill">' + esc(s) + '</span>'; }).join('') + '</div>') + '</div>' +
+            '<div class="glass-card">' + sec(5, 'Experience', expBlockHtml(d)) + '</div>' +
+            '<div class="bento-2col">' +
+              '<div class="glass-card">' + sec(6, 'Achievements', achBlockHtml(d)) + '</div>' +
+              '<div class="glass-card">' + sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) + '</div>' +
+            '</div>' +
+            '<div class="glass-card">' + sec(8, 'Declaration', declHtml(d)) + '</div>' +
+          '</div>';
+        }
+
+        if (state.layout === 'prism') {
+          return '<div class="lay-prism">' +
+            '<div class="prism-accent"></div>' +
+            '<header class="prism-head">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<div style="font-size:10px; font-weight:800; letter-spacing:0.2em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 class="prism-name">' + esc(d.name) + '</h1>' +
+                '<div style="font-size:12px; color:var(--r-body); margin-top:3px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + '</div>' +
+                '<div style="font-size:11.5px; color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="prism-2col">' +
+              '<div class="prism-card soft">' + sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:108px 10px 1fr;">' +
+                '<span class="kv-label">DOB</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+                '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
+                '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
+                '<span class="kv-label">Languages</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span></div>') + '</div>' +
+              '<div class="prism-card">' + sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') + '</div>' +
+            '</div>' +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="prism-2col">' +
+              '<div class="prism-card">' + sec(4, 'Skills', '<div style="display:flex; flex-wrap:wrap; gap:5px;">' + d.skills.map(function (s) { return '<span class="vogue-pill">' + esc(s) + '</span>'; }).join('') + '</div>') + '</div>' +
+              '<div class="prism-card">' + sec(5, 'Experience', expBlockHtml(d)) + '</div>' +
+            '</div>' +
+            '<div class="prism-2col">' +
+              '<div class="prism-card">' + sec(6, 'Achievements', achBlockHtml(d)) + '</div>' +
+              '<div class="prism-card soft">' + sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) + '</div>' +
+            '</div>' +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'luxe') {
+          return '<div class="lay-luxe">' +
+            '<header class="luxe-head">' +
+              '<div class="luxe-title-block">' +
+                '<div style="font-size:10px; font-weight:800; letter-spacing:0.2em; color:var(--r-secondary); text-transform:uppercase; margin-bottom:3px;">Curriculum Vitae</div>' +
+                '<h1 class="luxe-name">' + esc(d.name) + '</h1>' +
+                '<div class="luxe-meta">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
+                '<div style="font-size:11.5px; color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:135px 10px 1fr;">' +
+              '<span class="kv-label">Date of Birth</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+              '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
+              '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
+              '<span class="kv-label">Languages Known</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span></div>') +
+            sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            sec(4, 'Skills', '<ul class="skills-2col">' + d.skills.map(function (s) { return '<li><span class="dot"></span><span>' + esc(s) + '</span></li>'; }).join('') + '</ul>') +
+            sec(5, 'Experience', expBlockHtml(d)) +
+            sec(6, 'Achievements', achBlockHtml(d)) +
+            sec(7, 'Hobbies, Interest &amp; Strengths', extraPersonalKV(d)) +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'diplomat') {
+          return '<div class="lay-diplomat"><div class="dip-outer">' +
+            '<div class="dip-head">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<div style="font-size:10px; font-weight:800; letter-spacing:0.2em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 style="font-size:27px; font-weight:850; color:var(--r-primary); margin-top:2px;">' + esc(d.name) + '</h1>' +
+                '<div style="font-size:12px; color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + '</div>' +
+                '<div style="font-size:11.5px; color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</div>' +
+            sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:135px 10px 1fr;">' +
+              '<span class="kv-label">Date of Birth</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+              '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
+              '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
+              '<span class="kv-label">Languages Known</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span></div>') +
+            sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            sec(4, 'Skills', '<ul class="skills-2col">' + d.skills.map(function (s) { return '<li><span class="dot"></span><span>' + esc(s) + '</span></li>'; }).join('') + '</ul>') +
+            sec(5, 'Experience', expBlockHtml(d)) +
+            sec(6, 'Achievements', achBlockHtml(d)) +
+            sec(7, 'Hobbies, Interest &amp; Strengths', extraPersonalKV(d)) +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div></div>';
+        }
+
+        if (state.layout === 'zenith') {
+          return '<div class="lay-zenith">' +
+            '<header class="zen-hero">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<span class="zen-tag">Curriculum Vitae</span>' +
+                '<h1>' + esc(d.name) + '</h1>' +
+                '<div class="zen-meta">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
+                '<div class="zen-meta">' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="zen-2col">' +
+              '<div class="zen-panel">' + sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:110px 10px 1fr;">' +
+                '<span class="kv-label">DOB</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+                '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
+                '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
+                '<span class="kv-label">Languages</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span></div>') + '</div>' +
+              '<div class="zen-panel">' + sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') + '</div>' +
+            '</div>' +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="zen-2col">' +
+              '<div class="zen-panel">' + sec(4, 'Skills', '<ul class="cv-bullets">' + d.skills.map(function (s) { return '<li><span class="dot"></span><span>' + esc(s) + '</span></li>'; }).join('') + '</ul>') + '</div>' +
+              '<div class="zen-panel">' + sec(5, 'Experience', expBlockHtml(d)) + '</div>' +
+            '</div>' +
+            '<div class="zen-2col">' +
+              '<div class="zen-panel">' + sec(6, 'Achievements', achBlockHtml(d)) + '</div>' +
+              '<div class="zen-panel">' + sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) + '</div>' +
+            '</div>' +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
         // DEFAULT: CLASSIC INDIAN CV (EXACT LOCKED ORDER)
         return '<div class="lay-classic">' +
           '<div class="cv-doc-title">Curriculum Vitae (CV)</div>' +
@@ -2299,7 +2883,6 @@
         el.style.setProperty('--r-secondary', t.secondary);
         el.style.setProperty('--r-tint', t.tint);
         el.style.setProperty('--r-border', hexToBorderRgba(t.primary));
-        el.classList.toggle('density-compact', state.density === 'compact');
         ['font-sans', 'font-jakarta', 'font-serif', 'font-editorial', 'font-slab'].forEach(function (cls) {
           el.classList.remove(cls);
         });
@@ -2413,7 +2996,6 @@
         syncForm();
         setDocMode(state.docMode);
         setLayout(state.layout);
-        setDensity(state.density);
         setFont(state.font);
         setMobileView('edit');
         detectBikriPagePlan();

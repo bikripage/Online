@@ -179,12 +179,10 @@
     let editingProductId = ""; 
     let nativeStream = null;
 
-    function goBack() {
-        if(nativeStream) {
-            nativeStream.getTracks().forEach(track => track.stop());
-        }
-        window.location.href = "dashboard.html?shop=" + currentShopId;
-    }
+ function goBack() {
+    window.history.back();
+}
+
 
     function playBeepAndVibrate() {
         if ("vibrate" in navigator) navigator.vibrate(80); 

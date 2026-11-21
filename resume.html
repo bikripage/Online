@@ -14,7 +14,7 @@
   <!-- Curated Google Fonts (graceful offline fallback) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Roboto+Slab:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Lato:wght@400;700;900&family=Lora:wght@400;600;700&family=Merriweather:wght@400;700;900&family=Montserrat:wght@400;600;700;800&family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Poppins:wght@400;500;600;700;800&family=Raleway:wght@400;600;700;800&family=Roboto+Slab:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -233,9 +233,10 @@
       --r-body: #2C2C2E;
       --r-muted: #5A5A60;
       --r-font: var(--font-sans);
+      --fs-scale: 1;
       --d-pad: 38px;
       --d-gap: 15px;
-      --d-text: 12.2px;
+      --d-text: calc(12.2px * var(--fs-scale, 1));
       --d-lh: 1.5;
 
       width: 794px;
@@ -260,16 +261,30 @@
     .a4-sheet.auto-fit-compact {
       --d-pad: 32px;
       --d-gap: 12px;
-      --d-text: 11.8px;
+      --d-text: calc(11.8px * var(--fs-scale, 1));
       --d-lh: 1.42;
     }
+    /* Temporary class used only during true content height measurement */
+    .a4-sheet.measuring-natural .lay-exec,
+    .a4-sheet.measuring-natural .lay-split,
+    .a4-sheet.measuring-natural .lay-bento,
+    .a4-sheet.measuring-natural .lay-formal,
+    .a4-sheet.measuring-natural .formal-frame,
+    .a4-sheet.measuring-natural .lay-ribbon,
+    .a4-sheet.measuring-natural .lay-horizon,
+    .a4-sheet.measuring-natural .lay-aura,
+    .a4-sheet.measuring-natural .lay-glass,
+    .a4-sheet.measuring-natural .lay-diplomat,
+    .a4-sheet.measuring-natural .cl-wrap {
+      min-height: 0 !important;
+    }
     .a4-sheet.auto-fit-compact .cv-doc-title {
-      font-size: 19px;
+      font-size: calc(19px * var(--fs-scale, 1));
       padding-bottom: 9px;
       margin-bottom: 12px;
     }
     .a4-sheet.auto-fit-compact .cv-sec-head {
-      font-size: 11.5px;
+      font-size: calc(11.5px * var(--fs-scale, 1));
       padding-bottom: 3px;
       margin-bottom: 6px;
       gap: 5px;
@@ -295,11 +310,11 @@
     .a4-sheet.auto-fit-compact .cl-wrap {
       padding: 42px 50px;
       gap: 16px;
-      font-size: 12.8px;
+      font-size: calc(12.8px * var(--fs-scale, 1));
       line-height: 1.58;
     }
     .a4-sheet.auto-fit-compact .cl-header { padding-bottom: 12px; }
-    .a4-sheet.auto-fit-compact .cl-sender-name { font-size: 23px; }
+    .a4-sheet.auto-fit-compact .cl-sender-name { font-size: calc(23px * var(--fs-scale, 1)); }
     .a4-sheet.auto-fit-compact .cl-subject { padding: 9px 13px; }
 
     .a4-sheet.auto-fit-compact .lay-nordic { padding: 28px 38px; }
@@ -327,9 +342,46 @@
     .a4-sheet.auto-fit-compact .zen-hero { padding: 17px 20px; }
     .a4-sheet.font-sans { --r-font: "Inter", var(--font-sans); }
     .a4-sheet.font-jakarta { --r-font: "Plus Jakarta Sans", var(--font-sans); }
+    .a4-sheet.font-poppins { --r-font: "Poppins", var(--font-sans); }
+    .a4-sheet.font-montserrat { --r-font: "Montserrat", var(--font-sans); }
+    .a4-sheet.font-lato { --r-font: "Lato", var(--font-sans); }
+    .a4-sheet.font-raleway { --r-font: "Raleway", var(--font-sans); }
+    .a4-sheet.font-dmsans { --r-font: "DM Sans", var(--font-sans); }
+    .a4-sheet.font-nunito { --r-font: "Nunito", var(--font-sans); }
     .a4-sheet.font-serif { --r-font: var(--font-serif); }
     .a4-sheet.font-editorial { --r-font: "Playfair Display", Georgia, serif; }
+    .a4-sheet.font-merriweather { --r-font: "Merriweather", Georgia, serif; }
+    .a4-sheet.font-lora { --r-font: "Lora", Georgia, serif; }
     .a4-sheet.font-slab { --r-font: "Roboto Slab", Georgia, serif; }
+    .a4-sheet.font-mono { --r-font: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+    /* FONT SIZE ADJUST BAR */
+    .font-size-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      background: var(--input-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 7px 10px; flex-wrap: wrap;
+    }
+    .fs-left { display: flex; align-items: center; gap: 6px; }
+    .fs-title { font-size: 11.5px; font-weight: 700; color: var(--ink); }
+    .fs-badge {
+      font-size: 10.5px; font-weight: 750; color: var(--ios-blue);
+      background: rgba(0,122,255,0.11); padding: 2px 7px; border-radius: 999px;
+      min-width: 42px; text-align: center;
+    }
+    .fs-controls { display: flex; align-items: center; gap: 6px; flex: 1; justify-content: flex-end; min-width: 170px; }
+    .fs-btn {
+      height: 28px; min-width: 30px; padding: 0 8px; border-radius: 8px;
+      background: #FFF; border: 1px solid rgba(0,0,0,0.10); color: var(--ink);
+      font-size: 12px; font-weight: 750; display: inline-flex; align-items: center; justify-content: center;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04); transition: transform 0.12s ease, background 0.14s ease;
+    }
+    .fs-btn:active { transform: scale(0.93); background: rgba(0,122,255,0.10); color: var(--ios-blue); }
+    .fs-btn.reset { font-size: 10.5px; font-weight: 650; color: var(--muted); }
+    .fs-range {
+      flex: 1; max-width: 120px; min-width: 72px; accent-color: var(--ios-blue);
+      cursor: pointer; height: 4px;
+    }
+    .ios-alert-actions.single { grid-template-columns: 1fr; }
 
     /* SCROLLABLE PILL STRIPS & CUSTOM COLOR PICKER */
     .pill-strip {
@@ -369,9 +421,9 @@
     /* LAYOUT 6: MINIMAL SWISS */
     .lay-minimal { padding: calc(var(--d-pad) + 4px) 46px; display: flex; flex-direction: column; gap: var(--d-gap); }
     .min-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--r-border); }
-    .min-name { font-size: 32px; font-weight: 800; letter-spacing: -0.03em; color: var(--r-primary); line-height: 1.1; }
-    .min-sub { font-size: 11.8px; color: var(--r-muted); margin-top: 6px; line-height: 1.5; }
-    .lay-minimal .cv-sec-head { border-bottom: none; padding-bottom: 0; margin-bottom: 6px; font-size: 10.5px; letter-spacing: 0.16em; color: var(--r-secondary); }
+    .min-name { font-size: calc(32px * var(--fs-scale, 1)); font-weight: 800; letter-spacing: -0.03em; color: var(--r-primary); line-height: 1.1; }
+    .min-sub { font-size: calc(11.8px * var(--fs-scale, 1)); color: var(--r-muted); margin-top: 6px; line-height: 1.5; }
+    .lay-minimal .cv-sec-head { border-bottom: none; padding-bottom: 0; margin-bottom: 6px; font-size: calc(10.5px * var(--fs-scale, 1)); letter-spacing: 0.16em; color: var(--r-secondary); }
     .lay-minimal .cv-sec-num { display: none; }
     .lay-minimal section { padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.06); }
     .lay-minimal section:first-of-type { border-top: none; padding-top: 0; }
@@ -404,13 +456,13 @@
       display: flex; justify-content: space-between; align-items: center; gap: 18px;
       border: 1px solid var(--r-border);
     }
-    .nordic-name { font-size: 28px; font-weight: 800; color: var(--r-primary); letter-spacing: -0.025em; }
+    .nordic-name { font-size: calc(28px * var(--fs-scale, 1)); font-weight: 800; color: var(--r-primary); letter-spacing: -0.025em; }
     .nordic-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
     .nordic-chip {
-      font-size: 11px; font-weight: 600; color: var(--r-primary);
+      font-size: calc(11px * var(--fs-scale, 1)); font-weight: 600; color: var(--r-primary);
       background: #FFF; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--r-border);
     }
-    .lay-nordic .cv-sec-head { border-bottom: none; margin-bottom: 6px; font-size: 11.5px; letter-spacing: 0.1em; }
+    .lay-nordic .cv-sec-head { border-bottom: none; margin-bottom: 6px; font-size: calc(11.5px * var(--fs-scale, 1)); letter-spacing: 0.1em; }
     .lay-nordic .cv-sec-num { border-radius: 999px; background: var(--r-secondary); }
 
     /* LAYOUT 9: EDITORIAL MAGAZINE */
@@ -423,29 +475,29 @@
     .ed-masthead::after {
       content: ""; display: block; height: 1px; background: var(--r-border); margin-top: 12px;
     }
-    .ed-kicker { font-size: 10px; font-weight: 800; letter-spacing: 0.24em; text-transform: uppercase; color: var(--r-secondary); }
-    .ed-name { font-size: 32px; font-weight: 800; color: var(--r-primary); letter-spacing: 0.02em; margin-top: 4px; }
-    .ed-meta { font-size: 11.5px; color: var(--r-muted); margin-top: 5px; }
+    .ed-kicker { font-size: calc(10px * var(--fs-scale, 1)); font-weight: 800; letter-spacing: 0.24em; text-transform: uppercase; color: var(--r-secondary); }
+    .ed-name { font-size: calc(32px * var(--fs-scale, 1)); font-weight: 800; color: var(--r-primary); letter-spacing: 0.02em; margin-top: 4px; }
+    .ed-meta { font-size: calc(11.5px * var(--fs-scale, 1)); color: var(--r-muted); margin-top: 5px; }
     .ed-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-    .lay-editorial .cv-sec-head { border-bottom: 1px solid var(--r-primary); font-size: 11px; letter-spacing: 0.14em; }
+    .lay-editorial .cv-sec-head { border-bottom: 1px solid var(--r-primary); font-size: calc(11px * var(--fs-scale, 1)); letter-spacing: 0.14em; }
     .lay-editorial .cv-sec-num { display: none; }
 
     /* LAYOUT 10: VOGUE LUXE */
     .lay-vogue { padding: var(--d-pad) 44px; display: flex; flex-direction: column; gap: var(--d-gap); border-top: 7px solid var(--r-primary); }
     .vogue-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; padding-bottom: 14px; border-bottom: 1.5px solid var(--r-primary); }
-    .vogue-kicker { font-size: 9.5px; font-weight: 800; letter-spacing: 0.28em; text-transform: uppercase; color: var(--r-secondary); margin-bottom: 4px; }
-    .vogue-name { font-size: 33px; font-weight: 800; letter-spacing: -0.02em; color: var(--r-primary); line-height: 1.06; }
-    .vogue-sub { font-size: 11.5px; color: var(--r-muted); margin-top: 6px; }
+    .vogue-kicker { font-size: calc(9.5px * var(--fs-scale, 1)); font-weight: 800; letter-spacing: 0.28em; text-transform: uppercase; color: var(--r-secondary); margin-bottom: 4px; }
+    .vogue-name { font-size: calc(33px * var(--fs-scale, 1)); font-weight: 800; letter-spacing: -0.02em; color: var(--r-primary); line-height: 1.06; }
+    .vogue-sub { font-size: calc(11.5px * var(--fs-scale, 1)); color: var(--r-muted); margin-top: 6px; }
     .vogue-obj {
       background: var(--r-tint); border-left: 3.5px solid var(--r-secondary);
       padding: 11px 16px; border-radius: 0 10px 10px 0;
     }
     .vogue-pills { display: flex; flex-wrap: wrap; gap: 6px; }
     .vogue-pill {
-      font-size: 11.2px; font-weight: 600; color: var(--r-primary);
+      font-size: calc(11.2px * var(--fs-scale, 1)); font-weight: 600; color: var(--r-primary);
       padding: 4px 10px; border-radius: 6px; background: var(--r-tint); border: 1px solid var(--r-border);
     }
-    .lay-vogue .cv-sec-head { border-bottom: 1px solid var(--r-border); font-size: 10.8px; letter-spacing: 0.16em; color: var(--r-primary); }
+    .lay-vogue .cv-sec-head { border-bottom: 1px solid var(--r-border); font-size: calc(10.8px * var(--fs-scale, 1)); letter-spacing: 0.16em; color: var(--r-primary); }
     .lay-vogue .cv-sec-num { display: none; }
 
     /* LAYOUT 11: RIBBON EDGE */
@@ -464,7 +516,7 @@
     .mono-left { display: flex; align-items: center; gap: 15px; min-width: 0; }
     .mono-badge {
       width: 62px; height: 62px; border-radius: 16px; background: var(--r-primary); color: #FFF;
-      display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 850;
+      display: flex; align-items: center; justify-content: center; font-size: calc(24px * var(--fs-scale, 1)); font-weight: 850;
       letter-spacing: 0.04em; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.12);
     }
     .lay-monogram .cv-sec-head { border-bottom: none; background: var(--r-tint); padding: 5px 10px; border-radius: 7px; }
@@ -478,7 +530,7 @@
     }
     .hz-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
     .hz-pill {
-      background: rgba(255,255,255,0.16); color: #FFF; font-size: 11px; font-weight: 600;
+      background: rgba(255,255,255,0.16); color: #FFF; font-size: calc(11px * var(--fs-scale, 1)); font-weight: 600;
       padding: 3px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.28);
     }
     .hz-body { padding: var(--d-pad) 40px; display: flex; flex-direction: column; gap: var(--d-gap); }
@@ -491,11 +543,11 @@
       background: var(--r-primary); color: #FFF; padding: 18px 22px; border-radius: 6px;
       display: flex; flex-direction: column; justify-content: center;
     }
-    .metro-id h1 { font-size: 26px; font-weight: 850; letter-spacing: -0.02em; }
-    .metro-id .sub { font-size: 11.8px; opacity: 0.9; margin-top: 4px; }
+    .metro-id h1 { font-size: calc(26px * var(--fs-scale, 1)); font-weight: 850; letter-spacing: -0.02em; }
+    .metro-id .sub { font-size: calc(11.8px * var(--fs-scale, 1)); opacity: 0.9; margin-top: 4px; }
     .metro-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .lay-metro .cv-sec-head {
-      background: var(--r-primary); color: #FFF; padding: 4px 10px; border-bottom: none; border-radius: 4px; font-size: 11px;
+      background: var(--r-primary); color: #FFF; padding: 4px 10px; border-bottom: none; border-radius: 4px; font-size: calc(11px * var(--fs-scale, 1));
     }
     .lay-metro .cv-sec-num { background: rgba(255,255,255,0.22); }
 
@@ -506,15 +558,15 @@
       padding: 30px 42px 18px; border-bottom: 1px solid var(--r-border);
       display: flex; justify-content: space-between; align-items: center; gap: 18px;
     }
-    .aura-name { font-size: 30px; font-weight: 850; letter-spacing: -0.03em; color: var(--r-primary); line-height: 1.1; }
+    .aura-name { font-size: calc(30px * var(--fs-scale, 1)); font-weight: 850; letter-spacing: -0.03em; color: var(--r-primary); line-height: 1.1; }
     .aura-bar {
       display: inline-flex; flex-wrap: wrap; gap: 8px; margin-top: 9px;
       background: #FFF; border: 1px solid var(--r-border); border-radius: 10px;
-      padding: 6px 12px; font-size: 11.4px; font-weight: 600; color: var(--r-body);
+      padding: 6px 12px; font-size: calc(11.4px * var(--fs-scale, 1)); font-weight: 600; color: var(--r-body);
       box-shadow: 0 2px 6px rgba(0,0,0,0.03);
     }
     .aura-body { padding: 18px 42px var(--d-pad); display: flex; flex-direction: column; gap: var(--d-gap); }
-    .lay-aura .cv-sec-head { border-bottom: none; margin-bottom: 6px; padding-bottom: 0; font-size: 11.5px; letter-spacing: 0.09em; }
+    .lay-aura .cv-sec-head { border-bottom: none; margin-bottom: 6px; padding-bottom: 0; font-size: calc(11.5px * var(--fs-scale, 1)); letter-spacing: 0.09em; }
     .lay-aura .cv-sec-num { background: var(--r-tint); color: var(--r-primary); border: 1px solid var(--r-border); border-radius: 6px; }
 
     /* LAYOUT 16: FROSTED iOS CARDS */
@@ -526,7 +578,7 @@
     .glass-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
     .glass-pill {
       display: inline-block; padding: 4px 10px; border-radius: 999px;
-      background: var(--r-tint); color: var(--r-primary); font-size: 11.2px; font-weight: 650;
+      background: var(--r-tint); color: var(--r-primary); font-size: calc(11.2px * var(--fs-scale, 1)); font-weight: 650;
       border: 1px solid var(--r-border);
     }
     .lay-glass .cv-sec-head { border-bottom: none; margin-bottom: 6px; padding-bottom: 0; }
@@ -539,14 +591,14 @@
       background: linear-gradient(90deg, var(--r-primary) 0%, var(--r-secondary) 60%, var(--r-tint) 100%);
     }
     .prism-head { display: flex; justify-content: space-between; align-items: center; gap: 18px; }
-    .prism-name { font-size: 29px; font-weight: 850; letter-spacing: -0.025em; color: var(--r-primary); }
+    .prism-name { font-size: calc(29px * var(--fs-scale, 1)); font-weight: 850; letter-spacing: -0.025em; color: var(--r-primary); }
     .prism-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .prism-card {
       background: #FFF; border: 1px solid var(--r-border); border-top: 3px solid var(--r-secondary);
       border-radius: 10px; padding: 12px 15px;
     }
     .prism-card.soft { background: var(--r-tint); border-top-color: var(--r-primary); }
-    .lay-prism .cv-sec-head { border-bottom: none; margin-bottom: 6px; padding-bottom: 0; font-size: 11.4px; }
+    .lay-prism .cv-sec-head { border-bottom: none; margin-bottom: 6px; padding-bottom: 0; font-size: calc(11.4px * var(--fs-scale, 1)); }
     .lay-prism .cv-sec-num { background: var(--r-primary); border-radius: 5px; }
 
     /* LAYOUT 18: LUXE SIGNATURE */
@@ -556,11 +608,11 @@
       padding-bottom: 14px; border-bottom: 2px solid var(--r-primary);
     }
     .luxe-title-block { border-left: 4px solid var(--r-secondary); padding-left: 14px; flex: 1; min-width: 0; }
-    .luxe-name { font-size: 30px; font-weight: 850; color: var(--r-primary); letter-spacing: -0.02em; line-height: 1.08; }
-    .luxe-meta { font-size: 11.8px; color: var(--r-body); margin-top: 5px; }
+    .luxe-name { font-size: calc(30px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary); letter-spacing: -0.02em; line-height: 1.08; }
+    .luxe-meta { font-size: calc(11.8px * var(--fs-scale, 1)); color: var(--r-body); margin-top: 5px; }
     .lay-luxe .cv-sec-head {
       border-bottom: none; padding-bottom: 0; margin-bottom: 7px;
-      font-size: 11px; letter-spacing: 0.14em; color: var(--r-primary);
+      font-size: calc(11px * var(--fs-scale, 1)); letter-spacing: 0.14em; color: var(--r-primary);
     }
     .lay-luxe .cv-sec-head span:last-child {
       background: var(--r-tint); padding: 3px 10px; border-radius: 999px; border: 1px solid var(--r-border);
@@ -577,7 +629,7 @@
       display: flex; justify-content: space-between; align-items: center; gap: 18px;
       padding: 14px 18px; background: var(--r-tint); border-top: 1px solid var(--r-border); border-bottom: 1px solid var(--r-border);
     }
-    .lay-diplomat .cv-sec-head { border-bottom: 1.5px solid var(--r-primary); font-size: 11.8px; }
+    .lay-diplomat .cv-sec-head { border-bottom: 1.5px solid var(--r-primary); font-size: calc(11.8px * var(--fs-scale, 1)); }
     .lay-diplomat .cv-sec-num { background: var(--r-primary); border-radius: 3px; }
 
     /* LAYOUT 20: ZENITH MODERN */
@@ -586,12 +638,12 @@
       background: var(--r-primary); color: #FFF; border-radius: 18px; padding: 22px 26px;
       display: flex; justify-content: space-between; align-items: center; gap: 18px;
     }
-    .zen-hero h1 { font-size: 27px; font-weight: 850; letter-spacing: -0.025em; }
+    .zen-hero h1 { font-size: calc(27px * var(--fs-scale, 1)); font-weight: 850; letter-spacing: -0.025em; }
     .zen-tag {
-      display: inline-block; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.16em;
+      display: inline-block; font-size: calc(10px * var(--fs-scale, 1)); font-weight: 800; text-transform: uppercase; letter-spacing: 0.16em;
       background: rgba(255,255,255,0.16); color: #FFF; padding: 3px 9px; border-radius: 999px; margin-bottom: 6px;
     }
-    .zen-meta { font-size: 11.8px; opacity: 0.9; margin-top: 5px; }
+    .zen-meta { font-size: calc(11.8px * var(--fs-scale, 1)); opacity: 0.9; margin-top: 5px; }
     .zen-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .zen-panel { border: 1px solid var(--r-border); border-radius: 12px; padding: 12px 14px; background: #FAFAFC; }
     .lay-zenith .cv-sec-head { border-bottom: none; margin-bottom: 6px; padding-bottom: 0; }
@@ -599,19 +651,19 @@
 
     /* Shared CV Elements */
     .cv-doc-title {
-      text-align: center; font-size: 20px; font-weight: 800; letter-spacing: 0.14em;
+      text-align: center; font-size: calc(20px * var(--fs-scale, 1)); font-weight: 800; letter-spacing: 0.14em;
       text-transform: uppercase; color: var(--r-primary);
       padding-bottom: 10px; border-bottom: 2.5px solid var(--r-primary); margin-bottom: 14px;
     }
     .cv-sec-head {
-      font-size: 12px; font-weight: 750; text-transform: uppercase; letter-spacing: 0.08em;
+      font-size: calc(12px * var(--fs-scale, 1)); font-weight: 750; text-transform: uppercase; letter-spacing: 0.08em;
       color: var(--r-primary); padding-bottom: 4px; margin-bottom: 8px;
       border-bottom: 1.5px solid var(--r-border); display: flex; align-items: center; gap: 6px;
     }
     .cv-sec-num {
       display: inline-flex; align-items: center; justify-content: center;
-      width: 19px; height: 19px; border-radius: 5px; background: var(--r-primary);
-      color: #FFF; font-size: 10.5px; font-weight: 700;
+      width: calc(19px * var(--fs-scale, 1)); height: calc(19px * var(--fs-scale, 1)); border-radius: 5px; background: var(--r-primary);
+      color: #FFF; font-size: calc(10.5px * var(--fs-scale, 1)); font-weight: 700;
     }
     .kv-grid { display: grid; grid-template-columns: 142px 10px 1fr; row-gap: 4px; font-size: var(--d-text); line-height: var(--d-lh); }
     .kv-label { font-weight: 650; color: var(--r-ink); }
@@ -621,20 +673,20 @@
     .photo-frame {
       width: 104px; height: 124px; border-radius: 8px; border: 1.5px solid var(--r-border);
       background: var(--r-tint); display: flex; flex-direction: column; align-items: center;
-      justify-content: center; overflow: hidden; flex-shrink: 0; color: var(--r-muted); font-size: 11px;
+      justify-content: center; overflow: hidden; flex-shrink: 0; color: var(--r-muted); font-size: calc(11px * var(--fs-scale, 1));
     }
     .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
 
     .edu-table { width: 100%; border-collapse: collapse; font-size: var(--d-text); }
     .edu-table th {
       background: var(--r-tint); color: var(--r-primary); font-weight: 700; text-align: left;
-      padding: 7px 10px; border: 1px solid var(--r-border); font-size: 11.2px; text-transform: uppercase; letter-spacing: 0.04em;
+      padding: 7px 10px; border: 1px solid var(--r-border); font-size: calc(11.2px * var(--fs-scale, 1)); text-transform: uppercase; letter-spacing: 0.04em;
     }
     .edu-table td { padding: 7px 10px; border: 1px solid var(--r-border); color: var(--r-body); }
 
     .skills-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 18px; list-style: none; font-size: var(--d-text); }
     .skills-2col li, .cv-bullets li { display: flex; align-items: flex-start; gap: 7px; line-height: var(--d-lh); color: var(--r-body); }
-    .dot { width: 5px; height: 5px; border-radius: 999px; background: var(--r-secondary); margin-top: 7px; flex-shrink: 0; }
+    .dot { width: 5px; height: 5px; border-radius: 999px; background: var(--r-secondary); margin-top: calc(7px * var(--fs-scale, 1)); flex-shrink: 0; }
     .cv-bullets { list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: var(--d-text); margin-top: 5px; }
 
     .decl-footer {
@@ -642,8 +694,8 @@
       font-size: var(--d-text);
     }
     .sig-box { text-align: right; }
-    .sig-name { font-family: "Brush Script MT", "Segoe Script", Georgia, cursive; font-size: 20px; color: var(--r-primary); border-bottom: 1.5px solid var(--r-border); padding: 0 8px 2px; }
-    .sig-label { font-size: 10.5px; color: var(--r-muted); margin-top: 3px; }
+    .sig-name { font-family: "Brush Script MT", "Segoe Script", Georgia, cursive; font-size: calc(20px * var(--fs-scale, 1)); color: var(--r-primary); border-bottom: 1.5px solid var(--r-border); padding: 0 8px 2px; }
+    .sig-label { font-size: calc(10.5px * var(--fs-scale, 1)); color: var(--r-muted); margin-top: 3px; }
 
     /* LAYOUT 1: CLASSIC INDIAN CV */
     .lay-classic { padding: var(--d-pad) 42px; display: flex; flex-direction: column; gap: var(--d-gap); }
@@ -655,8 +707,8 @@
       background: var(--r-primary); color: #FFF; padding: 26px 40px;
       display: flex; align-items: center; justify-content: space-between; gap: 18px;
     }
-    .exec-banner h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
-    .exec-banner .sub { font-size: 12.5px; opacity: 0.9; margin-top: 4px; }
+    .exec-banner h1 { font-size: calc(28px * var(--fs-scale, 1)); font-weight: 800; letter-spacing: -0.02em; }
+    .exec-banner .sub { font-size: calc(12.5px * var(--fs-scale, 1)); opacity: 0.9; margin-top: 4px; }
     .exec-strip { height: 5px; background: var(--r-secondary); }
     .exec-body { padding: var(--d-pad) 40px; display: flex; flex-direction: column; gap: var(--d-gap); }
 
@@ -669,7 +721,7 @@
     .split-main { padding: var(--d-pad) 30px; display: flex; flex-direction: column; gap: var(--d-gap); }
     .split-pill {
       display: inline-block; padding: 4px 8px; border-radius: 6px; background: #FFF;
-      border: 1px solid var(--r-border); font-size: 11px; font-weight: 600; color: var(--r-primary);
+      border: 1px solid var(--r-border); font-size: calc(11px * var(--fs-scale, 1)); font-weight: 600; color: var(--r-primary);
     }
 
     /* LAYOUT 4: BENTO CARDS */
@@ -692,13 +744,13 @@
     }
 
     /* COVERING LETTER SHEET */
-    .cl-wrap { padding: 48px 54px; display: flex; flex-direction: column; gap: 18px; min-height: 1123px; font-size: 13.2px; line-height: 1.65; color: var(--r-body); }
+    .cl-wrap { padding: 48px 54px; display: flex; flex-direction: column; gap: 18px; min-height: 1123px; font-size: calc(13.2px * var(--fs-scale, 1)); line-height: 1.65; color: var(--r-body); }
     .cl-header {
       border-bottom: 2.5px solid var(--r-primary); padding-bottom: 14px;
       display: flex; justify-content: space-between; align-items: flex-end;
     }
-    .cl-sender-name { font-size: 24px; font-weight: 800; color: var(--r-primary); }
-    .cl-badge { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--r-secondary); }
+    .cl-sender-name { font-size: calc(24px * var(--fs-scale, 1)); font-weight: 800; color: var(--r-primary); }
+    .cl-badge { font-size: calc(11px * var(--fs-scale, 1)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--r-secondary); }
     .cl-subject {
       background: var(--r-tint); border-left: 4px solid var(--r-primary);
       padding: 10px 14px; font-weight: 700; color: var(--r-primary); border-radius: 0 8px 8px 0;
@@ -1132,13 +1184,36 @@
           </div>
         </div>
 
-        <!-- 5 Curated Fonts -->
+        <!-- 14 Curated Fonts -->
         <div class="pill-strip no-scrollbar" role="radiogroup" aria-label="Fonts">
-          <button id="fnt-sans" type="button" class="seg-btn active" onclick="setFont('sans')">Inter Sans</button>
-          <button id="fnt-jakarta" type="button" class="seg-btn" onclick="setFont('jakarta')">Jakarta</button>
-          <button id="fnt-serif" type="button" class="seg-btn" onclick="setFont('serif')">Classic Serif</button>
-          <button id="fnt-editorial" type="button" class="seg-btn" onclick="setFont('editorial')">Playfair</button>
-          <button id="fnt-slab" type="button" class="seg-btn" onclick="setFont('slab')">Roboto Slab</button>
+          <button id="fnt-sans" type="button" class="seg-btn active" style="font-family:'Inter',sans-serif;" onclick="setFont('sans')">Inter Sans</button>
+          <button id="fnt-jakarta" type="button" class="seg-btn" style="font-family:'Plus Jakarta Sans',sans-serif;" onclick="setFont('jakarta')">Jakarta</button>
+          <button id="fnt-poppins" type="button" class="seg-btn" style="font-family:'Poppins',sans-serif;" onclick="setFont('poppins')">Poppins</button>
+          <button id="fnt-montserrat" type="button" class="seg-btn" style="font-family:'Montserrat',sans-serif;" onclick="setFont('montserrat')">Montserrat</button>
+          <button id="fnt-lato" type="button" class="seg-btn" style="font-family:'Lato',sans-serif;" onclick="setFont('lato')">Lato</button>
+          <button id="fnt-raleway" type="button" class="seg-btn" style="font-family:'Raleway',sans-serif;" onclick="setFont('raleway')">Raleway</button>
+          <button id="fnt-dmsans" type="button" class="seg-btn" style="font-family:'DM Sans',sans-serif;" onclick="setFont('dmsans')">DM Sans</button>
+          <button id="fnt-nunito" type="button" class="seg-btn" style="font-family:'Nunito',sans-serif;" onclick="setFont('nunito')">Nunito</button>
+          <button id="fnt-serif" type="button" class="seg-btn" style="font-family:Georgia,serif;" onclick="setFont('serif')">Classic Serif</button>
+          <button id="fnt-editorial" type="button" class="seg-btn" style="font-family:'Playfair Display',serif;" onclick="setFont('editorial')">Playfair</button>
+          <button id="fnt-merriweather" type="button" class="seg-btn" style="font-family:'Merriweather',serif;" onclick="setFont('merriweather')">Merriweather</button>
+          <button id="fnt-lora" type="button" class="seg-btn" style="font-family:'Lora',serif;" onclick="setFont('lora')">Lora</button>
+          <button id="fnt-slab" type="button" class="seg-btn" style="font-family:'Roboto Slab',serif;" onclick="setFont('slab')">Roboto Slab</button>
+          <button id="fnt-mono" type="button" class="seg-btn" style="font-family:'JetBrains Mono',monospace;" onclick="setFont('mono')">Mono Tech</button>
+        </div>
+
+        <!-- Font Size Adjuster (Strict 1-Page A4 Limit) -->
+        <div class="font-size-bar">
+          <div class="fs-left">
+            <span class="fs-title">Font Size</span>
+            <span id="fs-val-badge" class="fs-badge">100%</span>
+          </div>
+          <div class="fs-controls">
+            <button type="button" class="fs-btn" onclick="stepFontSize(-0.05)" aria-label="Decrease Font Size">A-</button>
+            <input id="fs-slider" type="range" class="fs-range" min="75" max="145" step="5" value="100" oninput="onFontSizeSlider(this.value)" aria-label="Font Size Slider" />
+            <button type="button" class="fs-btn" onclick="stepFontSize(0.05)" aria-label="Increase Font Size">A+</button>
+            <button type="button" class="fs-btn reset" onclick="resetFontSize()">Reset</button>
+          </div>
         </div>
 
       </div>
@@ -1256,6 +1331,19 @@
       <div class="ios-alert-actions">
         <button type="button" class="ios-alert-btn cancel" onclick="closeIosConfirm(false)">Cancel</button>
         <button id="ios-confirm-ok" type="button" class="ios-alert-btn" onclick="closeIosConfirm(true)">Yes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- iOS NOTICE / NOT POSSIBLE ALERT MODAL -->
+  <div id="ios-notice-modal" class="ios-alert-backdrop no-print" onclick="if(event.target===this) closeIosNotice()">
+    <div class="ios-alert-box" role="alertdialog" aria-modal="true">
+      <div class="ios-alert-body">
+        <div id="ios-notice-title" class="ios-alert-title">Not Possible</div>
+        <div id="ios-notice-msg" class="ios-alert-msg"></div>
+      </div>
+      <div class="ios-alert-actions single">
+        <button type="button" class="ios-alert-btn" onclick="closeIosNotice()">OK</button>
       </div>
     </div>
   </div>
@@ -1456,6 +1544,7 @@
         theme: (saved && (THEMES[saved.theme] || saved.theme === 'custom')) ? saved.theme : 'midnight',
         customTheme: (saved && saved.customTheme) ? saved.customTheme : { primary: '#1B2A4A', secondary: '#4A6FA5' },
         font: (saved && saved.font) || 'sans',
+        fontScale: (saved && typeof saved.fontScale === 'number' && saved.fontScale >= 0.75 && saved.fontScale <= 1.45) ? saved.fontScale : 1,
         docMode: (saved && saved.docMode) || 'cv',
         mobileView: 'edit',
         editTab: 'cv',
@@ -1593,11 +1682,180 @@
         renderPreview(); save();
       };
 
+      const ALL_FONTS = ['sans', 'jakarta', 'poppins', 'montserrat', 'lato', 'raleway', 'dmsans', 'nunito', 'serif', 'editorial', 'merriweather', 'lora', 'slab', 'mono'];
+      const FONT_SCALE_MIN = 0.75;
+      const FONT_SCALE_MAX = 1.45;
+      const A4_SAFE_HEIGHT = 1120;
+      const A4_SAFE_WIDTH = 800;
+
+      function showIosNotice(title, msg) {
+        const tEl = document.getElementById('ios-notice-title');
+        const mEl = document.getElementById('ios-notice-msg');
+        const modal = document.getElementById('ios-notice-modal');
+        if (tEl) tEl.textContent = title || 'Not Possible';
+        if (mEl) mEl.textContent = msg || '';
+        if (modal) modal.classList.add('open');
+      }
+
+      window.closeIosNotice = function () {
+        const modal = document.getElementById('ios-notice-modal');
+        if (modal) modal.classList.remove('open');
+      };
+
+      function syncFontSizeUI() {
+        const pct = Math.round((state.fontScale || 1) * 100);
+        const badge = document.getElementById('fs-val-badge');
+        const slider = document.getElementById('fs-slider');
+        if (badge) badge.textContent = pct + '%';
+        if (slider) slider.value = String(pct);
+      }
+
+      function measureSheetAtScale(sheet, testScale) {
+        const content = sheet.querySelector('.sheet-content');
+        if (!content) return { fits: true, needsCompact: false, height: 0 };
+
+        const prevScale = sheet.style.getPropertyValue('--fs-scale');
+        const prevCompact = sheet.classList.contains('auto-fit-compact');
+        const prevTransform = content.style.transform;
+
+        sheet.classList.add('measuring-natural');
+        sheet.classList.remove('auto-fit-compact');
+        sheet.style.setProperty('--fs-scale', String(testScale));
+        content.style.transform = 'none';
+        content.style.width = '100%';
+        void content.offsetHeight;
+
+        let h = Math.max(content.scrollHeight, content.offsetHeight);
+        let w = content.scrollWidth;
+        let needsCompact = false;
+
+        if (h > A4_SAFE_HEIGHT) {
+          sheet.classList.add('auto-fit-compact');
+          void content.offsetHeight;
+          h = Math.max(content.scrollHeight, content.offsetHeight);
+          w = content.scrollWidth;
+          needsCompact = true;
+        }
+
+        // Restore previous visual state
+        sheet.classList.remove('measuring-natural');
+        if (prevCompact) sheet.classList.add('auto-fit-compact');
+        else sheet.classList.remove('auto-fit-compact');
+        if (prevScale) sheet.style.setProperty('--fs-scale', prevScale);
+        else sheet.style.removeProperty('--fs-scale');
+        content.style.transform = prevTransform;
+
+        return {
+          fits: (h <= A4_SAFE_HEIGHT && w <= A4_SAFE_WIDTH),
+          needsCompact: needsCompact,
+          height: h,
+          width: w
+        };
+      }
+
+      function canScaleFitAllSheets(testScale) {
+        const outer = document.getElementById('preview-scale-outer');
+        if (!outer) return true;
+        const sheets = Array.prototype.slice.call(outer.querySelectorAll('.a4-sheet'));
+        if (!sheets.length) return true;
+        for (let i = 0; i < sheets.length; i++) {
+          if (!sheets[i].getClientRects().length) continue;
+          const res = measureSheetAtScale(sheets[i], testScale);
+          if (!res.fits) return false;
+        }
+        return true;
+      }
+
+      function applyFontSizeChange(rawScale, fromSlider) {
+        let target = Math.round(rawScale * 20) / 20; // snap to 0.05 steps
+        const current = Math.round((state.fontScale || 1) * 20) / 20;
+
+        if (target < FONT_SCALE_MIN) {
+          syncFontSizeUI();
+          showIosNotice('Not Possible', 'Not possible! Minimum font size limit (75%) aa gayi hai.');
+          return;
+        }
+        if (target > FONT_SCALE_MAX) {
+          syncFontSizeUI();
+          showIosNotice('Not Possible', 'Not possible! Maximum font size limit (145%) aa gayi hai.');
+          return;
+        }
+        if (target === current) {
+          syncFontSizeUI();
+          return;
+        }
+
+        // Default 100% (<= 1.0) is always allowed so user can freely return from 75%-95% back to 100%.
+        // Above 100% (> 1.0), strictly verify that content fits inside 1 A4 page on current layout.
+        if (target > 1.0 && target > current) {
+          if (!canScaleFitAllSheets(target)) {
+            if (fromSlider) {
+              // On slider drag, step down to the highest size that still fits 1 page
+              let best = Math.max(1.0, current);
+              for (let s = Math.round((target - 0.05) * 20) / 20; s > best; s = Math.round((s - 0.05) * 20) / 20) {
+                if (canScaleFitAllSheets(s)) {
+                  best = s;
+                  break;
+                }
+              }
+              if (best > current) {
+                target = best;
+              } else {
+                syncFontSizeUI();
+                showIosNotice('Not Possible', 'Maximum font size reached for this layout!');
+                return;
+              }
+            } else {
+              syncFontSizeUI();
+              showIosNotice('Not Possible', 'Maximum font size reached for this layout!');
+              return;
+            }
+          }
+        }
+
+        state.fontScale = target;
+        syncFontSizeUI();
+        const outer = document.getElementById('preview-scale-outer');
+        if (outer) {
+          outer.querySelectorAll('.a4-sheet').forEach(function (sheet) {
+            sheet.style.setProperty('--fs-scale', String(state.fontScale));
+          });
+        }
+        fitAllSheetsToA4();
+        scaleAllSheets();
+        save();
+      }
+
+      window.stepFontSize = function (delta) {
+        const next = Math.round(((state.fontScale || 1) + delta) * 20) / 20;
+        applyFontSizeChange(next, false);
+      };
+
+      window.onFontSizeSlider = function (val) {
+        const num = Number(val) / 100;
+        if (!isNaN(num)) applyFontSizeChange(num, true);
+      };
+
+      window.resetFontSize = function () {
+        state.fontScale = 1;
+        syncFontSizeUI();
+        const outer = document.getElementById('preview-scale-outer');
+        if (outer) {
+          outer.querySelectorAll('.a4-sheet').forEach(function (sheet) {
+            sheet.style.setProperty('--fs-scale', '1');
+          });
+        }
+        fitAllSheetsToA4();
+        scaleAllSheets();
+        save();
+        toast('Font size reset to 100%');
+      };
+
       window.setFont = function (f) {
-        state.font = f;
-        ['sans', 'jakarta', 'serif', 'editorial', 'slab'].forEach(function (k) {
+        state.font = ALL_FONTS.indexOf(f) !== -1 ? f : 'sans';
+        ALL_FONTS.forEach(function (k) {
           const el = document.getElementById('fnt-' + k);
-          if (el) el.classList.toggle('active', k === f);
+          if (el) el.classList.toggle('active', k === state.font);
         });
         renderPreview(); save();
       };
@@ -2278,17 +2536,17 @@
         if (d.isFresher || validExps.length === 0) {
           const note = (d.fresherNote || '').trim();
           return '<div style="margin-bottom:4px;">' +
-            '<div style="font-size:13.2px; font-weight:750; color:var(--r-ink); margin-bottom:4px;">Fresher</div>' +
+            '<div style="font-size: calc(13.2px * var(--fs-scale, 1)); font-weight:750; color:var(--r-ink); margin-bottom:4px;">Fresher</div>' +
             (note ? '<p style="font-size:var(--d-text); line-height:var(--d-lh); color:var(--r-body);">' + esc(note) + '</p>' : '') +
           '</div>';
         }
         return validExps.map(function (e) {
           return '<div style="margin-bottom:8px;">' +
             '<div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px;">' +
-              '<div style="font-size:13.2px; font-weight:700; color:var(--r-ink);">' + esc(e.role) + '</div>' +
-              '<div style="font-size:11.5px; font-weight:600; color:var(--r-secondary);">' + esc(e.duration) + '</div>' +
+              '<div style="font-size: calc(13.2px * var(--fs-scale, 1)); font-weight:700; color:var(--r-ink);">' + esc(e.role) + '</div>' +
+              '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); font-weight:600; color:var(--r-secondary);">' + esc(e.duration) + '</div>' +
             '</div>' +
-            '<div style="font-size:12px; font-weight:600; color:var(--r-muted);">' + esc(e.company) + '</div>' +
+            '<div style="font-size: calc(12px * var(--fs-scale, 1)); font-weight:600; color:var(--r-muted);">' + esc(e.company) + '</div>' +
             '<ul class="cv-bullets">' + (e.bullets || []).map(function (b) { return '<li><span class="dot"></span><span>' + esc(b) + '</span></li>'; }).join('') + '</ul>' +
           '</div>';
         }).join('');
@@ -2346,10 +2604,10 @@
             '<aside class="split-side">' +
               '<div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:8px;">' +
                 photoBoxHtml(d) +
-                '<h1 style="font-size:21px; font-weight:800; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
+                '<h1 style="font-size: calc(21px * var(--fs-scale, 1)); font-weight:800; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
               '</div>' +
               '<div><div class="cv-sec-head"><span class="cv-sec-num">1</span><span>Personal Details</span></div>' +
-                '<div style="font-size:11.5px; display:flex; flex-direction:column; gap:5px; color:var(--r-body);">' +
+                '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); display:flex; flex-direction:column; gap:5px; color:var(--r-body);">' +
                   '<div><strong>Mobile:</strong> ' + esc(d.phone) + '</div>' +
                   '<div><strong>Email:</strong> ' + esc(d.email) + '</div>' +
                   '<div><strong>Address:</strong> ' + esc(d.address) + '</div>' +
@@ -2362,14 +2620,14 @@
                 d.skills.map(function (s) { return '<span class="split-pill">' + esc(s) + '</span>'; }).join('') +
               '</div></div>' +
               '<div><div class="cv-sec-head"><span class="cv-sec-num">7</span><span>Interests &amp; Strengths</span></div>' +
-                '<div style="font-size:11.5px; display:flex; flex-direction:column; gap:5px; color:var(--r-body);">' +
+                '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); display:flex; flex-direction:column; gap:5px; color:var(--r-body);">' +
                   '<div><strong>Hobbies:</strong> ' + esc(d.hobbies) + '</div>' +
                   '<div><strong>Interest:</strong> ' + esc(d.interest) + '</div>' +
                   '<div><strong>Strengths:</strong> ' + esc(d.strengths) + '</div>' +
                 '</div></div>' +
             '</aside>' +
             '<div class="split-main">' +
-              '<div class="cv-doc-title" style="text-align:left; font-size:16px; margin-bottom:4px;">Curriculum Vitae (CV)</div>' +
+              '<div class="cv-doc-title" style="text-align:left; font-size: calc(16px * var(--fs-scale, 1)); margin-bottom:4px;">Curriculum Vitae (CV)</div>' +
               sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
               sec(3, 'Educational Qualification', eduTableHtml(d)) +
               sec(5, 'Experience', expBlockHtml(d)) +
@@ -2381,7 +2639,7 @@
         if (state.layout === 'bento') {
           return '<div class="lay-bento">' +
             '<div class="bento-box tinted">' +
-              '<div style="font-size:11px; font-weight:800; letter-spacing:0.14em; color:var(--r-secondary); margin-bottom:6px;">CURRICULUM VITAE (CV)</div>' +
+              '<div style="font-size: calc(11px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.14em; color:var(--r-secondary); margin-bottom:6px;">CURRICULUM VITAE (CV)</div>' +
               '<div style="display:flex; justify-content:space-between; gap:14px; align-items:flex-start;">' + personalKV(d) + photoBoxHtml(d) + '</div>' +
             '</div>' +
             '<div class="bento-box">' + sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') + '</div>' +
@@ -2416,7 +2674,7 @@
           return '<div class="lay-minimal">' +
             '<header class="min-header">' +
               '<div style="flex:1; min-width:0;">' +
-                '<div style="font-size:10px; font-weight:800; letter-spacing:0.2em; color:var(--r-secondary); text-transform:uppercase; margin-bottom:4px;">Curriculum Vitae</div>' +
+                '<div style="font-size: calc(10px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.2em; color:var(--r-secondary); text-transform:uppercase; margin-bottom:4px;">Curriculum Vitae</div>' +
                 '<h1 class="min-name">' + esc(d.name) + '</h1>' +
                 '<div class="min-sub">' + esc(d.phone) + ' &nbsp;·&nbsp; ' + esc(d.email) + '<br/>' + esc(d.address) + '</div>' +
               '</div>' + photoBoxHtml(d) +
@@ -2443,10 +2701,10 @@
           return '<div class="lay-timeline">' +
             '<header class="tl-header">' +
               '<div style="flex:1; min-width:0;">' +
-                '<div style="font-size:10px; font-weight:800; letter-spacing:0.16em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae (CV)</div>' +
-                '<h1 style="font-size:28px; font-weight:850; color:var(--r-primary); margin-top:2px;">' + esc(d.name) + '</h1>' +
-                '<div style="font-size:12px; color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
-                '<div style="font-size:11.5px; color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+                '<div style="font-size: calc(10px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.16em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae (CV)</div>' +
+                '<h1 style="font-size: calc(28px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary); margin-top:2px;">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
+                '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
               '</div>' + photoBoxHtml(d) +
             '</header>' +
             '<div class="tl-track">' +
@@ -2471,9 +2729,9 @@
           return '<div class="lay-nordic">' +
             '<header class="nordic-head">' +
               '<div style="flex:1; min-width:0;">' +
-                '<div style="font-size:10px; font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<div style="font-size: calc(10px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
                 '<h1 class="nordic-name">' + esc(d.name) + '</h1>' +
-                '<div style="font-size:11.8px; color:var(--r-muted); margin-top:3px;">' + esc(d.address) + '</div>' +
+                '<div style="font-size: calc(11.8px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:3px;">' + esc(d.address) + '</div>' +
                 '<div class="nordic-chips">' +
                   '<span class="nordic-chip">' + esc(d.phone) + '</span>' +
                   '<span class="nordic-chip">' + esc(d.email) + '</span>' +
@@ -2551,10 +2809,10 @@
             '<div class="ribbon-body">' +
               '<header class="ribbon-head">' +
                 '<div style="flex:1; min-width:0;">' +
-                  '<div style="font-size:10.5px; font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
-                  '<h1 style="font-size:30px; font-weight:850; color:var(--r-primary); margin-top:2px;">' + esc(d.name) + '</h1>' +
-                  '<div style="font-size:12px; color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
-                  '<div style="font-size:11.5px; color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+                  '<div style="font-size: calc(10.5px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                  '<h1 style="font-size: calc(30px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary); margin-top:2px;">' + esc(d.name) + '</h1>' +
+                  '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
+                  '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
                 '</div>' + photoBoxHtml(d) +
               '</header>' +
               sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:135px 10px 1fr;">' +
@@ -2580,9 +2838,9 @@
               '<div class="mono-left">' +
                 '<div class="mono-badge">' + esc(initials) + '</div>' +
                 '<div style="min-width:0;">' +
-                  '<h1 style="font-size:27px; font-weight:850; color:var(--r-primary); line-height:1.1;">' + esc(d.name) + '</h1>' +
-                  '<div style="font-size:12px; color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
-                  '<div style="font-size:11.5px; color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+                  '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary); line-height:1.1;">' + esc(d.name) + '</h1>' +
+                  '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
+                  '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
                 '</div>' +
               '</div>' + photoBoxHtml(d) +
             '</header>' +
@@ -2605,9 +2863,9 @@
           return '<div class="lay-horizon">' +
             '<header class="hz-banner">' +
               '<div style="flex:1; min-width:0;">' +
-                '<div style="font-size:10px; font-weight:800; letter-spacing:0.2em; opacity:0.85; text-transform:uppercase;">Curriculum Vitae</div>' +
-                '<h1 style="font-size:29px; font-weight:850; margin-top:3px;">' + esc(d.name) + '</h1>' +
-                '<div style="font-size:12px; opacity:0.9; margin-top:4px;">' + esc(d.address) + '</div>' +
+                '<div style="font-size: calc(10px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.2em; opacity:0.85; text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 style="font-size: calc(29px * var(--fs-scale, 1)); font-weight:850; margin-top:3px;">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12px * var(--fs-scale, 1)); opacity:0.9; margin-top:4px;">' + esc(d.address) + '</div>' +
                 '<div class="hz-pills">' +
                   '<span class="hz-pill">' + esc(d.phone) + '</span>' +
                   '<span class="hz-pill">' + esc(d.email) + '</span>' +
@@ -2635,7 +2893,7 @@
           return '<div class="lay-metro">' +
             '<div class="metro-top">' +
               '<div class="metro-id">' +
-                '<div style="font-size:10px; font-weight:800; letter-spacing:0.18em; opacity:0.8; text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<div style="font-size: calc(10px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.18em; opacity:0.8; text-transform:uppercase;">Curriculum Vitae</div>' +
                 '<h1>' + esc(d.name) + '</h1>' +
                 '<div class="sub">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + '</div>' +
                 '<div class="sub">' + esc(d.address) + '</div>' +
@@ -2664,9 +2922,9 @@
           return '<div class="lay-aura">' +
             '<header class="aura-top">' +
               '<div style="flex:1; min-width:0;">' +
-                '<div style="font-size:10px; font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<div style="font-size: calc(10px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
                 '<h1 class="aura-name">' + esc(d.name) + '</h1>' +
-                '<div style="font-size:11.6px; color:var(--r-muted); margin-top:3px;">' + esc(d.address) + '</div>' +
+                '<div style="font-size: calc(11.6px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:3px;">' + esc(d.address) + '</div>' +
                 '<div class="aura-bar"><span>' + esc(d.phone) + '</span><span style="color:var(--r-secondary);">•</span><span>' + esc(d.email) + '</span></div>' +
               '</div>' + photoBoxHtml(d) +
             '</header>' +
@@ -2691,10 +2949,10 @@
           return '<div class="lay-glass">' +
             '<div class="glass-card glass-head">' +
               '<div style="flex:1; min-width:0;">' +
-                '<div style="font-size:10px; font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
-                '<h1 style="font-size:28px; font-weight:850; color:var(--r-primary); margin-top:2px;">' + esc(d.name) + '</h1>' +
-                '<div style="font-size:12px; color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
-                '<div style="font-size:11.5px; color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+                '<div style="font-size: calc(10px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 style="font-size: calc(28px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary); margin-top:2px;">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
+                '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
               '</div>' + photoBoxHtml(d) +
             '</div>' +
             '<div class="glass-card">' + sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:135px 10px 1fr;">' +
@@ -2719,10 +2977,10 @@
             '<div class="prism-accent"></div>' +
             '<header class="prism-head">' +
               '<div style="flex:1; min-width:0;">' +
-                '<div style="font-size:10px; font-weight:800; letter-spacing:0.2em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<div style="font-size: calc(10px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.2em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
                 '<h1 class="prism-name">' + esc(d.name) + '</h1>' +
-                '<div style="font-size:12px; color:var(--r-body); margin-top:3px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + '</div>' +
-                '<div style="font-size:11.5px; color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+                '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-body); margin-top:3px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + '</div>' +
+                '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
               '</div>' + photoBoxHtml(d) +
             '</header>' +
             '<div class="prism-2col">' +
@@ -2750,10 +3008,10 @@
           return '<div class="lay-luxe">' +
             '<header class="luxe-head">' +
               '<div class="luxe-title-block">' +
-                '<div style="font-size:10px; font-weight:800; letter-spacing:0.2em; color:var(--r-secondary); text-transform:uppercase; margin-bottom:3px;">Curriculum Vitae</div>' +
+                '<div style="font-size: calc(10px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.2em; color:var(--r-secondary); text-transform:uppercase; margin-bottom:3px;">Curriculum Vitae</div>' +
                 '<h1 class="luxe-name">' + esc(d.name) + '</h1>' +
                 '<div class="luxe-meta">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
-                '<div style="font-size:11.5px; color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+                '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
               '</div>' + photoBoxHtml(d) +
             '</header>' +
             sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:135px 10px 1fr;">' +
@@ -2775,10 +3033,10 @@
           return '<div class="lay-diplomat"><div class="dip-outer">' +
             '<div class="dip-head">' +
               '<div style="flex:1; min-width:0;">' +
-                '<div style="font-size:10px; font-weight:800; letter-spacing:0.2em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
-                '<h1 style="font-size:27px; font-weight:850; color:var(--r-primary); margin-top:2px;">' + esc(d.name) + '</h1>' +
-                '<div style="font-size:12px; color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + '</div>' +
-                '<div style="font-size:11.5px; color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+                '<div style="font-size: calc(10px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.2em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary); margin-top:2px;">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + '</div>' +
+                '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
               '</div>' + photoBoxHtml(d) +
             '</div>' +
             sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:135px 10px 1fr;">' +
@@ -2846,7 +3104,7 @@
         const cl = d.coverLetter;
         return '<div class="cl-wrap">' +
           '<div class="cl-header">' +
-            '<div><div class="cl-sender-name">' + esc(d.name) + '</div><div style="font-size:12px; color:var(--r-muted);">' + esc(d.address) + '</div></div>' +
+            '<div><div class="cl-sender-name">' + esc(d.name) + '</div><div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-muted);">' + esc(d.address) + '</div></div>' +
             '<div class="cl-badge">Covering Letter</div>' +
           '</div>' +
           '<div><strong>To,</strong><br/>' + esc(cl.to).replace(/\n/g, '<br/>') + '</div>' +
@@ -2861,8 +3119,8 @@
             '<div style="text-align:right;">' +
               '<div>' + esc(cl.signoff) + '</div>' +
               '<div style="font-weight:750; color:var(--r-primary); margin-top:6px;">' + esc(d.name) + '</div>' +
-              '<div style="font-size:12px;">Contact No.: ' + esc(d.phone) + '</div>' +
-              '<div style="font-size:12px;">Email: ' + esc(d.email) + '</div>' +
+              '<div style="font-size: calc(12px * var(--fs-scale, 1));">Contact No.: ' + esc(d.phone) + '</div>' +
+              '<div style="font-size: calc(12px * var(--fs-scale, 1));">Email: ' + esc(d.email) + '</div>' +
             '</div>' +
           '</div>' +
         '</div>';
@@ -2883,10 +3141,11 @@
         el.style.setProperty('--r-secondary', t.secondary);
         el.style.setProperty('--r-tint', t.tint);
         el.style.setProperty('--r-border', hexToBorderRgba(t.primary));
-        ['font-sans', 'font-jakarta', 'font-serif', 'font-editorial', 'font-slab'].forEach(function (cls) {
-          el.classList.remove(cls);
+        ALL_FONTS.forEach(function (k) {
+          el.classList.remove('font-' + k);
         });
         el.classList.add('font-' + (state.font || 'sans'));
+        el.style.setProperty('--fs-scale', String(state.fontScale || 1));
       }
 
       function renderPreview() {
@@ -2914,29 +3173,57 @@
       }
 
       // Fit each CV / letter independently so the document can never spill
-      // onto another printed page. Compact spacing is attempted before scaling.
+      // onto another printed page. Uses natural height measurement (ignoring
+      // layout min-height) and auto-clamps enlarged fontScale when switching layouts.
       function fitAllSheetsToA4() {
         const outer = document.getElementById('preview-scale-outer');
         if (!outer) return;
-        const targetHeight = 1105; // small safety margin for A4 print rounding
-        outer.querySelectorAll('.a4-sheet').forEach(function (sheet) {
-          if (!sheet.getClientRects().length) return; // preview is currently hidden
+        const sheets = Array.prototype.slice.call(outer.querySelectorAll('.a4-sheet'));
+        const visibleSheets = sheets.filter(function (s) { return s.getClientRects().length > 0; });
+        if (!visibleSheets.length) return;
+
+        // If user had enlarged fontScale (> 1.0) and switched layout/font or added text
+        // so it no longer fits 1 page, step down fontScale automatically until it fits (min 1.0).
+        let adjusted = false;
+        while ((state.fontScale || 1) > 1.0) {
+          let allFit = true;
+          for (let i = 0; i < visibleSheets.length; i++) {
+            if (!measureSheetAtScale(visibleSheets[i], state.fontScale).fits) {
+              allFit = false;
+              break;
+            }
+          }
+          if (allFit) break;
+          state.fontScale = Math.max(1.0, Math.round((state.fontScale - 0.05) * 20) / 20);
+          adjusted = true;
+        }
+        if (adjusted) {
+          syncFontSizeUI();
+          save();
+        }
+
+        visibleSheets.forEach(function (sheet) {
           const content = sheet.querySelector('.sheet-content');
           if (!content) return;
 
+          sheet.style.setProperty('--fs-scale', String(state.fontScale || 1));
+          sheet.classList.add('measuring-natural');
           content.style.transform = 'none';
           content.style.width = '100%';
           sheet.classList.remove('auto-fit-compact');
-          let contentHeight = Math.max(content.scrollHeight, Math.ceil(content.getBoundingClientRect().height));
+          void content.offsetHeight;
 
-          if (contentHeight > targetHeight) {
+          let contentHeight = Math.max(content.scrollHeight, content.offsetHeight);
+
+          if (contentHeight > A4_SAFE_HEIGHT) {
             sheet.classList.add('auto-fit-compact');
-            // Force layout so the compact rules are included in the measurement.
             void content.offsetHeight;
-            contentHeight = Math.max(content.scrollHeight, Math.ceil(content.getBoundingClientRect().height));
+            contentHeight = Math.max(content.scrollHeight, content.offsetHeight);
           }
 
-          const fitScale = contentHeight > targetHeight ? targetHeight / contentHeight : 1;
+          sheet.classList.remove('measuring-natural');
+
+          const fitScale = contentHeight > A4_SAFE_HEIGHT ? A4_SAFE_HEIGHT / contentHeight : 1;
           content.style.transformOrigin = 'top center';
           content.style.transform = 'scale(' + fitScale.toFixed(4) + ')';
           sheet.dataset.fitScale = fitScale.toFixed(4);
@@ -2996,6 +3283,7 @@
         syncForm();
         setDocMode(state.docMode);
         setLayout(state.layout);
+        syncFontSizeUI();
         setFont(state.font);
         setMobileView('edit');
         detectBikriPagePlan();

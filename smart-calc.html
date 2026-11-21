@@ -235,9 +235,10 @@
         };
 
         function goBack() {
-            const shopId = localStorage.getItem('BikriPage_active_shop') || '';
-            window.location.href = `dashboard.html?shop=${shopId}`;
-        }
+    window.history.back();
+}
+
+
 
         // 🚀 NAYA: Mode Switcher (By Qty vs By Amount)
         function setMode(mode) {

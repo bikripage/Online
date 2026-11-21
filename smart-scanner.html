@@ -165,7 +165,8 @@
     const db = firebase.firestore();
 
     const urlParams = new URLSearchParams(window.location.search);
-    const currentShopId = urlParams.get('shop');
+   const currentShopId = urlParams.get('shop') || localStorage.getItem('BikriPage_active_shop');
+
 
     if(!currentShopId) {
         alert("Shop ID missing. Please open from Dashboard.");

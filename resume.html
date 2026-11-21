@@ -239,7 +239,9 @@
       --d-lh: 1.5;
 
       width: 794px;
+      height: 1123px;
       min-height: 1123px;
+      max-height: 1123px;
       background: #FFFFFF;
       color: var(--r-ink);
       font-family: var(--r-font);
@@ -250,6 +252,56 @@
       transform-origin: top left;
     }
     .a4-sheet.density-compact { --d-pad: 28px; --d-gap: 11px; --d-text: 11.4px; --d-lh: 1.4; }
+    .sheet-content {
+      display: flow-root;
+      width: 100%;
+      transform-origin: top center;
+    }
+    /* Used automatically only when a document has more content than one A4 page. */
+    .a4-sheet.auto-fit-compact {
+      --d-pad: 32px;
+      --d-gap: 12px;
+      --d-text: 11.8px;
+      --d-lh: 1.42;
+    }
+    .a4-sheet.auto-fit-compact .cv-doc-title {
+      font-size: 19px;
+      padding-bottom: 9px;
+      margin-bottom: 12px;
+    }
+    .a4-sheet.auto-fit-compact .cv-sec-head {
+      font-size: 11.5px;
+      padding-bottom: 3px;
+      margin-bottom: 6px;
+      gap: 5px;
+    }
+    .a4-sheet.auto-fit-compact .edu-table th,
+    .a4-sheet.auto-fit-compact .edu-table td { padding: 6px 8px; }
+    .a4-sheet.auto-fit-compact .photo-frame { width: 96px; height: 114px; }
+    .a4-sheet.auto-fit-compact .decl-footer { margin-top: 12px; }
+    .a4-sheet.auto-fit-compact .cv-bullets { gap: 3px; margin-top: 4px; }
+    .a4-sheet.auto-fit-compact .lay-classic { padding: 32px 38px; }
+    .a4-sheet.auto-fit-compact .lay-minimal { padding: 36px 42px; }
+    .a4-sheet.auto-fit-compact .lay-timeline { padding: 32px 36px; }
+    .a4-sheet.auto-fit-compact .lay-bento { padding: 20px; gap: 9px; }
+    .a4-sheet.auto-fit-compact .bento-box { padding: 12px 14px; }
+    .a4-sheet.auto-fit-compact .bento-2col { gap: 9px; }
+    .a4-sheet.auto-fit-compact .lay-formal { padding: 20px; }
+    .a4-sheet.auto-fit-compact .formal-frame { padding: 20px 24px; min-height: 0; gap: 12px; }
+    .a4-sheet.auto-fit-compact .exec-banner { padding: 22px 34px; }
+    .a4-sheet.auto-fit-compact .exec-body { padding: 28px 34px; gap: 12px; }
+    .a4-sheet.auto-fit-compact .split-side { padding: 28px 19px; gap: 14px; }
+    .a4-sheet.auto-fit-compact .split-main { padding: 28px 26px; gap: 12px; }
+    .a4-sheet.auto-fit-compact .min-header { padding-bottom: 12px; }
+    .a4-sheet.auto-fit-compact .cl-wrap {
+      padding: 42px 50px;
+      gap: 16px;
+      font-size: 12.8px;
+      line-height: 1.58;
+    }
+    .a4-sheet.auto-fit-compact .cl-header { padding-bottom: 12px; }
+    .a4-sheet.auto-fit-compact .cl-sender-name { font-size: 23px; }
+    .a4-sheet.auto-fit-compact .cl-subject { padding: 9px 13px; }
     .a4-sheet.font-sans { --r-font: "Inter", var(--font-sans); }
     .a4-sheet.font-jakarta { --r-font: "Plus Jakarta Sans", var(--font-sans); }
     .a4-sheet.font-serif { --r-font: var(--font-serif); }
@@ -551,21 +603,36 @@
     }
     .share-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
-    /* PRINT A4 */
+    /* PRINT: every document sheet is locked to exactly one A4 page. */
     @page { size: A4 portrait; margin: 0; }
     @media print {
-      html, body { background: #FFF !important; margin: 0 !important; padding: 0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      html, body {
+        width: 210mm !important; min-width: 210mm !important;
+        background: #FFF !important; margin: 0 !important; padding: 0 !important;
+        -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
+      }
       .no-print { display: none !important; }
-      .workspace, .preview-pane, #preview-scale-outer, .sheet-scale-box {
+      .workspace, .preview-pane, #preview-scale-outer {
         display: block !important; position: static !important; width: 210mm !important;
         height: auto !important; margin: 0 !important; padding: 0 !important; transform: none !important;
       }
-      .a4-sheet {
-        width: 210mm !important; min-height: 297mm !important; transform: none !important;
-        border: none !important; border-radius: 0 !important; box-shadow: none !important;
-        page-break-after: always;
+      .sheet-scale-box {
+        display: block !important; position: relative !important;
+        width: 210mm !important; height: 297mm !important;
+        margin: 0 !important; padding: 0 !important; transform: none !important;
+        page-break-inside: avoid !important; break-inside: avoid !important;
+        page-break-after: always !important; break-after: page !important;
       }
-      .a4-sheet:last-child { page-break-after: auto; }
+      .sheet-scale-box:last-child { page-break-after: auto !important; break-after: auto !important; }
+      .a4-sheet {
+        position: relative !important;
+        width: 210mm !important; height: 297mm !important;
+        min-height: 297mm !important; max-height: 297mm !important;
+        overflow: hidden !important; transform: none !important;
+        border: none !important; border-radius: 0 !important; box-shadow: none !important;
+        page-break-inside: avoid !important; break-inside: avoid !important;
+      }
+      .sheet-content { transform-origin: top center !important; }
     }
   </style>
 </head>
@@ -1224,7 +1291,10 @@
           document.getElementById('edit-pane').classList.toggle('hidden', v !== 'edit');
           document.getElementById('preview-pane').classList.toggle('hidden', v !== 'preview');
         }
-        if (v === 'preview') requestAnimationFrame(scaleAllSheets);
+        if (v === 'preview') requestAnimationFrame(function () {
+          fitAllSheetsToA4();
+          scaleAllSheets();
+        });
       };
 
       window.setEditTab = function (t) {
@@ -1616,20 +1686,33 @@
       }
 
       function executeSingleExport() {
-        if (!billing.isPremium) {
-          let locked = false;
-          const doLock = function () {
-            if (locked) return;
-            locked = true;
-            window.removeEventListener('afterprint', doLock);
-            relockAfterExport();
-          };
-          window.addEventListener('afterprint', doLock);
-          window.print();
-          // Fallback for mobile browsers that do not fire afterprint reliably
-          setTimeout(doLock, 1200);
+        const startPrint = function () {
+          fitAllSheetsToA4();
+          scaleAllSheets();
+          requestAnimationFrame(function () {
+            if (!billing.isPremium) {
+              let locked = false;
+              const doLock = function () {
+                if (locked) return;
+                locked = true;
+                window.removeEventListener('afterprint', doLock);
+                relockAfterExport();
+              };
+              window.addEventListener('afterprint', doLock);
+              window.print();
+              // Fallback for mobile browsers that do not fire afterprint reliably
+              setTimeout(doLock, 1200);
+            } else {
+              window.print();
+            }
+          });
+        };
+
+        // Web fonts can change line wrapping; measure only after they settle.
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(startPrint).catch(startPrint);
         } else {
-          window.print();
+          startPrint();
         }
       }
 
@@ -2235,11 +2318,46 @@
           sheet.className = 'a4-sheet';
           applyThemeStyle(sheet);
           const wm = isDocUnlocked(kind) ? '' : watermarkHtml();
-          sheet.innerHTML = (kind === 'cv' ? buildCVHtml(state.data) : buildCLHtml(state.data)) + wm;
+          sheet.innerHTML = '<div class="sheet-content">' +
+            (kind === 'cv' ? buildCVHtml(state.data) : buildCLHtml(state.data)) +
+            '</div>' + wm;
           box.appendChild(sheet);
           outer.appendChild(box);
         });
-        requestAnimationFrame(scaleAllSheets);
+        requestAnimationFrame(function () {
+          fitAllSheetsToA4();
+          scaleAllSheets();
+        });
+      }
+
+      // Fit each CV / letter independently so the document can never spill
+      // onto another printed page. Compact spacing is attempted before scaling.
+      function fitAllSheetsToA4() {
+        const outer = document.getElementById('preview-scale-outer');
+        if (!outer) return;
+        const targetHeight = 1105; // small safety margin for A4 print rounding
+        outer.querySelectorAll('.a4-sheet').forEach(function (sheet) {
+          if (!sheet.getClientRects().length) return; // preview is currently hidden
+          const content = sheet.querySelector('.sheet-content');
+          if (!content) return;
+
+          content.style.transform = 'none';
+          content.style.width = '100%';
+          sheet.classList.remove('auto-fit-compact');
+          let contentHeight = Math.max(content.scrollHeight, Math.ceil(content.getBoundingClientRect().height));
+
+          if (contentHeight > targetHeight) {
+            sheet.classList.add('auto-fit-compact');
+            // Force layout so the compact rules are included in the measurement.
+            void content.offsetHeight;
+            contentHeight = Math.max(content.scrollHeight, Math.ceil(content.getBoundingClientRect().height));
+          }
+
+          const fitScale = contentHeight > targetHeight ? targetHeight / contentHeight : 1;
+          content.style.transformOrigin = 'top center';
+          content.style.transform = 'scale(' + fitScale.toFixed(4) + ')';
+          sheet.dataset.fitScale = fitScale.toFixed(4);
+        });
       }
 
       function scaleAllSheets() {
@@ -2308,7 +2426,10 @@
         } else {
           setMobileView(state.mobileView);
         }
-        requestAnimationFrame(scaleAllSheets);
+        requestAnimationFrame(function () {
+          fitAllSheetsToA4();
+          scaleAllSheets();
+        });
       });
 
       document.addEventListener('DOMContentLoaded', init);

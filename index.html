@@ -683,62 +683,36 @@
 
     </main>
      <!-- ✨ MOBILE SIDEBAR MENU (iOS Style) ✨ -->
-    <div id="mobile-sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100] hidden transition-opacity duration-300 opacity-0"></div>
-    <div id="mobile-sidebar" class="fixed top-0 right-0 h-full w-64 sm:w-80 bg-white shadow-2xl z-[105] transform translate-x-full transition-transform duration-300 flex flex-col rounded-l-[2rem]">
-        <div class="p-6 border-b border-gray-100 flex items-center justify-between mt-2">
-            <h2 class="font-black text-xl text-gray-900 tracking-tight">Menu</h2>
-            <button onclick="toggleSidebar()" class="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center text-gray-500 active:scale-90 transition"><i class="fas fa-times"></i></button>
-        </div>
-        
-        <div class="p-5 flex flex-col gap-2 flex-1 overflow-y-auto">
-            <a href="#" onclick="toggleSidebar(); window.scrollTo(0,0);" class="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-gray-50 font-bold text-gray-700 transition active:scale-95">
-                <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><i class="fas fa-home text-sm"></i></div> Home
-            </a>
-            <a href="#" onclick="toggleSidebar(); document.getElementById('marketplace').scrollIntoView();" class="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-gray-50 font-bold text-gray-700 transition active:scale-95">
-                <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center"><i class="fas fa-store text-sm"></i></div> Local Shops
-            </a>
-                                <!-- ✨ NAYA MY ORDERS BUTTON ✨ -->
-                    <a href="my-orders.html" class="flex items-center gap-4 text-gray-800 font-bold text-[15px] p-3 rounded-2xl hover:bg-[#F7F7F9] transition-all active:scale-95">
-                        <div class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
-                            <i class="fas fa-box-open text-orange-500"></i>
-                        </div>
-                        My Orders
-                    </a>
-                    
-            <a href="mailto:bikripage@gmail.com" onclick="toggleSidebar();" class="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-gray-50 font-bold text-gray-700 transition active:scale-95">
-                <div class="w-8 h-8 rounded-full bg-green-50 text-green-500 flex items-center justify-center"><i class="fas fa-headset text-sm"></i></div> Support
-            </a>
-
-            <!-- ✨ ADMIN INSTAGRAM SIDEBAR LINK ✨ -->
-            <a href="https://instagram.com/bikripage" target="_blank" class="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-gray-50 font-bold text-gray-700 transition active:scale-95">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500 text-white flex items-center justify-center shadow-sm"><i class="fab fa-instagram text-sm"></i></div> Follow Instagram
-            </a>
-
-            <div class="pt-3 pb-1 px-3.5 border-t border-gray-100 mt-1">
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Smart Tools</p>
-            </div>
-            <a href="resume.html" class="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-gray-50 font-bold text-gray-700 transition active:scale-95">
-                <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center"><i class="fas fa-file-alt text-sm"></i></div> Resume Studio
-            </a>
-            <a href="cyber-owner.html" class="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-gray-50 font-bold text-gray-700 transition active:scale-95">
-                <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fas fa-print text-sm"></i></div> Smart Print Desk
-            </a>
-            <a href="shopkeeper.html" class="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-gray-50 font-bold text-gray-700 transition active:scale-95">
-                <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center"><i class="fas fa-star text-sm"></i></div> Google Review QR
-            </a>
-            <a href="smart-calc.html" class="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-gray-50 font-bold text-gray-700 transition active:scale-95">
-                <div class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center"><i class="fas fa-calculator text-sm"></i></div> Smart Calculator
-            </a>
-            <a href="smart-scanner.html" class="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-gray-50 font-bold text-gray-700 transition active:scale-95">
-                <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center"><i class="fas fa-barcode text-sm"></i></div> Smart Scanner
-            </a>
-
-        </div>
-        
-        <div class="p-6 border-t border-gray-100 bg-gray-50 rounded-bl-[2rem]">
-            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center flex items-center justify-center gap-1.5"><i class="fas fa-magic"></i> BikriPage Platform</p>
-        </div>
+<div id="mobile-sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100] hidden transition-opacity duration-300 opacity-0"></div>
+<div id="mobile-sidebar" class="fixed top-0 right-0 h-full w-64 sm:w-80 bg-white shadow-2xl z-[105] transform translate-x-full transition-transform duration-300 flex flex-col rounded-l-[2rem]">
+    <div class="p-6 border-b border-gray-100 flex items-center justify-between mt-2">
+        <h2 class="font-black text-xl text-gray-900 tracking-tight">Menu</h2>
+        <button onclick="toggleSidebar()" class="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center text-gray-500 active:scale-90 transition"><i class="fas fa-times"></i></button>
     </div>
+    
+    <div class="p-5 flex flex-col gap-2 flex-1 overflow-y-auto">
+        <a href="#" onclick="toggleSidebar(); window.scrollTo(0,0);" class="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-gray-50 font-bold text-gray-700 transition active:scale-95">
+            <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><i class="fas fa-home text-sm"></i></div> Home
+        </a>
+        <a href="#" onclick="toggleSidebar(); document.getElementById('marketplace').scrollIntoView();" class="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-gray-50 font-bold text-gray-700 transition active:scale-95">
+            <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center"><i class="fas fa-store text-sm"></i></div> Local Shops
+        </a>
+        <a href="my-orders.html" class="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-gray-50 font-bold text-gray-700 transition active:scale-95">
+            <div class="w-8 h-8 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center"><i class="fas fa-box-open text-sm"></i></div> My Orders
+        </a>
+        <a href="mailto:bikripage@gmail.com" onclick="toggleSidebar();" class="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-gray-50 font-bold text-gray-700 transition active:scale-95">
+            <div class="w-8 h-8 rounded-full bg-green-50 text-green-500 flex items-center justify-center"><i class="fas fa-headset text-sm"></i></div> Support
+        </a>
+        <a href="https://instagram.com/bikripage" target="_blank" class="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-gray-50 font-bold text-gray-700 transition active:scale-95">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500 text-white flex items-center justify-center shadow-sm"><i class="fab fa-instagram text-sm"></i></div> Follow Instagram
+        </a>
+    </div>
+    
+    <div class="p-6 border-t border-gray-100 bg-gray-50 rounded-bl-[2rem]">
+        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center flex items-center justify-center gap-1.5"><i class="fas fa-magic"></i> BikriPage Platform</p>
+    </div>
+</div>
+
 
 
          <!-- ✨ APPLE-STYLE LIGHT & PREMIUM FOOTER ✨ -->

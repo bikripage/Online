@@ -154,8 +154,36 @@
 
     /* PHOTO UPLOADED BADGE & CROPPER */
     .photo-status-row {
-      display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
     }
+    .photo-thumb-preview {
+      width: 48px;
+      height: 56px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #E5E5EA;
+      border: 1.5px solid rgba(0, 0, 0, 0.12);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), border-radius 0.22s ease, border-color 0.22s ease;
+    }
+    .photo-thumb-preview:active { transform: scale(0.95); }
+    .photo-thumb-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .photo-thumb-preview.shape-square { border-radius: 4px; }
+    .photo-thumb-preview.shape-rounded { border-radius: 11px; }
+    .photo-thumb-preview.shape-circle { width: 52px; height: 52px; border-radius: 999px; }
+    .photo-thumb-preview.border-none { border-color: transparent; }
+    .photo-thumb-preview.border-thin { border: 1.5px solid rgba(0, 0, 0, 0.16); }
+    .photo-thumb-preview.border-accent { border: 2px solid var(--ios-blue); }
     .photo-label-group {
       display: inline-flex; align-items: center; gap: 6px;
     }
@@ -1035,10 +1063,21 @@
 
     /* EXPORT PAYWALL MODAL */
     .pay-backdrop {
-      position: fixed; inset: 0; z-index: 120; background: rgba(17, 24, 39, 0.55);
+      position: fixed; inset: 0; z-index: 120; background: rgba(17, 24, 39, 0.52);
       backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
       display: flex; align-items: flex-end; justify-content: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.22s ease;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      will-change: opacity;
+      transition: opacity 0.26s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0.26s;
+    }
+    .pay-backdrop.open {
+      opacity: 1; visibility: visible; pointer-events: auto;
+      transition: opacity 0.26s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0s;
+    }
+    .ai-modal-sheet, .pay-sheet {
+      will-change: transform;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
     }
     .pay-backdrop.open { opacity: 1; pointer-events: auto; }
     .pay-sheet {
@@ -1504,13 +1543,18 @@
               <div id="photo-upload-controls" style="display:flex; flex-direction:column; gap:8px; padding-top:7px; border-top:1px solid rgba(0,0,0,0.06);">
                 <div class="photo-status-row">
                   <div class="photo-label-group">
-                    <span style="font-size:11.5px; font-weight:600; color:var(--muted);">Passport Photo</span>
-                    <span id="photo-uploaded-badge" class="photo-uploaded-badge hidden">
-                      <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.6" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>Uploaded</span>
-                    </span>
+                    <div id="photo-thumb-box" class="photo-thumb-preview shape-square border-thin hidden" onclick="openPhotoCropModal()" title="Tap to Edit &amp; Crop">
+                      <img id="photo-thumb-img" src="" alt="Uploaded Passport Photo" />
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:3px;">
+                      <span style="font-size:11.5px; font-weight:600; color:var(--muted);">Passport Photo</span>
+                      <span id="photo-uploaded-badge" class="photo-uploaded-badge hidden" style="width:fit-content;">
+                        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.6" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>Uploaded</span>
+                      </span>
+                    </div>
                   </div>
                   <div class="photo-action-btns">
                     <input id="photo-input" type="file" accept="image/*" class="hidden" onchange="uploadPhoto(event)" />
@@ -1763,7 +1807,7 @@
       <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
         <div>
           <h3 style="font-size:17px; font-weight:800; letter-spacing:-0.02em;">Edit &amp; Crop Photo</h3>
-          <p style="font-size:12px; color:var(--muted); margin-top:2px;">Drag karke align karein, zoom ya rotate set karein</p>
+          <p style="font-size:12px; color:var(--muted); margin-top:2px;">Drag karke align karein, zoom, brightness ya rotate set karein</p>
         </div>
         <button type="button" onclick="closePhotoCropModal()" style="width:30px; height:30px; border-radius:999px; background:var(--input-bg); font-size:18px; color:var(--muted);">&times;</button>
       </div>
@@ -1778,12 +1822,17 @@
           <input id="crop-zoom-range" type="range" min="100" max="300" step="2" value="100" oninput="onCropZoomChange(this.value)" />
           <span id="crop-zoom-badge" class="crop-val-pill">100%</span>
         </div>
+        <div class="crop-slider-row">
+          <label for="crop-bright-range">Brightness</label>
+          <input id="crop-bright-range" type="range" min="60" max="150" step="2" value="100" oninput="onCropBrightnessChange(this.value)" />
+          <span id="crop-bright-badge" class="crop-val-pill">100%</span>
+        </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
           <button type="button" class="btn-soft" style="background:#FFF; height:38px;" onclick="rotateCropPhoto(90)">
             <span>Rotate 90°</span>
           </button>
           <button type="button" class="btn-soft" style="background:#FFF; height:38px;" onclick="resetCropTransform()">
-            <span>Reset Crop</span>
+            <span>Reset All</span>
           </button>
         </div>
       </div>
@@ -2276,11 +2325,25 @@
         const badge = document.getElementById('photo-uploaded-badge');
         const editBtn = document.getElementById('btn-edit-crop-photo');
 
+        const thumbBox = document.getElementById('photo-thumb-box');
+        const thumbImg = document.getElementById('photo-thumb-img');
+
         if (bYes) bYes.classList.toggle('active', show);
         if (bNo) bNo.classList.toggle('active', !show);
         if (ctrl) ctrl.classList.toggle('hidden', !show);
         if (badge) badge.classList.toggle('hidden', !hasPhoto);
         if (editBtn) editBtn.classList.toggle('hidden', !hasPhoto);
+
+        if (thumbBox && thumbImg) {
+          thumbBox.classList.toggle('hidden', !hasPhoto);
+          if (hasPhoto) {
+            thumbImg.src = state.data.photo;
+            thumbBox.classList.remove('shape-square', 'shape-rounded', 'shape-circle', 'border-none', 'border-thin', 'border-accent');
+            thumbBox.classList.add('shape-' + shape, 'border-' + border);
+          } else {
+            thumbImg.removeAttribute('src');
+          }
+        }
 
         ['square', 'rounded', 'circle'].forEach(function (s) {
           const el = document.getElementById('pshape-' + s);
@@ -2292,10 +2355,11 @@
         });
       }
 
-      /* PHOTO EDIT & CROP STUDIO */
+      /* PHOTO EDIT, BRIGHTNESS & CROP STUDIO */
       const cropState = {
         img: null,
         zoom: 1,
+        brightness: 100,
         rotation: 0,
         panX: 0,
         panY: 0,
@@ -2304,7 +2368,7 @@
         lastY: 0
       };
 
-      function drawCropCanvas() {
+      function drawCropCanvas(includeGuides) {
         const canvas = document.getElementById('crop-canvas');
         if (!canvas || !cropState.img) return;
         const ctx = canvas.getContext('2d');
@@ -2323,24 +2387,45 @@
 
         const baseScale = Math.max(cw / rotW, ch / rotH);
         const totalScale = baseScale * cropState.zoom;
+        const bVal = cropState.brightness || 100;
 
         ctx.save();
+        if ('filter' in ctx) {
+          ctx.filter = 'brightness(' + bVal + '%)';
+        }
         ctx.translate(cw / 2 + cropState.panX, ch / 2 + cropState.panY);
         ctx.rotate(rad);
         ctx.scale(totalScale, totalScale);
         ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
         ctx.restore();
 
-        ctx.save();
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-        ctx.lineWidth = 1;
-        for (let i = 1; i <= 2; i++) {
-          const gx = (cw / 3) * i;
-          const gy = (ch / 3) * i;
-          ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, ch); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(cw, gy); ctx.stroke();
+        // Pixel fallback if browser doesn't support ctx.filter
+        if (!('filter' in ctx) && bVal !== 100) {
+          try {
+            const imgData = ctx.getImageData(0, 0, cw, ch);
+            const data = imgData.data;
+            const factor = bVal / 100;
+            for (let p = 0; p < data.length; p += 4) {
+              data[p] = Math.min(255, data[p] * factor);
+              data[p + 1] = Math.min(255, data[p + 1] * factor);
+              data[p + 2] = Math.min(255, data[p + 2] * factor);
+            }
+            ctx.putImageData(imgData, 0, 0);
+          } catch (e) {}
         }
-        ctx.restore();
+
+        if (includeGuides !== false) {
+          ctx.save();
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+          ctx.lineWidth = 1;
+          for (let i = 1; i <= 2; i++) {
+            const gx = (cw / 3) * i;
+            const gy = (ch / 3) * i;
+            ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, ch); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(cw, gy); ctx.stroke();
+          }
+          ctx.restore();
+        }
       }
 
       function syncCropControlsUI() {
@@ -2349,6 +2434,12 @@
         const pct = Math.round(cropState.zoom * 100);
         if (range) range.value = String(pct);
         if (badge) badge.textContent = pct + '%';
+
+        const bRange = document.getElementById('crop-bright-range');
+        const bBadge = document.getElementById('crop-bright-badge');
+        const bPct = Math.round(cropState.brightness || 100);
+        if (bRange) bRange.value = String(bPct);
+        if (bBadge) bBadge.textContent = bPct + '%';
       }
 
       window.openPhotoCropModal = function () {
@@ -2357,21 +2448,32 @@
           toast('Pehle photo upload karein');
           return;
         }
-        const modal = document.getElementById('photo-crop-modal');
-        if (modal) modal.classList.add('open');
 
         cropState.zoom = 1;
+        cropState.brightness = 100;
         cropState.rotation = 0;
         cropState.panX = 0;
         cropState.panY = 0;
         syncCropControlsUI();
 
+        const openSmoothly = function () {
+          drawCropCanvas(true);
+          requestAnimationFrame(function () {
+            const modal = document.getElementById('photo-crop-modal');
+            if (modal) modal.classList.add('open');
+          });
+        };
+
         const im = new Image();
         im.onload = function () {
           cropState.img = im;
-          drawCropCanvas();
+          openSmoothly();
         };
         im.src = src;
+        if (im.complete && im.naturalWidth > 0) {
+          cropState.img = im;
+          openSmoothly();
+        }
       };
 
       window.closePhotoCropModal = function () {
@@ -2385,7 +2487,16 @@
         if (!isNaN(num)) {
           cropState.zoom = Math.max(1, Math.min(3, num / 100));
           syncCropControlsUI();
-          drawCropCanvas();
+          drawCropCanvas(true);
+        }
+      };
+
+      window.onCropBrightnessChange = function (val) {
+        const num = Number(val);
+        if (!isNaN(num)) {
+          cropState.brightness = Math.max(60, Math.min(150, num));
+          syncCropControlsUI();
+          drawCropCanvas(true);
         }
       };
 
@@ -2393,22 +2504,24 @@
         cropState.rotation = (cropState.rotation + (deg || 90)) % 360;
         cropState.panX = 0;
         cropState.panY = 0;
-        drawCropCanvas();
+        drawCropCanvas(true);
       };
 
       window.resetCropTransform = function () {
         cropState.zoom = 1;
+        cropState.brightness = 100;
         cropState.rotation = 0;
         cropState.panX = 0;
         cropState.panY = 0;
         syncCropControlsUI();
-        drawCropCanvas();
+        drawCropCanvas(true);
       };
 
       window.applyCroppedPhoto = function () {
         const canvas = document.getElementById('crop-canvas');
         if (!canvas || !cropState.img) return;
-        drawCropCanvas();
+        // Draw clean final image without grid guide lines
+        drawCropCanvas(false);
         try {
           state.data.photo = canvas.toDataURL('image/jpeg', 0.92);
           state.data.showPhoto = true;
@@ -2416,9 +2529,9 @@
           renderPreview();
           save();
           closePhotoCropModal();
-          toast('Photo cropped & updated');
+          toast('Photo updated');
         } catch (e) {
-          toast('Could not crop photo');
+          toast('Could not update photo');
         }
       };
 

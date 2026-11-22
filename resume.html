@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Smart CV &amp; Cover Letter Studio | BikriPage</title>
+  <title>Smart CV &amp; Cover Letter Studio | BikriPage</title>
   <!-- Firebase SDKs (BikriPage Connected) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -151,6 +151,215 @@
     }
     .btn-danger { font-size: 11.5px; font-weight: 600; color: var(--ios-red); padding: 4px 8px; border-radius: 999px; }
     .btn-muted { font-size: 11.5px; font-weight: 600; color: var(--muted); padding: 4px 8px; border-radius: 999px; }
+
+    /* PHOTO UPLOADED BADGE & CROPPER */
+    .photo-status-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+    }
+    .photo-label-group {
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .photo-uploaded-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 10.5px; font-weight: 750;
+      color: #15803D; background: #DCFCE7;
+      border: 1px solid #BBF7D0;
+      padding: 2px 8px; border-radius: 999px;
+      line-height: 1.2;
+    }
+    .photo-action-btns {
+      display: inline-flex; align-items: center; gap: 5px; flex-wrap: wrap;
+    }
+    .btn-photo-edit {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(0, 122, 255, 0.11); color: var(--ios-blue);
+      border: 1px solid rgba(0, 122, 255, 0.22);
+      font-size: 11.5px; font-weight: 650;
+      padding: 5px 10px; border-radius: 10px;
+    }
+    .btn-photo-edit:active { transform: scale(0.96); background: rgba(0, 122, 255, 0.18); }
+
+    .crop-stage-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 280px;
+      aspect-ratio: 104 / 124;
+      margin: 0 auto;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #111827;
+      border: 2px solid var(--border);
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: grab;
+    }
+    .crop-stage-wrap:active { cursor: grabbing; }
+    .crop-stage-wrap canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .crop-controls-box {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 11px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .crop-slider-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .crop-slider-row label {
+      font-size: 12px;
+      font-weight: 650;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    .crop-slider-row input[type="range"] {
+      flex: 1;
+      accent-color: var(--ios-blue);
+      cursor: pointer;
+    }
+    .crop-val-pill {
+      font-size: 11px;
+      font-weight: 750;
+      color: var(--ios-blue);
+      background: rgba(0, 122, 255, 0.11);
+      padding: 2px 7px;
+      border-radius: 999px;
+      min-width: 44px;
+      text-align: center;
+    }
+
+    /* MINIMALIST APPLE iOS COMPLETION PROGRESS BAR */
+    .cv-progress-card {
+      background: rgba(118, 118, 128, 0.07);
+      border: 0.5px solid rgba(0, 0, 0, 0.06);
+      border-radius: 13px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      transition:
+        background-color 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .cv-progress-card.complete {
+      background: rgba(52, 199, 89, 0.10);
+      border-color: rgba(52, 199, 89, 0.26);
+      animation: iosCompleteSpring 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @keyframes iosCompleteSpring {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.014); }
+      100% { transform: scale(1); }
+    }
+    .cv-prog-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .cv-prog-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12.5px;
+      font-weight: 650;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      transition: color 0.35s ease;
+    }
+    .cv-progress-card.complete .cv-prog-status {
+      color: #1B7A37;
+    }
+    .cv-prog-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(0, 122, 255, 0.12);
+      color: var(--ios-blue);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition:
+        background-color 0.38s ease,
+        color 0.38s ease,
+        transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .cv-progress-card.complete .cv-prog-icon {
+      background: var(--ios-green);
+      color: #FFFFFF;
+      transform: scale(1.06) rotate(360deg);
+    }
+    .cv-prog-pct {
+      font-size: 12px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.01em;
+      color: var(--muted);
+      transition: color 0.35s ease;
+      white-space: nowrap;
+    }
+    .cv-progress-card.complete .cv-prog-pct {
+      color: #1B7A37;
+      font-weight: 750;
+    }
+    .cv-prog-track {
+      width: 100%;
+      height: 5px;
+      background: rgba(118, 118, 128, 0.16);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+    .cv-prog-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: var(--ios-blue);
+      transition:
+        width 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+        background-color 0.42s ease;
+      position: relative;
+      overflow: hidden;
+      will-change: width;
+    }
+    .cv-progress-card.complete .cv-prog-fill {
+      background: var(--ios-green);
+    }
+    .cv-prog-fill::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.42) 50%, transparent 100%);
+      transform: translateX(-100%);
+      animation: iosGentleSheen 2.8s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes iosGentleSheen {
+      0%   { transform: translateX(-100%); }
+      55%, 100% { transform: translateX(100%); }
+    }
+    .cv-prog-sub {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      line-height: 1.35;
+      letter-spacing: -0.005em;
+      transition: color 0.35s ease, opacity 0.25s ease;
+    }
+    .cv-progress-card.complete .cv-prog-sub {
+      color: #248A3D;
+      font-weight: 600;
+    }
 
     /* ACCORDIONS */
     .acc-card {
@@ -851,7 +1060,6 @@
     .ios-alert-btn.danger { color: var(--ios-red); font-weight: 700; }
 
     /* SHARE BUTTON & QR POSTER MODAL */
-
     .btn-support-icon {
       width: 36px; height: 36px; border-radius: 11px;
       background: rgba(52, 199, 89, 0.12); color: #15803D;
@@ -915,7 +1123,6 @@
     }
     .share-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
-    
     /* PHOTO SHAPE & BORDER VARIANTS */
     .photo-frame.shape-square { border-radius: 3px; }
     .photo-frame.shape-rounded { border-radius: 12px; }
@@ -985,7 +1192,6 @@
       flex-direction: column;
       gap: 10px;
     }
-
 
     /* ============================================================
        SMOOTH iOS SPRING ANIMATIONS & GPU ACCELERATION
@@ -1208,6 +1414,25 @@
           <button id="edit-mode-cv" type="button" class="seg-btn active" onclick="setEditTab('cv')">CV (8 Sections)</button>
           <button id="edit-mode-cl" type="button" class="seg-btn" onclick="setEditTab('cl')">Covering Letter</button>
         </div>
+
+        <!-- LIVE SMOOTH PROGRESS BAR -->
+        <div id="cv-progress-card" class="cv-progress-card" aria-live="polite">
+          <div class="cv-prog-top">
+            <div class="cv-prog-status">
+              <span id="cv-prog-icon" class="cv-prog-icon">
+                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2" />
+                </svg>
+              </span>
+              <span id="cv-prog-title">0/8 Sections Complete</span>
+            </div>
+            <span id="cv-prog-pct" class="cv-prog-pct">0%</span>
+          </div>
+          <div class="cv-prog-track">
+            <div id="cv-prog-fill" class="cv-prog-fill"></div>
+          </div>
+          <div id="cv-prog-sub" class="cv-prog-sub">Checking sections...</div>
+        </div>
       </div>
 
       <!-- CV EDITOR SECTIONS -->
@@ -1239,11 +1464,20 @@
                 </div>
               </div>
               <div id="photo-upload-controls" style="display:flex; flex-direction:column; gap:8px; padding-top:7px; border-top:1px solid rgba(0,0,0,0.06);">
-                <div style="display:flex; align-items:center; justify-content:space-between;">
-                  <span style="font-size:11.5px; font-weight:600; color:var(--muted);">Passport Photo</span>
-                  <div style="display:flex; gap:6px;">
+                <div class="photo-status-row">
+                  <div class="photo-label-group">
+                    <span style="font-size:11.5px; font-weight:600; color:var(--muted);">Passport Photo</span>
+                    <span id="photo-uploaded-badge" class="photo-uploaded-badge hidden">
+                      <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.6" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Uploaded</span>
+                    </span>
+                  </div>
+                  <div class="photo-action-btns">
                     <input id="photo-input" type="file" accept="image/*" class="hidden" onchange="uploadPhoto(event)" />
-                    <button type="button" class="btn-soft" style="background:#FFF; padding:5px 11px;" onclick="document.getElementById('photo-input').click()">Upload</button>
+                    <button type="button" class="btn-soft" style="background:#FFF; padding:5px 10px;" onclick="document.getElementById('photo-input').click()">Upload</button>
+                    <button id="btn-edit-crop-photo" type="button" class="btn-photo-edit hidden" onclick="openPhotoCropModal()">Edit &amp; Crop</button>
                     <button type="button" class="btn-danger" onclick="clearPhoto()">Remove</button>
                   </div>
                 </div>
@@ -1483,6 +1717,45 @@
 
     </section>
   </main>
+
+  <!-- PHOTO EDIT & CROP MODAL -->
+  <div id="photo-crop-modal" class="pay-backdrop no-print" onclick="if(event.target===this) closePhotoCropModal()">
+    <div class="ai-modal-sheet" role="dialog" aria-modal="true" aria-label="Edit &amp; Crop Photo">
+      <div class="pay-handle"></div>
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
+        <div>
+          <h3 style="font-size:17px; font-weight:800; letter-spacing:-0.02em;">Edit &amp; Crop Photo</h3>
+          <p style="font-size:12px; color:var(--muted); margin-top:2px;">Drag karke align karein, zoom ya rotate set karein</p>
+        </div>
+        <button type="button" onclick="closePhotoCropModal()" style="width:30px; height:30px; border-radius:999px; background:var(--input-bg); font-size:18px; color:var(--muted);">&times;</button>
+      </div>
+
+      <div class="crop-stage-wrap" id="crop-stage-wrap">
+        <canvas id="crop-canvas" width="312" height="372"></canvas>
+      </div>
+
+      <div class="crop-controls-box">
+        <div class="crop-slider-row">
+          <label for="crop-zoom-range">Zoom</label>
+          <input id="crop-zoom-range" type="range" min="100" max="300" step="2" value="100" oninput="onCropZoomChange(this.value)" />
+          <span id="crop-zoom-badge" class="crop-val-pill">100%</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <button type="button" class="btn-soft" style="background:#FFF; height:38px;" onclick="rotateCropPhoto(90)">
+            <span>Rotate 90°</span>
+          </button>
+          <button type="button" class="btn-soft" style="background:#FFF; height:38px;" onclick="resetCropTransform()">
+            <span>Reset Crop</span>
+          </button>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1.35fr; gap:8px;">
+        <button type="button" class="btn-soft" style="height:44px;" onclick="closePhotoCropModal()">Cancel</button>
+        <button type="button" class="btn-primary" style="height:44px; font-size:13.5px;" onclick="applyCroppedPhoto()">Apply Crop</button>
+      </div>
+    </div>
+  </div>
 
   <!-- SUPPORT MODAL (INSTAGRAM & GMAIL) -->
   <div id="support-modal" class="pay-backdrop no-print" onclick="if(event.target===this) closeSupportModal()">
@@ -1957,12 +2230,19 @@
         const show = state.data.showPhoto !== false;
         const shape = state.data.photoShape || 'square';
         const border = state.data.photoBorder || 'thin';
+        const hasPhoto = Boolean(state.data.photo && String(state.data.photo).trim());
+
         const bYes = document.getElementById('photo-yes');
         const bNo = document.getElementById('photo-no');
         const ctrl = document.getElementById('photo-upload-controls');
+        const badge = document.getElementById('photo-uploaded-badge');
+        const editBtn = document.getElementById('btn-edit-crop-photo');
+
         if (bYes) bYes.classList.toggle('active', show);
         if (bNo) bNo.classList.toggle('active', !show);
         if (ctrl) ctrl.classList.toggle('hidden', !show);
+        if (badge) badge.classList.toggle('hidden', !hasPhoto);
+        if (editBtn) editBtn.classList.toggle('hidden', !hasPhoto);
 
         ['square', 'rounded', 'circle'].forEach(function (s) {
           const el = document.getElementById('pshape-' + s);
@@ -1972,6 +2252,170 @@
           const el = document.getElementById('pborder-' + b);
           if (el) el.classList.toggle('active', b === border);
         });
+      }
+
+      /* PHOTO EDIT & CROP STUDIO */
+      const cropState = {
+        img: null,
+        zoom: 1,
+        rotation: 0,
+        panX: 0,
+        panY: 0,
+        dragging: false,
+        lastX: 0,
+        lastY: 0
+      };
+
+      function drawCropCanvas() {
+        const canvas = document.getElementById('crop-canvas');
+        if (!canvas || !cropState.img) return;
+        const ctx = canvas.getContext('2d');
+        const cw = canvas.width;
+        const ch = canvas.height;
+        ctx.clearRect(0, 0, cw, ch);
+        ctx.fillStyle = '#111827';
+        ctx.fillRect(0, 0, cw, ch);
+
+        const img = cropState.img;
+        const rad = (cropState.rotation % 360) * Math.PI / 180;
+        const cos = Math.abs(Math.cos(rad));
+        const sin = Math.abs(Math.sin(rad));
+        const rotW = img.naturalWidth * cos + img.naturalHeight * sin;
+        const rotH = img.naturalWidth * sin + img.naturalHeight * cos;
+
+        const baseScale = Math.max(cw / rotW, ch / rotH);
+        const totalScale = baseScale * cropState.zoom;
+
+        ctx.save();
+        ctx.translate(cw / 2 + cropState.panX, ch / 2 + cropState.panY);
+        ctx.rotate(rad);
+        ctx.scale(totalScale, totalScale);
+        ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
+        ctx.restore();
+
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+        ctx.lineWidth = 1;
+        for (let i = 1; i <= 2; i++) {
+          const gx = (cw / 3) * i;
+          const gy = (ch / 3) * i;
+          ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, ch); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(cw, gy); ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function syncCropControlsUI() {
+        const range = document.getElementById('crop-zoom-range');
+        const badge = document.getElementById('crop-zoom-badge');
+        const pct = Math.round(cropState.zoom * 100);
+        if (range) range.value = String(pct);
+        if (badge) badge.textContent = pct + '%';
+      }
+
+      window.openPhotoCropModal = function () {
+        const src = state.data.photo;
+        if (!src) {
+          toast('Pehle photo upload karein');
+          return;
+        }
+        const modal = document.getElementById('photo-crop-modal');
+        if (modal) modal.classList.add('open');
+
+        cropState.zoom = 1;
+        cropState.rotation = 0;
+        cropState.panX = 0;
+        cropState.panY = 0;
+        syncCropControlsUI();
+
+        const im = new Image();
+        im.onload = function () {
+          cropState.img = im;
+          drawCropCanvas();
+        };
+        im.src = src;
+      };
+
+      window.closePhotoCropModal = function () {
+        cropState.dragging = false;
+        const modal = document.getElementById('photo-crop-modal');
+        if (modal) modal.classList.remove('open');
+      };
+
+      window.onCropZoomChange = function (val) {
+        const num = Number(val);
+        if (!isNaN(num)) {
+          cropState.zoom = Math.max(1, Math.min(3, num / 100));
+          syncCropControlsUI();
+          drawCropCanvas();
+        }
+      };
+
+      window.rotateCropPhoto = function (deg) {
+        cropState.rotation = (cropState.rotation + (deg || 90)) % 360;
+        cropState.panX = 0;
+        cropState.panY = 0;
+        drawCropCanvas();
+      };
+
+      window.resetCropTransform = function () {
+        cropState.zoom = 1;
+        cropState.rotation = 0;
+        cropState.panX = 0;
+        cropState.panY = 0;
+        syncCropControlsUI();
+        drawCropCanvas();
+      };
+
+      window.applyCroppedPhoto = function () {
+        const canvas = document.getElementById('crop-canvas');
+        if (!canvas || !cropState.img) return;
+        drawCropCanvas();
+        try {
+          state.data.photo = canvas.toDataURL('image/jpeg', 0.92);
+          state.data.showPhoto = true;
+          syncPhotoToggleUI();
+          renderPreview();
+          save();
+          closePhotoCropModal();
+          toast('Photo cropped & updated');
+        } catch (e) {
+          toast('Could not crop photo');
+        }
+      };
+
+      function bindCropPointerEvents() {
+        const wrap = document.getElementById('crop-stage-wrap');
+        if (!wrap) return;
+
+        wrap.addEventListener('pointerdown', function (e) {
+          if (!cropState.img) return;
+          cropState.dragging = true;
+          cropState.lastX = e.clientX;
+          cropState.lastY = e.clientY;
+          try { wrap.setPointerCapture(e.pointerId); } catch (err) {}
+        });
+
+        wrap.addEventListener('pointermove', function (e) {
+          if (!cropState.dragging) return;
+          const dx = e.clientX - cropState.lastX;
+          const dy = e.clientY - cropState.lastY;
+          cropState.lastX = e.clientX;
+          cropState.lastY = e.clientY;
+          cropState.panX += dx;
+          cropState.panY += dy;
+          drawCropCanvas();
+        });
+
+        function stopDrag(e) {
+          if (!cropState.dragging) return;
+          cropState.dragging = false;
+          if (e && e.pointerId !== undefined) {
+            try { wrap.releasePointerCapture(e.pointerId); } catch (err) {}
+          }
+        }
+        wrap.addEventListener('pointerup', stopDrag);
+        wrap.addEventListener('pointercancel', stopDrag);
       }
 
       window.setPhotoShape = function (shape) {
@@ -2024,7 +2468,6 @@
         syncStateFromLiveDOM();
         const d = state.data;
         const facts = {};
-        // Only personal/factual fields that ChatGPT cannot guess on its own
         const personalKeys = ['name', 'phone', 'email', 'dob', 'gender', 'nationality', 'address', 'languages', 'declDate', 'declPlace'];
         personalKeys.forEach(function (k) {
           if (d[k] && String(d[k]).trim()) {
@@ -2204,7 +2647,6 @@
 
         const d = state.data;
 
-        // Preserve existing form fields if ChatGPT returned empty strings
         const strFields = ['name', 'address', 'phone', 'email', 'dob', 'gender', 'nationality', 'languages', 'objective', 'fresherNote', 'hobbies', 'interest', 'strengths', 'declaration', 'declDate', 'declPlace', 'signature'];
         strFields.forEach(function (k) {
           if (typeof parsed[k] === 'string') {
@@ -2317,6 +2759,7 @@
         document.getElementById('edit-mode-cl').classList.toggle('active', t === 'cl');
         document.getElementById('cv-editor-group').classList.toggle('hidden', t !== 'cv');
         document.getElementById('cl-editor-group').classList.toggle('hidden', t !== 'cl');
+        updateProgressBar();
       };
 
       window.toggleAcc = function (id) {
@@ -2432,7 +2875,6 @@
           needsCompact = true;
         }
 
-        // Restore previous visual state
         sheet.classList.remove('measuring-natural');
         if (prevCompact) sheet.classList.add('auto-fit-compact');
         else sheet.classList.remove('auto-fit-compact');
@@ -2462,7 +2904,7 @@
       }
 
       function applyFontSizeChange(rawScale, fromSlider) {
-        let target = Math.round(rawScale * 20) / 20; // snap to 0.05 steps
+        let target = Math.round(rawScale * 20) / 20;
         const current = Math.round((state.fontScale || 1) * 20) / 20;
 
         if (target < FONT_SCALE_MIN) {
@@ -2480,12 +2922,9 @@
           return;
         }
 
-        // Default 100% (<= 1.0) is always allowed so user can freely return from 75%-95% back to 100%.
-        // Above 100% (> 1.0), strictly verify that content fits inside 1 A4 page on current layout.
         if (target > 1.0 && target > current) {
           if (!canScaleFitAllSheets(target)) {
             if (fromSlider) {
-              // On slider drag, step down to the highest size that still fits 1 page
               let best = Math.max(1.0, current);
               for (let s = Math.round((target - 0.05) * 20) / 20; s > best; s = Math.round((s - 0.05) * 20) / 20) {
                 if (canScaleFitAllSheets(s)) {
@@ -2570,12 +3009,17 @@
         r.onload = function () {
           state.data.photo = String(r.result || '');
           state.data.showPhoto = true;
+          e.target.value = '';
           syncPhotoToggleUI();
           renderPreview(); save(); toast('Photo uploaded');
         };
         r.readAsDataURL(file);
       };
-      window.clearPhoto = function () { state.data.photo = ''; renderPreview(); save(); toast('Photo removed'); };
+      window.clearPhoto = function () {
+        state.data.photo = '';
+        syncPhotoToggleUI();
+        renderPreview(); save(); toast('Photo removed');
+      };
 
       /* EDUCATION TABLE EDITOR */
       function renderEduEditor() {
@@ -2824,7 +3268,6 @@
               billing.unlocked[tier] = true;
             }
 
-            // Log payment in Firebase (non-blocking)
             if (db) {
               db.collection('resume_payments').add({
                 shopId: billing.shopId || 'guest',
@@ -2878,7 +3321,6 @@
               };
               window.addEventListener('afterprint', doLock);
               window.print();
-              // Fallback for mobile browsers that do not fire afterprint reliably
               setTimeout(doLock, 1200);
             } else {
               window.print();
@@ -2886,7 +3328,6 @@
           });
         };
 
-        // Web fonts can change line wrapping; measure only after they settle.
         if (document.fonts && document.fonts.ready) {
           document.fonts.ready.then(startPrint).catch(startPrint);
         } else {
@@ -2960,7 +3401,6 @@
         c.width = W; c.height = H;
         const ctx = c.getContext('2d');
 
-        // 1. Clean Light-iOS BikriPage Pearl Background
         const bgGrad = ctx.createLinearGradient(0, 0, W, H);
         bgGrad.addColorStop(0, '#F8FAFF');
         bgGrad.addColorStop(0.5, '#FFFFFF');
@@ -2968,7 +3408,6 @@
         ctx.fillStyle = bgGrad;
         ctx.fillRect(0, 0, W, H);
 
-        // Soft Pastel Ambient Glows (matching BikriPage website)
         const g1 = ctx.createRadialGradient(90, 90, 10, 90, 90, 300);
         g1.addColorStop(0, 'rgba(59, 130, 246, 0.16)');
         g1.addColorStop(1, 'rgba(59, 130, 246, 0)');
@@ -2981,7 +3420,6 @@
         ctx.fillStyle = g2;
         ctx.fillRect(0, 0, W, H);
 
-        // Subtle Dot Grid Pattern (from BikriPage index.html)
         ctx.fillStyle = 'rgba(148, 163, 184, 0.22)';
         for (let gx = 24; gx < W; gx += 32) {
           for (let gy = 24; gy < H; gy += 32) {
@@ -2991,7 +3429,6 @@
           }
         }
 
-        // Top Vibrant Accent Ribbon
         const topBar = ctx.createLinearGradient(0, 0, W, 0);
         topBar.addColorStop(0, '#2563EB');
         topBar.addColorStop(0.5, '#4F46E5');
@@ -2999,7 +3436,6 @@
         ctx.fillStyle = topBar;
         ctx.fillRect(0, 0, W, 12);
 
-        // 2. BikriPage 3D Brand Badge + Dark Crisp Title
         const bx = 224, by = 58, bs = 52;
         const badgeGrad = ctx.createLinearGradient(bx, by, bx + bs, by + bs);
         badgeGrad.addColorStop(0, '#3B82F6');
@@ -3020,7 +3456,6 @@
         ctx.font = '900 34px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
         ctx.fillText('BikriPage', bx + bs + 14, by + bs / 2 + 2);
 
-        // 3. Headline
         ctx.textAlign = 'center';
         rrect(ctx, W / 2 - 156, 134, 312, 32, 16);
         ctx.fillStyle = '#EFF6FF';
@@ -3036,7 +3471,6 @@
         ctx.font = '800 31px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
         ctx.fillText('2 Minute Me Resume Banayein', W / 2, 206);
 
-        // 4. Elevated White QR Card with Soft Shadow
         const cardX = 118, cardY = 246, cardW = 484, cardH = 492;
         ctx.save();
         ctx.shadowColor = 'rgba(15, 23, 42, 0.10)';
@@ -3052,27 +3486,20 @@
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Corner Scanner Brackets inside White Card
         const qx = W / 2 - 170, qy = cardY + 46, qs = 340, br = 28;
         ctx.strokeStyle = '#2563EB';
         ctx.lineWidth = 5;
         ctx.lineCap = 'round';
-        // Top-Left
         ctx.beginPath(); ctx.moveTo(qx - 14, qy + br); ctx.lineTo(qx - 14, qy - 14); ctx.lineTo(qx + br, qy - 14); ctx.stroke();
-        // Top-Right
         ctx.beginPath(); ctx.moveTo(qx + qs - br, qy - 14); ctx.lineTo(qx + qs + 14, qy - 14); ctx.lineTo(qx + qs + 14, qy + br); ctx.stroke();
-        // Bottom-Left
         ctx.beginPath(); ctx.moveTo(qx - 14, qy + qs - br); ctx.lineTo(qx - 14, qy + qs + 14); ctx.lineTo(qx + br, qy + qs + 14); ctx.stroke();
-        // Bottom-Right
         ctx.beginPath(); ctx.moveTo(qx + qs - br, qy + qs + 14); ctx.lineTo(qx + qs + 14, qy + qs + 14); ctx.lineTo(qx + qs + 14, qy + qs - br); ctx.stroke();
 
-        // Draw QR Code
         const qrSrc = await generateQrCanvas(url);
         if (qrSrc) {
           ctx.drawImage(qrSrc, qx, qy, qs, qs);
         }
 
-        // Scan CTA Pill inside Card
         rrect(ctx, W / 2 - 140, cardY + 418, 280, 44, 22);
         const ctaGrad = ctx.createLinearGradient(W / 2 - 140, 0, W / 2 + 140, 0);
         ctaGrad.addColorStop(0, '#2563EB');
@@ -3083,7 +3510,6 @@
         ctx.font = '800 17px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
         ctx.fillText('SCAN TO CREATE CV', W / 2, cardY + 441);
 
-        // 5. Feature Chips Row
         const pills = ['20 Layouts', 'Custom Colors', 'Instant A4 PDF'];
         const pW = 172, pGap = 14;
         const startX = (W - (pW * 3 + pGap * 2)) / 2;
@@ -3100,7 +3526,6 @@
           ctx.fillText(label, px + pW / 2, 797);
         });
 
-        // 6. Clean Dark Footer Strip
         rrect(ctx, 48, 852, W - 96, 74, 20);
         ctx.fillStyle = '#0F172A';
         ctx.fill();
@@ -3432,7 +3857,6 @@
             '</div>' +
           '</div>';
         }
-
 
         if (state.layout === 'nordic') {
           return '<div class="lay-nordic">' +
@@ -3857,6 +4281,128 @@
         el.style.setProperty('--fs-scale', String(state.fontScale || 1));
       }
 
+      /* LIVE COMPLETION PROGRESS BAR ENGINE */
+      function isStrFilled(v) {
+        return Boolean(v && String(v).trim().length > 0);
+      }
+
+      function computeCompletionState() {
+        const d = state.data;
+        const activeMode = state.editTab === 'cl' ? 'cl' : 'cv';
+
+        if (activeMode === 'cl') {
+          const cl = d.coverLetter || {};
+          const items = [
+            { label: 'Your Name & Contact', done: isStrFilled(d.name) && isStrFilled(d.phone) && isStrFilled(d.email) && isStrFilled(d.address) },
+            { label: 'Recipient (To)', done: isStrFilled(cl.to) },
+            { label: 'Subject & Salutation', done: isStrFilled(cl.subject) && isStrFilled(cl.salutation) },
+            { label: 'Opening Paragraph', done: isStrFilled(cl.p1) },
+            { label: 'Skills & Qualification Para', done: isStrFilled(cl.p2) },
+            { label: 'Interview Request & Closing', done: isStrFilled(cl.p3) && isStrFilled(cl.closing) },
+            { label: 'Sign-off & Enclosure', done: isStrFilled(cl.signoff) && isStrFilled(cl.enclosure) }
+          ];
+          const doneCount = items.filter(function (x) { return x.done; }).length;
+          const total = items.length;
+          const missing = items.filter(function (x) { return !x.done; }).map(function (x) { return x.label; });
+          return {
+            mode: 'cl',
+            doneCount: doneCount,
+            total: total,
+            pct: Math.round((doneCount / total) * 100),
+            missing: missing
+          };
+        }
+
+        // CV (All 8 Sections — nothing left blank)
+        const s1Personal = isStrFilled(d.name) && isStrFilled(d.phone) && isStrFilled(d.email) &&
+          isStrFilled(d.dob) && isStrFilled(d.gender) && isStrFilled(d.nationality) &&
+          isStrFilled(d.address) && isStrFilled(d.languages) &&
+          (d.showPhoto === false || isStrFilled(d.photo));
+
+        const s2Objective = isStrFilled(d.objective);
+
+        const validEdu = (d.education || []).filter(function (r) {
+          return r && isStrFilled(r.qual) && isStrFilled(r.board) && isStrFilled(r.year) && isStrFilled(r.pct);
+        });
+        const s3Education = validEdu.length > 0;
+
+        const validSkills = (d.skills || []).filter(function (s) { return isStrFilled(s); });
+        const s4Skills = validSkills.length > 0;
+
+        let s5Experience = false;
+        if (d.isFresher) {
+          s5Experience = isStrFilled(d.fresherNote);
+        } else {
+          const validExp = (d.experience || []).filter(function (e) {
+            return e && isStrFilled(e.role) && isStrFilled(e.company) && isStrFilled(e.duration) &&
+              Array.isArray(e.bullets) && e.bullets.some(function (b) { return isStrFilled(b); });
+          });
+          s5Experience = validExp.length > 0;
+        }
+
+        const validAch = (d.achievements || []).filter(function (a) { return isStrFilled(a); });
+        const s6Achievements = validAch.length > 0;
+
+        const s7Interests = isStrFilled(d.hobbies) && isStrFilled(d.interest) && isStrFilled(d.strengths);
+
+        const s8Declaration = isStrFilled(d.declaration) && isStrFilled(d.declDate) &&
+          isStrFilled(d.declPlace) && isStrFilled(d.signature);
+
+        const sections = [
+          { label: '1. Personal Details' + (d.showPhoto !== false && !isStrFilled(d.photo) ? ' & Photo' : ''), done: s1Personal },
+          { label: '2. Career Objective', done: s2Objective },
+          { label: '3. Education', done: s3Education },
+          { label: '4. Skills', done: s4Skills },
+          { label: '5. Experience', done: s5Experience },
+          { label: '6. Achievements', done: s6Achievements },
+          { label: '7. Hobbies & Strengths', done: s7Interests },
+          { label: '8. Declaration & Sign', done: s8Declaration }
+        ];
+
+        const doneCount = sections.filter(function (x) { return x.done; }).length;
+        const total = sections.length;
+        const missing = sections.filter(function (x) { return !x.done; }).map(function (x) { return x.label; });
+
+        return {
+          mode: 'cv',
+          doneCount: doneCount,
+          total: total,
+          pct: Math.round((doneCount / total) * 100),
+          missing: missing
+        };
+      }
+
+      function updateProgressBar() {
+        const card = document.getElementById('cv-progress-card');
+        const titleEl = document.getElementById('cv-prog-title');
+        const pctEl = document.getElementById('cv-prog-pct');
+        const fillEl = document.getElementById('cv-prog-fill');
+        const subEl = document.getElementById('cv-prog-sub');
+        const iconEl = document.getElementById('cv-prog-icon');
+        if (!card || !titleEl || !pctEl || !fillEl || !subEl || !iconEl) return;
+
+        const info = computeCompletionState();
+        const isComplete = info.doneCount === info.total;
+
+        card.classList.toggle('complete', isComplete);
+        fillEl.style.width = info.pct + '%';
+        pctEl.textContent = info.pct + '%';
+
+        if (isComplete) {
+          titleEl.textContent = 'Perfect — Ready to Export';
+          iconEl.innerHTML = '<svg width="10.5" height="10.5" fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>';
+          subEl.textContent = info.mode === 'cl'
+            ? 'All covering letter sections filled'
+            : 'All 8 sections filled — ready for A4 PDF';
+        } else {
+          const unit = info.mode === 'cl' ? 'Parts' : 'Sections';
+          titleEl.textContent = info.doneCount + ' of ' + info.total + ' ' + unit;
+          iconEl.innerHTML = '<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="3.2" fill="currentColor"/></svg>';
+          const previewMissing = info.missing.slice(0, 2).join(' · ') + (info.missing.length > 2 ? ' +' + (info.missing.length - 2) : '');
+          subEl.textContent = 'Remaining: ' + previewMissing;
+        }
+      }
+
       function renderPreview() {
         const outer = document.getElementById('preview-scale-outer');
         outer.innerHTML = '';
@@ -3875,15 +4421,13 @@
           box.appendChild(sheet);
           outer.appendChild(box);
         });
+        updateProgressBar();
         requestAnimationFrame(function () {
           fitAllSheetsToA4();
           scaleAllSheets();
         });
       }
 
-      // Fit each CV / letter independently so the document can never spill
-      // onto another printed page. Uses natural height measurement (ignoring
-      // layout min-height) and auto-clamps enlarged fontScale when switching layouts.
       function fitAllSheetsToA4() {
         const outer = document.getElementById('preview-scale-outer');
         if (!outer) return;
@@ -3891,8 +4435,6 @@
         const visibleSheets = sheets.filter(function (s) { return s.getClientRects().length > 0; });
         if (!visibleSheets.length) return;
 
-        // If user had enlarged fontScale (> 1.0) and switched layout/font or added text
-        // so it no longer fits 1 page, step down fontScale automatically until it fits (min 1.0).
         let adjusted = false;
         while ((state.fontScale || 1) > 1.0) {
           let allFit = true;
@@ -3988,6 +4530,7 @@
           if (pIn) pIn.value = THEMES[state.theme].primary;
           if (sIn) sIn.value = THEMES[state.theme].secondary;
         }
+        bindCropPointerEvents();
         renderSwatches();
         syncForm();
         setDocMode(state.docMode);

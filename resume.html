@@ -360,6 +360,44 @@
       color: #248A3D;
       font-weight: 600;
     }
+    .cv-progress-card.clickable {
+      cursor: pointer;
+    }
+    .cv-progress-card.clickable:active {
+      transform: scale(0.985);
+      background: rgba(0, 122, 255, 0.08);
+    }
+    .cv-prog-jump-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      color: var(--ios-blue);
+      font-weight: 650;
+      margin-left: 4px;
+    }
+
+    /* ULTRA-CLEAN MINIMALIST APPLE iOS FIELD HIGHLIGHT */
+    @keyframes iosMinimalFocusGlow {
+      0% {
+        background-color: #FFFFFF;
+        border-color: rgba(0, 122, 255, 0.72);
+        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.14);
+      }
+      65% {
+        background-color: #FFFFFF;
+        border-color: rgba(0, 122, 255, 0.55);
+        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.10);
+      }
+      100% {
+        background-color: var(--input-bg);
+        border-color: transparent;
+        box-shadow: 0 0 0 0 rgba(0, 122, 255, 0);
+      }
+    }
+    .ios-field-highlight {
+      animation: iosMinimalFocusGlow 2.1s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+      transition: none !important;
+    }
 
     /* ACCORDIONS */
     .acc-card {
@@ -1416,7 +1454,7 @@
         </div>
 
         <!-- LIVE SMOOTH PROGRESS BAR -->
-        <div id="cv-progress-card" class="cv-progress-card" aria-live="polite">
+        <div id="cv-progress-card" class="cv-progress-card clickable" role="button" tabindex="0" onclick="jumpToNextMissing()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();jumpToNextMissing();}" aria-live="polite">
           <div class="cv-prog-top">
             <div class="cv-prog-status">
               <span id="cv-prog-icon" class="cv-prog-icon">
@@ -4281,9 +4319,27 @@
         el.style.setProperty('--fs-scale', String(state.fontScale || 1));
       }
 
-      /* LIVE COMPLETION PROGRESS BAR ENGINE */
+      /* LIVE COMPLETION PROGRESS BAR & SMART REDIRECT ENGINE */
       function isStrFilled(v) {
         return Boolean(v && String(v).trim().length > 0);
+      }
+
+      function findFirstMissingPersonalTarget(d) {
+        const checks = [
+          { ok: isStrFilled(d.name), id: 'f-name' },
+          { ok: isStrFilled(d.phone), id: 'f-phone' },
+          { ok: isStrFilled(d.email), id: 'f-email' },
+          { ok: isStrFilled(d.dob), id: 'f-dob' },
+          { ok: isStrFilled(d.gender), id: 'f-gender' },
+          { ok: isStrFilled(d.nationality), id: 'f-nationality' },
+          { ok: isStrFilled(d.address), id: 'f-address' },
+          { ok: isStrFilled(d.languages), id: 'f-languages' },
+          { ok: (d.showPhoto === false || isStrFilled(d.photo)), id: 'photo-upload-controls' }
+        ];
+        for (let i = 0; i < checks.length; i++) {
+          if (!checks[i].ok) return checks[i].id;
+        }
+        return 'f-name';
       }
 
       function computeCompletionState() {
@@ -4293,23 +4349,30 @@
         if (activeMode === 'cl') {
           const cl = d.coverLetter || {};
           const items = [
-            { label: 'Your Name & Contact', done: isStrFilled(d.name) && isStrFilled(d.phone) && isStrFilled(d.email) && isStrFilled(d.address) },
-            { label: 'Recipient (To)', done: isStrFilled(cl.to) },
-            { label: 'Subject & Salutation', done: isStrFilled(cl.subject) && isStrFilled(cl.salutation) },
-            { label: 'Opening Paragraph', done: isStrFilled(cl.p1) },
-            { label: 'Skills & Qualification Para', done: isStrFilled(cl.p2) },
-            { label: 'Interview Request & Closing', done: isStrFilled(cl.p3) && isStrFilled(cl.closing) },
-            { label: 'Sign-off & Enclosure', done: isStrFilled(cl.signoff) && isStrFilled(cl.enclosure) }
+            {
+              label: 'Your Name & Contact',
+              done: isStrFilled(d.name) && isStrFilled(d.phone) && isStrFilled(d.email) && isStrFilled(d.address),
+              switchToCv: true,
+              accId: 'acc-1',
+              targetId: !isStrFilled(d.name) ? 'f-name' : (!isStrFilled(d.phone) ? 'f-phone' : (!isStrFilled(d.email) ? 'f-email' : 'f-address'))
+            },
+            { label: 'Recipient (To)', done: isStrFilled(cl.to), targetId: 'cl-to' },
+            { label: 'Subject & Salutation', done: isStrFilled(cl.subject) && isStrFilled(cl.salutation), targetId: !isStrFilled(cl.subject) ? 'cl-subject' : 'cl-salutation' },
+            { label: 'Opening Paragraph', done: isStrFilled(cl.p1), targetId: 'cl-p1' },
+            { label: 'Skills & Qualification Para', done: isStrFilled(cl.p2), targetId: 'cl-p2' },
+            { label: 'Interview Request & Closing', done: isStrFilled(cl.p3) && isStrFilled(cl.closing), targetId: !isStrFilled(cl.p3) ? 'cl-p3' : 'cl-closing' },
+            { label: 'Sign-off & Enclosure', done: isStrFilled(cl.signoff) && isStrFilled(cl.enclosure), targetId: !isStrFilled(cl.signoff) ? 'cl-signoff' : 'cl-enclosure' }
           ];
           const doneCount = items.filter(function (x) { return x.done; }).length;
           const total = items.length;
-          const missing = items.filter(function (x) { return !x.done; }).map(function (x) { return x.label; });
+          const missingItems = items.filter(function (x) { return !x.done; });
           return {
             mode: 'cl',
             doneCount: doneCount,
             total: total,
             pct: Math.round((doneCount / total) * 100),
-            missing: missing
+            missing: missingItems.map(function (x) { return x.label; }),
+            missingItems: missingItems
           };
         }
 
@@ -4349,28 +4412,148 @@
           isStrFilled(d.declPlace) && isStrFilled(d.signature);
 
         const sections = [
-          { label: '1. Personal Details' + (d.showPhoto !== false && !isStrFilled(d.photo) ? ' & Photo' : ''), done: s1Personal },
-          { label: '2. Career Objective', done: s2Objective },
-          { label: '3. Education', done: s3Education },
-          { label: '4. Skills', done: s4Skills },
-          { label: '5. Experience', done: s5Experience },
-          { label: '6. Achievements', done: s6Achievements },
-          { label: '7. Hobbies & Strengths', done: s7Interests },
-          { label: '8. Declaration & Sign', done: s8Declaration }
+          {
+            label: '1. Personal Details' + (d.showPhoto !== false && !isStrFilled(d.photo) ? ' & Photo' : ''),
+            done: s1Personal,
+            accId: 'acc-1',
+            targetId: findFirstMissingPersonalTarget(d)
+          },
+          {
+            label: '2. Career Objective',
+            done: s2Objective,
+            accId: 'acc-2',
+            targetId: 'f-objective'
+          },
+          {
+            label: '3. Education',
+            done: s3Education,
+            accId: 'acc-3',
+            targetSelector: '#edu-list input'
+          },
+          {
+            label: '4. Skills',
+            done: s4Skills,
+            accId: 'acc-4',
+            targetId: 'new-skill'
+          },
+          {
+            label: '5. Experience',
+            done: s5Experience,
+            accId: 'acc-5',
+            targetId: d.isFresher ? 'f-fresher-note' : null,
+            targetSelector: d.isFresher ? null : '#exp-list input, #exp-list textarea'
+          },
+          {
+            label: '6. Achievements',
+            done: s6Achievements,
+            accId: 'acc-6',
+            targetId: 'f-achievements'
+          },
+          {
+            label: '7. Hobbies & Strengths',
+            done: s7Interests,
+            accId: 'acc-7',
+            targetId: !isStrFilled(d.hobbies) ? 'f-hobbies' : (!isStrFilled(d.interest) ? 'f-interest' : 'f-strengths')
+          },
+          {
+            label: '8. Declaration & Sign',
+            done: s8Declaration,
+            accId: 'acc-8',
+            targetId: !isStrFilled(d.declaration) ? 'f-declaration' : (!isStrFilled(d.declDate) ? 'f-date' : (!isStrFilled(d.declPlace) ? 'f-place' : 'f-signature'))
+          }
         ];
 
         const doneCount = sections.filter(function (x) { return x.done; }).length;
         const total = sections.length;
-        const missing = sections.filter(function (x) { return !x.done; }).map(function (x) { return x.label; });
+        const missingItems = sections.filter(function (x) { return !x.done; });
 
         return {
           mode: 'cv',
           doneCount: doneCount,
           total: total,
           pct: Math.round((doneCount / total) * 100),
-          missing: missing
+          missing: missingItems.map(function (x) { return x.label; }),
+          missingItems: missingItems
         };
       }
+
+      function highlightTargetElement(el) {
+        if (!el) return;
+        el.classList.remove('ios-field-highlight');
+        void el.offsetWidth;
+        el.classList.add('ios-field-highlight');
+        clearTimeout(el._hlTimer);
+        el._hlTimer = setTimeout(function () {
+          el.classList.remove('ios-field-highlight');
+        }, 2150);
+      }
+
+      window.jumpToNextMissing = function () {
+        const info = computeCompletionState();
+        if (!info.missingItems || info.missingItems.length === 0) {
+          toast('Sabhi sections 100% complete hain! Print / Save PDF dabaye.');
+          return;
+        }
+
+        // Pick the nearest missing item based on current scroll position or first remaining
+        let chosen = info.missingItems[0];
+        const viewportRef = 140;
+        let bestDist = Infinity;
+
+        info.missingItems.forEach(function (item) {
+          const probe = item.accId ? document.getElementById(item.accId) : (item.targetId ? document.getElementById(item.targetId) : null);
+          if (probe) {
+            const rect = probe.getBoundingClientRect();
+            const dist = Math.abs(rect.top - viewportRef);
+            if (dist < bestDist) {
+              bestDist = dist;
+              chosen = item;
+            }
+          }
+        });
+
+        if (chosen.switchToCv && state.editTab !== 'cv') {
+          setEditTab('cv');
+        }
+
+        if (chosen.accId) {
+          const acc = document.getElementById(chosen.accId);
+          if (acc && !acc.classList.contains('open')) {
+            acc.classList.add('open');
+          }
+        }
+
+        // Wait slightly for accordion spring expansion so scroll target coordinates are exact
+        setTimeout(function () {
+          let targetEl = null;
+          if (chosen.targetId) {
+            targetEl = document.getElementById(chosen.targetId);
+          }
+          if (!targetEl && chosen.targetSelector) {
+            const candidates = document.querySelectorAll(chosen.targetSelector);
+            for (let i = 0; i < candidates.length; i++) {
+              if (!isStrFilled(candidates[i].value)) {
+                targetEl = candidates[i];
+                break;
+              }
+            }
+            if (!targetEl && candidates.length) targetEl = candidates[0];
+          }
+          if (!targetEl && chosen.accId) {
+            targetEl = document.getElementById(chosen.accId);
+          }
+
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            highlightTargetElement(targetEl);
+            if (typeof targetEl.focus === 'function' && (targetEl.tagName === 'INPUT' || targetEl.tagName === 'TEXTAREA')) {
+              setTimeout(function () {
+                try { targetEl.focus({ preventScroll: true }); } catch (e) {}
+              }, 360);
+            }
+          }
+        }, 120);
+      };
 
       function updateProgressBar() {
         const card = document.getElementById('cv-progress-card');
@@ -4385,6 +4568,7 @@
         const isComplete = info.doneCount === info.total;
 
         card.classList.toggle('complete', isComplete);
+        card.classList.toggle('clickable', !isComplete);
         fillEl.style.width = info.pct + '%';
         pctEl.textContent = info.pct + '%';
 
@@ -4399,7 +4583,7 @@
           titleEl.textContent = info.doneCount + ' of ' + info.total + ' ' + unit;
           iconEl.innerHTML = '<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="3.2" fill="currentColor"/></svg>';
           const previewMissing = info.missing.slice(0, 2).join(' · ') + (info.missing.length > 2 ? ' +' + (info.missing.length - 2) : '');
-          subEl.textContent = 'Remaining: ' + previewMissing;
+          subEl.innerHTML = 'Remaining: ' + esc(previewMissing) + ' <span class="cv-prog-jump-hint">Tap to fill &rsaquo;</span>';
         }
       }
 

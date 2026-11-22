@@ -878,6 +878,77 @@
     }
     .share-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
+    
+    /* PHOTO SHAPE & BORDER VARIANTS */
+    .photo-frame.shape-square { border-radius: 3px; }
+    .photo-frame.shape-rounded { border-radius: 12px; }
+    .photo-frame.shape-circle { width: 112px; height: 112px; border-radius: 999px; }
+    .a4-sheet.auto-fit-compact .photo-frame.shape-circle { width: 100px; height: 100px; }
+
+    .photo-frame.border-none { border: none !important; box-shadow: none; }
+    .photo-frame.border-thin { border: 1.5px solid var(--r-border) !important; }
+    .photo-frame.border-accent {
+      border: 2.5px solid var(--r-primary) !important;
+      box-shadow: 0 0 0 2px #FFF, 0 0 0 4px var(--r-secondary);
+    }
+
+    /* AI AUTO-FILL STUDIO (MINIMALIST iOS STYLE) */
+    .ai-quick-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .btn-ai-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 38px;
+      padding: 0 12px;
+      border-radius: 11px;
+      font-size: 12.5px;
+      font-weight: 650;
+      transition: transform 0.14s ease, background 0.16s ease;
+    }
+    .btn-ai-pill:active { transform: scale(0.97); }
+    .btn-ai-pill.primary {
+      background: #1C1C1E;
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+    .btn-ai-pill.secondary {
+      background: var(--input-bg);
+      color: var(--ink);
+      border: 1px solid rgba(0,0,0,0.07);
+    }
+
+    .ai-modal-sheet {
+      width: 100%;
+      max-width: 430px;
+      background: #FFFFFF;
+      border-radius: 24px 24px 0 0;
+      padding: 12px 20px 26px;
+      box-shadow: 0 -10px 36px rgba(0,0,0,0.18);
+      transform: translateY(32px);
+      transition: transform 0.25s cubic-bezier(0.22,1,0.36,1);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .pay-backdrop.open .ai-modal-sheet { transform: translateY(0); }
+    @media (min-width: 600px) {
+      .ai-modal-sheet { border-radius: 24px; padding: 20px 22px 24px; }
+    }
+    .ai-clean-box {
+      background: var(--input-bg);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
     /* PRINT: every document sheet is locked to exactly one A4 page. */
     @page { size: A4 portrait; margin: 0; }
     @media print {
@@ -964,6 +1035,22 @@
           </div>
           <button type="button" class="btn-soft" style="padding:6px 12px; color:var(--ios-red); background:rgba(255,59,48,0.09); border-color:rgba(255,59,48,0.20);" onclick="clearAllData()">Clear All</button>
         </div>
+        <!-- CLEAN AI QUICK ACTIONS -->
+        <div class="ai-quick-row">
+          <button type="button" class="btn-ai-pill primary" onclick="openAiModal('chatgpt')">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2L12 3z"/>
+            </svg>
+            <span>Fill with ChatGPT</span>
+          </button>
+          <button type="button" class="btn-ai-pill secondary" onclick="openAiModal('import')">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5 5 5M12 5v11"/>
+            </svg>
+            <span>Paste / Upload</span>
+          </button>
+        </div>
+
         <div class="segmented full-grid cols-2">
           <button id="edit-mode-cv" type="button" class="seg-btn active" onclick="setEditTab('cv')">CV (8 Sections)</button>
           <button id="edit-mode-cl" type="button" class="seg-btn" onclick="setEditTab('cl')">Covering Letter</button>
@@ -998,12 +1085,32 @@
                   <button id="photo-no" type="button" class="seg-btn" style="padding:4px 12px; font-size:11.5px;" onclick="setShowPhoto(false)">No</button>
                 </div>
               </div>
-              <div id="photo-upload-controls" style="display:flex; align-items:center; justify-content:space-between; padding-top:6px; border-top:1px solid rgba(0,0,0,0.06);">
-                <span style="font-size:11.5px; font-weight:500; color:var(--muted);">Passport Photo</span>
-                <div style="display:flex; gap:6px;">
-                  <input id="photo-input" type="file" accept="image/*" class="hidden" onchange="uploadPhoto(event)" />
-                  <button type="button" class="btn-soft" style="background:#FFF; padding:5px 11px;" onclick="document.getElementById('photo-input').click()">Upload</button>
-                  <button type="button" class="btn-danger" onclick="clearPhoto()">Remove</button>
+              <div id="photo-upload-controls" style="display:flex; flex-direction:column; gap:8px; padding-top:7px; border-top:1px solid rgba(0,0,0,0.06);">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                  <span style="font-size:11.5px; font-weight:600; color:var(--muted);">Passport Photo</span>
+                  <div style="display:flex; gap:6px;">
+                    <input id="photo-input" type="file" accept="image/*" class="hidden" onchange="uploadPhoto(event)" />
+                    <button type="button" class="btn-soft" style="background:#FFF; padding:5px 11px;" onclick="document.getElementById('photo-input').click()">Upload</button>
+                    <button type="button" class="btn-danger" onclick="clearPhoto()">Remove</button>
+                  </div>
+                </div>
+                <div class="field-grid cols-2" style="gap:7px;">
+                  <div>
+                    <span class="field-label" style="margin-bottom:3px;">Photo Shape</span>
+                    <div class="segmented full-grid cols-3" style="padding:2px; background:rgba(0,0,0,0.06);">
+                      <button id="pshape-square" type="button" class="seg-btn active" style="padding:4px 2px; font-size:11px;" onclick="setPhotoShape('square')">Square</button>
+                      <button id="pshape-rounded" type="button" class="seg-btn" style="padding:4px 2px; font-size:11px;" onclick="setPhotoShape('rounded')">Rounded</button>
+                      <button id="pshape-circle" type="button" class="seg-btn" style="padding:4px 2px; font-size:11px;" onclick="setPhotoShape('circle')">Circle</button>
+                    </div>
+                  </div>
+                  <div>
+                    <span class="field-label" style="margin-bottom:3px;">Border Style</span>
+                    <div class="segmented full-grid cols-3" style="padding:2px; background:rgba(0,0,0,0.06);">
+                      <button id="pborder-none" type="button" class="seg-btn" style="padding:4px 2px; font-size:11px;" onclick="setPhotoBorder('none')">None</button>
+                      <button id="pborder-thin" type="button" class="seg-btn active" style="padding:4px 2px; font-size:11px;" onclick="setPhotoBorder('thin')">Thin</button>
+                      <button id="pborder-accent" type="button" class="seg-btn" style="padding:4px 2px; font-size:11px;" onclick="setPhotoBorder('accent')">Accent</button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1321,6 +1428,61 @@
     </div>
   </div>
 
+  <!-- CLEAN CHATGPT AUTO-FILL & PASTE/UPLOAD MODAL -->
+  <div id="ai-studio-modal" class="pay-backdrop no-print" onclick="if(event.target===this) closeAiModal()">
+    <div class="ai-modal-sheet" role="dialog" aria-modal="true" aria-label="Fill with ChatGPT">
+      <div class="pay-handle"></div>
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
+        <div>
+          <h3 id="ai-modal-title" style="font-size:17px; font-weight:800; letter-spacing:-0.02em;">Fill with ChatGPT</h3>
+          <p id="ai-modal-sub" style="font-size:12px; color:var(--muted); margin-top:2px;">Apna job role likhein aur ChatGPT se CV ready karein</p>
+        </div>
+        <button type="button" onclick="closeAiModal()" style="width:30px; height:30px; border-radius:999px; background:var(--input-bg); font-size:18px; color:var(--muted);">&times;</button>
+      </div>
+
+      <!-- Segmented Tab Switcher inside Modal -->
+      <div class="segmented full-grid cols-2">
+        <button id="ai-tab-chatgpt" type="button" class="seg-btn active" onclick="switchAiTab('chatgpt')">1. Fill with ChatGPT</button>
+        <button id="ai-tab-import" type="button" class="seg-btn" onclick="switchAiTab('import')">2. Paste &amp; Upload</button>
+      </div>
+
+      <!-- VIEW 1: FILL WITH CHATGPT (NO PROMPT EXPOSED) -->
+      <div id="ai-view-chatgpt" class="ai-clean-box">
+        <div>
+          <label class="field-label" style="font-size:12px; color:var(--ink); margin-bottom:5px;">What type of job are you looking for?</label>
+          <input id="ai-job-input" class="ios-input" style="background:#FFF; border-color:rgba(0,0,0,0.10); font-size:14px; padding:11px 12px;" placeholder="e.g. Data Entry Operator, Accountant, Sales Executive..." onkeydown="if(event.key==='Enter'){event.preventDefault();launchChatGPTWithPrompt();}" />
+        </div>
+        <button type="button" class="btn-primary" style="height:46px; font-size:14px; background:#1C1C1E; box-shadow:0 4px 14px rgba(0,0,0,0.16);" onclick="launchChatGPTWithPrompt()">
+          <span>Continue to ChatGPT</span>
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </button>
+        <p style="font-size:11.5px; color:var(--muted); line-height:1.45; text-align:center;">
+          ChatGPT aapki details lekar ek ready file dega. Copy karke <strong>Paste &amp; Upload</strong> tab me daal dein.
+        </p>
+      </div>
+
+      <!-- VIEW 2: PASTE & UPLOAD -->
+      <div id="ai-view-import" class="ai-clean-box hidden">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+          <span style="font-size:12px; font-weight:700; color:var(--ink);">Paste Code or Upload File</span>
+          <div>
+            <input id="ai-json-file-input" type="file" accept=".json,.txt,application/json,text/plain" class="hidden" onchange="handleAiFileUpload(event)" />
+            <button type="button" class="btn-soft" style="background:#FFF; padding:5px 11px; font-size:11.5px; color:var(--ios-blue);" onclick="document.getElementById('ai-json-file-input').click()">
+              <span>Upload File</span>
+            </button>
+          </div>
+        </div>
+        <textarea id="ai-import-textarea" rows="5" class="ios-textarea" style="background:#FFF; font-size:12px;" placeholder="ChatGPT ka response yahan paste karein..."></textarea>
+        <div style="display:grid; grid-template-columns:1fr 1.3fr; gap:8px;">
+          <button type="button" class="btn-soft" style="background:#FFF; height:42px;" onclick="pasteFromClipboardToAi()">Paste</button>
+          <button type="button" class="btn-primary" style="height:42px; font-size:13.5px;" onclick="importAiResumeData()">Auto-Fill Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- iOS CONFIRMATION ALERT MODAL -->
   <div id="ios-confirm-modal" class="ios-alert-backdrop no-print" onclick="if(event.target===this) closeIosConfirm(false)">
     <div class="ios-alert-box" role="alertdialog" aria-modal="true">
@@ -1476,6 +1638,8 @@
           nationality: 'Indian',
           languages: 'Hindi, English',
           showPhoto: true,
+          photoShape: 'square',
+          photoBorder: 'thin',
           photo: '',
           objective: 'To secure a challenging position in a reputed organization where I can contribute my skills and knowledge, learn new things and grow professionally while making a positive impact.',
           education: [
@@ -1550,6 +1714,8 @@
         editTab: 'cv',
         data: (saved && saved.data) ? Object.assign({
           showPhoto: true,
+          photoShape: 'square',
+          photoBorder: 'thin',
           isFresher: false,
           fresherNote: 'Currently seeking my first professional opportunity as a Data Entry Operator. I am eager to apply my computer knowledge, learn new systems, and perform assigned tasks with accuracy, dedication, and responsibility.'
         }, saved.data) : getDefaultData()
@@ -1587,13 +1753,307 @@
 
       function syncPhotoToggleUI() {
         const show = state.data.showPhoto !== false;
+        const shape = state.data.photoShape || 'square';
+        const border = state.data.photoBorder || 'thin';
         const bYes = document.getElementById('photo-yes');
         const bNo = document.getElementById('photo-no');
         const ctrl = document.getElementById('photo-upload-controls');
         if (bYes) bYes.classList.toggle('active', show);
         if (bNo) bNo.classList.toggle('active', !show);
         if (ctrl) ctrl.classList.toggle('hidden', !show);
+
+        ['square', 'rounded', 'circle'].forEach(function (s) {
+          const el = document.getElementById('pshape-' + s);
+          if (el) el.classList.toggle('active', s === shape);
+        });
+        ['none', 'thin', 'accent'].forEach(function (b) {
+          const el = document.getElementById('pborder-' + b);
+          if (el) el.classList.toggle('active', b === border);
+        });
       }
+
+      window.setPhotoShape = function (shape) {
+        state.data.photoShape = shape;
+        syncPhotoToggleUI();
+        renderPreview();
+        save();
+      };
+
+      window.setPhotoBorder = function (border) {
+        state.data.photoBorder = border;
+        syncPhotoToggleUI();
+        renderPreview();
+        save();
+      };
+
+      /* ============================================================
+         CHATGPT MASTER PROMPT & 1-CLICK JSON AUTO-FILL ENGINE
+         ============================================================ */
+      function buildChatGPTMasterPrompt(jobRole) {
+        const role = (jobRole || '').trim() || 'Not specified yet';
+        return [
+          'You are an expert Indian HR & ATS Resume + Covering Letter Assistant for BikriPage Smart CV Studio.',
+          'Target Job Role: ' + role,
+          '',
+          'STRICT RULES & WORKFLOW:',
+          '1. FIRST REPLY: Greet briefly and ask ONLY ONE question first: Do you want (1) Resume / CV only, (2) Covering Letter only, or (3) Both Resume & Covering Letter? (If Target Job Role is "Not specified yet", also ask what job role they are applying for). Wait for the user reply.',
+          '2. SECOND REPLY: Ask short, simple questions in English/Hinglish to collect the user basic info (Name, Phone, Email, DOB, Gender, City/Address, Languages, Education, Skills, Fresher or Experience details, Achievements, Hobbies/Strengths, and Company/HR name if Covering Letter is needed).',
+          '   IMPORTANT RULE FOR MISSING/UNKNOWN INFO:',
+          '   - Tell the user clearly: "Jo details aapko nahi pata ya jo aap skip karna chahte hain, unhe chhod sakte hain."',
+          '   - NEVER ask follow-up or repeated questions for missing, skipped, or unknown details! If the user leaves any detail blank, says "nahi pata", "skip", or does not have achievements/experience/company name, DO NOT ask again—simply leave those JSON fields blank ("" or []) and move straight to generating the final output.',
+          '3. FINAL OUTPUT: Polish the provided details into professional, ATS-friendly language (write a tailored Career Objective for the target job, and a formal 3-paragraph Covering Letter if requested).',
+          '   Output ONLY a single clean JSON code block (```json ... ```) with NO extra explanation inside or before it so the user can 1-click Copy Code or download it and paste/upload directly into BikriPage Studio.',
+          '   After the JSON block, add just one short line: "Upar box ke right corner par Copy code dabakar BikriPage Studio me Paste & Upload karein!"',
+          '',
+          'EXACT JSON FORMAT (keep unknown/skipped fields as "" or []):',
+          '{',
+          '  "docMode": "cv",',
+          '  "name": "",',
+          '  "phone": "",',
+          '  "email": "",',
+          '  "dob": "",',
+          '  "gender": "",',
+          '  "nationality": "Indian",',
+          '  "address": "",',
+          '  "languages": "",',
+          '  "objective": "",',
+          '  "education": [',
+          '    { "qual": "", "board": "", "year": "", "pct": "" }',
+          '  ],',
+          '  "skills": [],',
+          '  "isFresher": true,',
+          '  "fresherNote": "",',
+          '  "experience": [',
+          '    { "role": "", "company": "", "duration": "", "bullets": [] }',
+          '  ],',
+          '  "achievements": [],',
+          '  "hobbies": "",',
+          '  "interest": "",',
+          '  "strengths": "",',
+          '  "declaration": "I hereby declare that the above information is true and correct to the best of my knowledge and belief.",',
+          '  "declDate": "",',
+          '  "declPlace": "",',
+          '  "signature": "",',
+          '  "coverLetter": {',
+          '    "to": "",',
+          '    "subject": "",',
+          '    "salutation": "Respected Sir/Madam,",',
+          '    "p1": "",',
+          '    "p2": "",',
+          '    "p3": "",',
+          '    "closing": "Thank you for your time and consideration. I look forward to hearing from you.",',
+          '    "signoff": "Yours faithfully,",',
+          '    "enclosure": "Curriculum Vitae (CV)"',
+          '  }',
+          '}'
+        ].join('\n');
+      }
+
+      window.switchAiTab = function (tab) {
+        const isChat = tab !== 'import';
+        const tChat = document.getElementById('ai-tab-chatgpt');
+        const tImp = document.getElementById('ai-tab-import');
+        const vChat = document.getElementById('ai-view-chatgpt');
+        const vImp = document.getElementById('ai-view-import');
+        const titleEl = document.getElementById('ai-modal-title');
+        const subEl = document.getElementById('ai-modal-sub');
+
+        if (tChat) tChat.classList.toggle('active', isChat);
+        if (tImp) tImp.classList.toggle('active', !isChat);
+        if (vChat) vChat.classList.toggle('hidden', !isChat);
+        if (vImp) vImp.classList.toggle('hidden', isChat);
+        if (titleEl) titleEl.textContent = isChat ? 'Fill with ChatGPT' : 'Paste & Upload';
+        if (subEl) subEl.textContent = isChat
+          ? 'Apna job role likhein aur ChatGPT se CV ready karein'
+          : 'ChatGPT ka response paste karein ya file upload karein';
+      };
+
+      window.openAiModal = function (tab) {
+        const targetTab = tab === 'import' ? 'import' : 'chatgpt';
+        switchAiTab(targetTab);
+        const modal = document.getElementById('ai-studio-modal');
+        if (modal) modal.classList.add('open');
+        setTimeout(function () {
+          if (targetTab === 'import') {
+            const ta = document.getElementById('ai-import-textarea');
+            if (ta) ta.focus();
+          } else {
+            const inp = document.getElementById('ai-job-input');
+            if (inp) inp.focus();
+          }
+        }, 120);
+      };
+
+      window.closeAiModal = function () {
+        const modal = document.getElementById('ai-studio-modal');
+        if (modal) modal.classList.remove('open');
+      };
+
+      function copyTextSilently(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          return navigator.clipboard.writeText(text).catch(function () {
+            const ta = document.createElement('textarea');
+            ta.value = text; document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); } catch (e) {}
+            document.body.removeChild(ta);
+          });
+        }
+        const ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+        return Promise.resolve();
+      }
+
+      window.launchChatGPTWithPrompt = function () {
+        const inp = document.getElementById('ai-job-input');
+        const job = inp ? inp.value.trim() : '';
+        if (!job) {
+          toast('Pehle job role likhein (e.g. Data Entry Operator)');
+          if (inp) inp.focus();
+          return;
+        }
+        const prompt = buildChatGPTMasterPrompt(job);
+        copyTextSilently(prompt);
+        const chatUrl = 'https://chatgpt.com/?q=' + encodeURIComponent(prompt);
+        window.open(chatUrl, '_blank');
+        switchAiTab('import');
+        toast('Opening ChatGPT...');
+      };
+
+      window.pasteFromClipboardToAi = async function () {
+        const ta = document.getElementById('ai-import-textarea');
+        if (!ta) return;
+        try {
+          if (navigator.clipboard && navigator.clipboard.readText) {
+            const txt = await navigator.clipboard.readText();
+            if (txt) {
+              ta.value = txt;
+              toast('Pasted!');
+              return;
+            }
+          }
+        } catch (e) {}
+        ta.focus();
+        toast('Long-press & Paste in the box');
+      };
+
+      window.handleAiFileUpload = function (e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function () {
+          const ta = document.getElementById('ai-import-textarea');
+          if (ta) ta.value = String(reader.result || '');
+          e.target.value = '';
+          importAiResumeData();
+        };
+        reader.readAsText(file);
+      };
+
+      function extractJsonFromAiText(raw) {
+        let txt = String(raw || '').trim();
+        if (!txt) return null;
+        const fenceMatch = txt.match(/```(?:json)?\s*([\s\S]*?)```/i);
+        if (fenceMatch && fenceMatch[1]) {
+          txt = fenceMatch[1].trim();
+        }
+        const firstBrace = txt.indexOf('{');
+        const lastBrace = txt.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace > firstBrace) {
+          txt = txt.slice(firstBrace, lastBrace + 1);
+        }
+        return JSON.parse(txt);
+      }
+
+      window.importAiResumeData = function () {
+        const ta = document.getElementById('ai-import-textarea');
+        const raw = ta ? ta.value : '';
+        if (!raw.trim()) {
+          toast('Pehle ChatGPT ka response paste ya file upload karein');
+          return;
+        }
+        let parsed = null;
+        try {
+          parsed = extractJsonFromAiText(raw);
+        } catch (err) {
+          showIosNotice('Invalid Format', 'ChatGPT ne jo code diya hai use poora copy karke paste karein.');
+          return;
+        }
+        if (!parsed || typeof parsed !== 'object') {
+          showIosNotice('Invalid Data', 'Valid resume data nahi mila. Dobara try karein.');
+          return;
+        }
+
+        const d = state.data;
+        const strFields = ['name', 'address', 'phone', 'email', 'dob', 'gender', 'nationality', 'languages', 'objective', 'fresherNote', 'hobbies', 'interest', 'strengths', 'declaration', 'declDate', 'declPlace', 'signature'];
+        strFields.forEach(function (k) {
+          if (typeof parsed[k] === 'string') {
+            d[k] = parsed[k].trim();
+          }
+        });
+        if (!d.signature && d.name) d.signature = d.name;
+
+        if (typeof parsed.isFresher === 'boolean') {
+          d.isFresher = parsed.isFresher;
+        }
+
+        if (Array.isArray(parsed.education)) {
+          const validEdu = parsed.education.map(function (row) {
+            return {
+              qual: String((row && (row.qual || row.qualification || row.degree)) || '').trim(),
+              board: String((row && (row.board || row.university || row.institute)) || '').trim(),
+              year: String((row && (row.year || row.passingYear)) || '').trim(),
+              pct: String((row && (row.pct || row.percentage || row.marks || row.cgpa)) || '').trim()
+            };
+          }).filter(function (r) { return r.qual || r.board || r.year || r.pct; });
+          d.education = validEdu.length ? validEdu : [{ qual: '', board: '', year: '', pct: '' }];
+        }
+
+        if (Array.isArray(parsed.skills)) {
+          d.skills = parsed.skills.map(function (s) { return String(s || '').trim(); }).filter(Boolean);
+        }
+
+        if (Array.isArray(parsed.experience)) {
+          const validExp = parsed.experience.map(function (ex) {
+            return {
+              role: String((ex && (ex.role || ex.title || ex.position)) || '').trim(),
+              company: String((ex && (ex.company || ex.organization)) || '').trim(),
+              duration: String((ex && (ex.duration || ex.period || ex.years)) || '').trim(),
+              bullets: Array.isArray(ex && ex.bullets)
+                ? ex.bullets.map(function (b) { return String(b || '').trim(); }).filter(Boolean)
+                : []
+            };
+          }).filter(function (e) { return e.role || e.company || e.duration || e.bullets.length; });
+          d.experience = validExp.length ? validExp : [{ role: '', company: '', duration: '', bullets: [] }];
+        }
+
+        if (Array.isArray(parsed.achievements)) {
+          d.achievements = parsed.achievements.map(function (a) { return String(a || '').trim(); }).filter(Boolean);
+        }
+
+        if (parsed.coverLetter && typeof parsed.coverLetter === 'object') {
+          const cl = parsed.coverLetter;
+          ['to', 'subject', 'salutation', 'p1', 'p2', 'p3', 'closing', 'signoff', 'enclosure'].forEach(function (ck) {
+            if (typeof cl[ck] === 'string') {
+              d.coverLetter[ck] = cl[ck].trim();
+            }
+          });
+        }
+
+        if (parsed.docMode && ['cv', 'cl', 'both'].indexOf(parsed.docMode) !== -1) {
+          setDocMode(parsed.docMode);
+        }
+
+        syncForm();
+        renderPreview();
+        save();
+        closeAiModal();
+        toast('Resume auto-filled!');
+        if (window.innerWidth < 980) {
+          setMobileView('preview');
+        }
+      };
 
       window.setShowPhoto = function (show) {
         state.data.showPhoto = Boolean(show);
@@ -2037,6 +2497,8 @@
           nationality: '',
           languages: '',
           showPhoto: state.data.showPhoto !== false,
+          photoShape: state.data.photoShape || 'square',
+          photoBorder: state.data.photoBorder || 'thin',
           photo: '',
           objective: '',
           education: [{ qual: '', board: '', year: '', pct: '' }],
@@ -2507,7 +2969,9 @@
       /* SHARED CV BLOCKS */
       function photoBoxHtml(d) {
         if (d.showPhoto === false) return '';
-        return '<div class="photo-frame">' +
+        const shape = ['square', 'rounded', 'circle'].indexOf(d.photoShape) !== -1 ? d.photoShape : 'square';
+        const border = ['none', 'thin', 'accent'].indexOf(d.photoBorder) !== -1 ? d.photoBorder : 'thin';
+        return '<div class="photo-frame shape-' + shape + ' border-' + border + '">' +
           (d.photo ? '<img src="' + d.photo + '" alt="Photo" />' : '<svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 20a7 7 0 0114 0"/></svg><span style="margin-top:4px;">(Photo)</span>') +
         '</div>';
       }

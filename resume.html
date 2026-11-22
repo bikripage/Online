@@ -949,6 +949,112 @@
       gap: 10px;
     }
 
+
+    /* ============================================================
+       SMOOTH iOS SPRING ANIMATIONS & GPU ACCELERATION
+       ============================================================ */
+    @keyframes iosFadeSlideUp {
+      from { opacity: 0; transform: translateY(10px) scale(0.99); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes iosSheetPop {
+      from { opacity: 0; transform: translateY(14px) scale(0.985); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    html { scroll-behavior: smooth; }
+    .card, .acc-card, .style-card {
+      animation: iosFadeSlideUp 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease;
+    }
+    .acc-card:nth-child(1) { animation-delay: 0.02s; }
+    .acc-card:nth-child(2) { animation-delay: 0.05s; }
+    .acc-card:nth-child(3) { animation-delay: 0.08s; }
+    .acc-card:nth-child(4) { animation-delay: 0.11s; }
+    .acc-card:nth-child(5) { animation-delay: 0.14s; }
+    .acc-card:nth-child(6) { animation-delay: 0.17s; }
+    .acc-card:nth-child(7) { animation-delay: 0.20s; }
+    .acc-card:nth-child(8) { animation-delay: 0.23s; }
+
+    /* Smooth accordion expand/collapse using CSS grid-template-rows */
+    .acc-trigger {
+      transition: background-color 0.18s ease;
+    }
+    .acc-trigger:active {
+      background-color: rgba(0, 0, 0, 0.03);
+    }
+    .acc-chevron {
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      display: inline-block;
+    }
+    .acc-body {
+      display: grid !important;
+      grid-template-rows: 0fr;
+      padding: 0 15px;
+      border-top: 1px solid transparent;
+      opacity: 0;
+      transition:
+        grid-template-rows 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+        padding 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.22s ease,
+        border-color 0.22s ease;
+    }
+    .acc-body > .acc-inner {
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 0;
+    }
+    .acc-card.open .acc-body {
+      grid-template-rows: 1fr;
+      padding: 12px 15px 15px;
+      border-top-color: rgba(0, 0, 0, 0.05);
+      opacity: 1;
+    }
+
+    /* Smooth tactile buttons, pills, swatches & sheets */
+    .btn-soft, .btn-primary, .btn-export, .btn-ai-pill, .seg-btn, .swatch-item, .pay-opt, .edit-pill {
+      transition:
+        transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+        background-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.22s ease,
+        border-color 0.2s ease;
+    }
+    .btn-primary:active, .btn-export:active, .btn-soft:active, .btn-ai-pill:active, .seg-btn:active, .pay-opt:active {
+      transform: scale(0.965);
+    }
+    .swatch-disc {
+      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease;
+    }
+    .sheet-scale-box {
+      animation: iosSheetPop 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+      transition: width 0.24s cubic-bezier(0.22, 1, 0.36, 1), height 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .a4-sheet {
+      transition:
+        transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+        background-color 0.25s ease,
+        color 0.25s ease;
+      will-change: transform;
+    }
+    .sheet-content {
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .ios-toast {
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.22s ease;
+    }
+    .pay-backdrop {
+      transition: opacity 0.25s ease;
+    }
+    .pay-sheet, .ai-modal-sheet {
+      transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .sub-card {
+      animation: iosFadeSlideUp 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
     /* PRINT: every document sheet is locked to exactly one A4 page. */
     @page { size: A4 portrait; margin: 0; }
     @media print {
@@ -1066,7 +1172,7 @@
             <div class="acc-left"><span class="acc-num">1</span><span class="acc-title">Personal Details &amp; Photo</span></div>
             <span class="acc-chevron">▾</span>
           </button>
-          <div class="acc-body">
+          <div class="acc-body"><div class="acc-inner">
             <div class="field-grid cols-2">
               <div><label class="field-label">Full Name</label><input id="f-name" class="ios-input" oninput="upd('name', this.value)" /></div>
               <div><label class="field-label">Mobile No.</label><input id="f-phone" class="ios-input" oninput="upd('phone', this.value)" /></div>
@@ -1114,7 +1220,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div></div>
         </div>
 
         <!-- 2. Career Objective -->
@@ -1123,9 +1229,9 @@
             <div class="acc-left"><span class="acc-num">2</span><span class="acc-title">Career Objective</span></div>
             <span class="acc-chevron">▾</span>
           </button>
-          <div class="acc-body">
+          <div class="acc-body"><div class="acc-inner">
             <textarea id="f-objective" rows="3" class="ios-textarea" oninput="upd('objective', this.value)"></textarea>
-          </div>
+          </div></div>
         </div>
 
         <!-- 3. Educational Qualification -->
@@ -1134,10 +1240,10 @@
             <div class="acc-left"><span class="acc-num">3</span><span class="acc-title">Educational Qualification (Table)</span></div>
             <span class="acc-chevron">▾</span>
           </button>
-          <div class="acc-body">
+          <div class="acc-body"><div class="acc-inner">
             <div id="edu-list" style="display:flex; flex-direction:column; gap:8px;"></div>
             <button type="button" class="btn-soft" style="width:100%;" onclick="addEdu()">+ Add Qualification Row</button>
-          </div>
+          </div></div>
         </div>
 
         <!-- 4. Skills -->
@@ -1146,13 +1252,13 @@
             <div class="acc-left"><span class="acc-num">4</span><span class="acc-title">Skills</span></div>
             <span class="acc-chevron">▾</span>
           </button>
-          <div class="acc-body">
+          <div class="acc-body"><div class="acc-inner">
             <div style="display:flex; gap:7px;">
               <input id="new-skill" class="ios-input" placeholder="Add skill..." onkeydown="if(event.key==='Enter'){event.preventDefault();addSkill();}" />
               <button type="button" class="btn-soft" style="background:var(--ios-blue); color:#FFF;" onclick="addSkill()">Add</button>
             </div>
             <div id="skills-list" class="skill-pills-wrap"></div>
-          </div>
+          </div></div>
         </div>
 
         <!-- 5. Experience -->
@@ -1161,7 +1267,7 @@
             <div class="acc-left"><span class="acc-num">5</span><span class="acc-title">Experience</span></div>
             <span class="acc-chevron">▾</span>
           </button>
-          <div class="acc-body">
+          <div class="acc-body"><div class="acc-inner">
             <div class="segmented full-grid cols-2">
               <button id="exp-mode-exp" type="button" class="seg-btn active" onclick="setExpMode(false)">Experienced</button>
               <button id="exp-mode-fresher" type="button" class="seg-btn" onclick="setExpMode(true)">Fresher</button>
@@ -1174,7 +1280,7 @@
               <label class="field-label">Fresher Summary (About your readiness &amp; goal)</label>
               <textarea id="f-fresher-note" rows="4" class="ios-textarea" placeholder="Currently seeking my first professional opportunity as a Data Entry Operator. I am eager to apply my computer knowledge, learn new systems, and perform assigned tasks with accuracy, dedication, and responsibility." oninput="upd('fresherNote', this.value)"></textarea>
             </div>
-          </div>
+          </div></div>
         </div>
 
         <!-- 6. Achievements -->
@@ -1183,10 +1289,10 @@
             <div class="acc-left"><span class="acc-num">6</span><span class="acc-title">Achievements</span></div>
             <span class="acc-chevron">▾</span>
           </button>
-          <div class="acc-body">
+          <div class="acc-body"><div class="acc-inner">
             <label class="field-label">One achievement per line</label>
             <textarea id="f-achievements" rows="4" class="ios-textarea" oninput="updLines('achievements', this.value)"></textarea>
-          </div>
+          </div></div>
         </div>
 
         <!-- 7. Hobbies, Interest & Strengths -->
@@ -1195,11 +1301,11 @@
             <div class="acc-left"><span class="acc-num">7</span><span class="acc-title">Hobbies, Interest &amp; Strengths</span></div>
             <span class="acc-chevron">▾</span>
           </button>
-          <div class="acc-body">
+          <div class="acc-body"><div class="acc-inner">
             <div><label class="field-label">Hobbies</label><input id="f-hobbies" class="ios-input" oninput="upd('hobbies', this.value)" /></div>
             <div><label class="field-label">Interest</label><input id="f-interest" class="ios-input" oninput="upd('interest', this.value)" /></div>
             <div><label class="field-label">Strengths</label><input id="f-strengths" class="ios-input" oninput="upd('strengths', this.value)" /></div>
-          </div>
+          </div></div>
         </div>
 
         <!-- 8. Declaration -->
@@ -1208,14 +1314,14 @@
             <div class="acc-left"><span class="acc-num">8</span><span class="acc-title">Declaration &amp; Signature</span></div>
             <span class="acc-chevron">▾</span>
           </button>
-          <div class="acc-body">
+          <div class="acc-body"><div class="acc-inner">
             <div><label class="field-label">Declaration Text</label><textarea id="f-declaration" rows="2" class="ios-textarea" oninput="upd('declaration', this.value)"></textarea></div>
             <div class="field-grid cols-2">
               <div><label class="field-label">Date</label><input id="f-date" class="ios-input" oninput="upd('declDate', this.value)" /></div>
               <div><label class="field-label">Place</label><input id="f-place" class="ios-input" oninput="upd('declPlace', this.value)" /></div>
             </div>
             <div><label class="field-label">Signature Name</label><input id="f-signature" class="ios-input" oninput="upd('signature', this.value)" /></div>
-          </div>
+          </div></div>
         </div>
 
       </div>
@@ -1789,64 +1895,79 @@
       /* ============================================================
          CHATGPT MASTER PROMPT & 1-CLICK JSON AUTO-FILL ENGINE
          ============================================================ */
+      function syncStateFromLiveDOM() {
+        const d = state.data;
+        const map = {
+          'f-name': 'name', 'f-phone': 'phone', 'f-email': 'email',
+          'f-dob': 'dob', 'f-gender': 'gender', 'f-nationality': 'nationality',
+          'f-address': 'address', 'f-languages': 'languages', 'f-objective': 'objective',
+          'f-hobbies': 'hobbies', 'f-interest': 'interest', 'f-strengths': 'strengths',
+          'f-declaration': 'declaration', 'f-date': 'declDate', 'f-place': 'declPlace',
+          'f-signature': 'signature', 'f-fresher-note': 'fresherNote'
+        };
+        Object.keys(map).forEach(function (id) {
+          const el = document.getElementById(id);
+          if (el) d[map[id]] = el.value;
+        });
+        const achEl = document.getElementById('f-achievements');
+        if (achEl) {
+          d.achievements = achEl.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
+        }
+        const clMap = {
+          'cl-to': 'to', 'cl-subject': 'subject', 'cl-salutation': 'salutation',
+          'cl-p1': 'p1', 'cl-p2': 'p2', 'cl-p3': 'p3',
+          'cl-closing': 'closing', 'cl-signoff': 'signoff', 'cl-enclosure': 'enclosure'
+        };
+        Object.keys(clMap).forEach(function (id) {
+          const el = document.getElementById(id);
+          if (el && d.coverLetter) d.coverLetter[clMap[id]] = el.value;
+        });
+      }
+
+      function getPersonalFactsOnly() {
+        syncStateFromLiveDOM();
+        const d = state.data;
+        const facts = {};
+        // Only personal/factual fields that ChatGPT cannot guess on its own
+        const personalKeys = ['name', 'phone', 'email', 'dob', 'gender', 'nationality', 'address', 'languages', 'declDate', 'declPlace'];
+        personalKeys.forEach(function (k) {
+          if (d[k] && String(d[k]).trim()) {
+            facts[k] = String(d[k]).trim();
+          }
+        });
+        if (Array.isArray(d.education)) {
+          const validEdu = d.education.filter(function (r) { return r && (r.qual || r.board || r.year || r.pct); });
+          if (validEdu.length) facts.education = validEdu;
+        }
+        facts.isFresher = Boolean(d.isFresher);
+        if (!d.isFresher && Array.isArray(d.experience)) {
+          const validExp = d.experience.filter(function (e) { return e && (e.role || e.company || e.duration); });
+          if (validExp.length) {
+            facts.experience = validExp.map(function (e) {
+              return { role: e.role || '', company: e.company || '', duration: e.duration || '' };
+            });
+          }
+        }
+        return facts;
+      }
+
       function buildChatGPTMasterPrompt(jobRole) {
         const role = (jobRole || '').trim() || 'Not specified yet';
+        const facts = getPersonalFactsOnly();
+        const filledList = Object.keys(facts).filter(function (k) { return k !== 'isFresher'; });
+
         return [
           'You are an expert Indian HR & ATS Resume + Covering Letter Assistant for BikriPage Smart CV Studio.',
           'Target Job Role: ' + role,
+          filledList.length ? ('USER PERSONAL DETAILS (ALREADY KNOWN — DO NOT ASK AGAIN):\n' + JSON.stringify(facts, null, 2)) : '',
           '',
-          'STRICT RULES & WORKFLOW:',
-          '1. FIRST REPLY: Greet briefly and ask ONLY ONE question first: Do you want (1) Resume / CV only, (2) Covering Letter only, or (3) Both Resume & Covering Letter? (If Target Job Role is "Not specified yet", also ask what job role they are applying for). Wait for the user reply.',
-          '2. SECOND REPLY: Ask short, simple questions in English/Hinglish to collect the user basic info (Name, Phone, Email, DOB, Gender, City/Address, Languages, Education, Skills, Fresher or Experience details, Achievements, Hobbies/Strengths, and Company/HR name if Covering Letter is needed).',
-          '   IMPORTANT RULE FOR MISSING/UNKNOWN INFO:',
-          '   - Tell the user clearly: "Jo details aapko nahi pata ya jo aap skip karna chahte hain, unhe chhod sakte hain."',
-          '   - NEVER ask follow-up or repeated questions for missing, skipped, or unknown details! If the user leaves any detail blank, says "nahi pata", "skip", or does not have achievements/experience/company name, DO NOT ask again—simply leave those JSON fields blank ("" or []) and move straight to generating the final output.',
-          '3. FINAL OUTPUT: Polish the provided details into professional, ATS-friendly language (write a tailored Career Objective for the target job, and a formal 3-paragraph Covering Letter if requested).',
-          '   Output ONLY a single clean JSON code block (```json ... ```) with NO extra explanation inside or before it so the user can 1-click Copy Code or download it and paste/upload directly into BikriPage Studio.',
-          '   After the JSON block, add just one short line: "Upar box ke right corner par Copy code dabakar BikriPage Studio me Paste & Upload karein!"',
-          '',
-          'EXACT JSON FORMAT (keep unknown/skipped fields as "" or []):',
-          '{',
-          '  "docMode": "cv",',
-          '  "name": "",',
-          '  "phone": "",',
-          '  "email": "",',
-          '  "dob": "",',
-          '  "gender": "",',
-          '  "nationality": "Indian",',
-          '  "address": "",',
-          '  "languages": "",',
-          '  "objective": "",',
-          '  "education": [',
-          '    { "qual": "", "board": "", "year": "", "pct": "" }',
-          '  ],',
-          '  "skills": [],',
-          '  "isFresher": true,',
-          '  "fresherNote": "",',
-          '  "experience": [',
-          '    { "role": "", "company": "", "duration": "", "bullets": [] }',
-          '  ],',
-          '  "achievements": [],',
-          '  "hobbies": "",',
-          '  "interest": "",',
-          '  "strengths": "",',
-          '  "declaration": "I hereby declare that the above information is true and correct to the best of my knowledge and belief.",',
-          '  "declDate": "",',
-          '  "declPlace": "",',
-          '  "signature": "",',
-          '  "coverLetter": {',
-          '    "to": "",',
-          '    "subject": "",',
-          '    "salutation": "Respected Sir/Madam,",',
-          '    "p1": "",',
-          '    "p2": "",',
-          '    "p3": "",',
-          '    "closing": "Thank you for your time and consideration. I look forward to hearing from you.",',
-          '    "signoff": "Yours faithfully,",',
-          '    "enclosure": "Curriculum Vitae (CV)"',
-          '  }',
-          '}'
-        ].join('\n');
+          'STRICT RULES:',
+          '1. FIRST REPLY: Greet briefly and ask ONLY ONE question: Do you want (1) Resume / CV only, (2) Covering Letter only, or (3) Both Resume & Covering Letter? Wait for user reply.',
+          '2. SECOND REPLY: Ask ONLY missing personal facts that ChatGPT cannot know (from: Name, Phone, Email, City/Address, Qualification, Fresher/Experience, and Company Name if Cover Letter selected). NEVER ask any detail already in USER PERSONAL DETAILS above! NEVER ask Objective, Skills, Achievements, Hobbies, Interest, Strengths, or Cover Letter text — you must write all of those yourself tailored to "' + role + '". Tell user: "Jo skip karna ho chhod dein." Never ask follow-up questions.',
+          '3. FINAL OUTPUT: Combine USER PERSONAL DETAILS + user replies, auto-write Objective, Skills, fresherNote/experience bullets, Achievements, Hobbies, Interest, Strengths, signature (= name), and full 3-paragraph Cover Letter (if needed) tailored to "' + role + '". Output ONLY a single clean ```json ... ``` block with this exact schema:',
+          '{"docMode":"cv|cl|both","name":"","phone":"","email":"","dob":"","gender":"","nationality":"Indian","address":"","languages":"Hindi, English","objective":"","education":[{"qual":"","board":"","year":"","pct":""}],"skills":[],"isFresher":true,"fresherNote":"","experience":[{"role":"","company":"","duration":"","bullets":[]}],"achievements":[],"hobbies":"","interest":"","strengths":"","declaration":"I hereby declare that the above information is true and correct to the best of my knowledge and belief.","declDate":"","declPlace":"","signature":"","coverLetter":{"to":"","subject":"","salutation":"Respected Sir/Madam,","p1":"","p2":"","p3":"","closing":"Thank you for your time and consideration. I look forward to hearing from you.","signoff":"Yours faithfully,","enclosure":"Curriculum Vitae (CV)"}}',
+          'After the JSON block, write 1 line: "Upar Copy code dabakar BikriPage Studio me Paste & Upload karein!"'
+        ].filter(Boolean).join('\n');
       }
 
       window.switchAiTab = function (tab) {
@@ -1986,10 +2107,15 @@
         }
 
         const d = state.data;
+
+        // Preserve existing form fields if ChatGPT returned empty strings
         const strFields = ['name', 'address', 'phone', 'email', 'dob', 'gender', 'nationality', 'languages', 'objective', 'fresherNote', 'hobbies', 'interest', 'strengths', 'declaration', 'declDate', 'declPlace', 'signature'];
         strFields.forEach(function (k) {
           if (typeof parsed[k] === 'string') {
-            d[k] = parsed[k].trim();
+            const val = parsed[k].trim();
+            if (val) {
+              d[k] = val;
+            }
           }
         });
         if (!d.signature && d.name) d.signature = d.name;
@@ -2007,11 +2133,16 @@
               pct: String((row && (row.pct || row.percentage || row.marks || row.cgpa)) || '').trim()
             };
           }).filter(function (r) { return r.qual || r.board || r.year || r.pct; });
-          d.education = validEdu.length ? validEdu : [{ qual: '', board: '', year: '', pct: '' }];
+          if (validEdu.length) {
+            d.education = validEdu.length ? validEdu : [{ qual: '', board: '', year: '', pct: '' }];
+          }
         }
 
         if (Array.isArray(parsed.skills)) {
-          d.skills = parsed.skills.map(function (s) { return String(s || '').trim(); }).filter(Boolean);
+          const validSkills = parsed.skills.map(function (s) { return String(s || '').trim(); }).filter(Boolean);
+          if (validSkills.length) {
+            d.skills = validSkills;
+          }
         }
 
         if (Array.isArray(parsed.experience)) {
@@ -2025,18 +2156,26 @@
                 : []
             };
           }).filter(function (e) { return e.role || e.company || e.duration || e.bullets.length; });
-          d.experience = validExp.length ? validExp : [{ role: '', company: '', duration: '', bullets: [] }];
+          if (validExp.length) {
+            d.experience = validExp.length ? validExp : [{ role: '', company: '', duration: '', bullets: [] }];
+          }
         }
 
         if (Array.isArray(parsed.achievements)) {
-          d.achievements = parsed.achievements.map(function (a) { return String(a || '').trim(); }).filter(Boolean);
+          const validAch = parsed.achievements.map(function (a) { return String(a || '').trim(); }).filter(Boolean);
+          if (validAch.length) {
+            d.achievements = validAch;
+          }
         }
 
         if (parsed.coverLetter && typeof parsed.coverLetter === 'object') {
           const cl = parsed.coverLetter;
           ['to', 'subject', 'salutation', 'p1', 'p2', 'p3', 'closing', 'signoff', 'enclosure'].forEach(function (ck) {
             if (typeof cl[ck] === 'string') {
-              d.coverLetter[ck] = cl[ck].trim();
+              const val = cl[ck].trim();
+              if (val) {
+                d.coverLetter[ck] = val;
+              }
             }
           });
         }
@@ -3045,7 +3184,7 @@
 
         if (state.layout === 'executive') {
           return '<div class="lay-exec">' +
-            '<header class="exec-banner"><div><h1>' + esc(d.name) + '</h1><div class="sub">' + esc(d.address) + '</div><div class="sub">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div></div>' + photoBoxHtml(d) + '</header>' +
+            '<header class="exec-banner"><div><h1>' + esc(d.name) + '</h1><div class="sub">' + esc(d.address) + '</div><div class="sub">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div></div>' + photoBoxHtml(d) + '</header>' +
             '<div class="exec-strip"></div>' +
             '<div class="exec-body">' +
               sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:140px 10px 1fr;">' +
@@ -3140,7 +3279,7 @@
               '<div style="flex:1; min-width:0;">' +
                 '<div style="font-size: calc(10px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.2em; color:var(--r-secondary); text-transform:uppercase; margin-bottom:4px;">Curriculum Vitae</div>' +
                 '<h1 class="min-name">' + esc(d.name) + '</h1>' +
-                '<div class="min-sub">' + esc(d.phone) + ' &nbsp;·&nbsp; ' + esc(d.email) + '<br/>' + esc(d.address) + '</div>' +
+                '<div class="min-sub">' + esc(d.phone) + ' &nbsp;&middot;&nbsp; ' + esc(d.email) + '<br/>' + esc(d.address) + '</div>' +
               '</div>' + photoBoxHtml(d) +
             '</header>' +
             sec(1, 'Personal Details', '<div class="kv-grid" style="grid-template-columns:130px 10px 1fr;">' +
@@ -3167,7 +3306,7 @@
               '<div style="flex:1; min-width:0;">' +
                 '<div style="font-size: calc(10px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.16em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae (CV)</div>' +
                 '<h1 style="font-size: calc(28px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary); margin-top:2px;">' + esc(d.name) + '</h1>' +
-                '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
+                '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
                 '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
               '</div>' + photoBoxHtml(d) +
             '</header>' +
@@ -3249,7 +3388,7 @@
               '<div style="flex:1; min-width:0;">' +
                 '<div class="vogue-kicker">Curriculum Vitae</div>' +
                 '<h1 class="vogue-name">' + esc(d.name) + '</h1>' +
-                '<div class="vogue-sub">' + esc(d.phone) + ' &nbsp;·&nbsp; ' + esc(d.email) + ' &nbsp;·&nbsp; ' + esc(d.address) + '</div>' +
+                '<div class="vogue-sub">' + esc(d.phone) + ' &nbsp;&middot;&nbsp; ' + esc(d.email) + ' &nbsp;&middot;&nbsp; ' + esc(d.address) + '</div>' +
               '</div>' + photoBoxHtml(d) +
             '</header>' +
             '<div class="vogue-obj">' + sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') + '</div>' +
@@ -3275,7 +3414,7 @@
                 '<div style="flex:1; min-width:0;">' +
                   '<div style="font-size: calc(10.5px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
                   '<h1 style="font-size: calc(30px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary); margin-top:2px;">' + esc(d.name) + '</h1>' +
-                  '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
+                  '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
                   '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
                 '</div>' + photoBoxHtml(d) +
               '</header>' +
@@ -3303,7 +3442,7 @@
                 '<div class="mono-badge">' + esc(initials) + '</div>' +
                 '<div style="min-width:0;">' +
                   '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary); line-height:1.1;">' + esc(d.name) + '</h1>' +
-                  '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
+                  '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
                   '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
                 '</div>' +
               '</div>' + photoBoxHtml(d) +
@@ -3389,7 +3528,7 @@
                 '<div style="font-size: calc(10px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
                 '<h1 class="aura-name">' + esc(d.name) + '</h1>' +
                 '<div style="font-size: calc(11.6px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:3px;">' + esc(d.address) + '</div>' +
-                '<div class="aura-bar"><span>' + esc(d.phone) + '</span><span style="color:var(--r-secondary);">•</span><span>' + esc(d.email) + '</span></div>' +
+                '<div class="aura-bar"><span>' + esc(d.phone) + '</span><span style="color:var(--r-secondary);">&bull;</span><span>' + esc(d.email) + '</span></div>' +
               '</div>' + photoBoxHtml(d) +
             '</header>' +
             '<div class="aura-body">' +
@@ -3415,7 +3554,7 @@
               '<div style="flex:1; min-width:0;">' +
                 '<div style="font-size: calc(10px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
                 '<h1 style="font-size: calc(28px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary); margin-top:2px;">' + esc(d.name) + '</h1>' +
-                '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
+                '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-body); margin-top:4px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
                 '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
               '</div>' + photoBoxHtml(d) +
             '</div>' +
@@ -3474,7 +3613,7 @@
               '<div class="luxe-title-block">' +
                 '<div style="font-size: calc(10px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.2em; color:var(--r-secondary); text-transform:uppercase; margin-bottom:3px;">Curriculum Vitae</div>' +
                 '<h1 class="luxe-name">' + esc(d.name) + '</h1>' +
-                '<div class="luxe-meta">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
+                '<div class="luxe-meta">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
                 '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
               '</div>' + photoBoxHtml(d) +
             '</header>' +
@@ -3524,7 +3663,7 @@
               '<div style="flex:1; min-width:0;">' +
                 '<span class="zen-tag">Curriculum Vitae</span>' +
                 '<h1>' + esc(d.name) + '</h1>' +
-                '<div class="zen-meta">' + esc(d.phone) + ' &nbsp;•&nbsp; ' + esc(d.email) + '</div>' +
+                '<div class="zen-meta">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
                 '<div class="zen-meta">' + esc(d.address) + '</div>' +
               '</div>' + photoBoxHtml(d) +
             '</header>' +

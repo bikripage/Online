@@ -111,8 +111,8 @@
         display: grid; grid-template-columns: minmax(360px, 430px) minmax(0, 1fr); gap: 24px;
         padding: 20px 24px 48px; align-items: start;
       }
-      .edit-pane { display: flex !important; max-height: calc(100vh - 90px); overflow-y: auto; padding-right: 4px; min-width: 0; }
-      .preview-pane { display: flex !important; position: sticky; top: 76px; min-width: 0; max-width: 100%; }
+      .edit-pane { display: flex !important; max-height: none; overflow-y: visible; padding-right: 0; min-width: 0; }
+      .preview-pane { display: flex !important; position: relative; top: 0; min-width: 0; max-width: 100%; }
     }
 
     /* CARDS & INPUTS */

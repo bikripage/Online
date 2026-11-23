@@ -8,6 +8,7 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -62,7 +63,7 @@
     </div>
   </header>
 
-  <main class="flex-1 max-w-xl mx-auto w-full px-4 pt-5 pb-28">
+  <main class="flex-1 max-w-xl mx-auto w-full px-4 pt-5 pb-36">
     <!-- Camera Section -->
     <section class="panel p-2 mb-5 relative">
       <div class="bg-slate-900 h-[260px] rounded-[18px] flex items-center justify-center relative overflow-hidden shadow-inner">
@@ -102,14 +103,32 @@
   </main>
 
   <!-- Checkout Bar fixed at bottom -->
-  <div class="fixed bottom-0 left-0 right-0 glass border-t border-slate-200/80 px-4 py-4 pb-8 z-40">
-    <div class="max-w-xl mx-auto flex gap-3">
-      <button onclick="clearBill()" class="btn w-20 rounded-[16px] bg-slate-100 text-slate-600 font-bold text-[13px] h-[54px] border border-slate-200 shadow-sm shrink-0">
-        Clear
+  <div class="fixed bottom-0 left-0 right-0 glass border-t border-slate-200/80 px-4 py-3 pb-7 z-40">
+    <div class="max-w-xl mx-auto flex flex-col gap-2.5">
+      <div class="flex gap-3">
+        <button onclick="clearBill()" class="btn w-20 rounded-[16px] bg-slate-100 text-slate-600 font-bold text-[13px] h-[50px] border border-slate-200 shadow-sm shrink-0">
+          Clear
+        </button>
+        <button id="save-bill-btn" onclick="sendToDashboard()" class="btn flex-1 rounded-[16px] bg-purple-600 text-white font-bold text-[15px] h-[50px] flex items-center justify-center gap-2 shadow-[0_8px_20px_rgba(168,85,247,0.3)]">
+          <i class="fas fa-check-circle"></i> Complete Bill
+        </button>
+      </div>
+      <button type="button" onclick="generateScannerQR()" class="btn w-full rounded-[16px] bg-slate-900 hover:bg-black text-white font-bold text-[14px] h-[46px] flex items-center justify-center gap-2 shadow-md">
+        <i class="fas fa-qrcode"></i> Generate QR
       </button>
-      <button id="save-bill-btn" onclick="sendToDashboard()" class="btn flex-1 rounded-[16px] bg-purple-600 text-white font-bold text-[15px] h-[54px] flex items-center justify-center gap-2 shadow-[0_8px_20px_rgba(168,85,247,0.3)]">
-        <i class="fas fa-check-circle"></i> Complete Bill
+    </div>
+  </div>
+
+  <!-- UPI QR Modal -->
+  <div id="qr-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-[24px] p-6 w-full max-w-xs shadow-2xl modal-enter border border-slate-100 text-center relative">
+      <button onclick="closeQrModal()" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 absolute top-4 right-4">
+        <i class="fas fa-times"></i>
       </button>
+      <h3 class="text-[18px] font-black text-slate-900">Scan to Pay</h3>
+      <p id="qr-modal-amount" class="text-2xl font-black text-emerald-600 mt-1">₹0</p>
+      <div id="qr-code-box" class="my-4 flex justify-center p-3 bg-slate-50 rounded-[18px] border border-slate-200"></div>
+      <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">UPI Payment QR</p>
     </div>
   </div>
 
@@ -177,6 +196,60 @@
     let isEditing = false;
     let editingProductId = "";
     let nativeStream = null;
+
+    function closeQrModal() {
+      document.getElementById("qr-modal").classList.add("hidden");
+      isScanningPaused = false;
+      const line = document.querySelector('.scan-line');
+      if (line) line.style.display = 'block';
+    }
+
+    async function generateScannerQR() {
+      if (billItems.length === 0) {
+        alert("Pehle list mein item scan/add karein!");
+        return;
+      }
+
+      const totalAmount = billItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      if (totalAmount <= 0) return alert("Valid total amount required!");
+
+      try {
+        const doc = await db.collection('shops').doc(currentShopId).get();
+        const shopData = doc.exists ? doc.data() : {};
+        const upiId = (shopData.onlinePayment && shopData.upiId) ? shopData.upiId.trim() : '';
+
+        if (!upiId) {
+          alert("please allow recieve payment online");
+          if (nativeStream) {
+            nativeStream.getTracks().forEach(track => track.stop());
+          }
+          window.location.href = "dashboard.html?shop=" + encodeURIComponent(currentShopId) + "&openStep=7";
+          return;
+        }
+
+        isScanningPaused = true;
+        const line = document.querySelector('.scan-line');
+        if (line) line.style.display = 'none';
+
+        const shopName = shopData.shopName || 'Store';
+        const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(shopName)}&am=${totalAmount.toFixed(2)}&cu=INR`;
+
+        document.getElementById("qr-modal-amount").textContent = "₹" + totalAmount;
+        const qrBox = document.getElementById("qr-code-box");
+        qrBox.innerHTML = "";
+        new QRCode(qrBox, {
+          text: upiLink,
+          width: 190,
+          height: 190,
+          colorDark: "#111827",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        document.getElementById("qr-modal").classList.remove("hidden");
+      } catch (e) {
+        alert("Error generating QR: " + e.message);
+      }
+    }
 
     function goBack() {
       isScanningPaused = true;

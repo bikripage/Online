@@ -19,7 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 
-    <!-- Firebase v8 SDKs (Background Sync) -->
+    <!-- Firebase v8 SDKs (Short Cloud ID for Visiting Cards + Background Sync) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
@@ -153,12 +153,26 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- ==================== PUBLIC DIGITAL VISITING CARD VIEW (WHEN SCANNED) ==================== -->
-    <div id="public-vcard-screen" class="hidden min-h-screen bg-gradient-to-b from-[#EEF2FF] via-[#F5F5F7] to-[#FFFFFF] py-6 px-4 flex flex-col items-center justify-center">
-        <div class="w-full max-w-md bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden animate-view">
+    <!-- ==================== PUBLIC DIGITAL VISITING CARD VIEW (WHEN SCANNED OR PREVIEWED) ==================== -->
+    <div id="public-vcard-screen" class="hidden min-h-screen bg-gradient-to-b from-[#EEF2FF] via-[#F5F5F7] to-[#FFFFFF] py-5 px-4 flex flex-col items-center justify-center">
+        <!-- Top Back Bar -->
+        <div class="w-full max-w-md flex items-center justify-between mb-3">
+            <button type="button" id="btn-back-from-preview" class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-bold px-4 py-2.5 rounded-2xl border border-gray-200/80 shadow-sm text-xs active:scale-95 transition">
+                <i class="fas fa-arrow-left text-blue-600"></i>
+                <span id="btn-back-label">Back to Card Editor</span>
+            </button>
+            <span class="text-[11px] font-bold text-gray-400">Digital Visiting Card</span>
+        </div>
+
+        <div id="public-card-loading" class="hidden w-full max-w-md bg-white rounded-[2rem] p-12 text-center shadow-lg border border-gray-100">
+            <i class="fas fa-circle-notch fa-spin text-3xl text-blue-600 mb-3"></i>
+            <p class="text-sm font-bold text-gray-800">Loading Visiting Card...</p>
+        </div>
+
+        <div id="public-card-container" class="w-full max-w-md bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden animate-view">
             <div class="h-32 bg-gradient-to-r from-[#1D1D1F] via-[#2B2D42] to-[#0071E3] relative">
                 <div class="absolute top-4 left-4 bg-white/15 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-white/20 flex items-center gap-1.5">
-                    <i class="fas fa-check-circle text-sky-300"></i> Digital Visiting Card
+                    <i class="fas fa-check-circle text-sky-300"></i> Verified Profile
                 </div>
                 <button type="button" id="btn-exit-public-card" class="absolute top-4 right-4 bg-white/15 hover:bg-white/25 backdrop-blur-md text-white text-xs font-semibold px-3 py-1.5 rounded-full border border-white/20 transition">
                     Create Yours
@@ -214,7 +228,7 @@
     <!-- ==================== MAIN STANDALONE QR STUDIO APP ==================== -->
     <div id="studio-app-shell" class="flex-1 flex flex-col">
 
-        <!-- Header (Clean without Firebase status badge) -->
+        <!-- Header -->
         <header class="ios-glass border-b border-gray-200/70 py-3 px-4 sm:px-6 sticky top-0 z-40">
             <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
                 <div class="flex items-center gap-2.5 min-w-0">
@@ -467,7 +481,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div>
                             <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Digital Visiting Card</h1>
-                            <p class="text-xs sm:text-sm text-gray-500">Create a scannable visiting card QR that opens your mobile profile with 1-tap Contact Save &amp; social links.</p>
+                            <p class="text-xs sm:text-sm text-gray-500">Clean, ultra-fast scannable QR code that opens your mobile profile with 1-tap Contact Save &amp; social links.</p>
                         </div>
                         <button type="button" id="btn-preview-card" class="self-start sm:self-auto bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm active:scale-95 transition">
                             <i class="fas fa-eye text-blue-600"></i> Preview Full Card
@@ -550,11 +564,16 @@
 
                         <div class="lg:col-span-5 space-y-5 lg:sticky lg:top-24">
                             <div class="ios-card rounded-3xl p-5 flex flex-col items-center text-center">
-                                <span class="text-[11px] font-extrabold uppercase tracking-widest text-gray-400 mb-3">Visiting Card QR Code</span>
-                                <div class="p-4 bg-white rounded-2xl border border-gray-200 shadow-sm">
-                                    <canvas id="vcard-qr-canvas" width="210" height="210"></canvas>
+                                <div class="w-full flex items-center justify-between mb-3">
+                                    <span class="text-[11px] font-extrabold uppercase tracking-widest text-gray-400">Visiting Card QR</span>
+                                    <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <i class="fas fa-bolt mr-1"></i>Fast-Scan Clean QR
+                                    </span>
                                 </div>
-                                <p class="text-[11px] text-gray-500 mt-3 max-w-xs">Scanning this QR opens your interactive Digital Visiting Card with 1-tap Contact Save, WhatsApp, Instagram &amp; Maps.</p>
+                                <div class="p-4 bg-white rounded-2xl border border-gray-200 shadow-sm">
+                                    <canvas id="vcard-qr-canvas" width="240" height="240"></canvas>
+                                </div>
+                                <p class="text-[11px] text-gray-500 mt-3 max-w-xs">Clean, low-density QR code that scans instantly from any phone camera to open your Digital Visiting Card.</p>
 
                                 <div class="w-full grid grid-cols-2 gap-2.5 mt-4">
                                     <button type="button" id="btn-download-card-qr" class="bg-[#1D1D1F] hover:bg-black text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-95 transition">
@@ -667,11 +686,17 @@
                     </div>
                 </section>
 
-                <!-- ==================== TAB 4: QUICK QR SCANNER ==================== -->
+                <!-- ==================== TAB 4: QUICK QR SCANNER (ADVANCED AUTO-REDIRECT) ==================== -->
                 <section id="panel-scanner" class="tab-panel hidden animate-view space-y-5">
-                    <div>
-                        <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Quick QR Scanner</h1>
-                        <p class="text-xs sm:text-sm text-gray-500">Scan QR codes via live camera or upload an image from your gallery.</p>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                            <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Smart QR Scanner</h1>
+                            <p class="text-xs sm:text-sm text-gray-500">Scans instantly via camera or gallery image and auto-opens links, cards, WhatsApp &amp; UPI.</p>
+                        </div>
+                        <label class="inline-flex items-center gap-2.5 bg-white px-3.5 py-2 rounded-2xl border border-gray-200 shadow-sm cursor-pointer self-start">
+                            <input type="checkbox" id="scanner-auto-redirect-toggle" checked class="w-4 h-4 accent-blue-600 rounded">
+                            <span class="text-xs font-bold text-gray-800">Auto-Redirect on Scan</span>
+                        </label>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -683,6 +708,9 @@
                                     </button>
                                     <button type="button" id="stop-cam-btn" class="hidden bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 active:scale-95 transition">
                                         <i class="fas fa-stop"></i> Stop Camera
+                                    </button>
+                                    <button type="button" id="torch-cam-btn" class="hidden bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold px-3.5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 active:scale-95 transition">
+                                        <i class="fas fa-bolt"></i> Flash
                                     </button>
                                 </div>
 
@@ -696,7 +724,7 @@
                                 <canvas id="scanner-hidden-canvas" class="hidden"></canvas>
 
                                 <div id="scanner-overlay" class="hidden absolute inset-0 pointer-events-none">
-                                    <div class="w-56 h-56 border-2 border-white/80 rounded-3xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]">
+                                    <div class="w-60 h-60 border-2 border-white/85 rounded-3xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]">
                                         <div class="scanner-laser"></div>
                                     </div>
                                 </div>
@@ -706,7 +734,7 @@
                                         <i class="fas fa-qrcode text-2xl text-sky-400"></i>
                                     </div>
                                     <p class="text-sm font-bold text-white">Camera is Paused</p>
-                                    <p class="text-xs text-gray-400 mt-1 max-w-xs">Click "Start Camera" (requires HTTPS or localhost) or upload a QR image below.</p>
+                                    <p class="text-xs text-gray-400 mt-1 max-w-xs">Click "Start Camera" (HTTPS/localhost) or upload a QR image below.</p>
                                 </div>
                             </div>
 
@@ -734,11 +762,16 @@
                                 <div class="w-12 h-12 rounded-2xl bg-gray-100 text-gray-400 mx-auto flex items-center justify-center mb-3">
                                     <i class="fas fa-search"></i>
                                 </div>
-                                <p class="text-xs font-bold text-gray-600">No QR Code Scanned Yet</p>
-                                <p class="text-[11px] text-gray-400 mt-1">Point your camera at any QR code or upload an image to inspect its content.</p>
+                                <p class="text-xs font-bold text-gray-600">Ready to Scan</p>
+                                <p class="text-[11px] text-gray-400 mt-1">Scan any QR code to automatically open links, digital visiting cards, WhatsApp chats, or UPI payments.</p>
                             </div>
 
                             <div id="scan-result-box" class="hidden space-y-4">
+                                <div id="scan-redirect-banner" class="hidden p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    <span id="scan-redirect-msg">Redirecting...</span>
+                                </div>
+
                                 <div class="p-3.5 rounded-2xl bg-[#F7F7F9] border border-gray-200 break-all">
                                     <p id="scan-raw-output" class="text-xs font-mono font-semibold text-gray-800 whitespace-pre-wrap"></p>
                                 </div>
@@ -825,7 +858,7 @@
         function getStudioDeviceId() {
             var id = localStorage.getItem("bp_qr_studio_device_id");
             if (!id) {
-                id = "studio_" + Math.random().toString(36).substring(2, 10) + "_" + Date.now();
+                id = "c_" + Math.random().toString(36).substring(2, 9);
                 localStorage.setItem("bp_qr_studio_device_id", id);
             }
             return id;
@@ -843,10 +876,12 @@
         var cardLogoDataUrl = "";
         var publicVCardData = null;
         var showFieldErrors = false;
+        var isPreviewModeFromEditor = false;
 
         var videoStream = null;
         var scanAnimFrame = null;
         var isScanning = false;
+        var torchEnabled = false;
 
         var qrTypeConfigs = {
             url: {
@@ -930,24 +965,62 @@
             }
         };
 
-        function encodeBase64Utf8(obj) {
-            var jsonStr = JSON.stringify(obj);
-            var bytes = new TextEncoder().encode(jsonStr);
+        // Compact Base64URL encoding for ultra-short, clean QR codes
+        function toBase64Url(str) {
+            var bytes = new TextEncoder().encode(str);
             var binStr = "";
             for (var i = 0; i < bytes.length; i++) {
                 binStr += String.fromCharCode(bytes[i]);
             }
-            return btoa(binStr);
+            return btoa(binStr).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
         }
 
-        function decodeBase64Utf8(b64) {
+        function fromBase64Url(b64url) {
+            var b64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
+            while (b64.length % 4) b64 += "=";
             var binStr = atob(b64);
             var bytes = new Uint8Array(binStr.length);
             for (var i = 0; i < binStr.length; i++) {
                 bytes[i] = binStr.charCodeAt(i);
             }
-            var jsonStr = new TextDecoder().decode(bytes);
-            return JSON.parse(jsonStr);
+            return new TextDecoder().decode(bytes);
+        }
+
+        function encodeCompactCard(data) {
+            // Short keys keep the QR code small and crisp even offline
+            var mini = [
+                data.shopName || "",
+                data.ownerName || "",
+                data.phone || "",
+                data.whatsapp || "",
+                data.instagram || "",
+                data.facebook || "",
+                data.website || "",
+                data.address || "",
+                data.mapsUrl || "",
+                data.description || ""
+            ];
+            return toBase64Url(JSON.stringify(mini));
+        }
+
+        function decodeCompactCard(token) {
+            var parsed = JSON.parse(fromBase64Url(token));
+            if (Array.isArray(parsed)) {
+                return {
+                    shopName: parsed[0] || "",
+                    ownerName: parsed[1] || "",
+                    phone: parsed[2] || "",
+                    whatsapp: parsed[3] || "",
+                    instagram: parsed[4] || "",
+                    facebook: parsed[5] || "",
+                    website: parsed[6] || "",
+                    address: parsed[7] || "",
+                    mapsUrl: parsed[8] || "",
+                    description: parsed[9] || "",
+                    logo: ""
+                };
+            }
+            return parsed;
         }
 
         function escapeHtml(str) {
@@ -1177,7 +1250,8 @@
                 return;
             }
 
-            var ecLevel = logoUrl ? "H" : "M";
+            // Use Level L for long URLs without logos to keep QR modules large and crisp, Level H only when center logo is present
+            var ecLevel = logoUrl ? "H" : (options.ecLevel || "M");
             var qr = qrcode(0, ecLevel);
             qr.addData(text || "https://bikripage.github.io/Online/");
             qr.make();
@@ -1208,7 +1282,7 @@
                 var img = new Image();
                 img.crossOrigin = "anonymous";
                 img.onload = function () {
-                    var logoBox = size * 0.21;
+                    var logoBox = size * 0.20;
                     var pad = 5;
                     var bx = (size - logoBox) / 2;
                     var by = (size - logoBox) / 2;
@@ -1382,7 +1456,7 @@
             showToast("SVG vector downloaded!");
         }
 
-        // -------------------- DIGITAL VISITING CARD --------------------
+        // -------------------- DIGITAL VISITING CARD (ULTRA-CLEAN SHORT QR) --------------------
         function loadDigitalCard() {
             var saved = null;
             try { saved = JSON.parse(localStorage.getItem(STORAGE_CARD_KEY)); } catch (e) {}
@@ -1430,10 +1504,14 @@
         }
 
         function buildDigitalCardShareUrl() {
-            var compactCard = getDigitalCardObject(false);
-            var encoded = encodeBase64Utf8(compactCard);
             var baseUrl = window.location.href.split("?")[0].split("#")[0];
-            return baseUrl + "?card=" + encodeURIComponent(encoded);
+            // When Firebase is ready, use ultra-short ?cid=DEVICE_ID (~60 chars total -> low-density QR!)
+            if (firebaseReady && db) {
+                return baseUrl + "?cid=" + encodeURIComponent(DEVICE_ID);
+            }
+            // Offline fallback: compact array encoding with Error Correction L
+            var compactToken = encodeCompactCard(getDigitalCardObject(false));
+            return baseUrl + "?c=" + compactToken;
         }
 
         function updateDigitalCardLive() {
@@ -1471,42 +1549,55 @@
         function renderDigitalCardQr() {
             var url = buildDigitalCardShareUrl();
             var canvas = document.getElementById("vcard-qr-canvas");
-            drawQrOnCanvas(canvas, url, { fg: "#1D1D1F", bg: "#FFFFFF", logoUrl: cardLogoDataUrl });
+            // Do NOT cover Visiting Card QR with center logo & use Level L so modules are super clean and fast to scan
+            drawQrOnCanvas(canvas, url, { fg: "#1D1D1F", bg: "#FFFFFF", ecLevel: "L" });
+        }
+
+        async function syncDigitalCardToFirebase(data) {
+            if (!firebaseReady || !db) return;
+            try {
+                await db.collection("qr_studio_cards").doc(DEVICE_ID).set({
+                    deviceId: DEVICE_ID,
+                    shopName: data.shopName,
+                    ownerName: data.ownerName,
+                    phone: data.phone,
+                    whatsapp: data.whatsapp,
+                    instagram: data.instagram,
+                    facebook: data.facebook,
+                    website: data.website,
+                    address: data.address,
+                    mapsUrl: data.mapsUrl,
+                    description: data.description,
+                    logo: data.logo || "",
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            } catch (err) {}
         }
 
         async function saveDigitalCardProfile(e) {
             e.preventDefault();
             var data = getDigitalCardObject(true);
             localStorage.setItem(STORAGE_CARD_KEY, JSON.stringify(data));
-
-            if (firebaseReady && db) {
-                try {
-                    await db.collection("qr_studio_cards").doc(DEVICE_ID).set({
-                        deviceId: DEVICE_ID,
-                        shopName: data.shopName,
-                        ownerName: data.ownerName,
-                        phone: data.phone,
-                        whatsapp: data.whatsapp,
-                        instagram: data.instagram,
-                        facebook: data.facebook,
-                        website: data.website,
-                        address: data.address,
-                        mapsUrl: data.mapsUrl,
-                        description: data.description,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    }, { merge: true });
-                } catch (err) {}
-            }
+            await syncDigitalCardToFirebase(data);
 
             renderDigitalCardQr();
             logActivity("Saved Digital Card", "Updated visiting card for " + data.shopName);
             showToast("Digital Visiting Card saved!");
         }
 
-        function openPublicCardView(data) {
+        function openPublicCardView(data, fromEditorPreview) {
+            isPreviewModeFromEditor = !!fromEditorPreview;
             publicVCardData = data;
+
             document.getElementById("studio-app-shell").classList.add("hidden");
             document.getElementById("public-vcard-screen").classList.remove("hidden");
+            document.getElementById("public-card-loading").classList.add("hidden");
+            document.getElementById("public-card-container").classList.remove("hidden");
+
+            var backLabel = document.getElementById("btn-back-label");
+            if (backLabel) {
+                backLabel.textContent = isPreviewModeFromEditor ? "Back to Card Editor" : "Back to QR Studio";
+            }
 
             document.getElementById("pub-card-shop").textContent = data.shopName || "Business Card";
             document.getElementById("pub-card-owner").textContent = data.ownerName || "";
@@ -1576,6 +1667,17 @@
                 document.getElementById("pub-btn-maps").href = data.mapsUrl || "https://maps.google.com/?q=" + encodeURIComponent(data.address);
             } else {
                 addrBox.classList.add("hidden");
+            }
+        }
+
+        function returnFromPublicCard() {
+            document.getElementById("public-vcard-screen").classList.add("hidden");
+            document.getElementById("studio-app-shell").classList.remove("hidden");
+            if (window.location.search.indexOf("c=") !== -1 || window.location.search.indexOf("cid=") !== -1 || window.location.search.indexOf("card=") !== -1) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            if (isPreviewModeFromEditor) {
+                switchTab("vcard");
             }
         }
 
@@ -1666,7 +1768,7 @@
             drawQrOnCanvas(canvas, targetUri, { fg: "#111827", bg: "#FFFFFF" });
         }
 
-        // -------------------- QUICK QR SCANNER --------------------
+        // -------------------- ADVANCED QR SCANNER WITH AUTO-REDIRECT --------------------
         async function startCameraScanner() {
             var errAlert = document.getElementById("scanner-error-alert");
             var errText = document.getElementById("scanner-error-text");
@@ -1683,8 +1785,8 @@
                 var selectedDeviceId = document.getElementById("camera-select").value;
                 var constraints = {
                     video: selectedDeviceId
-                        ? { deviceId: { exact: selectedDeviceId } }
-                        : { facingMode: { ideal: "environment" } }
+                        ? { deviceId: { exact: selectedDeviceId }, width: { ideal: 1280 }, height: { ideal: 1280 } }
+                        : { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 1280 } }
                 };
 
                 videoStream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -1697,6 +1799,14 @@
                 document.getElementById("scanner-placeholder").classList.add("hidden");
                 document.getElementById("start-cam-btn").classList.add("hidden");
                 document.getElementById("stop-cam-btn").classList.remove("hidden");
+
+                // Check flashlight (torch) support
+                var track = videoStream.getVideoTracks()[0];
+                if (track && track.getCapabilities && track.getCapabilities().torch) {
+                    document.getElementById("torch-cam-btn").classList.remove("hidden");
+                } else {
+                    document.getElementById("torch-cam-btn").classList.add("hidden");
+                }
 
                 var devices = await navigator.mediaDevices.enumerateDevices();
                 var videoInputs = devices.filter(function (d) { return d.kind === "videoinput"; });
@@ -1718,6 +1828,7 @@
 
         function stopCameraScanner() {
             isScanning = false;
+            torchEnabled = false;
             if (scanAnimFrame) cancelAnimationFrame(scanAnimFrame);
             if (videoStream) {
                 videoStream.getTracks().forEach(function (t) { t.stop(); });
@@ -1729,6 +1840,7 @@
             document.getElementById("scanner-placeholder").classList.remove("hidden");
             document.getElementById("start-cam-btn").classList.remove("hidden");
             document.getElementById("stop-cam-btn").classList.add("hidden");
+            document.getElementById("torch-cam-btn").classList.add("hidden");
         }
 
         function tickCameraScan() {
@@ -1742,11 +1854,14 @@
                 var ctx = canvas.getContext("2d", { willReadFrequently: true });
                 ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                 var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                var code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: "dontInvert" });
+                var code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: "attemptBoth" });
 
                 if (code && code.data) {
-                    handleDetectedQrContent(code.data, "Camera Scan");
+                    if (navigator.vibrate) {
+                        try { navigator.vibrate(120); } catch (e) {}
+                    }
                     stopCameraScanner();
+                    handleDetectedQrContent(code.data, "Camera Scan");
                     return;
                 }
             }
@@ -1760,25 +1875,59 @@
 
             var badge = document.getElementById("scan-type-badge");
             var actions = document.getElementById("scan-smart-actions");
+            var redirectBanner = document.getElementById("scan-redirect-banner");
+            var redirectMsg = document.getElementById("scan-redirect-msg");
+
             badge.classList.remove("hidden");
+            redirectBanner.classList.add("hidden");
             actions.innerHTML = "";
 
             var detectedType = "TEXT";
+            var autoRedirect = document.getElementById("scanner-auto-redirect-toggle").checked;
+            var isDigitalCardUrl = false;
+            var redirectTargetUrl = "";
 
-            if (/^upi:\/\/pay/i.test(rawText)) {
+            // Check if scanned QR is a BikriPage Digital Visiting Card URL
+            try {
+                if (/^https?:\/\//i.test(rawText)) {
+                    var parsedUrl = new URL(rawText);
+                    var cid = parsedUrl.searchParams.get("cid");
+                    var cTok = parsedUrl.searchParams.get("c") || parsedUrl.searchParams.get("card");
+                    if (cid || cTok) {
+                        isDigitalCardUrl = true;
+                        detectedType = "DIGITAL CARD";
+                        redirectTargetUrl = rawText;
+                    }
+                }
+            } catch (e) {}
+
+            if (isDigitalCardUrl) {
+                actions.innerHTML = '<button type="button" id="btn-open-scanned-card" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-id-card"></i> Open Digital Visiting Card</button>';
+                setTimeout(function () {
+                    var btn = document.getElementById("btn-open-scanned-card");
+                    if (btn) btn.addEventListener("click", function () {
+                        loadCardFromUrlString(rawText);
+                    });
+                }, 0);
+            } else if (/^upi:\/\/pay/i.test(rawText)) {
                 detectedType = "UPI PAYMENT";
+                redirectTargetUrl = rawText;
                 actions.innerHTML = '<a href="' + escapeHtml(rawText) + '" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-rupee-sign"></i> Open in UPI App</a>';
             } else if (/^https?:\/\/wa\.me\//i.test(rawText)) {
                 detectedType = "WHATSAPP";
+                redirectTargetUrl = rawText;
                 actions.innerHTML = '<a href="' + escapeHtml(rawText) + '" target="_blank" rel="noopener noreferrer" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fab fa-whatsapp text-sm"></i> Open WhatsApp Chat</a>';
             } else if (/^https?:\/\//i.test(rawText)) {
                 detectedType = "WEBSITE LINK";
+                redirectTargetUrl = rawText;
                 actions.innerHTML = '<a href="' + escapeHtml(rawText) + '" target="_blank" rel="noopener noreferrer" class="w-full bg-[#0071E3] hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-external-link-alt"></i> Open Website Link</a>';
             } else if (/^tel:/i.test(rawText)) {
                 detectedType = "PHONE NUMBER";
+                redirectTargetUrl = rawText;
                 actions.innerHTML = '<a href="' + escapeHtml(rawText) + '" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-phone-alt"></i> Call Number</a>';
             } else if (/^mailto:/i.test(rawText)) {
                 detectedType = "EMAIL";
+                redirectTargetUrl = rawText;
                 actions.innerHTML = '<a href="' + escapeHtml(rawText) + '" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-envelope"></i> Send Email</a>';
             } else if (/^BEGIN:VCARD/i.test(rawText)) {
                 detectedType = "CONTACT CARD";
@@ -1799,10 +1948,72 @@
 
             badge.textContent = detectedType;
             logActivity(source, "Scanned " + detectedType + ": " + rawText.substring(0, 48));
-            showToast("QR Code detected (" + detectedType + ")");
+
+            // Instant Direct Redirect when enabled
+            if (autoRedirect && redirectTargetUrl) {
+                redirectBanner.classList.remove("hidden");
+                redirectMsg.textContent = "Opening " + detectedType + "...";
+                showToast("Opening " + detectedType + "...");
+                setTimeout(function () {
+                    if (isDigitalCardUrl) {
+                        loadCardFromUrlString(redirectTargetUrl);
+                    } else {
+                        window.location.href = redirectTargetUrl;
+                    }
+                }, 350);
+            } else {
+                showToast("QR Code detected (" + detectedType + ")");
+            }
         }
 
-        // -------------------- SAVED QR CODES & CLOUD SYNC --------------------
+        async function loadCardFromUrlString(urlStr) {
+            try {
+                var u = new URL(urlStr);
+                var cid = u.searchParams.get("cid");
+                var cTok = u.searchParams.get("c") || u.searchParams.get("card");
+
+                if (cid) {
+                    await openCardByCloudId(cid);
+                } else if (cTok) {
+                    var decoded = decodeCompactCard(cTok);
+                    openPublicCardView(decoded, false);
+                }
+            } catch (e) {
+                window.location.href = urlStr;
+            }
+        }
+
+        async function openCardByCloudId(cid) {
+            document.getElementById("studio-app-shell").classList.add("hidden");
+            document.getElementById("public-vcard-screen").classList.remove("hidden");
+            document.getElementById("public-card-loading").classList.remove("hidden");
+            document.getElementById("public-card-container").classList.add("hidden");
+
+            if (firebaseReady && db) {
+                try {
+                    var doc = await db.collection("qr_studio_cards").doc(cid).get();
+                    if (doc.exists) {
+                        openPublicCardView(doc.data(), false);
+                        return;
+                    }
+                } catch (err) {}
+            }
+
+            // Fallback to local saved card if same device
+            try {
+                var localSaved = JSON.parse(localStorage.getItem(STORAGE_CARD_KEY));
+                if (localSaved) {
+                    openPublicCardView(localSaved, false);
+                    return;
+                }
+            } catch (e) {}
+
+            document.getElementById("public-card-loading").innerHTML =
+                '<p class="text-sm font-bold text-red-600 mb-3">Card not found or offline.</p>' +
+                '<button type="button" onclick="returnFromPublicCard()" class="bg-gray-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl">Open QR Studio</button>';
+        }
+
+        // -------------------- SAVED QR CODES & RECENT ACTIVITY --------------------
         function getSavedQrList() {
             try { return JSON.parse(localStorage.getItem(STORAGE_SAVED_KEY)) || []; } catch (e) { return []; }
         }
@@ -1950,14 +2161,17 @@
         }
 
         // -------------------- INITIALIZE APP --------------------
-        function initStudioApp() {
+        async function initStudioApp() {
             var params = new URLSearchParams(window.location.search);
-            var cardParam = params.get("card");
+            var cidParam = params.get("cid");
+            var cardParam = params.get("c") || params.get("card");
 
-            if (cardParam) {
+            if (cidParam) {
+                await openCardByCloudId(cidParam);
+            } else if (cardParam) {
                 try {
-                    var decoded = decodeBase64Utf8(cardParam);
-                    openPublicCardView(decoded);
+                    var decoded = decodeCompactCard(cardParam);
+                    openPublicCardView(decoded, false);
                 } catch (e) {}
             }
 
@@ -1966,6 +2180,9 @@
             initUpiSection();
             renderSavedQrCodes();
             renderActivityFeed();
+
+            // Auto-sync current card to Firebase silently so ?cid= QR always works immediately
+            syncDigitalCardToFirebase(getDigitalCardObject(true));
 
             document.querySelectorAll("[data-nav-tab]").forEach(function (btn) {
                 btn.addEventListener("click", function () {
@@ -2080,17 +2297,22 @@
 
             document.getElementById("digital-card-form").addEventListener("submit", saveDigitalCardProfile);
 
-            document.getElementById("btn-preview-card").addEventListener("click", function () {
-                openPublicCardView(getDigitalCardObject(true));
+            document.getElementById("btn-preview-card").addEventListener("click", async function () {
+                var data = getDigitalCardObject(true);
+                localStorage.setItem(STORAGE_CARD_KEY, JSON.stringify(data));
+                syncDigitalCardToFirebase(data);
+                openPublicCardView(data, true);
             });
 
-            document.getElementById("btn-download-card-qr").addEventListener("click", function () {
+            document.getElementById("btn-download-card-qr").addEventListener("click", async function () {
                 var data = getDigitalCardObject(true);
+                localStorage.setItem(STORAGE_CARD_KEY, JSON.stringify(data));
+                await syncDigitalCardToFirebase(data);
                 var url = buildDigitalCardShareUrl();
                 var c = document.createElement("canvas");
                 c.width = 512;
                 c.height = 512;
-                drawQrOnCanvas(c, url, { fg: "#1D1D1F", bg: "#FFFFFF", logoUrl: cardLogoDataUrl });
+                drawQrOnCanvas(c, url, { fg: "#1D1D1F", bg: "#FFFFFF", ecLevel: "L" });
                 setTimeout(function () {
                     var poster = generatePosterExportCanvas(c, "#FFFFFF", "#1D1D1F", data.shopName, "Scan for Contact, WhatsApp & Socials");
                     var link = document.createElement("a");
@@ -2102,24 +2324,22 @@
                 }, 140);
             });
 
-            document.getElementById("btn-copy-card-link").addEventListener("click", function () {
+            document.getElementById("btn-copy-card-link").addEventListener("click", async function () {
+                var data = getDigitalCardObject(true);
+                localStorage.setItem(STORAGE_CARD_KEY, JSON.stringify(data));
+                await syncDigitalCardToFirebase(data);
                 navigator.clipboard.writeText(buildDigitalCardShareUrl()).then(function () {
                     showToast("Digital Card link copied!");
                 });
             });
 
-            document.getElementById("btn-exit-public-card").addEventListener("click", function () {
-                document.getElementById("public-vcard-screen").classList.add("hidden");
-                document.getElementById("studio-app-shell").classList.remove("hidden");
-                if (window.location.search.indexOf("card=") !== -1) {
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                }
-            });
+            document.getElementById("btn-back-from-preview").addEventListener("click", returnFromPublicCard);
+            document.getElementById("btn-exit-public-card").addEventListener("click", returnFromPublicCard);
 
             document.getElementById("btn-download-public-vcf").addEventListener("click", downloadPublicVCard);
 
             document.getElementById("btn-share-public-card").addEventListener("click", function () {
-                var shareUrl = window.location.href.indexOf("card=") !== -1 ? window.location.href : buildDigitalCardShareUrl();
+                var shareUrl = (window.location.search.indexOf("cid=") !== -1 || window.location.search.indexOf("c=") !== -1) ? window.location.href : buildDigitalCardShareUrl();
                 var title = (publicVCardData && publicVCardData.shopName) || "Digital Visiting Card";
                 if (navigator.share) {
                     navigator.share({ title: title, text: "Check out " + title + "'s Digital Visiting Card", url: shareUrl }).catch(function () {});
@@ -2179,6 +2399,16 @@
 
             document.getElementById("start-cam-btn").addEventListener("click", startCameraScanner);
             document.getElementById("stop-cam-btn").addEventListener("click", stopCameraScanner);
+            document.getElementById("torch-cam-btn").addEventListener("click", async function () {
+                if (!videoStream) return;
+                var track = videoStream.getVideoTracks()[0];
+                if (track && track.applyConstraints) {
+                    torchEnabled = !torchEnabled;
+                    try {
+                        await track.applyConstraints({ advanced: [{ torch: torchEnabled }] });
+                    } catch (e) {}
+                }
+            });
             document.getElementById("camera-select").addEventListener("change", function () {
                 if (isScanning) startCameraScanner();
             });

@@ -131,10 +131,10 @@
                      <!-- PROGRESS BAR (Now divided in 6 steps) -->
             <div class="mt-5">
                 <div class="w-full bg-gray-100 rounded-full h-1.5 mb-1.5 overflow-hidden">
-                    <!-- 100/6 = 16.6% -->
-                    <div id="setup-progress" class="bg-purple-600 h-full rounded-full transition-all duration-500 ease-out" style="width: 16.6%;"></div>
+                    <!-- 100/7 = 14.3% -->
+                    <div id="setup-progress" class="bg-purple-600 h-full rounded-full transition-all duration-500 ease-out" style="width: 14.3%;"></div>
                 </div>
-                <p id="setup-step-text" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Step 1 of 6</p>
+                <p id="setup-step-text" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Step 1 of 7</p>
             </div>
             </div>
 
@@ -327,6 +327,45 @@
                     </div>
                 </div>
                 
+                <button type="button" onclick="nextSetupStep(7)" class="w-full bg-gray-900 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex justify-center items-center gap-2 shrink-0">
+                    Next <i class="fas fa-arrow-right text-sm"></i>
+                </button>
+            </div>
+
+            <!-- STEP 7: ONLINE PAYMENT (UPI ID) & FINISH -->
+            <div id="setup-step-7" class="step-container step-hidden-right">
+                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4 shrink-0">7. Online Payment</p>
+
+                <div class="space-y-4 mb-auto">
+                    <div class="bg-purple-50 p-4 sm:p-5 rounded-[20px] border border-purple-100">
+                        <label class="font-bold text-purple-900 text-[15px] block mb-1">Want to receive online payment?</label>
+                        <p class="text-[11px] text-purple-700 mb-3 leading-snug">If enabled, a UPI QR code will automatically appear on Unpaid / Partial Paid bills.</p>
+                        <div class="flex gap-3">
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="online_payment" value="yes" class="peer hidden" onchange="toggleOnlinePaymentField(true)">
+                                <div class="w-full text-center py-3.5 bg-white border border-gray-200 rounded-xl font-bold text-sm text-gray-500 peer-checked:bg-purple-600 peer-checked:text-white peer-checked:border-purple-600 transition-all shadow-sm">
+                                    Yes
+                                </div>
+                            </label>
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="online_payment" value="no" class="peer hidden" onchange="toggleOnlinePaymentField(false)" checked>
+                                <div class="w-full text-center py-3.5 bg-white border border-gray-200 rounded-xl font-bold text-sm text-gray-500 peer-checked:bg-gray-800 peer-checked:text-white peer-checked:border-gray-800 transition-all shadow-sm">
+                                    No
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="online-upi-container" class="hidden space-y-2 transition-all">
+                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">Your UPI ID</label>
+                        <div class="flex items-center bg-white rounded-2xl border border-gray-200 focus-within:border-purple-500 transition shadow-sm overflow-hidden px-4 h-14 shrink-0">
+                            <i class="fas fa-qrcode text-purple-600 mr-3"></i>
+                            <input type="text" id="setup-upi-id" placeholder="e.g. yourname@okicici or 9876543210@ybl" class="w-full bg-transparent outline-none text-sm font-bold text-gray-900">
+                        </div>
+                        <p class="text-[11px] text-gray-500 font-medium">Customers can scan the QR code printed on their bill to pay directly to this UPI ID.</p>
+                    </div>
+                </div>
+
                 <button type="button" id="final-launch-btn" onclick="submitFinalStore(event)" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_10px_20px_rgba(168,85,247,0.3)] flex justify-center items-center gap-2 shrink-0">
                     Launch Store <i class="fas fa-rocket text-sm"></i>
                 </button>
@@ -1823,7 +1862,12 @@
         <!-- BOTTOM SECTION -->
         <div class="shrink-0 mt-auto w-full flex flex-col">
             <div class="mx-14 pt-4 pb-3 flex justify-between items-end border-t border-gray-200 relative z-10">
-                <div class="pb-3 shrink-0">
+                <div class="pb-3 shrink-0 flex flex-col items-start">
+                    <div id="receipt-upi-qr-box" class="hidden mb-4 bg-[#FCFCFD] border border-gray-200 rounded-[18px] p-3 flex-col items-center text-center shadow-sm">
+                        <div id="receipt-upi-qr-img-wrap" class="w-[104px] h-[104px] bg-white p-1.5 rounded-xl border border-gray-100 flex items-center justify-center overflow-hidden"></div>
+                        <p class="text-[9px] font-black text-gray-800 uppercase tracking-wider mt-1.5">Scan to Pay</p>
+                        <p id="receipt-upi-id-text" class="text-[9px] font-bold text-gray-500 mt-0.5 max-w-[130px] truncate"></p>
+                    </div>
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-1">Payment Status</p>
                     <div id="receipt-paystatus" class="inline-flex items-center justify-center h-10 px-6 rounded-full text-sm font-black tracking-widest leading-none shadow-sm">
                         PAID
@@ -1991,9 +2035,9 @@
             if(step1) step1.className = 'step-container step-active';
             
                         const prog = document.getElementById('setup-progress');
-            if(prog) prog.style.width = '16.6%';
+            if(prog) prog.style.width = '14.3%';
             const stepTxt = document.getElementById('setup-step-text');
-            if(stepTxt) stepTxt.innerText = 'Step 1 of 6';
+            if(stepTxt) stepTxt.innerText = 'Step 1 of 7';
 
 
             if (document.getElementById('setup-shop-name')) document.getElementById('setup-shop-name').value = globalShopData.shopName || '';
@@ -4486,6 +4530,39 @@ async function deleteProduct(id) {
 
         let isP = b.payStatus === 'Paid';
         let isA = b.payStatus === 'Advance';
+
+        // ✨ UPI Payment QR Code when bill is NOT Paid & shopkeeper enabled online payment ✨
+        const upiQrBox = document.getElementById('receipt-upi-qr-box');
+        const upiQrWrap = document.getElementById('receipt-upi-qr-img-wrap');
+        const upiIdText = document.getElementById('receipt-upi-id-text');
+        const dueAmt = parseFloat(b.grandTotal) || 0;
+        const shopUpi = (globalShopData && globalShopData.onlinePayment && globalShopData.upiId) ? globalShopData.upiId.trim() : '';
+
+        if (upiQrBox && upiQrWrap) {
+            if (!isP && shopUpi && dueAmt > 0 && typeof QRCode !== 'undefined') {
+                const upiLink = `upi://pay?pa=${encodeURIComponent(shopUpi)}&pn=${encodeURIComponent(sName)}&am=${dueAmt.toFixed(2)}&cu=INR`;
+                const tempQrDiv = document.createElement('div');
+                new QRCode(tempQrDiv, {
+                    text: upiLink,
+                    width: 180,
+                    height: 180,
+                    colorDark: "#111827",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+                const qrCanvas = tempQrDiv.querySelector('canvas');
+                if (qrCanvas) {
+                    upiQrWrap.innerHTML = `<img src="${qrCanvas.toDataURL('image/png')}" style="width:92px;height:92px;display:block;">`;
+                }
+                if (upiIdText) upiIdText.innerText = shopUpi;
+                upiQrBox.classList.remove('hidden');
+                upiQrBox.classList.add('flex');
+            } else {
+                upiQrWrap.innerHTML = '';
+                upiQrBox.classList.add('hidden');
+                upiQrBox.classList.remove('flex');
+            }
+        }
         let sE = document.getElementById('receipt-paystatus');
         if(sE) { 
             if (isP) {
@@ -4707,7 +4784,17 @@ async function deleteProduct(id) {
             } 
         }
                  let currentSetupStep = 1;
-        const totalSetupSteps = 6; // Ab 6 steps ho gaye hain
+        const totalSetupSteps = 7; // Ab 7 steps ho gaye hain
+
+        function toggleOnlinePaymentField(isYes) {
+            const box = document.getElementById('online-upi-container');
+            if (!box) return;
+            if (isYes) {
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+            }
+        }
 
           // ✨ NAYA: Delivery Show/Hide Function (100% FIXED FOR ALL BUSINESS TYPES) ✨
     function toggleDeliveryRange(isYes) {
@@ -4806,6 +4893,11 @@ async function deleteProduct(id) {
                     showIOSAlert("Category Required", "Please type your custom category name."); return;
                 }
             }
+            else if (currentSetupStep === 6) {
+                if (!document.getElementById('setup-address').value.trim()) {
+                    showIOSAlert("Missing Address", "Please add your store address!"); return;
+                }
+            }
             goToStep(stepNumber);
         }
 
@@ -4854,8 +4946,8 @@ async function deleteProduct(id) {
             const step1 = document.getElementById('setup-step-1');
             if(step1) step1.className = 'step-container step-active';
             
-                        document.getElementById('setup-progress').style.width = '16.6%';
-            document.getElementById('setup-step-text').innerText = 'Step 1 of 6';
+                        document.getElementById('setup-progress').style.width = '14.3%';
+            document.getElementById('setup-step-text').innerText = 'Step 1 of 7';
 
 
             if (document.getElementById('setup-shop-name')) document.getElementById('setup-shop-name').value = globalShopData.shopName || '';
@@ -4872,6 +4964,14 @@ async function deleteProduct(id) {
             if (!userEmail.includes('@')) userEmail = ''; // Ye check karega ki wo number nahi, email hi ho
             if (document.getElementById('setup-email')) document.getElementById('setup-email').value = userEmail;
             if (document.getElementById('setup-gstin')) document.getElementById('setup-gstin').value = globalShopData.gstin || '';
+            if (document.getElementById('setup-upi-id')) document.getElementById('setup-upi-id').value = globalShopData.upiId || '';
+            if (globalShopData.onlinePayment === true && globalShopData.upiId) {
+                const upiYes = document.querySelector('input[name="online_payment"][value="yes"]');
+                if (upiYes) { upiYes.checked = true; toggleOnlinePaymentField(true); }
+            } else {
+                const upiNo = document.querySelector('input[name="online_payment"][value="no"]');
+                if (upiNo) { upiNo.checked = true; toggleOnlinePaymentField(false); }
+            }
 
                     
 
@@ -4943,6 +5043,14 @@ async function deleteProduct(id) {
             if(category === 'Other') category = document.getElementById('other-category-input').value.trim();
             if(!address) { showIOSAlert("Missing Address", "Please add your store address!"); return; }
 
+            const onlinePayEl = document.querySelector('input[name="online_payment"]:checked');
+            const wantsOnlinePayment = onlinePayEl ? (onlinePayEl.value === 'yes') : false;
+            const storeUpiId = document.getElementById('setup-upi-id') ? document.getElementById('setup-upi-id').value.trim() : '';
+            if (wantsOnlinePayment && !storeUpiId) {
+                showIOSAlert("Missing UPI ID", "Please enter your UPI ID to receive online payments, or select No.");
+                return;
+            }
+
             const offersDeliveryElement = document.querySelector('input[name="home_delivery"]:checked');
             const offersDelivery = offersDeliveryElement ? (offersDeliveryElement.value === 'yes') : false;
             const deliveryRangeElement = document.querySelector('input[name="delivery_area"]:checked');
@@ -4977,7 +5085,9 @@ async function deleteProduct(id) {
                     shopName: shopName, 
                     ownerName: ownerName,
                     phone: storePhone,
-                    gstin: storeGstin,         
+                    gstin: storeGstin,
+                    onlinePayment: wantsOnlinePayment,
+                    upiId: wantsOnlinePayment ? storeUpiId : '',         
                     businessType: businessType,
                     description: desc,
                     category: category,
@@ -12371,8 +12481,9 @@ setTimeout(loadAppSecurityDetails, 2500);
         // Updated Render Draft Bill (With Plus/Minus Buttons)
         function renderDraftBill() {
             const tb = document.getElementById('draft-bill-items-list'); const em = document.getElementById('draft-bill-empty'); const tot = document.getElementById('draft-bill-total');
+            const gstAmtElEmpty = document.getElementById('draft-bill-gst-amount');
             let itemTot = 0;
-            if(draftBillItems.length === 0) { tb.innerHTML = ''; em.style.display='block'; tot.innerText='₹0'; return; }
+            if(draftBillItems.length === 0) { tb.innerHTML = ''; em.style.display='block'; tot.innerText='₹0'; if(gstAmtElEmpty) gstAmtElEmpty.innerText='₹0.00'; return; }
             em.style.display='none';
             
             tb.innerHTML = draftBillItems.map(i => { 
@@ -12400,11 +12511,17 @@ setTimeout(loadAppSecurityDetails, 2500);
                 </tr>`; 
             }).join('');
             
-            let disc = parseInt(document.getElementById('bill-discount').value)||0; 
-            let del = parseInt(document.getElementById('bill-delivery').value)||0;
-            let adv = parseInt(document.getElementById('bill-advance').value)||0;
+            const gstAmtEl = document.getElementById('draft-bill-gst-amount');
+            let disc = parseFloat(document.getElementById('bill-discount').value)||0; 
+            let del = parseFloat(document.getElementById('bill-delivery').value)||0;
+            let adv = parseFloat(document.getElementById('bill-advance').value)||0;
+            let gstRate = Math.max(0, parseFloat(document.getElementById('bill-gst')?.value)||0);
+
+            let taxableAmount = Math.max(0, itemTot - disc + del);
+            let gstAmount = Math.round(((taxableAmount * gstRate) / 100) * 100) / 100;
+            if (gstAmtEl) gstAmtEl.innerText = `₹${gstAmount.toFixed(2)}`;
             
-            let gt = Math.max(0, itemTot - disc + del - adv); 
+            let gt = Math.max(0, Math.round((taxableAmount + gstAmount - adv) * 100) / 100); 
             tot.innerText = `₹${gt}`;
         }
         // ==========================================
@@ -12423,6 +12540,7 @@ setTimeout(loadAppSecurityDetails, 2500);
             document.getElementById('bill-discount').value = '0'; 
             document.getElementById('bill-delivery').value = '0';
             document.getElementById('bill-advance').value = '0';
+            if (document.getElementById('bill-gst')) document.getElementById('bill-gst').value = '0';
             const md = document.getElementById('bill-pay-mode'); 
             md.value = 'UPI (Online)'; 
             md.disabled = false;
@@ -12512,4 +12630,3 @@ setTimeout(loadAppSecurityDetails, 2500);
        
 </body>
 </html>
-

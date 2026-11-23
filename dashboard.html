@@ -1866,7 +1866,6 @@
                     <div id="receipt-upi-qr-box" class="hidden mb-4 bg-[#FCFCFD] border border-gray-200 rounded-[18px] p-3 flex-col items-center text-center shadow-sm">
                         <div id="receipt-upi-qr-img-wrap" class="w-[104px] h-[104px] bg-white p-1.5 rounded-xl border border-gray-100 flex items-center justify-center overflow-hidden"></div>
                         <p class="text-[9px] font-black text-gray-800 uppercase tracking-wider mt-1.5">Scan to Pay</p>
-                        <p id="receipt-upi-id-text" class="text-[9px] font-bold text-gray-500 mt-0.5 max-w-[130px] truncate"></p>
                     </div>
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-1">Payment Status</p>
                     <div id="receipt-paystatus" class="inline-flex items-center justify-center h-10 px-6 rounded-full text-sm font-black tracking-widest leading-none shadow-sm">
@@ -2360,6 +2359,14 @@ function applyProLocks(shopData) {
 
                                         fetchFirebaseData(); 
                     
+                    // ✨ Direct Step Redirect (e.g. from Smart Calc / Smart Scanner Generate QR) ✨
+                    if (urlParams.get('openStep') === '7') {
+                        setTimeout(() => {
+                            openSettings();
+                            setTimeout(() => goToStep(7), 150);
+                        }, 200);
+                    }
+
                     // ✨ NAYA: Welcome Offer Modal सिर्फ तब आएगा जब Setup पूरा हो गया हो ✨
                     const hasSeenOffer = localStorage.getItem('BikriPage_welcome_shown_' + currentShopId);
                     if (!hasSeenOffer && isSetupDone) {
@@ -4534,7 +4541,6 @@ async function deleteProduct(id) {
         // ✨ UPI Payment QR Code when bill is NOT Paid & shopkeeper enabled online payment ✨
         const upiQrBox = document.getElementById('receipt-upi-qr-box');
         const upiQrWrap = document.getElementById('receipt-upi-qr-img-wrap');
-        const upiIdText = document.getElementById('receipt-upi-id-text');
         const dueAmt = parseFloat(b.grandTotal) || 0;
         const shopUpi = (globalShopData && globalShopData.onlinePayment && globalShopData.upiId) ? globalShopData.upiId.trim() : '';
 
@@ -4554,7 +4560,6 @@ async function deleteProduct(id) {
                 if (qrCanvas) {
                     upiQrWrap.innerHTML = `<img src="${qrCanvas.toDataURL('image/png')}" style="width:92px;height:92px;display:block;">`;
                 }
-                if (upiIdText) upiIdText.innerText = shopUpi;
                 upiQrBox.classList.remove('hidden');
                 upiQrBox.classList.add('flex');
             } else {

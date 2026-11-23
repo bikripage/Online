@@ -154,14 +154,14 @@
 <body class="min-h-screen flex flex-col">
 
     <!-- ==================== PUBLIC DIGITAL VISITING CARD VIEW (WHEN SCANNED OR PREVIEWED) ==================== -->
-    <div id="public-vcard-screen" class="hidden min-h-screen bg-gradient-to-b from-[#EEF2FF] via-[#F5F5F7] to-[#FFFFFF] py-5 px-4 flex flex-col items-center justify-center">
-        <!-- Top Back Bar -->
-        <div class="w-full max-w-md flex items-center justify-between mb-3">
+    <div id="public-vcard-screen" class="hidden min-h-screen bg-gradient-to-b from-[#EEF2FF] via-[#F5F5F7] to-[#FFFFFF] py-6 px-4 flex flex-col items-center justify-center">
+        <!-- Top Back Bar (Only visible in Card Editor Preview) -->
+        <div id="preview-top-back-bar" class="hidden w-full max-w-md flex items-center justify-between mb-3">
             <button type="button" id="btn-back-from-preview" class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-bold px-4 py-2.5 rounded-2xl border border-gray-200/80 shadow-sm text-xs active:scale-95 transition">
                 <i class="fas fa-arrow-left text-blue-600"></i>
-                <span id="btn-back-label">Back to Card Editor</span>
+                <span>Back to Card Editor</span>
             </button>
-            <span class="text-[11px] font-bold text-gray-400">Digital Visiting Card</span>
+            <span class="text-[11px] font-bold text-gray-400">Card Preview</span>
         </div>
 
         <div id="public-card-loading" class="hidden w-full max-w-md bg-white rounded-[2rem] p-12 text-center shadow-lg border border-gray-100">
@@ -693,10 +693,16 @@
                             <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Smart QR Scanner</h1>
                             <p class="text-xs sm:text-sm text-gray-500">Scans instantly via camera or gallery image and auto-opens links, cards, WhatsApp &amp; UPI.</p>
                         </div>
-                        <label class="inline-flex items-center gap-2.5 bg-white px-3.5 py-2 rounded-2xl border border-gray-200 shadow-sm cursor-pointer self-start">
-                            <input type="checkbox" id="scanner-auto-redirect-toggle" checked class="w-4 h-4 accent-blue-600 rounded">
-                            <span class="text-xs font-bold text-gray-800">Auto-Redirect on Scan</span>
-                        </label>
+                        <div class="flex flex-wrap items-center gap-2 self-start">
+                            <label class="inline-flex items-center gap-2 bg-white px-3.5 py-2 rounded-2xl border border-gray-200 shadow-sm cursor-pointer">
+                                <input type="checkbox" id="scanner-auto-start-toggle" checked class="w-4 h-4 accent-blue-600 rounded">
+                                <span class="text-xs font-bold text-gray-800">Auto-Start Camera</span>
+                            </label>
+                            <label class="inline-flex items-center gap-2 bg-white px-3.5 py-2 rounded-2xl border border-gray-200 shadow-sm cursor-pointer">
+                                <input type="checkbox" id="scanner-auto-redirect-toggle" checked class="w-4 h-4 accent-blue-600 rounded">
+                                <span class="text-xs font-bold text-gray-800">Auto-Redirect</span>
+                            </label>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -1061,6 +1067,14 @@
                 btn.classList.toggle("active", btn.getAttribute("data-nav-tab") === tabName);
             });
 
+            if (tabName === "scanner") {
+                var autoStartEl = document.getElementById("scanner-auto-start-toggle");
+                if (!autoStartEl || autoStartEl.checked) {
+                    setTimeout(function () {
+                        if (!isScanning) startCameraScanner();
+                    }, 120);
+                }
+            }
             if (tabName === "vcard") renderDigitalCardQr();
             if (tabName === "upi") renderUpiQr();
             if (tabName === "saved") renderSavedQrCodes();
@@ -1594,9 +1608,10 @@
             document.getElementById("public-card-loading").classList.add("hidden");
             document.getElementById("public-card-container").classList.remove("hidden");
 
-            var backLabel = document.getElementById("btn-back-label");
-            if (backLabel) {
-                backLabel.textContent = isPreviewModeFromEditor ? "Back to Card Editor" : "Back to QR Studio";
+            var previewBackBar = document.getElementById("preview-top-back-bar");
+            if (previewBackBar) {
+                previewBackBar.classList.toggle("hidden", !isPreviewModeFromEditor);
+                previewBackBar.classList.toggle("flex", !!isPreviewModeFromEditor);
             }
 
             document.getElementById("pub-card-shop").textContent = data.shopName || "Business Card";

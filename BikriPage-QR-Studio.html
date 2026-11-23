@@ -232,6 +232,9 @@
         <header class="ios-glass border-b border-gray-200/70 py-3 px-4 sm:px-6 sticky top-0 z-40">
             <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
                 <div class="flex items-center gap-2.5 min-w-0">
+                    <button type="button" id="btn-studio-header-back" title="Go Back" class="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 flex items-center justify-center transition active:scale-95 shrink-0">
+                        <i class="fas fa-arrow-left text-xs"></i>
+                    </button>
                     <div class="w-9 h-9 rounded-[12px] bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-700 flex items-center justify-center text-white shadow-[0_6px_16px_rgba(59,130,246,0.35)] shrink-0">
                         <i class="fas fa-qrcode text-base"></i>
                     </div>
@@ -1800,8 +1803,8 @@
                 var selectedDeviceId = document.getElementById("camera-select").value;
                 var constraints = {
                     video: selectedDeviceId
-                        ? { deviceId: { exact: selectedDeviceId }, width: { ideal: 1280 }, height: { ideal: 1280 } }
-                        : { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 1280 } }
+                        ? { deviceId: { exact: selectedDeviceId }, width: { ideal: 640, max: 960 }, height: { ideal: 480, max: 720 }, frameRate: { ideal: 30, max: 30 } }
+                        : { facingMode: { ideal: "environment" }, width: { ideal: 640, max: 960 }, height: { ideal: 480, max: 720 }, frameRate: { ideal: 30, max: 30 } }
                 };
 
                 videoStream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -1858,18 +1861,29 @@
             document.getElementById("torch-cam-btn").classList.add("hidden");
         }
 
+        var lastScanDecodeTime = 0;
+        var scanWorkCanvas = document.createElement("canvas");
+        scanWorkCanvas.width = 480;
+        scanWorkCanvas.height = 480;
+        var scanWorkCtx = scanWorkCanvas.getContext("2d", { willReadFrequently: true });
+
         function tickCameraScan() {
             if (!isScanning) return;
             var video = document.getElementById("scanner-video");
-            var canvas = document.getElementById("scanner-hidden-canvas");
+            var now = performance.now();
 
-            if (video.readyState === video.HAVE_ENOUGH_DATA && typeof jsQR !== "undefined") {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                var ctx = canvas.getContext("2d", { willReadFrequently: true });
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                var code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: "attemptBoth" });
+            // Decode at ~12 fps on a lightweight 480x480 frame while video preview stays 100% smooth
+            if (video.readyState === video.HAVE_ENOUGH_DATA && typeof jsQR !== "undefined" && (now - lastScanDecodeTime) >= 80) {
+                lastScanDecodeTime = now;
+                var vw = video.videoWidth;
+                var vh = video.videoHeight;
+                var side = Math.min(vw, vh);
+                var sx = (vw - side) / 2;
+                var sy = (vh - side) / 2;
+
+                scanWorkCtx.drawImage(video, sx, sy, side, side, 0, 0, 480, 480);
+                var imgData = scanWorkCtx.getImageData(0, 0, 480, 480);
+                var code = jsQR(imgData.data, 480, 480, { inversionAttempts: "dontInvert" });
 
                 if (code && code.data) {
                     if (navigator.vibrate) {
@@ -2463,6 +2477,18 @@
                 var raw = document.getElementById("scan-raw-output").textContent;
                 navigator.clipboard.writeText(raw).then(function () { showToast("Scanned content copied!"); });
             });
+
+            var headerBackBtn = document.getElementById("btn-studio-header-back");
+            if (headerBackBtn) {
+                headerBackBtn.addEventListener("click", function () {
+                    if (isScanning) stopCameraScanner();
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    } else {
+                        window.location.href = "index.html";
+                    }
+                });
+            }
 
             document.getElementById("btn-saved-create-new").addEventListener("click", function () {
                 switchTab("generator");

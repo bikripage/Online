@@ -1,0 +1,2240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BikriPage QR Studio | Smart QR &amp; Digital Identity Platform</title>
+    <meta name="description" content="Create custom QR codes, digital visiting cards, fixed-amount UPI QR codes, and scan QR codes seamlessly with BikriPage QR Studio.">
+
+    <!-- Tailwind CSS & FontAwesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Free QR Generation & Scanning Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+
+    <!-- Firebase v8 SDKs (Background Sync) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCWquftO39vqj83ZtYqtF_sDfkHVNpjd3k",
+            authDomain: "bikripage-3aba6.firebaseapp.com",
+            projectId: "bikripage-3aba6",
+            storageBucket: "bikripage-3aba6.firebasestorage.app",
+            messagingSenderId: "900882116436",
+            appId: "1:900882116436:web:8a521d0308347ddcccdc92",
+            measurementId: "G-ZP8L3S5R66"
+        };
+
+        var db = null;
+        var firebaseReady = false;
+
+        try {
+            if (typeof firebase !== "undefined") {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                db = firebase.firestore();
+                firebaseReady = true;
+            }
+        } catch (e) {
+            firebaseReady = false;
+        }
+    </script>
+
+    <style>
+        :root {
+            --ios-spring: cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background-color: #F5F5F7;
+            color: #1D1D1F;
+            -webkit-font-smoothing: antialiased;
+        }
+        .ios-card {
+            background: #FFFFFF;
+            border: 1px solid rgba(229, 231, 235, 0.9);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+        .ios-glass {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .ios-input {
+            background-color: #F7F7F9;
+            border: 1px solid #E5E7EB;
+            color: #1D1D1F;
+            transition: all 0.2s ease;
+        }
+        .ios-input:focus {
+            background-color: #FFFFFF;
+            border-color: #0071E3;
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
+            outline: none;
+        }
+
+        .nav-item {
+            background-color: transparent;
+            color: #374151;
+        }
+        .nav-item:hover {
+            background-color: #F3F4F6;
+        }
+        .nav-item.active {
+            background-color: #1D1D1F;
+            color: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(29, 29, 31, 0.18);
+        }
+
+        .mobile-nav-item {
+            color: #6B7280;
+        }
+        .mobile-nav-item.active {
+            color: #0071E3;
+        }
+        .mobile-nav-item.active .nav-icon-pill {
+            background-color: rgba(0, 113, 227, 0.14);
+            color: #0071E3;
+        }
+
+        .qr-type-pill {
+            background-color: #FFFFFF;
+            color: #1F2937;
+            border: 1.5px solid #E5E7EB;
+        }
+        .qr-type-pill:hover {
+            background-color: #F9FAFB;
+            border-color: #D1D5DB;
+        }
+        .qr-type-pill.active {
+            background-color: #1D1D1F;
+            color: #FFFFFF;
+            border-color: #1D1D1F;
+            box-shadow: 0 4px 12px rgba(29, 29, 31, 0.18);
+        }
+        .qr-type-pill.active i {
+            color: #38BDF8;
+        }
+
+        @keyframes scanLine {
+            0%, 100% { top: 10%; }
+            50% { top: 88%; }
+        }
+        .scanner-laser {
+            position: absolute;
+            left: 8%;
+            right: 8%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #0071E3, #38BDF8, #0071E3, transparent);
+            box-shadow: 0 0 10px #0071E3;
+            animation: scanLine 2.4s ease-in-out infinite;
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-view {
+            animation: fadeSlideUp 0.25s var(--ios-spring) forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- ==================== PUBLIC DIGITAL VISITING CARD VIEW (WHEN SCANNED) ==================== -->
+    <div id="public-vcard-screen" class="hidden min-h-screen bg-gradient-to-b from-[#EEF2FF] via-[#F5F5F7] to-[#FFFFFF] py-6 px-4 flex flex-col items-center justify-center">
+        <div class="w-full max-w-md bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden animate-view">
+            <div class="h-32 bg-gradient-to-r from-[#1D1D1F] via-[#2B2D42] to-[#0071E3] relative">
+                <div class="absolute top-4 left-4 bg-white/15 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-white/20 flex items-center gap-1.5">
+                    <i class="fas fa-check-circle text-sky-300"></i> Digital Visiting Card
+                </div>
+                <button type="button" id="btn-exit-public-card" class="absolute top-4 right-4 bg-white/15 hover:bg-white/25 backdrop-blur-md text-white text-xs font-semibold px-3 py-1.5 rounded-full border border-white/20 transition">
+                    Create Yours
+                </button>
+            </div>
+
+            <div class="px-6 pb-8 -mt-14 relative text-center">
+                <div class="w-28 h-28 mx-auto rounded-[1.75rem] bg-white p-1.5 shadow-lg border border-gray-100">
+                    <img id="pub-card-logo" src="" alt="Logo" class="w-full h-full object-cover rounded-[1.4rem] hidden">
+                    <div id="pub-card-initials" class="w-full h-full rounded-[1.4rem] bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-black text-3xl flex items-center justify-center">
+                        QR
+                    </div>
+                </div>
+
+                <h1 id="pub-card-shop" class="text-2xl font-black text-gray-900 mt-4 tracking-tight">Business Name</h1>
+                <p id="pub-card-owner" class="text-sm font-semibold text-blue-600 mt-0.5">Owner Name</p>
+                <p id="pub-card-desc" class="text-xs text-gray-500 mt-3 leading-relaxed max-w-xs mx-auto"></p>
+
+                <div class="grid grid-cols-2 gap-3 mt-6">
+                    <button type="button" id="btn-download-public-vcf" class="col-span-2 bg-[#1D1D1F] hover:bg-black text-white font-bold py-3.5 px-4 rounded-2xl shadow-md flex items-center justify-center gap-2 active:scale-95 transition text-sm">
+                        <i class="fas fa-address-book text-sky-400"></i> Save Contact (.vcf)
+                    </button>
+                    <a id="pub-btn-call" href="#" class="bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-sm transition active:scale-95">
+                        <i class="fas fa-phone-alt"></i> Call Now
+                    </a>
+                    <a id="pub-btn-wa" href="#" target="_blank" rel="noopener noreferrer" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-sm transition active:scale-95">
+                        <i class="fab fa-whatsapp text-base"></i> WhatsApp
+                    </a>
+                </div>
+
+                <div id="pub-links-list" class="mt-6 space-y-2.5 text-left"></div>
+
+                <div id="pub-address-box" class="mt-5 p-4 bg-[#F7F7F9] rounded-2xl border border-gray-200/70 text-left hidden">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Location</p>
+                            <p id="pub-card-address" class="text-xs font-semibold text-gray-800 leading-relaxed"></p>
+                        </div>
+                        <a id="pub-btn-maps" href="#" target="_blank" rel="noopener noreferrer" class="shrink-0 w-10 h-10 bg-white rounded-xl border border-gray-200 flex items-center justify-center text-blue-600 shadow-sm hover:bg-blue-50 transition">
+                            <i class="fas fa-directions text-lg"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <button type="button" id="btn-share-public-card" class="mt-6 w-full py-3 rounded-2xl border border-gray-200 text-gray-700 hover:bg-gray-50 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95">
+                    <i class="fas fa-share-alt"></i> Share Visiting Card
+                </button>
+            </div>
+        </div>
+        <p class="text-[11px] text-gray-400 font-semibold mt-5">Powered by <span class="text-gray-700 font-bold">BikriPage QR Studio</span></p>
+    </div>
+
+    <!-- ==================== MAIN STANDALONE QR STUDIO APP ==================== -->
+    <div id="studio-app-shell" class="flex-1 flex flex-col">
+
+        <!-- Header (Clean without Firebase status badge) -->
+        <header class="ios-glass border-b border-gray-200/70 py-3 px-4 sm:px-6 sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-9 h-9 rounded-[12px] bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-700 flex items-center justify-center text-white shadow-[0_6px_16px_rgba(59,130,246,0.35)] shrink-0">
+                        <i class="fas fa-qrcode text-base"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-black text-base sm:text-lg tracking-tight text-gray-900">BikriPage</span>
+                            <span class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100 shrink-0">QR Studio</span>
+                        </div>
+                        <p class="text-[11px] text-gray-500 font-medium truncate">Custom QR, Digital Card &amp; UPI Generator</p>
+                    </div>
+                </div>
+
+                <button type="button" data-nav-tab="saved" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-xs font-bold text-gray-800 transition shrink-0">
+                    <i class="fas fa-bookmark text-blue-600"></i>
+                    <span id="header-saved-count">0</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Workspace Body -->
+        <div class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 pt-5 pb-28 lg:pb-10 flex flex-col lg:flex-row gap-6">
+
+            <!-- Desktop Sidebar Navigation -->
+            <aside class="hidden lg:flex lg:w-64 shrink-0 flex-col gap-2">
+                <div class="ios-card rounded-3xl p-3 space-y-1 sticky top-24">
+                    <p class="px-3 pt-2 pb-1 text-[10px] font-extrabold uppercase tracking-widest text-gray-400">Studio Tools</p>
+                    <button type="button" data-nav-tab="generator" class="nav-item active w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-sm font-bold transition">
+                        <i class="fas fa-qrcode w-5 text-center"></i> QR Generator
+                    </button>
+                    <button type="button" data-nav-tab="vcard" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-sm font-bold transition">
+                        <i class="fas fa-id-card w-5 text-center"></i> Digital Visiting Card
+                    </button>
+                    <button type="button" data-nav-tab="upi" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-sm font-bold transition">
+                        <i class="fas fa-rupee-sign w-5 text-center"></i> UPI Payment QR
+                    </button>
+                    <button type="button" data-nav-tab="scanner" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-sm font-bold transition">
+                        <i class="fas fa-expand w-5 text-center"></i> Quick Scanner
+                    </button>
+
+                    <div class="border-t border-gray-100 my-2 pt-2">
+                        <p class="px-3 pb-1 text-[10px] font-extrabold uppercase tracking-widest text-gray-400">Library &amp; Logs</p>
+                        <button type="button" data-nav-tab="saved" class="nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-bold transition">
+                            <span class="flex items-center gap-3"><i class="fas fa-bookmark w-5 text-center"></i> Saved QR Codes</span>
+                            <span id="sidebar-saved-count" class="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">0</span>
+                        </button>
+                        <button type="button" data-nav-tab="activity" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-sm font-bold transition">
+                            <i class="fas fa-history w-5 text-center"></i> Recent Activity
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content Panels -->
+            <main class="flex-1 min-w-0">
+
+                <!-- ==================== TAB 1: QR CODE GENERATOR ==================== -->
+                <section id="panel-generator" class="tab-panel animate-view space-y-5">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Custom QR Generator</h1>
+                        <p class="text-xs sm:text-sm text-gray-500">Create high-contrast, scannable QR codes for any link, social handle, contact, or payment.</p>
+                    </div>
+
+                    <!-- QR Purpose Selector -->
+                    <div class="ios-card rounded-3xl p-4">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2.5">1. Select QR Purpose</label>
+                        <div id="qr-type-pills" class="flex flex-wrap gap-2">
+                            <button type="button" data-qrtype="url" class="qr-type-pill active px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                                <i class="fas fa-globe text-blue-600"></i> Website URL
+                            </button>
+                            <button type="button" data-qrtype="whatsapp" class="qr-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                                <i class="fab fa-whatsapp text-emerald-600"></i> WhatsApp
+                            </button>
+                            <button type="button" data-qrtype="instagram" class="qr-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                                <i class="fab fa-instagram text-pink-600"></i> Instagram
+                            </button>
+                            <button type="button" data-qrtype="facebook" class="qr-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                                <i class="fab fa-facebook text-blue-600"></i> Facebook
+                            </button>
+                            <button type="button" data-qrtype="phone" class="qr-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                                <i class="fas fa-phone-alt text-indigo-600"></i> Phone
+                            </button>
+                            <button type="button" data-qrtype="email" class="qr-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                                <i class="fas fa-envelope text-amber-600"></i> Email
+                            </button>
+                            <button type="button" data-qrtype="vcard" class="qr-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                                <i class="fas fa-address-card text-purple-600"></i> Contact (vCard)
+                            </button>
+                            <button type="button" data-qrtype="wifi" class="qr-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                                <i class="fas fa-wifi text-sky-600"></i> Wi-Fi
+                            </button>
+                            <button type="button" data-qrtype="maps" class="qr-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                                <i class="fas fa-map-marker-alt text-red-500"></i> Google Maps
+                            </button>
+                            <button type="button" data-qrtype="text" class="qr-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                                <i class="fas fa-align-left text-gray-600"></i> Plain Text
+                            </button>
+                            <button type="button" data-qrtype="upi" class="qr-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                                <i class="fas fa-rupee-sign text-emerald-700"></i> UPI Payment
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                        <!-- Left: Dynamic Form + Design Controls -->
+                        <div class="lg:col-span-7 space-y-5">
+                            <div class="ios-card rounded-3xl p-5 space-y-4">
+                                <div class="flex items-center justify-between gap-2">
+                                    <h2 class="text-sm font-extrabold text-gray-900 flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs shrink-0">2</span>
+                                        <span id="qr-form-heading">Enter Website URL</span>
+                                    </h2>
+                                    <button type="button" id="btn-clear-qr-fields" class="text-[11px] font-bold text-gray-600 hover:text-gray-900 bg-gray-100 px-2.5 py-1 rounded-lg transition shrink-0">
+                                        <i class="fas fa-eraser mr-1"></i> Reset
+                                    </button>
+                                </div>
+
+                                <div id="dynamic-qr-fields" class="space-y-3.5"></div>
+
+                                <div id="qr-validation-msg" class="hidden text-xs font-semibold text-red-600 bg-red-50 border border-red-100 px-3.5 py-2.5 rounded-xl flex items-center gap-2">
+                                    <i class="fas fa-exclamation-circle shrink-0"></i>
+                                    <span></span>
+                                </div>
+                            </div>
+
+                            <!-- Customization Card -->
+                            <div class="ios-card rounded-3xl p-5 space-y-4">
+                                <h2 class="text-sm font-extrabold text-gray-900 flex items-center gap-2">
+                                    <span class="w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs shrink-0">3</span>
+                                    Customize Appearance &amp; Frame
+                                </h2>
+
+                                <div>
+                                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Color Presets</label>
+                                    <div id="qr-presets-grid" class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                                        <button type="button" data-fg="#1D1D1F" data-bg="#FFFFFF" data-label="Classic" class="preset-btn p-2 rounded-xl border border-gray-200 hover:border-gray-400 flex flex-col items-center gap-1 bg-white transition">
+                                            <span class="w-6 h-6 rounded-full border border-gray-200" style="background: linear-gradient(135deg, #1D1D1F 50%, #FFFFFF 50%);"></span>
+                                            <span class="text-[10px] font-bold text-gray-700">Classic</span>
+                                        </button>
+                                        <button type="button" data-fg="#0071E3" data-bg="#F0F7FF" data-label="Cobalt" class="preset-btn p-2 rounded-xl border border-gray-200 hover:border-blue-400 flex flex-col items-center gap-1 bg-white transition">
+                                            <span class="w-6 h-6 rounded-full border border-gray-200" style="background: linear-gradient(135deg, #0071E3 50%, #F0F7FF 50%);"></span>
+                                            <span class="text-[10px] font-bold text-gray-700">Cobalt</span>
+                                        </button>
+                                        <button type="button" data-fg="#065F46" data-bg="#ECFDF5" data-label="Emerald" class="preset-btn p-2 rounded-xl border border-gray-200 hover:border-emerald-400 flex flex-col items-center gap-1 bg-white transition">
+                                            <span class="w-6 h-6 rounded-full border border-gray-200" style="background: linear-gradient(135deg, #065F46 50%, #ECFDF5 50%);"></span>
+                                            <span class="text-[10px] font-bold text-gray-700">Emerald</span>
+                                        </button>
+                                        <button type="button" data-fg="#7E22CE" data-bg="#FAF5FF" data-label="Violet" class="preset-btn p-2 rounded-xl border border-gray-200 hover:border-purple-400 flex flex-col items-center gap-1 bg-white transition">
+                                            <span class="w-6 h-6 rounded-full border border-gray-200" style="background: linear-gradient(135deg, #7E22CE 50%, #FAF5FF 50%);"></span>
+                                            <span class="text-[10px] font-bold text-gray-700">Violet</span>
+                                        </button>
+                                        <button type="button" data-fg="#BE123C" data-bg="#FFF1F2" data-label="Crimson" class="preset-btn p-2 rounded-xl border border-gray-200 hover:border-rose-400 flex flex-col items-center gap-1 bg-white transition">
+                                            <span class="w-6 h-6 rounded-full border border-gray-200" style="background: linear-gradient(135deg, #BE123C 50%, #FFF1F2 50%);"></span>
+                                            <span class="text-[10px] font-bold text-gray-700">Crimson</span>
+                                        </button>
+                                        <button type="button" data-fg="#FFFFFF" data-bg="#111827" data-label="Midnight" class="preset-btn p-2 rounded-xl border border-gray-200 hover:border-gray-800 flex flex-col items-center gap-1 bg-white transition">
+                                            <span class="w-6 h-6 rounded-full border border-gray-200" style="background: linear-gradient(135deg, #FFFFFF 50%, #111827 50%);"></span>
+                                            <span class="text-[10px] font-bold text-gray-700">Midnight</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">QR Foreground</label>
+                                        <div class="flex items-center gap-2 ios-input rounded-xl px-3 py-2">
+                                            <input type="color" id="qr-fg-color" value="#1D1D1F" class="w-7 h-7 rounded cursor-pointer border-0 bg-transparent">
+                                            <span id="qr-fg-hex" class="text-xs font-mono font-bold text-gray-700">#1D1D1F</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Background</label>
+                                        <div class="flex items-center gap-2 ios-input rounded-xl px-3 py-2">
+                                            <input type="color" id="qr-bg-color" value="#FFFFFF" class="w-7 h-7 rounded cursor-pointer border-0 bg-transparent">
+                                            <span id="qr-bg-hex" class="text-xs font-mono font-bold text-gray-700">#FFFFFF</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Card Title (Optional)</label>
+                                        <input type="text" id="qr-custom-title" placeholder="e.g. Scan to Chat" class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Caption / Subtitle</label>
+                                        <input type="text" id="qr-custom-caption" placeholder="e.g. Scan with Camera" class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Center Logo (High Error Correction 'H')</label>
+                                        <button type="button" id="remove-logo-btn" class="hidden text-[11px] font-bold text-red-500 hover:underline">Remove Logo</button>
+                                    </div>
+                                    <label class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 cursor-pointer flex items-center justify-center gap-2 border-dashed">
+                                        <i class="fas fa-image text-blue-600"></i>
+                                        <span id="qr-logo-filename" class="truncate">Upload PNG/JPG Logo</span>
+                                        <input type="file" id="qr-logo-input" accept="image/*" class="hidden">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Sticky Live Preview -->
+                        <div class="lg:col-span-5 lg:sticky lg:top-24">
+                            <div class="ios-card rounded-3xl p-5 sm:p-6 flex flex-col items-center text-center">
+                                <div class="w-full flex items-center justify-between mb-4">
+                                    <span class="text-[11px] font-extrabold uppercase tracking-widest text-gray-400">Live Preview</span>
+                                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                                        <i class="fas fa-check-circle"></i> High Scannability
+                                    </span>
+                                </div>
+
+                                <div id="qr-poster-preview" class="w-full max-w-[290px] rounded-[1.75rem] p-5 border border-gray-200/80 shadow-sm transition-colors duration-200 flex flex-col items-center justify-center" style="background-color: #FFFFFF;">
+                                    <p id="preview-title-text" class="text-base font-black tracking-tight mb-3 hidden" style="color: #1D1D1F;"></p>
+                                    <div class="relative flex items-center justify-center">
+                                        <canvas id="main-qr-canvas" width="240" height="240" class="rounded-xl max-w-full h-auto"></canvas>
+                                    </div>
+                                    <p id="preview-caption-text" class="text-[11px] font-semibold mt-3 opacity-80 hidden" style="color: #1D1D1F;"></p>
+                                </div>
+
+                                <div class="w-full mt-4 bg-[#F7F7F9] rounded-xl p-2.5 border border-gray-200/70 flex items-center justify-between gap-2">
+                                    <code id="encoded-payload-preview" class="text-[11px] text-gray-600 truncate font-mono">https://bikripage.github.io/Online/</code>
+                                    <button type="button" id="btn-copy-payload" class="shrink-0 text-xs font-bold text-blue-600 hover:text-blue-800 px-2 py-1 rounded-lg hover:bg-blue-50 transition" title="Copy Content">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+
+                                <div class="w-full grid grid-cols-2 gap-2.5 mt-4">
+                                    <button type="button" id="btn-download-png" class="bg-[#1D1D1F] hover:bg-black text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm active:scale-95 transition">
+                                        <i class="fas fa-download"></i> Download PNG
+                                    </button>
+                                    <button type="button" id="btn-download-svg" class="bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-95 transition">
+                                        <i class="fas fa-vector-square text-indigo-600"></i> Download SVG
+                                    </button>
+                                    <button type="button" id="btn-save-qr" class="col-span-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm active:scale-95 transition">
+                                        <i class="fas fa-bookmark"></i> Save to My QR Codes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== TAB 2: DIGITAL VISITING CARD ==================== -->
+                <section id="panel-vcard" class="tab-panel hidden animate-view space-y-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                            <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Digital Visiting Card</h1>
+                            <p class="text-xs sm:text-sm text-gray-500">Create a scannable visiting card QR that opens your mobile profile with 1-tap Contact Save &amp; social links.</p>
+                        </div>
+                        <button type="button" id="btn-preview-card" class="self-start sm:self-auto bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm active:scale-95 transition">
+                            <i class="fas fa-eye text-blue-600"></i> Preview Full Card
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                        <form id="digital-card-form" class="lg:col-span-7 ios-card rounded-3xl p-5 space-y-4">
+                            <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                                <h2 class="text-sm font-extrabold text-gray-900">Card Profile Details</h2>
+                                <span class="text-[11px] font-semibold text-gray-400">Digital Identity</span>
+                            </div>
+
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-black text-xl flex items-center justify-center overflow-hidden shrink-0 border border-gray-200 shadow-sm">
+                                    <img id="dc-logo-preview" src="" class="w-full h-full object-cover hidden">
+                                    <span id="dc-logo-initials">QR</span>
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-xs font-bold text-gray-800 mb-1">Logo / Profile Photo</label>
+                                    <div class="flex flex-wrap gap-2">
+                                        <label class="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold cursor-pointer transition">
+                                            <i class="fas fa-camera mr-1"></i> Upload Photo
+                                            <input type="file" id="dc-logo-input" accept="image/*" class="hidden">
+                                        </label>
+                                        <button type="button" id="btn-remove-dc-logo" class="px-3 py-1.5 rounded-xl text-red-600 hover:bg-red-50 text-xs font-bold transition">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Business / Brand Name *</label>
+                                    <input type="text" id="dc-shop-name" required placeholder="e.g. Veer Digital Studio" class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Your Name / Title *</label>
+                                    <input type="text" id="dc-owner-name" required placeholder="e.g. Veer" class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Phone Number *</label>
+                                    <input type="tel" id="dc-phone" required placeholder="e.g. 9876543210" class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">WhatsApp Number</label>
+                                    <input type="tel" id="dc-whatsapp" placeholder="Same as phone if blank" class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Instagram Username or Link</label>
+                                    <input type="text" id="dc-instagram" placeholder="@username or URL" class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Facebook Page Link</label>
+                                    <input type="text" id="dc-facebook" placeholder="facebook.com/yourpage" class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold">
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Website / Portfolio Link</label>
+                                    <input type="url" id="dc-website" placeholder="https://example.com" class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold">
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Address</label>
+                                    <input type="text" id="dc-address" placeholder="e.g. Nangloi, West Delhi - 110041" class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold">
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Google Maps Link (Optional)</label>
+                                    <input type="url" id="dc-maps-url" placeholder="https://maps.google.com/?q=..." class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold">
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Short Bio / Tagline</label>
+                                    <textarea id="dc-description" rows="2" placeholder="Describe your business or services..." class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold resize-none"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="pt-2">
+                                <button type="submit" id="save-dc-btn" class="w-full bg-[#1D1D1F] hover:bg-black text-white font-bold py-3.5 px-5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
+                                    <i class="fas fa-save text-sky-400"></i> Save Visiting Card
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="lg:col-span-5 space-y-5 lg:sticky lg:top-24">
+                            <div class="ios-card rounded-3xl p-5 flex flex-col items-center text-center">
+                                <span class="text-[11px] font-extrabold uppercase tracking-widest text-gray-400 mb-3">Visiting Card QR Code</span>
+                                <div class="p-4 bg-white rounded-2xl border border-gray-200 shadow-sm">
+                                    <canvas id="vcard-qr-canvas" width="210" height="210"></canvas>
+                                </div>
+                                <p class="text-[11px] text-gray-500 mt-3 max-w-xs">Scanning this QR opens your interactive Digital Visiting Card with 1-tap Contact Save, WhatsApp, Instagram &amp; Maps.</p>
+
+                                <div class="w-full grid grid-cols-2 gap-2.5 mt-4">
+                                    <button type="button" id="btn-download-card-qr" class="bg-[#1D1D1F] hover:bg-black text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-95 transition">
+                                        <i class="fas fa-download"></i> Download QR
+                                    </button>
+                                    <button type="button" id="btn-copy-card-link" class="bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-95 transition">
+                                        <i class="fas fa-link"></i> Copy Card Link
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="ios-card rounded-3xl p-4 bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-lg">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="text-[10px] font-bold uppercase tracking-widest text-sky-400">Live Card Mini-Preview</span>
+                                    <span class="text-[10px] text-slate-400">Mobile View</span>
+                                </div>
+                                <div class="bg-white text-gray-900 rounded-2xl p-4 shadow-inner">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-12 h-12 rounded-xl bg-blue-600 text-white font-black flex items-center justify-center text-base overflow-hidden shrink-0">
+                                            <img id="mini-dc-logo" src="" class="w-full h-full object-cover hidden">
+                                            <span id="mini-dc-initials">QR</span>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <h4 id="mini-dc-shop" class="font-black text-sm truncate">Business Name</h4>
+                                            <p id="mini-dc-owner" class="text-xs font-semibold text-blue-600 truncate">Owner Name</p>
+                                        </div>
+                                    </div>
+                                    <p id="mini-dc-desc" class="text-[11px] text-gray-500 mt-2.5 line-clamp-2">Your business tagline appears here.</p>
+                                    <div class="grid grid-cols-3 gap-1.5 mt-3 pt-3 border-t border-gray-100 text-center text-[10px] font-bold">
+                                        <span class="py-1.5 rounded-lg bg-gray-900 text-white"><i class="fas fa-user-plus mr-1"></i>Save</span>
+                                        <span class="py-1.5 rounded-lg bg-emerald-50 text-emerald-700"><i class="fab fa-whatsapp mr-1"></i>Chat</span>
+                                        <span class="py-1.5 rounded-lg bg-pink-50 text-pink-700"><i class="fab fa-instagram mr-1"></i>Insta</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== TAB 3: UPI PAYMENT QR ==================== -->
+                <section id="panel-upi" class="tab-panel hidden animate-view space-y-5">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Fixed-Amount UPI Payment QR</h1>
+                        <p class="text-xs sm:text-sm text-gray-500">Generate instant NPCI-compliant UPI QR codes for GPay, PhonePe, Paytm &amp; BHIM.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                        <div class="lg:col-span-7 ios-card rounded-3xl p-5 space-y-4">
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Payee UPI ID (VPA) *</label>
+                                <input type="text" id="upi-id-input" placeholder="e.g. yourname@okicici or 9876543210@paytm" class="w-full ios-input rounded-xl px-4 py-3 text-sm font-semibold">
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Payee / Business Name *</label>
+                                    <input type="text" id="upi-payee-input" placeholder="e.g. Veer Store" class="w-full ios-input rounded-xl px-4 py-3 text-sm font-semibold">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Fixed Amount (INR ₹) *</label>
+                                    <input type="number" id="upi-amount-input" min="1" max="100000" step="0.01" placeholder="e.g. 499" class="w-full ios-input rounded-xl px-4 py-3 text-sm font-black text-emerald-700">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Payment Note / Reference (Optional)</label>
+                                <input type="text" id="upi-note-input" maxlength="40" placeholder="e.g. Order Payment" class="w-full ios-input rounded-xl px-4 py-3 text-sm font-semibold">
+                            </div>
+
+                            <div id="upi-error-box" class="hidden text-xs font-semibold text-red-600 bg-red-50 border border-red-100 px-3.5 py-2.5 rounded-xl"></div>
+
+                            <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200/80 flex items-start gap-3">
+                                <i class="fas fa-shield-alt text-amber-600 mt-0.5 shrink-0"></i>
+                                <p class="text-[11px] text-amber-900 font-medium leading-relaxed">
+                                    <strong>Important Notice:</strong> Generating a UPI QR code encodes payment instructions only and <strong>does not verify, track, or confirm</strong> whether a payment has been completed. Always verify credit in your bank or UPI app.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5 ios-card rounded-3xl p-6 flex flex-col items-center text-center">
+                            <div class="w-full max-w-[280px] rounded-[1.75rem] bg-gradient-to-b from-[#FFFFFF] to-[#F8FAFC] border border-gray-200 p-5 shadow-sm">
+                                <div class="flex items-center justify-center gap-2 mb-2">
+                                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-black uppercase tracking-wider">UPI Accepted Here</span>
+                                </div>
+                                <h3 id="upi-card-payee" class="font-black text-gray-900 text-base truncate">Payee Name</h3>
+                                <p id="upi-card-vpa" class="text-[11px] font-mono text-gray-500 truncate mb-3">yourname@upi</p>
+
+                                <div class="bg-white p-3 rounded-2xl border border-gray-100 inline-block shadow-inner">
+                                    <canvas id="upi-qr-canvas" width="200" height="200"></canvas>
+                                </div>
+
+                                <div id="upi-amount-pill" class="mt-3 py-1.5 px-4 rounded-xl bg-emerald-600 text-white font-black text-base inline-block shadow-sm">
+                                    ₹ 100.00
+                                </div>
+                                <p id="upi-card-note" class="text-[11px] text-gray-500 mt-2 truncate"></p>
+                            </div>
+
+                            <div class="w-full grid grid-cols-2 gap-2.5 mt-5">
+                                <button type="button" id="btn-download-upi" class="bg-[#1D1D1F] hover:bg-black text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-95 transition">
+                                    <i class="fas fa-download"></i> Download PNG
+                                </button>
+                                <button type="button" id="btn-share-upi" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-95 transition">
+                                    <i class="fas fa-share-alt"></i> Share QR
+                                </button>
+                                <button type="button" id="btn-save-upi" class="col-span-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition">
+                                    <i class="fas fa-bookmark text-blue-600"></i> Save UPI QR to Library
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== TAB 4: QUICK QR SCANNER ==================== -->
+                <section id="panel-scanner" class="tab-panel hidden animate-view space-y-5">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Quick QR Scanner</h1>
+                        <p class="text-xs sm:text-sm text-gray-500">Scan QR codes via live camera or upload an image from your gallery.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                        <div class="lg:col-span-7 ios-card rounded-3xl p-5 space-y-4">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <div class="flex items-center gap-2">
+                                    <button type="button" id="start-cam-btn" class="bg-[#0071E3] hover:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm active:scale-95 transition">
+                                        <i class="fas fa-camera"></i> Start Camera
+                                    </button>
+                                    <button type="button" id="stop-cam-btn" class="hidden bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 active:scale-95 transition">
+                                        <i class="fas fa-stop"></i> Stop Camera
+                                    </button>
+                                </div>
+
+                                <select id="camera-select" class="hidden ios-input rounded-xl px-3 py-2 text-xs font-bold text-gray-700 max-w-[180px]">
+                                    <option value="">Default Camera</option>
+                                </select>
+                            </div>
+
+                            <div class="relative w-full aspect-square max-h-[340px] mx-auto rounded-2xl bg-[#111827] overflow-hidden flex items-center justify-center border border-gray-200">
+                                <video id="scanner-video" class="w-full h-full object-cover hidden" playsinline muted></video>
+                                <canvas id="scanner-hidden-canvas" class="hidden"></canvas>
+
+                                <div id="scanner-overlay" class="hidden absolute inset-0 pointer-events-none">
+                                    <div class="w-56 h-56 border-2 border-white/80 rounded-3xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]">
+                                        <div class="scanner-laser"></div>
+                                    </div>
+                                </div>
+
+                                <div id="scanner-placeholder" class="text-center p-6 text-gray-300">
+                                    <div class="w-14 h-14 rounded-2xl bg-white/10 mx-auto flex items-center justify-center mb-3">
+                                        <i class="fas fa-qrcode text-2xl text-sky-400"></i>
+                                    </div>
+                                    <p class="text-sm font-bold text-white">Camera is Paused</p>
+                                    <p class="text-xs text-gray-400 mt-1 max-w-xs">Click "Start Camera" (requires HTTPS or localhost) or upload a QR image below.</p>
+                                </div>
+                            </div>
+
+                            <div id="scanner-error-alert" class="hidden text-xs font-semibold text-red-600 bg-red-50 border border-red-100 p-3.5 rounded-xl flex items-start gap-2.5">
+                                <i class="fas fa-exclamation-triangle mt-0.5 shrink-0"></i>
+                                <span id="scanner-error-text"></span>
+                            </div>
+
+                            <div class="pt-1">
+                                <label class="w-full ios-input hover:bg-gray-100 rounded-2xl p-3.5 text-xs font-bold text-gray-700 cursor-pointer flex items-center justify-center gap-2 border-dashed transition">
+                                    <i class="fas fa-file-image text-blue-600 text-base"></i>
+                                    <span>Upload QR Image from Device</span>
+                                    <input type="file" id="scanner-file-input" accept="image/*" class="hidden">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5 ios-card rounded-3xl p-5 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-sm font-extrabold text-gray-900">Scan Result</h2>
+                                <span id="scan-type-badge" class="hidden text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600">URL</span>
+                            </div>
+
+                            <div id="scan-empty-state" class="py-10 text-center">
+                                <div class="w-12 h-12 rounded-2xl bg-gray-100 text-gray-400 mx-auto flex items-center justify-center mb-3">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <p class="text-xs font-bold text-gray-600">No QR Code Scanned Yet</p>
+                                <p class="text-[11px] text-gray-400 mt-1">Point your camera at any QR code or upload an image to inspect its content.</p>
+                            </div>
+
+                            <div id="scan-result-box" class="hidden space-y-4">
+                                <div class="p-3.5 rounded-2xl bg-[#F7F7F9] border border-gray-200 break-all">
+                                    <p id="scan-raw-output" class="text-xs font-mono font-semibold text-gray-800 whitespace-pre-wrap"></p>
+                                </div>
+
+                                <div id="scan-smart-actions" class="space-y-2"></div>
+
+                                <button type="button" id="btn-copy-scan" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 transition">
+                                    <i class="fas fa-copy"></i> Copy Scanned Text
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== TAB 5: MY SAVED QR CODES ==================== -->
+                <section id="panel-saved" class="tab-panel hidden animate-view space-y-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">My Saved QR Codes</h1>
+                            <p class="text-xs sm:text-sm text-gray-500">Your saved QR codes stored on this device and synced in the background.</p>
+                        </div>
+                        <button type="button" id="btn-saved-create-new" class="self-start sm:self-auto bg-[#1D1D1F] text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm active:scale-95 transition">
+                            <i class="fas fa-plus"></i> Create New QR
+                        </button>
+                    </div>
+
+                    <div id="saved-qr-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </section>
+
+                <!-- ==================== TAB 6: RECENT ACTIVITY ==================== -->
+                <section id="panel-activity" class="tab-panel hidden animate-view space-y-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Recent Activity</h1>
+                            <p class="text-xs sm:text-sm text-gray-500">History of generated, downloaded, and scanned QR codes.</p>
+                        </div>
+                        <button type="button" id="btn-clear-activity" class="text-xs font-bold text-red-600 hover:bg-red-50 px-3 py-2 rounded-xl transition">
+                            Clear History
+                        </button>
+                    </div>
+
+                    <div id="activity-feed-list" class="ios-card rounded-3xl divide-y divide-gray-100 overflow-hidden"></div>
+                </section>
+
+            </main>
+        </div>
+
+        <!-- Mobile Bottom Navigation Bar -->
+        <nav class="lg:hidden fixed bottom-0 left-0 right-0 ios-glass border-t border-gray-200/80 px-2 py-1.5 z-40 flex items-center justify-around">
+            <button type="button" data-nav-tab="generator" class="mobile-nav-item active flex flex-col items-center py-1 px-2">
+                <span class="nav-icon-pill w-9 h-7 rounded-full flex items-center justify-center text-sm mb-0.5 transition"><i class="fas fa-qrcode"></i></span>
+                <span class="text-[10px] font-bold">Create</span>
+            </button>
+            <button type="button" data-nav-tab="vcard" class="mobile-nav-item flex flex-col items-center py-1 px-2">
+                <span class="nav-icon-pill w-9 h-7 rounded-full flex items-center justify-center text-sm mb-0.5 transition"><i class="fas fa-id-card"></i></span>
+                <span class="text-[10px] font-bold">Card</span>
+            </button>
+            <button type="button" data-nav-tab="upi" class="mobile-nav-item flex flex-col items-center py-1 px-2">
+                <span class="nav-icon-pill w-9 h-7 rounded-full flex items-center justify-center text-sm mb-0.5 transition"><i class="fas fa-rupee-sign"></i></span>
+                <span class="text-[10px] font-bold">UPI</span>
+            </button>
+            <button type="button" data-nav-tab="scanner" class="mobile-nav-item flex flex-col items-center py-1 px-2">
+                <span class="nav-icon-pill w-9 h-7 rounded-full flex items-center justify-center text-sm mb-0.5 transition"><i class="fas fa-expand"></i></span>
+                <span class="text-[10px] font-bold">Scan</span>
+            </button>
+            <button type="button" data-nav-tab="saved" class="mobile-nav-item flex flex-col items-center py-1 px-2">
+                <span class="nav-icon-pill w-9 h-7 rounded-full flex items-center justify-center text-sm mb-0.5 transition"><i class="fas fa-bookmark"></i></span>
+                <span class="text-[10px] font-bold">Saved</span>
+            </button>
+            <button type="button" data-nav-tab="activity" class="mobile-nav-item flex flex-col items-center py-1 px-2">
+                <span class="nav-icon-pill w-9 h-7 rounded-full flex items-center justify-center text-sm mb-0.5 transition"><i class="fas fa-history"></i></span>
+                <span class="text-[10px] font-bold">Logs</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- ==================== TOAST NOTIFICATION ==================== -->
+    <div id="studio-toast" class="fixed top-20 right-4 left-4 sm:left-auto sm:w-80 bg-[#1D1D1F] text-white px-4 py-3 rounded-2xl shadow-xl z-50 hidden items-center gap-3 text-xs font-semibold">
+        <i id="toast-icon" class="fas fa-check-circle text-emerald-400 text-base"></i>
+        <span id="toast-msg" class="flex-1">Action completed</span>
+    </div>
+
+    <script>
+        function getStudioDeviceId() {
+            var id = localStorage.getItem("bp_qr_studio_device_id");
+            if (!id) {
+                id = "studio_" + Math.random().toString(36).substring(2, 10) + "_" + Date.now();
+                localStorage.setItem("bp_qr_studio_device_id", id);
+            }
+            return id;
+        }
+
+        var DEVICE_ID = getStudioDeviceId();
+        var STORAGE_SAVED_KEY = "bp_qr_studio_saved_list";
+        var STORAGE_CARD_KEY = "bp_qr_studio_digital_card";
+        var STORAGE_ACTIVITY_KEY = "bp_qr_studio_activity";
+        var STORAGE_UPI_KEY = "bp_qr_studio_upi_id";
+
+        var currentQrType = "url";
+        var currentQrPayload = "https://bikripage.github.io/Online/";
+        var qrCenterLogoDataUrl = "";
+        var cardLogoDataUrl = "";
+        var publicVCardData = null;
+        var showFieldErrors = false;
+
+        var videoStream = null;
+        var scanAnimFrame = null;
+        var isScanning = false;
+
+        var qrTypeConfigs = {
+            url: {
+                heading: "Enter Website URL",
+                fields: [
+                    { id: "fld-url", label: "Website or Link *", type: "url", placeholder: "https://example.com", defaultVal: "https://bikripage.github.io/Online/" }
+                ]
+            },
+            whatsapp: {
+                heading: "WhatsApp Direct Chat QR",
+                fields: [
+                    { id: "fld-wa-phone", label: "WhatsApp Number (with Country Code) *", type: "tel", placeholder: "919876543210", defaultVal: "91" },
+                    { id: "fld-wa-msg", label: "Pre-filled Message (Optional)", type: "text", placeholder: "Hi! I want to connect with you." }
+                ]
+            },
+            instagram: {
+                heading: "Instagram Profile QR",
+                fields: [
+                    { id: "fld-ig-user", label: "Instagram Username or Profile URL *", type: "text", placeholder: "@username or https://instagram.com/username", defaultVal: "bikripage" }
+                ]
+            },
+            facebook: {
+                heading: "Facebook Page QR",
+                fields: [
+                    { id: "fld-fb-url", label: "Facebook Page Username or URL *", type: "text", placeholder: "https://facebook.com/yourpage" }
+                ]
+            },
+            phone: {
+                heading: "Direct Phone Call QR",
+                fields: [
+                    { id: "fld-phone", label: "Phone Number *", type: "tel", placeholder: "+919876543210" }
+                ]
+            },
+            email: {
+                heading: "Email Compose QR",
+                fields: [
+                    { id: "fld-email-to", label: "Recipient Email *", type: "email", placeholder: "hello@example.com" },
+                    { id: "fld-email-sub", label: "Subject (Optional)", type: "text", placeholder: "Inquiry" },
+                    { id: "fld-email-body", label: "Message Body (Optional)", type: "text", placeholder: "Hello..." }
+                ]
+            },
+            vcard: {
+                heading: "Contact Card (vCard 3.0) QR",
+                fields: [
+                    { id: "fld-vc-name", label: "Full Name *", type: "text", placeholder: "Veer" },
+                    { id: "fld-vc-org", label: "Business / Organization", type: "text", placeholder: "My Business" },
+                    { id: "fld-vc-phone", label: "Mobile Number *", type: "tel", placeholder: "+919876543210" },
+                    { id: "fld-vc-email", label: "Email Address", type: "email", placeholder: "contact@example.com" },
+                    { id: "fld-vc-url", label: "Website URL", type: "url", placeholder: "https://example.com" },
+                    { id: "fld-vc-addr", label: "Address", type: "text", placeholder: "Delhi, India" }
+                ]
+            },
+            wifi: {
+                heading: "Wi-Fi Instant Connect QR",
+                fields: [
+                    { id: "fld-wifi-ssid", label: "Network Name (SSID) *", type: "text", placeholder: "My_WiFi" },
+                    { id: "fld-wifi-pass", label: "Wi-Fi Password", type: "text", placeholder: "********" },
+                    { id: "fld-wifi-enc", label: "Security Type", type: "select", options: ["WPA", "WEP", "nopass"] }
+                ]
+            },
+            maps: {
+                heading: "Google Maps Location QR",
+                fields: [
+                    { id: "fld-maps-query", label: "Maps Link or Address / Coordinates *", type: "text", placeholder: "https://maps.google.com/?q=28.68,77.06 or Address" }
+                ]
+            },
+            text: {
+                heading: "Plain Text / Note QR",
+                fields: [
+                    { id: "fld-text", label: "Text Content *", type: "textarea", placeholder: "Enter any text, coupon code, or message..." }
+                ]
+            },
+            upi: {
+                heading: "UPI Payment QR (Fixed Amount)",
+                fields: [
+                    { id: "fld-upi-id", label: "UPI ID (VPA) *", type: "text", placeholder: "name@okicici" },
+                    { id: "fld-upi-name", label: "Payee Name *", type: "text", placeholder: "Payee Name" },
+                    { id: "fld-upi-amt", label: "Fixed Amount (₹) *", type: "number", placeholder: "299" },
+                    { id: "fld-upi-note", label: "Transaction Note", type: "text", placeholder: "Payment" }
+                ]
+            }
+        };
+
+        function encodeBase64Utf8(obj) {
+            var jsonStr = JSON.stringify(obj);
+            var bytes = new TextEncoder().encode(jsonStr);
+            var binStr = "";
+            for (var i = 0; i < bytes.length; i++) {
+                binStr += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binStr);
+        }
+
+        function decodeBase64Utf8(b64) {
+            var binStr = atob(b64);
+            var bytes = new Uint8Array(binStr.length);
+            for (var i = 0; i < binStr.length; i++) {
+                bytes[i] = binStr.charCodeAt(i);
+            }
+            var jsonStr = new TextDecoder().decode(bytes);
+            return JSON.parse(jsonStr);
+        }
+
+        function escapeHtml(str) {
+            return String(str || "").replace(/[&<>"']/g, function (m) {
+                return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[m];
+            });
+        }
+
+        var toastTimer = null;
+        function showToast(msg, type) {
+            var toast = document.getElementById("studio-toast");
+            var icon = document.getElementById("toast-icon");
+            document.getElementById("toast-msg").textContent = msg;
+            icon.className = type === "error"
+                ? "fas fa-exclamation-circle text-red-400 text-base"
+                : "fas fa-check-circle text-emerald-400 text-base";
+            toast.classList.remove("hidden");
+            toast.classList.add("flex");
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () {
+                toast.classList.add("hidden");
+                toast.classList.remove("flex");
+            }, 2600);
+        }
+
+        function switchTab(tabName) {
+            if (tabName !== "scanner" && isScanning) {
+                stopCameraScanner();
+            }
+
+            document.querySelectorAll(".tab-panel").forEach(function (p) {
+                p.classList.add("hidden");
+            });
+            var target = document.getElementById("panel-" + tabName);
+            if (target) target.classList.remove("hidden");
+
+            document.querySelectorAll("[data-nav-tab]").forEach(function (btn) {
+                btn.classList.toggle("active", btn.getAttribute("data-nav-tab") === tabName);
+            });
+
+            if (tabName === "vcard") renderDigitalCardQr();
+            if (tabName === "upi") renderUpiQr();
+            if (tabName === "saved") renderSavedQrCodes();
+            if (tabName === "activity") renderActivityFeed();
+        }
+
+        function selectQrType(type) {
+            currentQrType = type;
+            showFieldErrors = false;
+
+            document.querySelectorAll(".qr-type-pill").forEach(function (btn) {
+                btn.classList.toggle("active", btn.getAttribute("data-qrtype") === type);
+            });
+
+            var cfg = qrTypeConfigs[type];
+            document.getElementById("qr-form-heading").textContent = cfg.heading;
+            var container = document.getElementById("dynamic-qr-fields");
+
+            container.innerHTML = cfg.fields.map(function (f) {
+                if (f.type === "select") {
+                    return '<div><label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">' + f.label + '</label>' +
+                        '<select id="' + f.id + '" class="qr-dyn-input w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold">' +
+                        f.options.map(function (o) {
+                            return '<option value="' + o + '">' + (o === "nopass" ? "None (Open)" : o) + '</option>';
+                        }).join("") +
+                        '</select></div>';
+                }
+                if (f.type === "textarea") {
+                    return '<div><label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">' + f.label + '</label>' +
+                        '<textarea id="' + f.id + '" rows="3" placeholder="' + (f.placeholder || "") + '" class="qr-dyn-input w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold resize-none">' + (f.defaultVal || "") + '</textarea></div>';
+                }
+                return '<div><label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">' + f.label + '</label>' +
+                    '<input type="' + f.type + '" id="' + f.id + '" value="' + (f.defaultVal || "") + '" placeholder="' + (f.placeholder || "") + '" class="qr-dyn-input w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold"></div>';
+            }).join("");
+
+            container.querySelectorAll(".qr-dyn-input").forEach(function (el) {
+                el.addEventListener("input", function () {
+                    showFieldErrors = true;
+                    renderLiveQr();
+                });
+                el.addEventListener("change", function () {
+                    showFieldErrors = true;
+                    renderLiveQr();
+                });
+            });
+
+            renderLiveQr();
+        }
+
+        function buildPayloadFromCurrentType() {
+            var val = function (id) {
+                var el = document.getElementById(id);
+                return el ? el.value.trim() : "";
+            };
+            var payload = "";
+            var error = "";
+
+            if (currentQrType === "url") {
+                var u = val("fld-url");
+                if (!u) { error = "Please enter a website URL."; }
+                else {
+                    if (!/^https?:\/\//i.test(u)) u = "https://" + u;
+                    payload = u;
+                }
+            } else if (currentQrType === "whatsapp") {
+                var p = val("fld-wa-phone").replace(/\D/g, "");
+                if (p.length < 10) { error = "Enter a valid WhatsApp number with country code (e.g. 919876543210)."; }
+                else {
+                    if (p.length === 10) p = "91" + p;
+                    var msg = val("fld-wa-msg");
+                    payload = "https://wa.me/" + p + (msg ? "?text=" + encodeURIComponent(msg) : "");
+                }
+            } else if (currentQrType === "instagram") {
+                var ig = val("fld-ig-user");
+                if (!ig) { error = "Enter an Instagram username or URL."; }
+                else if (!/^https?:\/\//i.test(ig)) {
+                    payload = "https://instagram.com/" + ig.replace(/^@/, "");
+                } else {
+                    payload = ig;
+                }
+            } else if (currentQrType === "facebook") {
+                var fb = val("fld-fb-url");
+                if (!fb) { error = "Enter a Facebook page username or link."; }
+                else if (!/^https?:\/\//i.test(fb)) {
+                    payload = "https://facebook.com/" + fb.replace(/^@/, "");
+                } else {
+                    payload = fb;
+                }
+            } else if (currentQrType === "phone") {
+                var ph = val("fld-phone").replace(/[^\d+]/g, "");
+                if (ph.length < 7) { error = "Enter a valid phone number."; }
+                else { payload = "tel:" + ph; }
+            } else if (currentQrType === "email") {
+                var to = val("fld-email-to");
+                if (!to || to.indexOf("@") === -1) { error = "Enter a valid email address."; }
+                else {
+                    var sub = val("fld-email-sub");
+                    var body = val("fld-email-body");
+                    var params = [];
+                    if (sub) params.push("subject=" + encodeURIComponent(sub));
+                    if (body) params.push("body=" + encodeURIComponent(body));
+                    payload = "mailto:" + to + (params.length ? "?" + params.join("&") : "");
+                }
+            } else if (currentQrType === "vcard") {
+                var name = val("fld-vc-name");
+                var phone = val("fld-vc-phone");
+                if (!name || !phone) { error = "Name and mobile number are required for vCard."; }
+                else {
+                    var lines = [
+                        "BEGIN:VCARD",
+                        "VERSION:3.0",
+                        "N:" + name + ";;;;",
+                        "FN:" + name
+                    ];
+                    var org = val("fld-vc-org");
+                    var email = val("fld-vc-email");
+                    var url = val("fld-vc-url");
+                    var addr = val("fld-vc-addr");
+                    if (org) lines.push("ORG:" + org);
+                    lines.push("TEL;TYPE=CELL:" + phone);
+                    if (email) lines.push("EMAIL:" + email);
+                    if (url) lines.push("URL:" + url);
+                    if (addr) lines.push("ADR:;;" + addr + ";;;;");
+                    lines.push("END:VCARD");
+                    payload = lines.join("\n");
+                }
+            } else if (currentQrType === "wifi") {
+                var ssid = val("fld-wifi-ssid");
+                if (!ssid) { error = "Enter the Wi-Fi Network Name (SSID)."; }
+                else {
+                    var pass = val("fld-wifi-pass");
+                    var enc = val("fld-wifi-enc") || "WPA";
+                    payload = "WIFI:T:" + enc + ";S:" + ssid + ";P:" + (enc === "nopass" ? "" : pass) + ";;";
+                }
+            } else if (currentQrType === "maps") {
+                var q = val("fld-maps-query");
+                if (!q) { error = "Enter a Google Maps link or location address."; }
+                else {
+                    payload = /^https?:\/\//i.test(q) ? q : "https://maps.google.com/?q=" + encodeURIComponent(q);
+                }
+            } else if (currentQrType === "text") {
+                var t = val("fld-text");
+                if (!t) { error = "Enter some text to encode."; }
+                else { payload = t; }
+            } else if (currentQrType === "upi") {
+                var pa = val("fld-upi-id");
+                var pn = val("fld-upi-name");
+                var am = val("fld-upi-amt");
+                var tn = val("fld-upi-note");
+                if (!pa || pa.indexOf("@") === -1) { error = "Enter a valid UPI ID (e.g. name@okicici)."; }
+                else if (!pn) { error = "Enter Payee Name."; }
+                else if (!am || parseFloat(am) <= 0) { error = "Enter a valid amount greater than ₹0."; }
+                else {
+                    payload = "upi://pay?pa=" + encodeURIComponent(pa) + "&pn=" + encodeURIComponent(pn) + "&am=" + encodeURIComponent(parseFloat(am).toFixed(2)) + "&cu=INR" + (tn ? "&tn=" + encodeURIComponent(tn) : "");
+                }
+            }
+
+            return { payload: payload, error: error };
+        }
+
+        function fillRoundedRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.arcTo(x + w, y, x + w, y + h, r);
+            ctx.arcTo(x + w, y + h, x, y + h, r);
+            ctx.arcTo(x, y + h, x, y, r);
+            ctx.arcTo(x, y, x + w, y, r);
+            ctx.closePath();
+        }
+
+        function drawQrOnCanvas(canvas, text, options) {
+            if (!canvas) return;
+            options = options || {};
+            var fg = options.fg || "#1D1D1F";
+            var bg = options.bg || "#FFFFFF";
+            var logoUrl = options.logoUrl || "";
+            var size = canvas.width;
+
+            if (typeof qrcode === "undefined") {
+                var ctx = canvas.getContext("2d");
+                ctx.fillStyle = "#FEE2E2";
+                ctx.fillRect(0, 0, size, size);
+                ctx.fillStyle = "#991B1B";
+                ctx.font = "bold 12px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("QR Engine Loading...", size / 2, size / 2);
+                return;
+            }
+
+            var ecLevel = logoUrl ? "H" : "M";
+            var qr = qrcode(0, ecLevel);
+            qr.addData(text || "https://bikripage.github.io/Online/");
+            qr.make();
+
+            var count = qr.getModuleCount();
+            var margin = 2;
+            var totalModules = count + margin * 2;
+            var cellSize = size / totalModules;
+
+            var ctx = canvas.getContext("2d");
+            ctx.fillStyle = bg;
+            ctx.fillRect(0, 0, size, size);
+
+            ctx.fillStyle = fg;
+            for (var r = 0; r < count; r++) {
+                for (var c = 0; c < count; c++) {
+                    if (qr.isDark(r, c)) {
+                        var x = Math.round((c + margin) * cellSize);
+                        var y = Math.round((r + margin) * cellSize);
+                        var w = Math.ceil(cellSize);
+                        var h = Math.ceil(cellSize);
+                        ctx.fillRect(x, y, w, h);
+                    }
+                }
+            }
+
+            if (logoUrl) {
+                var img = new Image();
+                img.crossOrigin = "anonymous";
+                img.onload = function () {
+                    var logoBox = size * 0.21;
+                    var pad = 5;
+                    var bx = (size - logoBox) / 2;
+                    var by = (size - logoBox) / 2;
+
+                    ctx.fillStyle = bg;
+                    fillRoundedRect(ctx, bx - pad, by - pad, logoBox + pad * 2, logoBox + pad * 2, 10);
+                    ctx.fill();
+
+                    ctx.save();
+                    fillRoundedRect(ctx, bx, by, logoBox, logoBox, 8);
+                    ctx.clip();
+                    ctx.drawImage(img, bx, by, logoBox, logoBox);
+                    ctx.restore();
+                };
+                img.src = logoUrl;
+            }
+        }
+
+        function renderLiveQr() {
+            var fg = document.getElementById("qr-fg-color").value;
+            var bg = document.getElementById("qr-bg-color").value;
+            document.getElementById("qr-fg-hex").textContent = fg.toUpperCase();
+            document.getElementById("qr-bg-hex").textContent = bg.toUpperCase();
+
+            var title = document.getElementById("qr-custom-title").value.trim();
+            var caption = document.getElementById("qr-custom-caption").value.trim();
+
+            var poster = document.getElementById("qr-poster-preview");
+            var titleEl = document.getElementById("preview-title-text");
+            var captionEl = document.getElementById("preview-caption-text");
+
+            poster.style.backgroundColor = bg;
+            titleEl.style.color = fg;
+            captionEl.style.color = fg;
+
+            if (title) {
+                titleEl.textContent = title;
+                titleEl.classList.remove("hidden");
+            } else {
+                titleEl.classList.add("hidden");
+            }
+
+            if (caption) {
+                captionEl.textContent = caption;
+                captionEl.classList.remove("hidden");
+            } else {
+                captionEl.classList.add("hidden");
+            }
+
+            var res = buildPayloadFromCurrentType();
+            var errBox = document.getElementById("qr-validation-msg");
+
+            if (res.error) {
+                if (showFieldErrors) {
+                    errBox.querySelector("span").textContent = res.error;
+                    errBox.classList.remove("hidden");
+                } else {
+                    errBox.classList.add("hidden");
+                }
+            } else {
+                errBox.classList.add("hidden");
+                currentQrPayload = res.payload;
+            }
+
+            document.getElementById("encoded-payload-preview").textContent = currentQrPayload;
+            var canvas = document.getElementById("main-qr-canvas");
+            drawQrOnCanvas(canvas, currentQrPayload, { fg: fg, bg: bg, logoUrl: qrCenterLogoDataUrl });
+        }
+
+        function generatePosterExportCanvas(qrCanvas, bg, fg, title, caption) {
+            var padding = 36;
+            var titleH = title ? 36 : 0;
+            var captionH = caption ? 28 : 0;
+            var outW = qrCanvas.width + padding * 2;
+            var outH = qrCanvas.height + padding * 2 + titleH + captionH;
+
+            var out = document.createElement("canvas");
+            out.width = outW;
+            out.height = outH;
+            var ctx = out.getContext("2d");
+
+            ctx.fillStyle = bg;
+            ctx.fillRect(0, 0, outW, outH);
+
+            ctx.fillStyle = fg;
+            ctx.textAlign = "center";
+
+            if (title) {
+                ctx.font = "800 20px Inter, sans-serif";
+                ctx.fillText(title, outW / 2, padding + 16);
+            }
+
+            ctx.drawImage(qrCanvas, padding, padding + titleH);
+
+            if (caption) {
+                ctx.font = "600 13px Inter, sans-serif";
+                ctx.fillText(caption, outW / 2, padding + titleH + qrCanvas.height + 22);
+            }
+
+            return out;
+        }
+
+        function downloadQrPng() {
+            var res = buildPayloadFromCurrentType();
+            if (res.error) {
+                showFieldErrors = true;
+                renderLiveQr();
+                showToast(res.error, "error");
+                return;
+            }
+
+            var fg = document.getElementById("qr-fg-color").value;
+            var bg = document.getElementById("qr-bg-color").value;
+            var title = document.getElementById("qr-custom-title").value.trim();
+            var caption = document.getElementById("qr-custom-caption").value.trim();
+
+            var hiResCanvas = document.createElement("canvas");
+            hiResCanvas.width = 512;
+            hiResCanvas.height = 512;
+            drawQrOnCanvas(hiResCanvas, currentQrPayload, { fg: fg, bg: bg, logoUrl: qrCenterLogoDataUrl });
+
+            setTimeout(function () {
+                var exportCanvas = generatePosterExportCanvas(hiResCanvas, bg, fg, title, caption);
+                var link = document.createElement("a");
+                link.download = "BikriPage-QR-" + currentQrType + "-" + Date.now() + ".png";
+                link.href = exportCanvas.toDataURL("image/png");
+                link.click();
+                logActivity("Downloaded PNG", currentQrType.toUpperCase() + " QR exported as PNG");
+                showToast("PNG downloaded!");
+            }, 140);
+        }
+
+        function downloadQrSvg() {
+            var res = buildPayloadFromCurrentType();
+            if (res.error) {
+                showFieldErrors = true;
+                renderLiveQr();
+                showToast(res.error, "error");
+                return;
+            }
+
+            var fg = document.getElementById("qr-fg-color").value;
+            var bg = document.getElementById("qr-bg-color").value;
+            var qr = qrcode(0, "M");
+            qr.addData(currentQrPayload);
+            qr.make();
+
+            var count = qr.getModuleCount();
+            var margin = 2;
+            var total = count + margin * 2;
+            var scale = 10;
+            var size = total * scale;
+
+            var rects = '<rect width="' + size + '" height="' + size + '" fill="' + bg + '"/>';
+            for (var r = 0; r < count; r++) {
+                for (var c = 0; c < count; c++) {
+                    if (qr.isDark(r, c)) {
+                        rects += '<rect x="' + ((c + margin) * scale) + '" y="' + ((r + margin) * scale) + '" width="' + scale + '" height="' + scale + '" fill="' + fg + '"/>';
+                    }
+                }
+            }
+            var svgStr = '<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + size + ' ' + size + '" width="' + size + '" height="' + size + '">' + rects + '</svg>';
+            var blob = new Blob([svgStr], { type: "image/svg+xml;charset=utf-8" });
+            var url = URL.createObjectURL(blob);
+            var link = document.createElement("a");
+            link.download = "BikriPage-QR-" + currentQrType + "-" + Date.now() + ".svg";
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+            logActivity("Downloaded SVG", currentQrType.toUpperCase() + " vector SVG downloaded");
+            showToast("SVG vector downloaded!");
+        }
+
+        // -------------------- DIGITAL VISITING CARD --------------------
+        function loadDigitalCard() {
+            var saved = null;
+            try { saved = JSON.parse(localStorage.getItem(STORAGE_CARD_KEY)); } catch (e) {}
+
+            document.getElementById("dc-shop-name").value = (saved && saved.shopName) || "My Business";
+            document.getElementById("dc-owner-name").value = (saved && saved.ownerName) || "Owner";
+            document.getElementById("dc-phone").value = (saved && saved.phone) || "";
+            document.getElementById("dc-whatsapp").value = (saved && saved.whatsapp) || "";
+            document.getElementById("dc-instagram").value = (saved && saved.instagram) || "";
+            document.getElementById("dc-facebook").value = (saved && saved.facebook) || "";
+            document.getElementById("dc-website").value = (saved && saved.website) || "";
+            document.getElementById("dc-address").value = (saved && saved.address) || "";
+            document.getElementById("dc-maps-url").value = (saved && saved.mapsUrl) || "";
+            document.getElementById("dc-description").value = (saved && saved.description) || "";
+            cardLogoDataUrl = (saved && saved.logo) || "";
+
+            updateDigitalCardLive();
+        }
+
+        function getDigitalCardObject(includeLogo) {
+            var shopName = document.getElementById("dc-shop-name").value.trim() || "My Business";
+            var ownerName = document.getElementById("dc-owner-name").value.trim() || "Owner";
+            var phone = document.getElementById("dc-phone").value.trim();
+            var whatsapp = document.getElementById("dc-whatsapp").value.trim() || phone;
+            var instagram = document.getElementById("dc-instagram").value.trim();
+            var facebook = document.getElementById("dc-facebook").value.trim();
+            var website = document.getElementById("dc-website").value.trim();
+            var address = document.getElementById("dc-address").value.trim();
+            var mapsUrl = document.getElementById("dc-maps-url").value.trim();
+            var description = document.getElementById("dc-description").value.trim();
+
+            return {
+                shopName: shopName,
+                ownerName: ownerName,
+                phone: phone,
+                whatsapp: whatsapp,
+                instagram: instagram,
+                facebook: facebook,
+                website: website,
+                address: address,
+                mapsUrl: mapsUrl,
+                description: description,
+                logo: includeLogo ? cardLogoDataUrl : ""
+            };
+        }
+
+        function buildDigitalCardShareUrl() {
+            var compactCard = getDigitalCardObject(false);
+            var encoded = encodeBase64Utf8(compactCard);
+            var baseUrl = window.location.href.split("?")[0].split("#")[0];
+            return baseUrl + "?card=" + encodeURIComponent(encoded);
+        }
+
+        function updateDigitalCardLive() {
+            var data = getDigitalCardObject(true);
+            var initials = data.shopName.substring(0, 2).toUpperCase();
+
+            document.getElementById("mini-dc-shop").textContent = data.shopName;
+            document.getElementById("mini-dc-owner").textContent = data.ownerName;
+            document.getElementById("mini-dc-desc").textContent = data.description || "Your business tagline appears here.";
+
+            var logoPreview = document.getElementById("dc-logo-preview");
+            var logoInit = document.getElementById("dc-logo-initials");
+            var miniLogo = document.getElementById("mini-dc-logo");
+            var miniInit = document.getElementById("mini-dc-initials");
+
+            if (data.logo) {
+                logoPreview.src = data.logo;
+                logoPreview.classList.remove("hidden");
+                logoInit.classList.add("hidden");
+                miniLogo.src = data.logo;
+                miniLogo.classList.remove("hidden");
+                miniInit.classList.add("hidden");
+            } else {
+                logoPreview.classList.add("hidden");
+                logoInit.classList.remove("hidden");
+                logoInit.textContent = initials;
+                miniLogo.classList.add("hidden");
+                miniInit.classList.remove("hidden");
+                miniInit.textContent = initials;
+            }
+
+            renderDigitalCardQr();
+        }
+
+        function renderDigitalCardQr() {
+            var url = buildDigitalCardShareUrl();
+            var canvas = document.getElementById("vcard-qr-canvas");
+            drawQrOnCanvas(canvas, url, { fg: "#1D1D1F", bg: "#FFFFFF", logoUrl: cardLogoDataUrl });
+        }
+
+        async function saveDigitalCardProfile(e) {
+            e.preventDefault();
+            var data = getDigitalCardObject(true);
+            localStorage.setItem(STORAGE_CARD_KEY, JSON.stringify(data));
+
+            if (firebaseReady && db) {
+                try {
+                    await db.collection("qr_studio_cards").doc(DEVICE_ID).set({
+                        deviceId: DEVICE_ID,
+                        shopName: data.shopName,
+                        ownerName: data.ownerName,
+                        phone: data.phone,
+                        whatsapp: data.whatsapp,
+                        instagram: data.instagram,
+                        facebook: data.facebook,
+                        website: data.website,
+                        address: data.address,
+                        mapsUrl: data.mapsUrl,
+                        description: data.description,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                } catch (err) {}
+            }
+
+            renderDigitalCardQr();
+            logActivity("Saved Digital Card", "Updated visiting card for " + data.shopName);
+            showToast("Digital Visiting Card saved!");
+        }
+
+        function openPublicCardView(data) {
+            publicVCardData = data;
+            document.getElementById("studio-app-shell").classList.add("hidden");
+            document.getElementById("public-vcard-screen").classList.remove("hidden");
+
+            document.getElementById("pub-card-shop").textContent = data.shopName || "Business Card";
+            document.getElementById("pub-card-owner").textContent = data.ownerName || "";
+            document.getElementById("pub-card-desc").textContent = data.description || "";
+
+            var logoImg = document.getElementById("pub-card-logo");
+            var logoInit = document.getElementById("pub-card-initials");
+            if (data.logo) {
+                logoImg.src = data.logo;
+                logoImg.classList.remove("hidden");
+                logoInit.classList.add("hidden");
+            } else {
+                logoImg.classList.add("hidden");
+                logoInit.classList.remove("hidden");
+                logoInit.textContent = (data.shopName || "QR").substring(0, 2).toUpperCase();
+            }
+
+            var cleanPhone = (data.phone || "").replace(/\D/g, "");
+            var cleanWa = (data.whatsapp || data.phone || "").replace(/\D/g, "");
+
+            var callBtn = document.getElementById("pub-btn-call");
+            if (cleanPhone) {
+                callBtn.href = "tel:" + (cleanPhone.length === 10 ? "+91" + cleanPhone : "+" + cleanPhone);
+                callBtn.classList.remove("hidden");
+            } else {
+                callBtn.classList.add("hidden");
+            }
+
+            var waBtn = document.getElementById("pub-btn-wa");
+            if (cleanWa) {
+                var waNum = cleanWa.length === 10 ? "91" + cleanWa : cleanWa;
+                waBtn.href = "https://wa.me/" + waNum + "?text=" + encodeURIComponent("Hi " + (data.shopName || "") + ", I scanned your Digital Visiting Card!");
+                waBtn.classList.remove("hidden");
+            } else {
+                waBtn.classList.add("hidden");
+            }
+
+            var linksContainer = document.getElementById("pub-links-list");
+            var links = [];
+
+            if (data.instagram) {
+                var igUrl = /^https?:\/\//i.test(data.instagram) ? data.instagram : "https://instagram.com/" + data.instagram.replace(/^@/, "");
+                links.push({ label: "Follow on Instagram", sub: data.instagram, href: igUrl, icon: "fab fa-instagram", color: "text-pink-600 bg-pink-50" });
+            }
+            if (data.facebook) {
+                var fbUrl = /^https?:\/\//i.test(data.facebook) ? data.facebook : "https://facebook.com/" + data.facebook.replace(/^@/, "");
+                links.push({ label: "Visit Facebook Page", sub: data.facebook, href: fbUrl, icon: "fab fa-facebook", color: "text-blue-600 bg-blue-50" });
+            }
+            if (data.website) {
+                var webUrl = /^https?:\/\//i.test(data.website) ? data.website : "https://" + data.website;
+                links.push({ label: "Visit Website", sub: data.website, href: webUrl, icon: "fas fa-globe", color: "text-indigo-600 bg-indigo-50" });
+            }
+
+            linksContainer.innerHTML = links.map(function (l) {
+                return '<a href="' + escapeHtml(l.href) + '" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-3.5 rounded-2xl bg-[#F7F7F9] hover:bg-gray-100 border border-gray-200/70 transition">' +
+                    '<div class="flex items-center gap-3 min-w-0">' +
+                    '<div class="w-10 h-10 rounded-xl ' + l.color + ' flex items-center justify-center text-lg shrink-0"><i class="' + l.icon + '"></i></div>' +
+                    '<div class="min-w-0"><p class="text-xs font-extrabold text-gray-900">' + escapeHtml(l.label) + '</p>' +
+                    '<p class="text-[11px] text-gray-500 truncate">' + escapeHtml(l.sub) + '</p></div></div>' +
+                    '<i class="fas fa-chevron-right text-xs text-gray-400"></i></a>';
+            }).join("");
+
+            var addrBox = document.getElementById("pub-address-box");
+            if (data.address || data.mapsUrl) {
+                addrBox.classList.remove("hidden");
+                document.getElementById("pub-card-address").textContent = data.address || "Open in Google Maps";
+                document.getElementById("pub-btn-maps").href = data.mapsUrl || "https://maps.google.com/?q=" + encodeURIComponent(data.address);
+            } else {
+                addrBox.classList.add("hidden");
+            }
+        }
+
+        function downloadPublicVCard() {
+            if (!publicVCardData) return;
+            var d = publicVCardData;
+            var phone = (d.phone || "").replace(/\D/g, "");
+            var formattedPhone = phone.length === 10 ? "+91" + phone : (phone ? "+" + phone : "");
+
+            var vcfLines = [
+                "BEGIN:VCARD",
+                "VERSION:3.0",
+                "N:" + (d.ownerName || d.shopName) + ";;;;",
+                "FN:" + d.shopName + " (" + (d.ownerName || "Owner") + ")",
+                "ORG:" + d.shopName
+            ];
+            if (formattedPhone) vcfLines.push("TEL;TYPE=CELL,VOICE:" + formattedPhone);
+            if (d.website) vcfLines.push("URL:" + d.website);
+            if (d.address) vcfLines.push("ADR;TYPE=WORK:;;" + d.address + ";;;;");
+            if (d.description) vcfLines.push("NOTE:" + d.description);
+            vcfLines.push("END:VCARD");
+
+            var blob = new Blob([vcfLines.join("\r\n")], { type: "text/vcard;charset=utf-8" });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement("a");
+            a.href = url;
+            a.download = (d.shopName || "Contact").replace(/\s+/g, "_") + ".vcf";
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("Contact (.vcf) downloaded! Open to save.");
+        }
+
+        // -------------------- UPI PAYMENT QR --------------------
+        function initUpiSection() {
+            var savedUpi = localStorage.getItem(STORAGE_UPI_KEY) || "";
+            if (savedUpi) document.getElementById("upi-id-input").value = savedUpi;
+            document.getElementById("upi-payee-input").value = "BikriPage QR Studio";
+            document.getElementById("upi-amount-input").value = "100";
+            renderUpiQr();
+        }
+
+        function buildUpiUri() {
+            var pa = document.getElementById("upi-id-input").value.trim();
+            var pn = document.getElementById("upi-payee-input").value.trim() || "Merchant";
+            var amRaw = document.getElementById("upi-amount-input").value.trim();
+            var tn = document.getElementById("upi-note-input").value.trim();
+            var am = parseFloat(amRaw);
+
+            var errBox = document.getElementById("upi-error-box");
+            if (!pa) {
+                errBox.textContent = "Enter your UPI ID (e.g. name@okicici) to generate a valid payment QR.";
+                errBox.classList.remove("hidden");
+                return null;
+            }
+            if (!/^[\w.\-]{2,256}@[a-zA-Z]{2,64}$/.test(pa)) {
+                errBox.textContent = "Invalid UPI ID format. Example: yourname@oksbi or 9876543210@ybl";
+                errBox.classList.remove("hidden");
+                return null;
+            }
+            if (isNaN(am) || am <= 0) {
+                errBox.textContent = "Enter a valid fixed amount greater than ₹0.";
+                errBox.classList.remove("hidden");
+                return null;
+            }
+
+            errBox.classList.add("hidden");
+            localStorage.setItem(STORAGE_UPI_KEY, pa);
+            return {
+                uri: "upi://pay?pa=" + encodeURIComponent(pa) + "&pn=" + encodeURIComponent(pn) + "&am=" + am.toFixed(2) + "&cu=INR" + (tn ? "&tn=" + encodeURIComponent(tn) : ""),
+                pa: pa, pn: pn, am: am.toFixed(2), tn: tn
+            };
+        }
+
+        function renderUpiQr() {
+            var pa = document.getElementById("upi-id-input").value.trim() || "yourname@upi";
+            var pn = document.getElementById("upi-payee-input").value.trim() || "Payee Name";
+            var am = parseFloat(document.getElementById("upi-amount-input").value) || 0;
+            var tn = document.getElementById("upi-note-input").value.trim();
+
+            document.getElementById("upi-card-payee").textContent = pn;
+            document.getElementById("upi-card-vpa").textContent = pa;
+            document.getElementById("upi-amount-pill").textContent = "₹ " + am.toFixed(2);
+            document.getElementById("upi-card-note").textContent = tn ? "Note: " + tn : "";
+
+            var res = buildUpiUri();
+            var canvas = document.getElementById("upi-qr-canvas");
+            var targetUri = res ? res.uri : "upi://pay?pa=" + encodeURIComponent(pa) + "&pn=" + encodeURIComponent(pn) + "&am=" + am.toFixed(2) + "&cu=INR";
+            drawQrOnCanvas(canvas, targetUri, { fg: "#111827", bg: "#FFFFFF" });
+        }
+
+        // -------------------- QUICK QR SCANNER --------------------
+        async function startCameraScanner() {
+            var errAlert = document.getElementById("scanner-error-alert");
+            var errText = document.getElementById("scanner-error-text");
+            errAlert.classList.add("hidden");
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                errText.textContent = "Camera API is not supported on this browser or requires HTTPS / localhost. You can still upload a QR image below.";
+                errAlert.classList.remove("hidden");
+                return;
+            }
+
+            try {
+                stopCameraScanner();
+                var selectedDeviceId = document.getElementById("camera-select").value;
+                var constraints = {
+                    video: selectedDeviceId
+                        ? { deviceId: { exact: selectedDeviceId } }
+                        : { facingMode: { ideal: "environment" } }
+                };
+
+                videoStream = await navigator.mediaDevices.getUserMedia(constraints);
+                var video = document.getElementById("scanner-video");
+                video.srcObject = videoStream;
+                await video.play();
+
+                video.classList.remove("hidden");
+                document.getElementById("scanner-overlay").classList.remove("hidden");
+                document.getElementById("scanner-placeholder").classList.add("hidden");
+                document.getElementById("start-cam-btn").classList.add("hidden");
+                document.getElementById("stop-cam-btn").classList.remove("hidden");
+
+                var devices = await navigator.mediaDevices.enumerateDevices();
+                var videoInputs = devices.filter(function (d) { return d.kind === "videoinput"; });
+                var camSelect = document.getElementById("camera-select");
+                if (videoInputs.length > 1) {
+                    camSelect.innerHTML = videoInputs.map(function (d, idx) {
+                        return '<option value="' + d.deviceId + '"' + (d.deviceId === selectedDeviceId ? " selected" : "") + '>' + escapeHtml(d.label || "Camera " + (idx + 1)) + '</option>';
+                    }).join("");
+                    camSelect.classList.remove("hidden");
+                }
+
+                isScanning = true;
+                tickCameraScan();
+            } catch (err) {
+                errText.textContent = "Camera permission denied or unavailable (" + err.message + "). Allow camera access or upload a QR image.";
+                errAlert.classList.remove("hidden");
+            }
+        }
+
+        function stopCameraScanner() {
+            isScanning = false;
+            if (scanAnimFrame) cancelAnimationFrame(scanAnimFrame);
+            if (videoStream) {
+                videoStream.getTracks().forEach(function (t) { t.stop(); });
+                videoStream = null;
+            }
+            var video = document.getElementById("scanner-video");
+            video.classList.add("hidden");
+            document.getElementById("scanner-overlay").classList.add("hidden");
+            document.getElementById("scanner-placeholder").classList.remove("hidden");
+            document.getElementById("start-cam-btn").classList.remove("hidden");
+            document.getElementById("stop-cam-btn").classList.add("hidden");
+        }
+
+        function tickCameraScan() {
+            if (!isScanning) return;
+            var video = document.getElementById("scanner-video");
+            var canvas = document.getElementById("scanner-hidden-canvas");
+
+            if (video.readyState === video.HAVE_ENOUGH_DATA && typeof jsQR !== "undefined") {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                var ctx = canvas.getContext("2d", { willReadFrequently: true });
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                var code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: "dontInvert" });
+
+                if (code && code.data) {
+                    handleDetectedQrContent(code.data, "Camera Scan");
+                    stopCameraScanner();
+                    return;
+                }
+            }
+            scanAnimFrame = requestAnimationFrame(tickCameraScan);
+        }
+
+        function handleDetectedQrContent(rawText, source) {
+            document.getElementById("scan-empty-state").classList.add("hidden");
+            document.getElementById("scan-result-box").classList.remove("hidden");
+            document.getElementById("scan-raw-output").textContent = rawText;
+
+            var badge = document.getElementById("scan-type-badge");
+            var actions = document.getElementById("scan-smart-actions");
+            badge.classList.remove("hidden");
+            actions.innerHTML = "";
+
+            var detectedType = "TEXT";
+
+            if (/^upi:\/\/pay/i.test(rawText)) {
+                detectedType = "UPI PAYMENT";
+                actions.innerHTML = '<a href="' + escapeHtml(rawText) + '" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-rupee-sign"></i> Open in UPI App</a>';
+            } else if (/^https?:\/\/wa\.me\//i.test(rawText)) {
+                detectedType = "WHATSAPP";
+                actions.innerHTML = '<a href="' + escapeHtml(rawText) + '" target="_blank" rel="noopener noreferrer" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fab fa-whatsapp text-sm"></i> Open WhatsApp Chat</a>';
+            } else if (/^https?:\/\//i.test(rawText)) {
+                detectedType = "WEBSITE LINK";
+                actions.innerHTML = '<a href="' + escapeHtml(rawText) + '" target="_blank" rel="noopener noreferrer" class="w-full bg-[#0071E3] hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-external-link-alt"></i> Open Website Link</a>';
+            } else if (/^tel:/i.test(rawText)) {
+                detectedType = "PHONE NUMBER";
+                actions.innerHTML = '<a href="' + escapeHtml(rawText) + '" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-phone-alt"></i> Call Number</a>';
+            } else if (/^mailto:/i.test(rawText)) {
+                detectedType = "EMAIL";
+                actions.innerHTML = '<a href="' + escapeHtml(rawText) + '" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-envelope"></i> Send Email</a>';
+            } else if (/^BEGIN:VCARD/i.test(rawText)) {
+                detectedType = "CONTACT CARD";
+                actions.innerHTML = '<button type="button" id="btn-save-scanned-vcf" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-address-book"></i> Save Contact (.vcf)</button>';
+                setTimeout(function () {
+                    var btn = document.getElementById("btn-save-scanned-vcf");
+                    if (btn) btn.addEventListener("click", function () {
+                        var blob = new Blob([rawText], { type: "text/vcard;charset=utf-8" });
+                        var url = URL.createObjectURL(blob);
+                        var a = document.createElement("a");
+                        a.href = url;
+                        a.download = "Scanned-Contact-" + Date.now() + ".vcf";
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    });
+                }, 0);
+            }
+
+            badge.textContent = detectedType;
+            logActivity(source, "Scanned " + detectedType + ": " + rawText.substring(0, 48));
+            showToast("QR Code detected (" + detectedType + ")");
+        }
+
+        // -------------------- SAVED QR CODES & CLOUD SYNC --------------------
+        function getSavedQrList() {
+            try { return JSON.parse(localStorage.getItem(STORAGE_SAVED_KEY)) || []; } catch (e) { return []; }
+        }
+
+        function setSavedQrList(list) {
+            localStorage.setItem(STORAGE_SAVED_KEY, JSON.stringify(list));
+        }
+
+        async function saveQrRecord(item) {
+            var record = {
+                id: "qr_" + Date.now(),
+                deviceId: DEVICE_ID,
+                type: item.type,
+                title: item.title,
+                caption: item.caption,
+                payload: item.payload,
+                fg: item.fg || "#1D1D1F",
+                bg: item.bg || "#FFFFFF",
+                createdAt: new Date().toISOString()
+            };
+
+            var list = getSavedQrList();
+            list.unshift(record);
+            setSavedQrList(list);
+
+            if (firebaseReady && db) {
+                try {
+                    await db.collection("qr_studio_items").doc(record.id).set(record);
+                } catch (e) {}
+            }
+
+            renderSavedQrCodes();
+            logActivity("Saved QR Code", 'Saved "' + record.title + '" (' + record.type.toUpperCase() + ")");
+            showToast("Saved to My QR Codes!");
+        }
+
+        function renderSavedQrCodes() {
+            var list = getSavedQrList();
+            var sidebarBadge = document.getElementById("sidebar-saved-count");
+            var headerBadge = document.getElementById("header-saved-count");
+            if (sidebarBadge) sidebarBadge.textContent = list.length;
+            if (headerBadge) headerBadge.textContent = list.length;
+
+            var grid = document.getElementById("saved-qr-grid");
+            if (!grid) return;
+
+            if (list.length === 0) {
+                grid.innerHTML = '<div class="col-span-full ios-card rounded-3xl p-10 text-center">' +
+                    '<div class="w-12 h-12 rounded-2xl bg-gray-100 text-gray-400 mx-auto flex items-center justify-center mb-3"><i class="fas fa-bookmark text-lg"></i></div>' +
+                    '<h3 class="text-sm font-extrabold text-gray-800">No Saved QR Codes Yet</h3>' +
+                    '<p class="text-xs text-gray-500 mt-1 max-w-xs mx-auto">Generate any QR code and click "Save to My QR Codes" to store and download it anytime.</p></div>';
+                return;
+            }
+
+            grid.innerHTML = list.map(function (item) {
+                return '<div class="ios-card rounded-3xl p-4 flex flex-col justify-between gap-3">' +
+                    '<div class="flex items-start justify-between gap-2">' +
+                    '<div class="min-w-0">' +
+                    '<span class="inline-block text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 mb-1">' + escapeHtml(item.type) + '</span>' +
+                    '<h3 class="text-sm font-extrabold text-gray-900 truncate">' + escapeHtml(item.title) + '</h3>' +
+                    '<p class="text-[11px] text-gray-500 truncate">' + escapeHtml(item.caption) + '</p></div>' +
+                    '<button type="button" data-del-qr="' + item.id + '" class="w-7 h-7 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500 flex items-center justify-center transition" title="Delete"><i class="fas fa-trash-alt text-xs"></i></button></div>' +
+                    '<div class="p-3 rounded-2xl border border-gray-100 flex items-center justify-center" style="background-color: ' + item.bg + ';"><canvas id="saved-canvas-' + item.id + '" width="150" height="150"></canvas></div>' +
+                    '<div class="grid grid-cols-2 gap-2">' +
+                    '<button type="button" data-dl-qr="' + item.id + '" class="bg-[#1D1D1F] hover:bg-black text-white font-bold py-2 rounded-xl text-[11px] flex items-center justify-center gap-1.5"><i class="fas fa-download"></i> PNG</button>' +
+                    '<button type="button" data-cp-qr="' + item.id + '" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2 rounded-xl text-[11px] flex items-center justify-center gap-1.5"><i class="fas fa-copy"></i> Copy</button></div></div>';
+            }).join("");
+
+            list.forEach(function (item) {
+                var c = document.getElementById("saved-canvas-" + item.id);
+                if (c) drawQrOnCanvas(c, item.payload, { fg: item.fg, bg: item.bg });
+            });
+
+            grid.querySelectorAll("[data-del-qr]").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    var id = btn.getAttribute("data-del-qr");
+                    setSavedQrList(getSavedQrList().filter(function (x) { return x.id !== id; }));
+                    renderSavedQrCodes();
+                    showToast("Removed from saved QR codes");
+                });
+            });
+
+            grid.querySelectorAll("[data-dl-qr]").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    var id = btn.getAttribute("data-dl-qr");
+                    var item = getSavedQrList().find(function (x) { return x.id === id; });
+                    if (!item) return;
+                    var c = document.createElement("canvas");
+                    c.width = 512;
+                    c.height = 512;
+                    drawQrOnCanvas(c, item.payload, { fg: item.fg, bg: item.bg });
+                    setTimeout(function () {
+                        var poster = generatePosterExportCanvas(c, item.bg, item.fg, item.title, item.caption);
+                        var a = document.createElement("a");
+                        a.download = item.title.replace(/\s+/g, "-") + ".png";
+                        a.href = poster.toDataURL("image/png");
+                        a.click();
+                        showToast("Saved QR downloaded!");
+                    }, 100);
+                });
+            });
+
+            grid.querySelectorAll("[data-cp-qr]").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    var id = btn.getAttribute("data-cp-qr");
+                    var item = getSavedQrList().find(function (x) { return x.id === id; });
+                    if (item) navigator.clipboard.writeText(item.payload).then(function () { showToast("QR content copied!"); });
+                });
+            });
+        }
+
+        // -------------------- RECENT ACTIVITY --------------------
+        function getActivityList() {
+            try { return JSON.parse(localStorage.getItem(STORAGE_ACTIVITY_KEY)) || []; } catch (e) { return []; }
+        }
+
+        function logActivity(action, detail) {
+            var list = getActivityList();
+            list.unshift({
+                action: action,
+                detail: detail,
+                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + " • " + new Date().toLocaleDateString()
+            });
+            localStorage.setItem(STORAGE_ACTIVITY_KEY, JSON.stringify(list.slice(0, 30)));
+        }
+
+        function renderActivityFeed() {
+            var list = getActivityList();
+            var container = document.getElementById("activity-feed-list");
+            if (!container) return;
+
+            if (list.length === 0) {
+                container.innerHTML = '<div class="p-10 text-center"><p class="text-xs font-bold text-gray-600">No Recent Activity</p><p class="text-[11px] text-gray-400 mt-1">Your QR creations, downloads, and scans will appear here.</p></div>';
+                return;
+            }
+
+            container.innerHTML = list.map(function (entry) {
+                return '<div class="p-4 flex items-center justify-between gap-3">' +
+                    '<div class="flex items-center gap-3 min-w-0">' +
+                    '<div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0"><i class="fas fa-bolt text-xs"></i></div>' +
+                    '<div class="min-w-0"><p class="text-xs font-extrabold text-gray-900">' + escapeHtml(entry.action) + '</p>' +
+                    '<p class="text-[11px] text-gray-500 truncate">' + escapeHtml(entry.detail) + '</p></div></div>' +
+                    '<span class="text-[10px] font-semibold text-gray-400 shrink-0">' + escapeHtml(entry.time) + '</span></div>';
+            }).join("");
+        }
+
+        // -------------------- INITIALIZE APP --------------------
+        function initStudioApp() {
+            var params = new URLSearchParams(window.location.search);
+            var cardParam = params.get("card");
+
+            if (cardParam) {
+                try {
+                    var decoded = decodeBase64Utf8(cardParam);
+                    openPublicCardView(decoded);
+                } catch (e) {}
+            }
+
+            selectQrType("url");
+            loadDigitalCard();
+            initUpiSection();
+            renderSavedQrCodes();
+            renderActivityFeed();
+
+            document.querySelectorAll("[data-nav-tab]").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    switchTab(btn.getAttribute("data-nav-tab"));
+                });
+            });
+
+            document.querySelectorAll(".qr-type-pill").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    selectQrType(btn.getAttribute("data-qrtype"));
+                });
+            });
+
+            document.getElementById("btn-clear-qr-fields").addEventListener("click", function () {
+                selectQrType(currentQrType);
+                document.getElementById("qr-custom-title").value = "";
+                document.getElementById("qr-custom-caption").value = "";
+                renderLiveQr();
+                showToast("Fields reset");
+            });
+
+            document.querySelectorAll(".preset-btn").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    document.getElementById("qr-fg-color").value = btn.getAttribute("data-fg");
+                    document.getElementById("qr-bg-color").value = btn.getAttribute("data-bg");
+                    renderLiveQr();
+                    showToast('Applied "' + btn.getAttribute("data-label") + '" theme');
+                });
+            });
+
+            ["qr-fg-color", "qr-bg-color", "qr-custom-title", "qr-custom-caption"].forEach(function (id) {
+                document.getElementById(id).addEventListener("input", renderLiveQr);
+            });
+
+            document.getElementById("qr-logo-input").addEventListener("change", function (e) {
+                var file = e.target.files[0];
+                if (!file) return;
+                document.getElementById("qr-logo-filename").textContent = file.name;
+                var reader = new FileReader();
+                reader.onload = function (ev) {
+                    qrCenterLogoDataUrl = ev.target.result;
+                    document.getElementById("remove-logo-btn").classList.remove("hidden");
+                    renderLiveQr();
+                };
+                reader.readAsDataURL(file);
+            });
+
+            document.getElementById("remove-logo-btn").addEventListener("click", function () {
+                qrCenterLogoDataUrl = "";
+                document.getElementById("qr-logo-input").value = "";
+                document.getElementById("qr-logo-filename").textContent = "Upload PNG/JPG Logo";
+                document.getElementById("remove-logo-btn").classList.add("hidden");
+                renderLiveQr();
+            });
+
+            document.getElementById("btn-copy-payload").addEventListener("click", function () {
+                navigator.clipboard.writeText(currentQrPayload).then(function () {
+                    showToast("Encoded QR content copied!");
+                });
+            });
+            document.getElementById("btn-download-png").addEventListener("click", downloadQrPng);
+            document.getElementById("btn-download-svg").addEventListener("click", downloadQrSvg);
+            document.getElementById("btn-save-qr").addEventListener("click", function () {
+                var res = buildPayloadFromCurrentType();
+                if (res.error) {
+                    showFieldErrors = true;
+                    renderLiveQr();
+                    showToast(res.error, "error");
+                    return;
+                }
+                var title = document.getElementById("qr-custom-title").value.trim() || (currentQrType.toUpperCase() + " QR");
+                var caption = document.getElementById("qr-custom-caption").value.trim() || currentQrPayload.substring(0, 32);
+                saveQrRecord({
+                    type: currentQrType,
+                    title: title,
+                    caption: caption,
+                    payload: currentQrPayload,
+                    fg: document.getElementById("qr-fg-color").value,
+                    bg: document.getElementById("qr-bg-color").value
+                });
+            });
+
+            ["dc-shop-name", "dc-owner-name", "dc-phone", "dc-whatsapp", "dc-instagram", "dc-facebook", "dc-website", "dc-address", "dc-maps-url", "dc-description"].forEach(function (id) {
+                document.getElementById(id).addEventListener("input", updateDigitalCardLive);
+            });
+
+            document.getElementById("dc-logo-input").addEventListener("change", function (e) {
+                var file = e.target.files[0];
+                if (!file) return;
+                var reader = new FileReader();
+                reader.onload = function (ev) {
+                    var img = new Image();
+                    img.onload = function () {
+                        var c = document.createElement("canvas");
+                        var max = 140;
+                        var scale = Math.min(max / img.width, max / img.height, 1);
+                        c.width = Math.round(img.width * scale);
+                        c.height = Math.round(img.height * scale);
+                        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+                        cardLogoDataUrl = c.toDataURL("image/jpeg", 0.8);
+                        updateDigitalCardLive();
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+
+            document.getElementById("btn-remove-dc-logo").addEventListener("click", function () {
+                cardLogoDataUrl = "";
+                updateDigitalCardLive();
+            });
+
+            document.getElementById("digital-card-form").addEventListener("submit", saveDigitalCardProfile);
+
+            document.getElementById("btn-preview-card").addEventListener("click", function () {
+                openPublicCardView(getDigitalCardObject(true));
+            });
+
+            document.getElementById("btn-download-card-qr").addEventListener("click", function () {
+                var data = getDigitalCardObject(true);
+                var url = buildDigitalCardShareUrl();
+                var c = document.createElement("canvas");
+                c.width = 512;
+                c.height = 512;
+                drawQrOnCanvas(c, url, { fg: "#1D1D1F", bg: "#FFFFFF", logoUrl: cardLogoDataUrl });
+                setTimeout(function () {
+                    var poster = generatePosterExportCanvas(c, "#FFFFFF", "#1D1D1F", data.shopName, "Scan for Contact, WhatsApp & Socials");
+                    var link = document.createElement("a");
+                    link.download = data.shopName.replace(/\s+/g, "-") + "-Visiting-Card-QR.png";
+                    link.href = poster.toDataURL("image/png");
+                    link.click();
+                    logActivity("Downloaded Card QR", "Exported Digital Card QR for " + data.shopName);
+                    showToast("Visiting Card QR downloaded!");
+                }, 140);
+            });
+
+            document.getElementById("btn-copy-card-link").addEventListener("click", function () {
+                navigator.clipboard.writeText(buildDigitalCardShareUrl()).then(function () {
+                    showToast("Digital Card link copied!");
+                });
+            });
+
+            document.getElementById("btn-exit-public-card").addEventListener("click", function () {
+                document.getElementById("public-vcard-screen").classList.add("hidden");
+                document.getElementById("studio-app-shell").classList.remove("hidden");
+                if (window.location.search.indexOf("card=") !== -1) {
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            });
+
+            document.getElementById("btn-download-public-vcf").addEventListener("click", downloadPublicVCard);
+
+            document.getElementById("btn-share-public-card").addEventListener("click", function () {
+                var shareUrl = window.location.href.indexOf("card=") !== -1 ? window.location.href : buildDigitalCardShareUrl();
+                var title = (publicVCardData && publicVCardData.shopName) || "Digital Visiting Card";
+                if (navigator.share) {
+                    navigator.share({ title: title, text: "Check out " + title + "'s Digital Visiting Card", url: shareUrl }).catch(function () {});
+                } else {
+                    navigator.clipboard.writeText(shareUrl).then(function () { showToast("Card link copied!"); });
+                }
+            });
+
+            ["upi-id-input", "upi-payee-input", "upi-amount-input", "upi-note-input"].forEach(function (id) {
+                document.getElementById(id).addEventListener("input", renderUpiQr);
+            });
+
+            document.getElementById("btn-download-upi").addEventListener("click", function () {
+                var res = buildUpiUri();
+                if (!res) { showToast("Fix UPI details before downloading", "error"); return; }
+                var c = document.createElement("canvas");
+                c.width = 512;
+                c.height = 512;
+                drawQrOnCanvas(c, res.uri, { fg: "#111827", bg: "#FFFFFF" });
+                setTimeout(function () {
+                    var poster = generatePosterExportCanvas(c, "#FFFFFF", "#111827", res.pn + " • ₹" + res.am, "UPI: " + res.pa);
+                    var link = document.createElement("a");
+                    link.download = "UPI-QR-Rs" + res.am + "-" + Date.now() + ".png";
+                    link.href = poster.toDataURL("image/png");
+                    link.click();
+                    logActivity("Downloaded UPI QR", "₹" + res.am + " UPI QR for " + res.pa);
+                    showToast("UPI Payment QR downloaded!");
+                }, 100);
+            });
+
+            document.getElementById("btn-share-upi").addEventListener("click", function () {
+                var res = buildUpiUri();
+                if (!res) { showToast("Fix UPI details first", "error"); return; }
+                var canvas = document.getElementById("upi-qr-canvas");
+                canvas.toBlob(function (blob) {
+                    var file = new File([blob], "UPI-QR-Rs" + res.am + ".png", { type: "image/png" });
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        navigator.share({ title: "Pay ₹" + res.am + " to " + res.pn, text: "Pay via UPI (" + res.pa + ")", files: [file] }).catch(function () {});
+                    } else {
+                        navigator.clipboard.writeText(res.uri).then(function () { showToast("UPI payment link copied!"); });
+                    }
+                });
+            });
+
+            document.getElementById("btn-save-upi").addEventListener("click", function () {
+                var res = buildUpiUri();
+                if (!res) { showToast("Enter valid UPI details first", "error"); return; }
+                saveQrRecord({
+                    type: "upi",
+                    title: "UPI ₹" + res.am + " • " + res.pn,
+                    caption: res.pa,
+                    payload: res.uri,
+                    fg: "#111827",
+                    bg: "#FFFFFF"
+                });
+            });
+
+            document.getElementById("start-cam-btn").addEventListener("click", startCameraScanner);
+            document.getElementById("stop-cam-btn").addEventListener("click", stopCameraScanner);
+            document.getElementById("camera-select").addEventListener("change", function () {
+                if (isScanning) startCameraScanner();
+            });
+
+            document.getElementById("scanner-file-input").addEventListener("change", function (e) {
+                var file = e.target.files[0];
+                if (!file) return;
+                var errAlert = document.getElementById("scanner-error-alert");
+                var errText = document.getElementById("scanner-error-text");
+                errAlert.classList.add("hidden");
+
+                var reader = new FileReader();
+                reader.onload = function (ev) {
+                    var img = new Image();
+                    img.onload = function () {
+                        var canvas = document.getElementById("scanner-hidden-canvas");
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        var ctx = canvas.getContext("2d");
+                        ctx.drawImage(img, 0, 0);
+                        var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        var code = typeof jsQR !== "undefined" ? jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: "attemptBoth" }) : null;
+                        if (code && code.data) {
+                            handleDetectedQrContent(code.data, "Image Upload Scan");
+                        } else {
+                            errText.textContent = "No readable QR code found in the uploaded image. Try a clearer image.";
+                            errAlert.classList.remove("hidden");
+                        }
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+                e.target.value = "";
+            });
+
+            document.getElementById("btn-copy-scan").addEventListener("click", function () {
+                var raw = document.getElementById("scan-raw-output").textContent;
+                navigator.clipboard.writeText(raw).then(function () { showToast("Scanned content copied!"); });
+            });
+
+            document.getElementById("btn-saved-create-new").addEventListener("click", function () {
+                switchTab("generator");
+            });
+
+            document.getElementById("btn-clear-activity").addEventListener("click", function () {
+                localStorage.removeItem(STORAGE_ACTIVITY_KEY);
+                renderActivityFeed();
+                showToast("Activity log cleared");
+            });
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initStudioApp);
+        } else {
+            initStudioApp();
+        }
+    </script>
+</body>
+</html>

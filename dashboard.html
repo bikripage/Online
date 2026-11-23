@@ -181,6 +181,10 @@
                         <i class="fas fa-envelope text-gray-400 mr-3"></i>
                         <input type="email" id="setup-email" placeholder="Business Email (Optional)" class="w-full bg-transparent outline-none text-sm font-bold text-gray-900">
                     </div>
+                    <div class="flex items-center bg-white rounded-2xl border border-gray-200 focus-within:border-purple-500 transition shadow-sm overflow-hidden px-4 h-14 shrink-0">
+                        <i class="fas fa-file-invoice text-gray-400 mr-3"></i>
+                        <input type="text" id="setup-gstin" maxlength="15" oninput="this.value = this.value.toUpperCase()" placeholder="GSTIN Number (Optional)" class="w-full bg-transparent outline-none text-sm font-bold text-gray-900 uppercase">
+                    </div>
                 </div>
                 <button type="button" onclick="nextSetupStep(3)" class="w-full bg-gray-900 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex justify-center items-center gap-2 shrink-0">
                     Next <i class="fas fa-arrow-right text-sm"></i>
@@ -1571,6 +1575,17 @@
                     </div>
                 </div>
 
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                        <label class="text-[9px] sm:text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-1 block">GST (% - Optional)</label>
+                        <input type="number" id="bill-gst" value="0" min="0" max="100" step="0.1" placeholder="e.g. 5, 12, 18" oninput="renderDraftBill()" class="w-full bg-[#F7F7F9] border border-[#E5E7EB] rounded-[12px] px-3 py-2 text-[#111827] text-sm font-semibold outline-none transition focus:border-purple-500">
+                    </div>
+                    <div>
+                        <label class="text-[9px] sm:text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-1 block">GST Amount (Auto)</label>
+                        <div id="draft-bill-gst-amount" class="w-full bg-[#F7F7F9] border border-[#E5E7EB] rounded-[12px] px-3 py-2 text-purple-700 text-sm font-bold flex items-center h-[38px]">₹0.00</div>
+                    </div>
+                </div>
+
                 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
                     <!-- नया Delivery Status ड्रॉपडाउन -->
@@ -1757,6 +1772,7 @@
                     <h1 id="print-store-name" class="text-3xl font-black tracking-tight text-gray-900 leading-none uppercase">STORE NAME</h1>
                     <p id="print-store-address" class="text-sm text-gray-600 mt-2 max-w-[280px] font-semibold leading-relaxed">Address line goes here</p>
                     <p class="text-sm text-gray-600 mt-1 font-semibold flex items-center gap-1.5"><i class="fas fa-phone-alt text-[11px] text-gray-500"></i> <span id="print-store-phone">Phone</span></p>
+                    <p id="print-store-gstin-wrap" class="hidden text-xs text-gray-600 mt-1 font-bold tracking-wider uppercase">GSTIN: <span id="print-store-gstin"></span></p>
                 </div>
             </div> 
             
@@ -1826,6 +1842,10 @@
     <div id="receipt-delivery-row" class="hidden justify-between items-center gap-8 text-blue-500">
         <span>Delivery</span>
         <span class="text-right bg-blue-50 px-2.5 py-1 rounded-lg text-blue-600">+₹<span id="receipt-delivery">0.00</span></span>
+    </div>
+    <div id="receipt-gst-row" class="hidden justify-between items-center gap-8 text-purple-600">
+        <span>GST (<span id="receipt-gst-rate">0</span>%)</span>
+        <span class="text-right bg-purple-50 px-2.5 py-1 rounded-lg text-purple-700">+₹<span id="receipt-gst-amount">0.00</span></span>
     </div>
     <!-- Partial Paid (Advance) Row -->
     <div id="receipt-advance-row" class="hidden justify-between items-center gap-8 text-amber-500">
@@ -2207,6 +2227,7 @@ function applyProLocks(shopData) {
                         let userPhone = globalShopData.phone || '';
                         if (userPhone.includes('@')) userPhone = '';
                         if(document.getElementById('setup-phone')) document.getElementById('setup-phone').value = userPhone;
+                        if(document.getElementById('setup-gstin')) document.getElementById('setup-gstin').value = globalShopData.gstin || '';
                         
                         return;
 
@@ -3234,6 +3255,7 @@ else if(o.status === 'accepted') {
             document.getElementById('bill-discount').value='0'; 
             document.getElementById('bill-delivery').value='0';
             document.getElementById('bill-advance').value='0';
+            if(document.getElementById('bill-gst')) document.getElementById('bill-gst').value='0';
  
             const md = document.getElementById('bill-pay-mode'); md.value='UPI (Online)'; md.disabled=false;
             
@@ -3388,8 +3410,9 @@ function toggleNewBillDateField() {
 
               function renderDraftBill() {
             const tb = document.getElementById('draft-bill-items-list'); const em = document.getElementById('draft-bill-empty'); const tot = document.getElementById('draft-bill-total');
+            const gstAmtEl = document.getElementById('draft-bill-gst-amount');
             let itemTot = 0;
-            if(draftBillItems.length === 0) { tb.innerHTML = ''; em.style.display='block'; tot.innerText='₹0'; return; }
+            if(draftBillItems.length === 0) { tb.innerHTML = ''; em.style.display='block'; tot.innerText='₹0'; if(gstAmtEl) gstAmtEl.innerText='₹0.00'; return; }
             em.style.display='none';
             
             tb.innerHTML = draftBillItems.map(i => { 
@@ -3407,11 +3430,16 @@ function toggleNewBillDateField() {
                 </tr>`; 
             }).join('');
             
-            let disc = parseInt(document.getElementById('bill-discount').value)||0; 
-            let del = parseInt(document.getElementById('bill-delivery').value)||0;
-            let adv = parseInt(document.getElementById('bill-advance').value)||0;
+            let disc = parseFloat(document.getElementById('bill-discount').value)||0; 
+            let del = parseFloat(document.getElementById('bill-delivery').value)||0;
+            let adv = parseFloat(document.getElementById('bill-advance').value)||0;
+            let gstRate = Math.max(0, parseFloat(document.getElementById('bill-gst')?.value)||0);
+
+            let taxableAmount = Math.max(0, itemTot - disc + del);
+            let gstAmount = Math.round(((taxableAmount * gstRate) / 100) * 100) / 100;
+            if(gstAmtEl) gstAmtEl.innerText = `₹${gstAmount.toFixed(2)}`;
             
-            let gt = Math.max(0, itemTot - disc + del - adv); 
+            let gt = Math.max(0, Math.round((taxableAmount + gstAmount - adv) * 100) / 100); 
             tot.innerText = `₹${gt}`;
         }
 
@@ -3428,14 +3456,15 @@ function toggleNewBillDateField() {
             
             const btn = event.currentTarget; const orig = btn.innerHTML; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`; btn.disabled = true;
             
-            let disc = parseInt(document.getElementById('bill-discount').value)||0; 
-           
-
-            let del = parseInt(document.getElementById('bill-delivery').value)||0;
-            let adv = parseInt(document.getElementById('bill-advance').value)||0;
+            let disc = parseFloat(document.getElementById('bill-discount').value)||0; 
+            let del = parseFloat(document.getElementById('bill-delivery').value)||0;
+            let adv = parseFloat(document.getElementById('bill-advance').value)||0;
+            let gstRate = Math.max(0, parseFloat(document.getElementById('bill-gst')?.value)||0);
             
             let iTot = draftBillItems.reduce((s, i) => s + i.total, 0); 
-            let gt = Math.max(0, iTot - disc + del - adv);
+            let taxableAmount = Math.max(0, iTot - disc + del);
+            let gstAmount = Math.round(((taxableAmount * gstRate) / 100) * 100) / 100;
+            let gt = Math.max(0, Math.round((taxableAmount + gstAmount - adv) * 100) / 100);
             const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
                         // कस्टम डिलीवरी डेट चेक करना
             let dStatus = document.getElementById('bill-delivery-status').value;
@@ -3452,13 +3481,13 @@ function toggleNewBillDateField() {
                 items: [...draftBillItems], 
                 discount: disc, 
                 delivery: del,
+                gstRate: gstRate,
+                gstAmount: gstAmount,
                 advance: adv, 
                 grandTotal: gt, 
                 payStatus: document.getElementById('bill-pay-status').value, 
                 payMode: document.getElementById('bill-pay-mode').value, 
                 deliveryStatus: dStatus,
-
-                 
                 timestamp: firebase.firestore.FieldValue.serverTimestamp() 
             };
 
@@ -4419,14 +4448,35 @@ async function deleteProduct(id) {
 
 
 
-          let dC = parseFloat(b.discount)||0; let dL = parseFloat(b.delivery)||0;
+        const gstWrap = document.getElementById('print-store-gstin-wrap');
+        const gstValEl = document.getElementById('print-store-gstin');
+        if (gstWrap && gstValEl) {
+            if (globalShopData && globalShopData.gstin) {
+                gstValEl.innerText = globalShopData.gstin;
+                gstWrap.classList.remove('hidden');
+            } else {
+                gstWrap.classList.add('hidden');
+            }
+        }
+
+        let dC = parseFloat(b.discount)||0; let dL = parseFloat(b.delivery)||0;
         let bAdv = parseFloat(b.advance)||0; 
+        let gstRate = parseFloat(b.gstRate)||0;
+        let gstAmount = parseFloat(b.gstAmount)||0;
+        if (gstRate > 0 && gstAmount <= 0) {
+            let taxable = Math.max(0, tA - dC + dL);
+            gstAmount = Math.round(((taxable * gstRate) / 100) * 100) / 100;
+        }
         
         let bD = document.getElementById('receipt-breakdown');
-        if (dC > 0 || dL > 0 || bAdv > 0) {
+        let gstRow = document.getElementById('receipt-gst-row');
+        if (dC > 0 || dL > 0 || bAdv > 0 || gstAmount > 0) {
             document.getElementById('receipt-subtotal').innerText = `₹${tA.toFixed(2)}`;
             if(dC>0){document.getElementById('receipt-discount').innerText=dC.toFixed(2); document.getElementById('receipt-discount-row').classList.remove('hidden');document.getElementById('receipt-discount-row').classList.add('flex');} else {document.getElementById('receipt-discount-row').classList.add('hidden');}
             if(dL>0){document.getElementById('receipt-delivery').innerText=dL.toFixed(2); document.getElementById('receipt-delivery-row').classList.remove('hidden');document.getElementById('receipt-delivery-row').classList.add('flex');} else {document.getElementById('receipt-delivery-row').classList.add('hidden');}
+            if(gstRow) {
+                if(gstAmount>0){document.getElementById('receipt-gst-rate').innerText=gstRate; document.getElementById('receipt-gst-amount').innerText=gstAmount.toFixed(2); gstRow.classList.remove('hidden'); gstRow.classList.add('flex');} else {gstRow.classList.add('hidden'); gstRow.classList.remove('flex');}
+            }
             if(bAdv>0){document.getElementById('receipt-advance').innerText=bAdv.toFixed(2); document.getElementById('receipt-advance-row').classList.remove('hidden');document.getElementById('receipt-advance-row').classList.add('flex');} else {document.getElementById('receipt-advance-row').classList.add('hidden');document.getElementById('receipt-advance-row').classList.remove('flex');}
             
             bD.classList.remove('hidden'); bD.classList.add('flex');
@@ -4821,6 +4871,7 @@ async function deleteProduct(id) {
             let userEmail = globalShopData.email || localStorage.getItem('BikriPage_customer_phone') || '';
             if (!userEmail.includes('@')) userEmail = ''; // Ye check karega ki wo number nahi, email hi ho
             if (document.getElementById('setup-email')) document.getElementById('setup-email').value = userEmail;
+            if (document.getElementById('setup-gstin')) document.getElementById('setup-gstin').value = globalShopData.gstin || '';
 
                     
 
@@ -4881,6 +4932,7 @@ async function deleteProduct(id) {
             
             const storePhone = document.getElementById('setup-phone').value.trim();
             const storeEmail = document.getElementById('setup-email').value.trim();
+            const storeGstin = document.getElementById('setup-gstin') ? document.getElementById('setup-gstin').value.trim().toUpperCase() : '';
             const businessType = document.getElementById('selected-business-type').value;
 
             let category = document.getElementById('selected-category').value;
@@ -4924,7 +4976,8 @@ async function deleteProduct(id) {
                 const updateData = {
                     shopName: shopName, 
                     ownerName: ownerName,
-                    phone: storePhone,         
+                    phone: storePhone,
+                    gstin: storeGstin,         
                     businessType: businessType,
                     description: desc,
                     category: category,
@@ -12459,3 +12512,4 @@ setTimeout(loadAppSecurityDetails, 2500);
        
 </body>
 </html>
+

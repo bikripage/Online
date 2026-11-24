@@ -85,9 +85,23 @@
     </main>
 
     <script>
-                document.addEventListener('DOMContentLoaded', () => {
-            // सिस्टम खुद चेक करेगा कि इस फोन से कोई ऑर्डर हुआ है या नहीं
-            const custPhone = localStorage.getItem('BikriPage_customer_phone');
+        function normalizePhone(raw) {
+            if (!raw) return "";
+            const digits = String(raw).replace(/\D/g, "");
+            return digits.length >= 10 ? digits.slice(-10) : digits;
+        }
+
+        function getActiveCustomerPhone() {
+            const raw = localStorage.getItem('BikriPage_customer_phone') || localStorage.getItem('BikriPage_saved_phone') || "";
+            const clean = normalizePhone(raw);
+            if (clean) {
+                localStorage.setItem('BikriPage_customer_phone', clean);
+            }
+            return clean;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const custPhone = getActiveCustomerPhone();
             const container = document.getElementById('orders-container');
 
             if (!custPhone) {
@@ -106,20 +120,27 @@
                 return;
             }
 
-            // अगर इसी फोन से ऑर्डर हुआ है, तो सीधा लिस्ट दिखा देगा
             fetchMyOrders(custPhone);
         });
 
-        // (पुराना savePhoneAndTrack वाला फंक्शन अब मिटा दें, उसकी जरूरत नहीं है)
-
         async function fetchMyOrders(phone) {
             const container = document.getElementById('orders-container');
-            
-            try {
-                // Fetch orders for this customer
-                const snapshot = await db.collection('orders').where('customerId', '==', phone).get();
+            const cleanPhone = normalizePhone(phone);
 
-                if (snapshot.empty) {
+            try {
+                // Match both normalized 10-digit and raw phone/customerPhone if saved differently
+                const candidates = Array.from(new Set([cleanPhone, phone, `+91${cleanPhone}`, `91${cleanPhone}`].filter(Boolean)));
+                const docsMap = new Map();
+
+                for (const idVal of candidates) {
+                    const snapByCustId = await db.collection('orders').where('customerId', '==', idVal).get();
+                    snapByCustId.forEach(doc => docsMap.set(doc.id, { id: doc.id, ...doc.data() }));
+
+                    const snapByCustPhone = await db.collection('orders').where('customerPhone', '==', idVal).get();
+                    snapByCustPhone.forEach(doc => docsMap.set(doc.id, { id: doc.id, ...doc.data() }));
+                }
+
+                if (docsMap.size === 0) {
                     container.innerHTML = `
                         <div class="text-center py-16 px-6 animate-slide-up mt-10">
                             <div class="w-24 h-24 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl"><i class="fas fa-box-open"></i></div>
@@ -130,12 +151,9 @@
                     return;
                 }
 
-                let ordersList = [];
-                snapshot.forEach(doc => { 
-                    ordersList.push({ id: doc.id, ...doc.data() }); 
-                });
+                let ordersList = Array.from(docsMap.values());
 
-                         // Sort by Latest First
+                // Sort by Latest First
                 ordersList.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
                 
                 // ✨ Taki function me details mil sake
@@ -206,7 +224,7 @@
                             </span>
                         </div>
                         
-                                             <!-- Inner Gray Box for Items (iOS Grouped Style) -->
+                        <!-- Inner Gray Box for Items (iOS Grouped Style) -->
                         <div class="bg-gray-50/80 rounded-[14px] p-3 mb-3 border border-gray-100/50">
                             <p class="text-[13px] text-gray-600 leading-relaxed">${itemsHtml}</p>
                             <p class="text-[11px] text-gray-400 font-medium mt-1.5">${dateStr}</p>
@@ -247,7 +265,7 @@
             }
         }
 
-             let pendingCancelOrderId = null;
+        let pendingCancelOrderId = null;
         let pendingCancelBtnElement = null;
 
         // Modal kholne ka function
@@ -279,7 +297,7 @@
 
         // Asli Cancel ka action (Jab user "Yes" dabaye)
         async function confirmCancelAction() {
-            closeCancelModal(); // Pehle modal band karo
+            closeCancelModal();
             
             if (!pendingCancelOrderId || !pendingCancelBtnElement) return;
 
@@ -287,7 +305,6 @@
             const btnElement = pendingCancelBtnElement;
 
             try {
-                const origHtml = btnElement.innerHTML;
                 btnElement.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i>`;
                 btnElement.disabled = true;
                 
@@ -296,8 +313,7 @@
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
-                // Status refresh karne ke liye
-                fetchMyOrders(localStorage.getItem('BikriPage_customer_phone'));
+                fetchMyOrders(getActiveCustomerPhone());
             } catch (error) {
                 alert("Could not cancel order: " + error.message);
                 btnElement.innerHTML = "Cancel";
@@ -305,29 +321,24 @@
             }
         }
 
-                // ==========================================
+        // ==========================================
         // ✨ AUTO REVIEW PROMPT LOGIC ✨
         // ==========================================
         function checkForUnreviewedOrder(orders) {
-            // Find the most recent delivered order that DOES NOT have a review yet
             const unreviewedOrder = orders.find(o => o.status === 'delivered' && !o.review);
 
             if (unreviewedOrder) {
-                // Check in localStorage if we already prompted the user for THIS specific order
                 const hasPrompted = localStorage.getItem('BikriPage_prompted_review_' + unreviewedOrder.id);
 
                 if (!hasPrompted) {
-                    // Update Modal Text
                     document.getElementById('auto-review-shop').innerText = unreviewedOrder.shopName || 'Store';
                     
-                    // Attach the specific Order ID to the button
                     const btn = document.getElementById('auto-review-btn');
                     btn.onclick = () => {
                         closeAutoReviewPrompt();
-                        openReviewModal(unreviewedOrder.id); // Seedha review wala modal khol dega
+                        openReviewModal(unreviewedOrder.id);
                     };
 
-                    // Show the Prompt Modal with a slight delay so it looks natural
                     setTimeout(() => {
                         const modal = document.getElementById('auto-review-prompt');
                         modal.classList.remove('hidden');
@@ -335,7 +346,6 @@
                         document.body.style.overflow = 'hidden';
                     }, 800);
 
-                    // Mark as prompted so they don't get annoyed every time they open the app
                     localStorage.setItem('BikriPage_prompted_review_' + unreviewedOrder.id, 'true');
                 }
             }
@@ -347,10 +357,9 @@
             modal.classList.remove('flex');
             document.body.style.overflow = '';
         }
-
     </script>
 
-     <!-- ✨ PREMIUM BILL CONTAINER ✨ -->
+    <!-- ✨ PREMIUM BILL CONTAINER ✨ -->
     <div id="receipt-container" style="width: 800px !important; height: 1131px !important; min-width: 800px !important; display: block !important;" class="fixed -left-[9999px] top-0 bg-white text-[#1d1d1f] font-sans overflow-hidden shadow-2xl pb-0 z-[-50]">
         <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap'); .font-inter { font-family: 'Inter', sans-serif; }</style>
         
@@ -474,7 +483,6 @@
                 const order = window.customerOrders.find(o => o.id === orderId);
                 if(!order) throw new Error("Order not found");
 
-                // 1. Basic Order Details Bharo
                 document.getElementById('receipt-id').innerText = `#ORD-${order.id.substring(0,6).toUpperCase()}`;
                 const sName = order.shopName || "Local Store";
                 document.getElementById('print-store-name').innerText = sName;
@@ -486,7 +494,6 @@
                 const d = order.createdAt ? order.createdAt.toDate() : new Date();
                 document.getElementById('receipt-date').innerText = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
                 
-                // 2. Fetch Store Details from Firebase (Logo & Address)
                 document.getElementById('print-store-phone').innerText = order.shopPhone || "";
                 document.getElementById('watermark-initials').innerText = sName.substring(0, 2).toUpperCase();
                 
@@ -508,7 +515,6 @@
                     }
                 }
                 
-                // 3. Items Bharo
                 let itemsHtml = ''; let tA = 0;
                 if(order.items) {
                     order.items.forEach((i, idx) => {
@@ -519,7 +525,6 @@
                 document.getElementById('receipt-items').innerHTML = itemsHtml;
                 document.getElementById('receipt-total').innerText = `₹${tA.toFixed(2)}`;
 
-                // 4. Generate Photo
                 setTimeout(() => {
                     const c = document.getElementById('receipt-container');
                     html2canvas(c, { scale: 2, backgroundColor: "#ffffff", useCORS: true, windowWidth: 800, width: 800, windowHeight: 1131, height: 1131, logging: false }).then(cv => {
@@ -564,13 +569,9 @@
 
     <!-- ✨ AMAZON/FLIPKART STYLE E-COMMERCE SUCCESS MODAL ✨ -->
     <div id="ecommerce-success-modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4">
-        <!-- Semi-transparent Backdrop -->
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeSuccessModal()"></div>
         
-        <!-- Premium White Card -->
         <div class="bg-white rounded-[24px] w-full max-w-[320px] p-8 relative z-10 flex flex-col items-center text-center shadow-2xl animate-pop-in">
-            
-            <!-- E-commerce Style Graphic (Green tick with pulse effect) -->
             <div class="relative w-20 h-20 mb-5 flex items-center justify-center">
                 <div class="absolute inset-0 bg-green-100 rounded-full animate-ping opacity-75"></div>
                 <div class="relative bg-green-500 w-16 h-16 rounded-full flex items-center justify-center shadow-[0_4px_14px_rgba(34,197,94,0.4)]">
@@ -586,7 +587,8 @@
             </button>
         </div>
     </div>
-        <!-- ✨ iOS STYLE CANCEL CONFIRMATION MODAL ✨ -->
+
+    <!-- ✨ iOS STYLE CANCEL CONFIRMATION MODAL ✨ -->
     <div id="ios-cancel-modal" class="fixed inset-0 z-[300] hidden flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0">
         <div id="ios-cancel-card" class="bg-white/90 backdrop-blur-xl w-[270px] rounded-[14px] shadow-2xl transform scale-95 transition-transform duration-300 text-center overflow-hidden flex flex-col">
             <div class="p-4 pt-5 pb-4">
@@ -602,10 +604,8 @@
 
     <!-- ✨ AUTO REVIEW PROMPT MODAL ✨ -->
     <div id="auto-review-prompt" class="fixed inset-0 z-[250] hidden items-end sm:items-center justify-center p-4">
-        <!-- Backdrop -->
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeAutoReviewPrompt()"></div>
         
-        <!-- Modal Card -->
         <div class="bg-white rounded-[24px] w-full max-w-[340px] p-6 relative z-10 animate-slide-up shadow-2xl flex flex-col items-center text-center">
             <button onclick="closeAutoReviewPrompt()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-50 w-8 h-8 rounded-full flex items-center justify-center transition active:scale-95"><i class="fas fa-times"></i></button>
 
@@ -634,7 +634,6 @@
             currentReviewOrderId = orderId;
             document.getElementById('review-shop-name').innerText = order.shopName || 'Store';
             
-            // Check if review already exists (EDIT MODE)
             if (order.review) {
                 currentRating = order.review.rating || 0;
                 document.getElementById('review-text').value = order.review.text || "";
@@ -692,7 +691,6 @@
             const reviewText = document.getElementById('review-text').value.trim();
 
             try {
-                // Update Order Document in Firebase
                 await db.collection('orders').doc(currentReviewOrderId).update({
                     review: {
                         rating: currentRating,
@@ -705,11 +703,9 @@
                 btn.innerHTML = origHtml;
                 btn.disabled = false;
 
-                // ✨ Show Amazon/Flipkart Style Modal
                 showSuccessModal();
 
-                // Refresh orders
-                fetchMyOrders(localStorage.getItem('BikriPage_customer_phone'));
+                fetchMyOrders(getActiveCustomerPhone());
             } catch (error) {
                 alert("Could not post review: " + error.message);
                 btn.innerHTML = origHtml;
@@ -717,19 +713,18 @@
             }
         }
 
-        // Functions for the new E-commerce Style Success Modal
         function showSuccessModal() {
             const modal = document.getElementById('ecommerce-success-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
-            document.body.style.overflow = 'hidden'; // Stop background scrolling
+            document.body.style.overflow = 'hidden';
         }
 
         function closeSuccessModal() {
             const modal = document.getElementById('ecommerce-success-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
-            document.body.style.overflow = ''; // Restore scrolling
+            document.body.style.overflow = '';
         }
     </script>
 </body>

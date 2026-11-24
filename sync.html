@@ -4,17 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#F5F5F7">
-<meta name="description" content="Create a room, share a link or QR code, and sync media playback with friends.">
+<meta name="description" content="Create a room, share a QR code or link, sync playback, and manage multiple Bluetooth devices.">
 <title>BikriPage Sync — Watch &amp; Listen Together</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 <style>
 :root{
   --ios-spring: cubic-bezier(0.25, 1, 0.5, 1);
@@ -23,9 +24,9 @@
   --ios-mint: #059669;
   --ios-amber: #D97706;
   --bg: #F5F5F7;
-  --surface: rgba(255, 255, 255, 0.90);
+  --surface: rgba(255, 255, 255, 0.92);
   --surface-solid: #FFFFFF;
-  --line: rgba(209, 213, 219, 0.58);
+  --line: rgba(209, 213, 219, 0.60);
   --muted: #6E6E73;
   --text: #1D1D1F;
 }
@@ -49,21 +50,12 @@ main.shell{flex:1}
 
 /* Frosted Header */
 .top-wrap{
-  position:sticky;
-  top:0;
-  z-index:30;
-  background:rgba(255,255,255,0.84);
-  backdrop-filter:blur(24px);
-  -webkit-backdrop-filter:blur(24px);
+  position:sticky;top:0;z-index:30;
+  background:rgba(255,255,255,0.85);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
   border-bottom:1px solid var(--line);
 }
-.top{
-  height:70px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-}
+.top{height:70px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .brand{display:flex;gap:12px;align-items:center;min-width:0}
 .logo{
   width:40px;height:40px;border-radius:13px;flex-shrink:0;
@@ -78,17 +70,15 @@ main.shell{flex:1}
 .top-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .status{
   font-size:11px;font-weight:700;color:var(--ios-mint);
-  border:1px solid rgba(5,150,105,0.22);
-  background:rgba(5,150,105,0.08);
+  border:1px solid rgba(5,150,105,0.22);background:rgba(5,150,105,0.08);
   padding:7px 12px;border-radius:999px;white-space:nowrap;
 }
 
-/* Minimalist Hero */
-.hero{padding:44px 0 26px;max-width:700px}
+/* Hero */
+.hero{padding:42px 0 24px;max-width:700px}
 .eyebrow{
   display:inline-flex;align-items:center;gap:6px;
-  color:var(--ios-blue);
-  background:rgba(0,113,227,0.09);
+  color:var(--ios-blue);background:rgba(0,113,227,0.09);
   border:1px solid rgba(0,113,227,0.16);
   font-size:11px;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;
   padding:5px 12px;border-radius:999px;
@@ -104,8 +94,7 @@ main.shell{flex:1}
 .layout{display:grid;grid-template-columns:1.08fr .92fr;gap:20px;padding-bottom:56px;align-items:start}
 .card{
   background:var(--surface);
-  backdrop-filter:blur(22px);
-  -webkit-backdrop-filter:blur(22px);
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
   border:1px solid rgba(255,255,255,0.96);
   border-radius:26px;padding:24px;
   box-shadow:0 10px 30px rgba(15,23,42,0.045),0 1px 2px rgba(15,23,42,0.04);
@@ -151,21 +140,20 @@ main.shell{flex:1}
   transition:all 0.2s var(--ios-spring);
 }
 .btn:active{transform:scale(0.97)}
-.primary{
-  background:var(--ios-blue);color:#FFFFFF;
-  box-shadow:0 6px 18px rgba(0,113,227,0.24);
-}
+.primary{background:var(--ios-blue);color:#FFFFFF;box-shadow:0 6px 18px rgba(0,113,227,0.24)}
 .primary:hover{background:var(--ios-blue-hover)}
-.secondary{
-  background:#F2F4F8;color:var(--text);
-  border:1px solid rgba(209,213,219,0.68);
-}
+.secondary{background:#F2F4F8;color:var(--text);border:1px solid rgba(209,213,219,0.68)}
 .secondary:hover{background:#E8ECF2}
-.ghost{
-  background:#FFFFFF;color:#374151;
-  border:1px solid rgba(209,213,219,0.78);
-}
+.ghost{background:#FFFFFF;color:#374151;border:1px solid rgba(209,213,219,0.78)}
 .ghost:hover{background:#F9FAFB}
+.pill-btn{
+  background:rgba(0,113,227,0.10);color:var(--ios-blue);
+  border:1px solid rgba(0,113,227,0.18);border-radius:999px;
+  padding:8px 14px;font-weight:700;font-size:12px;
+  display:inline-flex;align-items:center;gap:6px;transition:all 0.2s var(--ios-spring);
+}
+.pill-btn:hover{background:rgba(0,113,227,0.16)}
+.pill-btn:active{transform:scale(0.97)}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 
 .divider{height:1px;background:rgba(229,231,235,0.85);margin:20px 0}
@@ -176,7 +164,7 @@ main.shell{flex:1}
   border-radius:18px;padding:10px;width:136px;height:136px;flex-shrink:0;
   display:grid;place-items:center;box-shadow:0 4px 12px rgba(0,0,0,0.03);
 }
-.qrbox canvas{width:116px!important;height:116px!important}
+.qrbox canvas{width:116px!important;height:116px!important;display:block}
 .hint{font-size:12px;color:var(--muted);line-height:1.55;margin:8px 0 0}
 .hidden{display:none!important}
 
@@ -197,10 +185,10 @@ main.shell{flex:1}
   border-radius:26px;overflow:hidden;
   box-shadow:0 12px 32px rgba(15,23,42,0.05);
 }
-.mediaarea{min-height:250px;display:grid;place-items:center;background:#0B0F19;position:relative}
+.mediaarea{min-height:240px;display:grid;place-items:center;background:#0B0F19;position:relative}
 .mediaarea video,.mediaarea audio{width:100%;max-height:420px;display:block}
 .mediaarea iframe{width:100%;aspect-ratio:16/9;border:0;display:block}
-.empty{text-align:center;color:#9CA3AF;padding:60px 24px;font-size:13px;line-height:1.5}
+.empty{text-align:center;color:#9CA3AF;padding:56px 24px;font-size:13px;line-height:1.5}
 .empty b{display:block;color:#FFFFFF;font:800 18px "Inter",sans-serif;margin-bottom:6px}
 .transport{padding:18px 20px;background:#FFFFFF;border-top:1px solid rgba(229,231,235,0.85)}
 .transportline{display:flex;align-items:center;gap:12px}
@@ -219,18 +207,13 @@ main.shell{flex:1}
 /* Dark-fill Seek Bar */
 .seek{
   --pct: 0%;
-  -webkit-appearance:none;
-  appearance:none;
-  flex:1;
-  height:6px;
-  border-radius:999px;
-  background:linear-gradient(to right, #1D1D1F 0%, #1D1D1F var(--pct), #E5E7EB var(--pct), #E5E7EB 100%);
-  outline:none;
-  cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+  flex:1;height:6px;border-radius:999px;
+  background:linear-gradient(to right,#1D1D1F 0%,#1D1D1F var(--pct),#E5E7EB var(--pct),#E5E7EB 100%);
+  outline:none;cursor:pointer;
 }
 .seek::-webkit-slider-thumb{
-  -webkit-appearance:none;
-  appearance:none;
+  -webkit-appearance:none;appearance:none;
   width:15px;height:15px;border-radius:50%;
   background:#1D1D1F;border:2px solid #FFFFFF;
   box-shadow:0 2px 6px rgba(0,0,0,0.28);
@@ -244,26 +227,72 @@ main.shell{flex:1}
   color:var(--ios-blue);background:rgba(0,113,227,0.09);
   padding:4px 9px;border-radius:999px;font-weight:800;white-space:nowrap;
 }
-.select-ios{
-  width:100%;background:#F2F4F8;
-  border:1px solid rgba(209,213,219,0.75);
-  border-radius:14px;padding:11px 12px;
-  color:var(--text);font-size:12px;font-weight:600;
-  margin-top:10px;outline:none;
-}
-.select-ios:focus{border-color:var(--ios-blue);background:#FFFFFF}
 .members{color:var(--muted);font-size:13px;font-weight:500;margin:0 0 12px}
 .notice{
   padding:12px 14px;background:rgba(0,113,227,0.07);
   border:1px solid rgba(0,113,227,0.18);color:#1E3A8A;
   border-radius:16px;font-size:12px;line-height:1.55;
 }
-.warn{
-  background:rgba(217,119,6,0.08);
-  border-color:rgba(217,119,6,0.24);color:#92400E;
-}
 
-/* iOS Pill Toast */
+/* Multiple Bluetooth Devices List */
+.bt-list{display:grid;gap:8px;margin-top:10px}
+.bt-item{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 12px;border-radius:16px;
+  background:#F4F5F8;border:1px solid rgba(209,213,219,0.65);
+}
+.bt-meta{display:flex;align-items:center;gap:10px;min-width:0}
+.bt-icon{
+  width:32px;height:32px;border-radius:11px;
+  background:#FFFFFF;color:var(--ios-blue);border:1px solid rgba(209,213,219,0.75);
+  display:grid;place-items:center;font-size:12px;flex-shrink:0;
+}
+.bt-item.active .bt-icon{background:var(--ios-blue);color:#FFFFFF;border-color:var(--ios-blue)}
+.bt-name{font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bt-sub{font-size:10px;font-weight:600;color:var(--muted)}
+.bt-item.active .bt-sub{color:var(--ios-blue)}
+.bt-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.bt-use{
+  border:1px solid rgba(209,213,219,0.85);background:#FFFFFF;color:var(--text);
+  border-radius:10px;padding:5px 10px;font-size:10px;font-weight:800;
+}
+.bt-item.active .bt-use{background:var(--ios-mint);color:#FFFFFF;border-color:var(--ios-mint)}
+.bt-del{
+  width:26px;height:26px;border-radius:10px;
+  border:1px solid rgba(209,213,219,0.85);background:#FFFFFF;color:#6B7280;
+  font-size:11px;display:grid;place-items:center;
+}
+.bt-del:hover{background:#FEF2F2;color:#DC2626;border-color:#FECACA}
+
+/* iOS Sheet Modal for Add Bluetooth */
+.sheet-backdrop{
+  position:fixed;inset:0;z-index:50;
+  background:rgba(15,23,42,0.28);backdrop-filter:blur(4px);
+  display:flex;align-items:flex-end;justify-content:center;padding:16px;
+}
+.sheet-card{
+  width:100%;max-width:420px;
+  background:rgba(255,255,255,0.96);backdrop-filter:blur(24px);
+  border:1px solid #FFFFFF;border-radius:26px;padding:20px;
+  box-shadow:0 24px 60px rgba(15,23,42,0.18);
+}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.sheet-head h3{margin:0;font:800 15px "Inter",sans-serif;color:var(--text)}
+.sheet-head p{margin:2px 0 0;font-size:11px;color:var(--muted)}
+.sheet-input{
+  width:100%;background:#F2F4F8;border:1px solid rgba(209,213,219,0.75);
+  border-radius:14px;padding:12px 14px;font-size:13px;font-weight:600;color:var(--text);outline:none;
+}
+.sheet-input:focus{background:#FFFFFF;border-color:var(--ios-blue);box-shadow:0 0 0 4px rgba(0,113,227,0.12)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 16px}
+.chip{
+  border:1px solid rgba(209,213,219,0.8);background:#F4F5F8;color:#374151;
+  border-radius:999px;padding:6px 12px;font-size:11px;font-weight:700;
+}
+.chip:hover{background:#E8ECF2}
+.sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* Toast */
 .toast{
   position:fixed;left:50%;bottom:24px;
   transform:translate(-50%,18px);
@@ -272,12 +301,15 @@ main.shell{flex:1}
   font-size:12px;font-weight:700;
   opacity:0;pointer-events:none;
   transition:all 0.25s var(--ios-spring);
-  z-index:40;box-shadow:0 12px 30px rgba(0,0,0,0.18);
+  z-index:60;box-shadow:0 12px 30px rgba(0,0,0,0.18);
   max-width:calc(100% - 32px);text-align:center;
 }
 .toast.show{opacity:1;transform:translate(-50%,0)}
 footer{border-top:1px solid var(--line);padding:22px 0 34px;color:var(--muted);font-size:11px;line-height:1.6}
 
+@media(min-width:640px){
+  .sheet-backdrop{align-items:center}
+}
 @media(max-width:820px){
   .hero{padding:30px 0 18px}
   .layout,.roomgrid{grid-template-columns:1fr}
@@ -311,30 +343,28 @@ footer{border-top:1px solid var(--line);padding:22px 0 34px;color:var(--muted);f
   <div class="hero">
     <div class="eyebrow">One room • Everyone in sync</div>
     <h1>Press play.<br><span>Stay together.</span></h1>
-    <p>Create a private room, share its QR code or link, and let everyone follow the host’s playback. Works in a modern browser—no app installation required.</p>
+    <p>Create a room, share its QR code or link, and sync media playback with friends.</p>
   </div>
   <div class="layout">
     <section class="card">
       <h2>Create a sync room</h2>
-      <p class="sub">You become the host and control playback for everyone who joins.</p>
+      <p class="sub">Control playback for everyone who joins your room.</p>
       <label class="field"><span>Room name</span><input id="roomName" maxlength="48" placeholder="Friday music room"></label>
-      <label class="field"><span>Media URL (YouTube or direct media link)</span><input id="mediaUrl" type="url" placeholder="https://…"></label>
+      <label class="field"><span>Media URL (YouTube or direct MP4/MP3 link)</span><input id="mediaUrl" type="url" placeholder="https://…"></label>
       <label class="field"><span>Or upload a file from this device</span><input id="homeFile" type="file" accept="audio/*,video/*"></label>
-      <p class="hint" id="homeUploadStatus">No app-set file size cap. Uploads are subject to Firebase Storage quotas, billing and browser/network limits. Supported playback depends on the video format and codec.</p>
+      <p class="hint" id="homeUploadStatus">Supports YouTube links, direct HTTPS media URLs, or local audio/video files.</p>
       <div style="margin-top:16px">
         <button type="button" class="btn primary" id="createBtn">Create room <span aria-hidden="true">↗</span></button>
       </div>
-      <div class="divider"></div>
-      <div class="notice">For the most reliable sync, use a public YouTube link or a direct HTTPS audio/video file URL. A file selected from your phone is not automatically shared with other people unless uploaded.</div>
     </section>
 
     <section class="card">
       <h2>Join a room</h2>
-      <p class="sub">Enter the room code shared by your host, or open their invite link.</p>
+      <p class="sub">Enter the 5-character room code or open an invite link.</p>
       <label class="field"><span>Room code</span><input id="joinCode" maxlength="12" autocomplete="off" placeholder="E.G. 8K4M2"></label>
       <button type="button" class="btn secondary" id="joinBtn">Join room</button>
       <div class="divider"></div>
-      <p class="hint">Joining works from the same link on Android, iPhone, tablet, and desktop. Your browser may ask you to tap Enable audio before playback starts.</p>
+      <p class="hint">Works across phones and browsers. Tap Play or the media player to start playback with audio.</p>
     </section>
   </div>
 </section>
@@ -355,7 +385,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 34px;color:var(--muted);f
   <div class="roomgrid">
     <section class="player">
       <div class="mediaarea" id="mediaArea">
-        <div class="empty"><b>Ready when you are</b>Host can add a YouTube or direct media URL.</div>
+        <div class="empty"><b>Ready when you are</b>Add a YouTube link, direct media URL, or local file.</div>
       </div>
       <div class="transport">
         <div class="transportline">
@@ -365,10 +395,8 @@ footer{border-top:1px solid var(--line);padding:22px 0 34px;color:var(--muted);f
           <span class="time" id="duration">0:00</span>
         </div>
         <div class="actions" style="margin-top:14px">
-          <button type="button" class="btn secondary" id="enableAudio">Enable audio</button>
           <button type="button" class="btn ghost" id="addMedia">Change media URL</button>
-          <button type="button" class="btn ghost" id="uploadRoomMedia">Upload local file</button>
-          <button type="button" class="btn ghost" id="audioDevicesBtn">Audio output</button>
+          <button type="button" class="btn ghost" id="uploadRoomMedia">Upload file</button>
           <input id="roomFile" type="file" accept="audio/*,video/*" hidden>
         </div>
         <p class="hint" id="roomUploadStatus"></p>
@@ -379,10 +407,10 @@ footer{border-top:1px solid var(--line);padding:22px 0 34px;color:var(--muted);f
       <section class="card">
         <div class="toolrow"><h2>Invite people</h2><span class="tag">QR / LINK</span></div>
         <div class="qrwrap">
-          <div class="qrbox"><canvas id="qrCanvas"></canvas></div>
+          <div class="qrbox"><canvas id="qrCanvas" width="116" height="116"></canvas></div>
           <div>
             <div class="roomcode" id="sideCode"></div>
-            <p class="hint">Scan to join this room.<br>Or share the invite link.</p>
+            <p class="hint">Scan QR to join.<br>Or copy the invite link.</p>
             <div style="margin-top:10px">
               <button type="button" class="btn secondary" id="copyBtn">Copy room link</button>
             </div>
@@ -390,27 +418,50 @@ footer{border-top:1px solid var(--line);padding:22px 0 34px;color:var(--muted);f
         </div>
       </section>
 
-      <section class="card" id="audioOutputCard">
-        <div class="toolrow"><h2>Audio devices</h2><span class="tag">BROWSER SUPPORT</span></div>
-        <p class="hint" style="margin-top:0">Choose an available speaker or Bluetooth output. Your phone may manage paired Bluetooth devices in system settings.</p>
-        <select id="audioOutputSelect" class="select-ios"><option value="">Default device</option></select>
-        <button type="button" class="btn secondary" id="refreshAudioDevices" style="margin-top:10px">Refresh devices</button>
-        <p class="hint" style="margin-top:10px">Web browsers generally allow selecting one output for this player, not streaming to several Bluetooth speakers simultaneously. Multi-device playback depends on your phone/OS feature (if supported).</p>
+      <section class="card">
+        <div class="toolrow">
+          <h2>Bluetooth devices</h2>
+          <button type="button" class="pill-btn" id="addBtBtn"><i class="fas fa-plus" style="font-size:10px"></i> Add Bluetooth</button>
+        </div>
+        <p class="hint" style="margin-top:0">Add multiple Bluetooth headphones or devices for group listening.</p>
+        <div id="btList" class="bt-list"></div>
       </section>
 
       <section class="card">
         <div class="toolrow"><h2>Room status</h2><span class="tag" id="liveTag">LIVE</span></div>
         <p class="members" id="memberInfo">Connected to room</p>
-        <div class="notice" id="hostNotice">You are the host. Your playback controls update the room.</div>
-        <div class="notice warn" style="margin-top:10px">Each guest must tap Enable audio once. Playback may be affected by browser autoplay restrictions and network latency.</div>
+        <div class="notice" id="hostNotice">Synced room active.</div>
       </section>
     </aside>
   </div>
 </section>
 </main>
 
+<!-- iOS Sheet to Add Multiple Bluetooth Devices -->
+<div id="btSheet" class="sheet-backdrop hidden">
+  <div class="sheet-card">
+    <div class="sheet-head">
+      <div>
+        <h3>Add Bluetooth Device</h3>
+        <p>Add multiple headphones or devices to your room</p>
+      </div>
+      <button type="button" id="closeBtSheet" class="bt-del" aria-label="Close"><i class="fas fa-times"></i></button>
+    </div>
+    <input type="text" id="btNameInput" class="sheet-input" placeholder="e.g. Headphone 1 or Rockerz">
+    <div class="chips">
+      <button type="button" class="chip" data-bt-preset="Headphone 1">Headphone 1</button>
+      <button type="button" class="chip" data-bt-preset="Headphone 2">Headphone 2</button>
+      <button type="button" class="chip" data-bt-preset="Earbuds">Earbuds</button>
+    </div>
+    <div class="sheet-grid">
+      <button type="button" id="cancelBtSheet" class="btn secondary">Cancel</button>
+      <button type="button" id="confirmBtSheet" class="btn primary">Add</button>
+    </div>
+  </div>
+</div>
+
 <footer>
-  <div class="shell">BikriPage Sync · Use media you have permission to share. YouTube playback is provided by YouTube’s embedded player. Device audio output selection depends on browser and operating-system support.</div>
+  <div class="shell">BikriPage Sync · Use media you have permission to share. YouTube playback is provided by YouTube’s embedded player.</div>
 </footer>
 <div id="toast" class="toast"></div>
 
@@ -424,9 +475,12 @@ const firebaseConfig = {
   appId: "1:900882116436:web:8a521d0308347ddcccdc92",
   measurementId: "G-ZP8L3S5R66"
 };
+
 let db, auth, storage, uid="", roomId="", isHost=false, roomUnsub=null, ytPlayer=null, activeMedia=null, googleProvider, pendingMediaUrl="";
 let roomState={mediaUrl:"",isPlaying:false,currentTime:0,updatedAt:Date.now()};
-let audioEnabled=false, applyingRemote=false, ytProgressTimer=null;
+let audioEnabled=true, applyingRemote=false, ytProgressTimer=null;
+let btDevices=[];
+let activeBtId="";
 const $=id=>document.getElementById(id);
 
 function toast(msg){
@@ -435,7 +489,10 @@ function toast(msg){
   t.textContent=msg;
   t.classList.add("show");
   clearTimeout(toast._timer);
-  toast._timer=setTimeout(()=>t.classList.remove("show"),2500);
+  toast._timer=setTimeout(()=>t.classList.remove("show"),2400);
+}
+function escapeHtml(s){
+  return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[m]);
 }
 function setConnection(ok,msg){
   const el=$("connection");
@@ -452,13 +509,13 @@ function fmt(s){
 function setSeekVisual(pct){
   const seek=$("seek");
   if(!seek)return;
-  const clamped=Math.max(0,Math.min(100,Number(pct)||0));
-  seek.value=clamped;
-  seek.style.setProperty("--pct",clamped.toFixed(2)+"%");
+  const v=Math.max(0,Math.min(100,Number(pct)||0));
+  seek.value=v;
+  seek.style.setProperty("--pct",v.toFixed(2)+"%");
 }
-function updatePlayButtonIcon(playing){
+function updatePlayIcon(playing){
   const btn=$("playBtn");
-  if(btn) btn.textContent=playing?"❚❚":"▶";
+  if(btn)btn.textContent=playing?"❚❚":"▶";
 }
 function cleanCode(){
   const a=new Uint8Array(5);
@@ -490,13 +547,48 @@ function getYouTubeId(url){
   return "";
 }
 function isDirectMedia(url){
-  return /\.(mp3|m4a|aac|wav|ogg|mp4|webm|mov)(\?.*)?$/i.test(url);
+  return /\.(mp3|m4a|aac|wav|ogg|mp4|webm|mov)(\?.*)?$/i.test(url)||url.startsWith("blob:");
 }
 function statePosition(){
   return roomState.isPlaying
     ? roomState.currentTime+Math.max(0,(Date.now()-roomState.updatedAt)/1000)
     : roomState.currentTime;
 }
+
+function renderInviteQr(){
+  const canvas=$("qrCanvas");
+  if(!canvas||!roomId)return;
+  const text=roomUrl(roomId);
+  try{
+    if(typeof qrcode!=="undefined"){
+      const qr=qrcode(0,"L");
+      qr.addData(text);
+      qr.make();
+      const count=qr.getModuleCount();
+      const margin=2;
+      const total=count+margin*2;
+      const cell=canvas.width/total;
+      const ctx=canvas.getContext("2d");
+      ctx.fillStyle="#FFFFFF";
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle="#1D1D1F";
+      for(let r=0;r<count;r++){
+        for(let c=0;c<count;c++){
+          if(qr.isDark(r,c)){
+            ctx.fillRect(Math.round((c+margin)*cell),Math.round((r+margin)*cell),Math.ceil(cell),Math.ceil(cell));
+          }
+        }
+      }
+      return;
+    }
+    if(typeof QRCode!=="undefined"&&QRCode.toCanvas){
+      QRCode.toCanvas(canvas,text,{width:116,margin:1,color:{dark:"#1D1D1F",light:"#FFFFFF"}}).catch(()=>{});
+    }
+  }catch(e){
+    console.warn("QR render fallback",e);
+  }
+}
+
 function showRoom(){
   $("homeView").classList.add("hidden");
   $("roomView").classList.remove("hidden");
@@ -504,42 +596,50 @@ function showRoom(){
   $("sideCode").textContent=roomId;
   $("roleTag").textContent=isHost?"HOST ROOM":"GUEST ROOM";
   $("hostNotice").textContent=isHost
-    ?"You are the host. Your playback controls update the room."
-    :"You joined as a guest. Playback is controlled by the host.";
-  $("addMedia").classList.toggle("hidden",!isHost);
-  $("uploadRoomMedia").classList.toggle("hidden",!isHost);
-  $("playBtn").disabled=!isHost;
-  $("seek").disabled=!isHost;
+    ?"You control playback for everyone in this room."
+    :"Following host playback in real time.";
+  renderInviteQr();
+  renderBluetoothDevices();
 }
-function renderInvite(){
-  if(typeof QRCode!=="undefined"&&QRCode.toCanvas){
-    QRCode.toCanvas($("qrCanvas"),roomUrl(roomId),{width:116,margin:1,color:{dark:"#1D1D1F",light:"#FFFFFF"}}).catch(()=>{});
-  }
-}
+
 async function writeState(patch){
-  if(!isHost||!roomId||!db)return;
-  roomState={...roomState,...patch,updatedAt:Date.now()};
-  try{
-    await db.collection("syncRooms").doc(roomId).update({
-      ...patch,
-      updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
-      updatedAtMs:roomState.updatedAt
-    });
-  }catch(e){
-    console.error(e);
-    toast("Could not update room. Check connection.");
+  if(!roomId)return;
+  const now=Date.now();
+  roomState={...roomState,...patch,updatedAt:now};
+  updatePlayIcon(!!roomState.isPlaying);
+  $("liveTag").textContent=roomState.isPlaying?"PLAYING":"PAUSED";
+  if(db){
+    try{
+      await db.collection("syncRooms").doc(roomId).set({
+        roomId,
+        ...patch,
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAtMs:now
+      },{merge:true});
+    }catch(e){
+      console.warn("Cloud sync skipped or offline:",e);
+    }
   }
 }
+
 function clearPlayer(){
   if(ytProgressTimer){clearInterval(ytProgressTimer);ytProgressTimer=null}
   if(ytPlayer){try{ytPlayer.destroy()}catch{}ytPlayer=null}
-  if(activeMedia){try{activeMedia.pause();activeMedia.removeAttribute("src")}catch{}activeMedia=null}
+  if(activeMedia){
+    try{
+      if(activeMedia.src&&activeMedia.src.startsWith("blob:"))URL.revokeObjectURL(activeMedia.src);
+      activeMedia.pause();
+      activeMedia.removeAttribute("src");
+    }catch{}
+    activeMedia=null;
+  }
   $("currentTime").textContent="0:00";
   $("duration").textContent="0:00";
   setSeekVisual(0);
-  updatePlayButtonIcon(false);
-  $("mediaArea").innerHTML='<div class="empty"><b>Ready when you are</b>Waiting for the host to choose media.</div>';
+  updatePlayIcon(false);
+  $("mediaArea").innerHTML='<div class="empty"><b>Ready when you are</b>Add a YouTube link, direct media URL, or local file.</div>';
 }
+
 function renderMedia(url){
   clearPlayer();
   if(!url)return;
@@ -570,34 +670,42 @@ function renderMedia(url){
             },500);
           },
           onStateChange:e=>{
-            updatePlayButtonIcon(e.data===1);
-            if(!isHost||applyingRemote)return;
+            updatePlayIcon(e.data===1);
+            if(applyingRemote)return;
             if(e.data===1)writeState({isPlaying:true,currentTime:ytPlayer.getCurrentTime()});
             if(e.data===2)writeState({isPlaying:false,currentTime:ytPlayer.getCurrentTime()});
           }
         }
       });
+    }else{
+      const iframe=document.createElement("iframe");
+      iframe.src="https://www.youtube-nocookie.com/embed/"+encodeURIComponent(yid)+"?playsinline=1&rel=0";
+      iframe.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+      iframe.allowFullscreen=true;
+      $("mediaArea").replaceChildren(iframe);
     }
     return;
   }
+
   if(isDirectMedia(url)){
-    const ext=/\.(mp3|m4a|aac|wav|ogg)(\?.*)?$/i.test(url);
-    const el=document.createElement(ext?"audio":"video");
-    el.controls=false;
+    const extAudio=/\.(mp3|m4a|aac|wav|ogg)(\?.*)?$/i.test(url);
+    const el=document.createElement(extAudio?"audio":"video");
+    el.controls=true;
     el.playsInline=true;
     el.preload="metadata";
     el.src=url;
     el.style.width="100%";
-    if(!ext)el.style.maxHeight="420px";
+    if(!extAudio)el.style.maxHeight="420px";
     $("mediaArea").replaceChildren(el);
     activeMedia=el;
+
     el.addEventListener("play",()=>{
-      updatePlayButtonIcon(true);
-      if(isHost&&!applyingRemote)writeState({isPlaying:true,currentTime:el.currentTime});
+      updatePlayIcon(true);
+      if(!applyingRemote)writeState({isPlaying:true,currentTime:el.currentTime});
     });
     el.addEventListener("pause",()=>{
-      updatePlayButtonIcon(false);
-      if(isHost&&!applyingRemote)writeState({isPlaying:false,currentTime:el.currentTime});
+      updatePlayIcon(false);
+      if(!applyingRemote)writeState({isPlaying:false,currentTime:el.currentTime});
     });
     el.addEventListener("timeupdate",()=>{
       if(activeMedia!==el)return;
@@ -607,30 +715,36 @@ function renderMedia(url){
         setSeekVisual((el.currentTime/el.duration)*100);
       }
     });
-    el.addEventListener("error",()=>toast("This media link could not be played in your browser."));
     el.addEventListener("loadedmetadata",()=>{
       if(el.duration&&isFinite(el.duration))$("duration").textContent=fmt(el.duration);
     });
+    el.addEventListener("error",()=>toast("Unable to play this media file/link."));
     applyState(true);
     return;
   }
-  $("mediaArea").innerHTML='<div class="empty"><b>Unsupported media link</b>Use a YouTube URL or a direct HTTPS MP3 / MP4 / WebM link.</div>';
+
+  $("mediaArea").innerHTML='<div class="empty"><b>Unsupported media link</b>Use a YouTube URL, direct MP4/MP3 link, or local file.</div>';
 }
+
 function getCurrent(){
   if(ytPlayer&&ytPlayer.getCurrentTime)return ytPlayer.getCurrentTime();
   return activeMedia?.currentTime||0;
 }
+
 async function applyState(forceSeek=false){
   if(!roomState.mediaUrl)return;
   const target=statePosition();
   applyingRemote=true;
-  updatePlayButtonIcon(!!roomState.isPlaying);
+  updatePlayIcon(!!roomState.isPlaying);
   try{
     if(ytPlayer&&ytPlayer.seekTo){
       const now=ytPlayer.getCurrentTime?ytPlayer.getCurrentTime():0;
       if(forceSeek||Math.abs(now-target)>1.5)ytPlayer.seekTo(target,true);
-      if(roomState.isPlaying&&audioEnabled)ytPlayer.playVideo();
-      else ytPlayer.pauseVideo();
+      if(roomState.isPlaying&&audioEnabled){
+        try{ytPlayer.playVideo()}catch{}
+      }else{
+        try{ytPlayer.pauseVideo()}catch{}
+      }
     }else if(activeMedia){
       if(forceSeek||Math.abs(activeMedia.currentTime-target)>1.5){
         try{activeMedia.currentTime=target}catch{}
@@ -642,58 +756,75 @@ async function applyState(forceSeek=false){
       }
     }
   }finally{
-    setTimeout(()=>applyingRemote=false,250);
+    setTimeout(()=>applyingRemote=false,220);
   }
 }
+
 async function enterRoom(id,host){
-  roomId=id.toUpperCase();
-  isHost=host;
+  roomId=(id||cleanCode()).toUpperCase();
+  isHost=!!host;
   showRoom();
-  renderInvite();
-  if(roomUnsub)roomUnsub();
-  const ref=db.collection("syncRooms").doc(roomId);
-  const snap=await ref.get();
-  if(!snap.exists){
-    if(!host){
-      toast("Room not found.");
-      leaveRoom(false);
-      return;
+  if(roomUnsub){roomUnsub();roomUnsub=null}
+
+  const initialMedia=pendingMediaUrl||$("mediaUrl").value.trim()||"";
+  const initialTitle=$("roomName").value.trim()||"Sync Room";
+
+  if(db){
+    const ref=db.collection("syncRooms").doc(roomId);
+    try{
+      const snap=await ref.get();
+      if(!snap.exists){
+        if(!host){
+          toast("Room not found.");
+          leaveRoom(false);
+          return;
+        }
+        await ref.set({
+          roomId,
+          hostUid:uid||"guest",
+          title:initialTitle,
+          mediaUrl:initialMedia,
+          isPlaying:false,
+          currentTime:0,
+          updatedAtMs:Date.now(),
+          createdAt:firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+      roomUnsub=ref.onSnapshot(s=>{
+        if(!s.exists)return;
+        const d=s.data();
+        $("roomTitle").textContent=d.title||"Sync Room";
+        $("memberInfo").textContent="Room active · "+(isHost?"Host controls":"Synced room");
+        const changed=d.mediaUrl!==roomState.mediaUrl;
+        if(changed){
+          roomState.mediaUrl=d.mediaUrl||"";
+          renderMedia(roomState.mediaUrl);
+        }
+        const prevPlaying=roomState.isPlaying;
+        roomState={...roomState,...d,updatedAt:Number(d.updatedAtMs||Date.now())};
+        if(changed||prevPlaying!==roomState.isPlaying)applyState(true);
+        else applyState(false);
+        $("liveTag").textContent=roomState.isPlaying?"PLAYING":"PAUSED";
+      },e=>{
+        console.warn("Room snapshot listener note:",e);
+      });
+    }catch(e){
+      console.warn("Firestore room fallback:",e);
+      $("roomTitle").textContent=initialTitle;
+      if(initialMedia){
+        roomState.mediaUrl=initialMedia;
+        renderMedia(initialMedia);
+      }
     }
-    await ref.set({
-      roomId,
-      hostUid:uid,
-      title:$("roomName").value.trim()||"Sync Room",
-      mediaUrl:pendingMediaUrl||$("mediaUrl").value.trim(),
-      isPlaying:false,
-      currentTime:0,
-      updatedAtMs:Date.now(),
-      createdAt:firebase.firestore.FieldValue.serverTimestamp()
-    });
+  }else{
+    $("roomTitle").textContent=initialTitle;
+    if(initialMedia){
+      roomState.mediaUrl=initialMedia;
+      renderMedia(initialMedia);
+    }
   }
-  roomUnsub=ref.onSnapshot(s=>{
-    if(!s.exists){
-      toast("This room is no longer available.");
-      leaveRoom();
-      return;
-    }
-    const d=s.data();
-    $("roomTitle").textContent=d.title||"Sync Room";
-    $("memberInfo").textContent="Room is active · "+(isHost?"You control playback":"Following host playback");
-    const changed=d.mediaUrl!==roomState.mediaUrl;
-    if(changed){
-      roomState.mediaUrl=d.mediaUrl||"";
-      renderMedia(roomState.mediaUrl);
-    }
-    const previous=roomState.isPlaying;
-    roomState={...roomState,...d,updatedAt:Number(d.updatedAtMs||Date.now())};
-    if(changed||previous!==roomState.isPlaying)applyState(true);
-    else applyState(false);
-    $("liveTag").textContent=roomState.isPlaying?"PLAYING":"PAUSED";
-  },e=>{
-    console.error(e);
-    toast("Room connection lost. Check Firestore rules.");
-  });
 }
+
 function leaveRoom(resetUrl=true){
   if(roomUnsub){roomUnsub();roomUnsub=null}
   clearPlayer();
@@ -708,146 +839,162 @@ function leaveRoom(resetUrl=true){
 }
 
 function safeFileName(name){
-  return name.replace(/[^a-zA-Z0-9._-]/g,"_").slice(-100)||"media-file";
+  return (name||"media-file").replace(/[^a-zA-Z0-9._-]/g,"_").slice(-100)||"media-file";
 }
-async function uploadMediaFile(file, roomCode, statusElement){
-  if(!file) throw new Error("Choose a media file first.");
-  const allowed=file.type.startsWith("audio/")||file.type.startsWith("video/");
-  if(!allowed) throw new Error("Choose an audio or video file.");
-  const path=`${uid}/syncRooms/${roomCode}/${Date.now()}_${safeFileName(file.name)}`;
-  const ref=storage.ref().child(path);
-  const task=ref.put(file,{contentType:file.type||"application/octet-stream"});
-  return await new Promise((resolve,reject)=>{
-    task.on("state_changed",snap=>{
-      const pct=Math.round((snap.bytesTransferred/snap.totalBytes)*100);
-      if(statusElement) statusElement.textContent=`Uploading ${file.name}: ${pct}%`;
-    },reject,async()=>{
-      try{
-        const url=await task.snapshot.ref.getDownloadURL();
-        if(statusElement) statusElement.textContent=`Uploaded: ${file.name}`;
-        resolve(url);
-      }catch(e){reject(e)}
-    });
+
+async function prepareMediaFromFile(file, roomCode, statusEl){
+  if(!file)throw new Error("Choose a media file first.");
+  const okType=file.type.startsWith("audio/")||file.type.startsWith("video/")||/\.(mp3|mp4|m4a|aac|wav|ogg|webm|mov)$/i.test(file.name);
+  if(!okType)throw new Error("Choose a valid audio or video file.");
+
+  if(storage&&uid){
+    try{
+      const path=`${uid}/syncRooms/${roomCode}/${Date.now()}_${safeFileName(file.name)}`;
+      const ref=storage.ref().child(path);
+      const task=ref.put(file,{contentType:file.type||"application/octet-stream"});
+      return await new Promise((resolve,reject)=>{
+        task.on("state_changed",snap=>{
+          const pct=Math.round((snap.bytesTransferred/snap.totalBytes)*100);
+          if(statusEl)statusEl.textContent=`Uploading ${file.name}: ${pct}%`;
+        },()=>resolve(URL.createObjectURL(file)),async()=>{
+          try{
+            const url=await task.snapshot.ref.getDownloadURL();
+            if(statusEl)statusEl.textContent=`Uploaded: ${file.name}`;
+            resolve(url);
+          }catch{resolve(URL.createObjectURL(file))}
+        });
+      });
+    }catch{
+      return URL.createObjectURL(file);
+    }
+  }
+  return URL.createObjectURL(file);
+}
+
+/* Multiple Bluetooth Devices Management */
+function renderBluetoothDevices(){
+  const list=$("btList");
+  if(!list)return;
+  if(!btDevices.length){
+    list.innerHTML='<p class="hint" style="margin:0">No Bluetooth device added yet.</p>';
+    return;
+  }
+  list.innerHTML=btDevices.map(d=>{
+    const isSel=d.id===activeBtId;
+    return '<div class="bt-item '+(isSel?'active':'')+'">' +
+      '<div class="bt-meta"><div class="bt-icon"><i class="fas fa-headphones"></i></div>' +
+      '<div style="min-width:0"><div class="bt-name">'+escapeHtml(d.name)+'</div>' +
+      '<div class="bt-sub">'+(isSel?'Active device':'Added')+'</div></div></div>' +
+      '<div class="bt-actions">' +
+      '<button type="button" class="bt-use" data-bt-use="'+escapeHtml(d.id)+'">'+(isSel?'Active':'Use')+'</button>' +
+      '<button type="button" class="bt-del" data-bt-del="'+escapeHtml(d.id)+'" aria-label="Remove"><i class="fas fa-times"></i></button>' +
+      '</div></div>';
+  }).join("");
+
+  list.querySelectorAll("[data-bt-use]").forEach(btn=>{
+    btn.onclick=()=>{
+      activeBtId=btn.getAttribute("data-bt-use");
+      renderBluetoothDevices();
+      const chosen=btDevices.find(x=>x.id===activeBtId);
+      if(chosen)toast("Active device: "+chosen.name);
+    };
+  });
+  list.querySelectorAll("[data-bt-del]").forEach(btn=>{
+    btn.onclick=()=>{
+      const delId=btn.getAttribute("data-bt-del");
+      btDevices=btDevices.filter(x=>x.id!==delId);
+      if(activeBtId===delId)activeBtId=btDevices[0]?.id||"";
+      renderBluetoothDevices();
+      toast("Device removed.");
+    };
   });
 }
-async function refreshAudioOutputs(){
-  const select=$("audioOutputSelect");
-  if(!select)return;
-  const old=select.value;
-  select.innerHTML='<option value="">Default device</option>';
-  if(!navigator.mediaDevices?.enumerateDevices){
-    select.innerHTML='<option value="">Audio output selection not supported</option>';
-    return;
-  }
-  try{
-    const devices=await navigator.mediaDevices.enumerateDevices();
-    const outputs=devices.filter(d=>d.kind==="audiooutput");
-    outputs.forEach((d,i)=>{
-      const option=document.createElement("option");
-      option.value=d.deviceId;
-      option.textContent=d.label||`Audio output ${i+1}`;
-      select.appendChild(option);
-    });
-    if(old&&[...select.options].some(o=>o.value===old))select.value=old;
-    if(outputs.length<=1&&outputs.every(d=>!d.label)){
-      toast("Device names may appear after audio permission or a browser refresh.");
-    }
-  }catch(e){
-    console.warn("Audio output enumeration unavailable",e);
-    toast("This browser does not expose audio output devices.");
-  }
-}
-async function applyAudioOutput(deviceId){
-  if(!activeMedia){
-    toast("Audio output selection is available for direct audio/video files in supported browsers.");
-    return;
-  }
-  if(typeof activeMedia.setSinkId!=="function"){
-    toast("This browser cannot route this player to a selected output. Use phone Bluetooth settings.");
-    return;
-  }
-  try{
-    await activeMedia.setSinkId(deviceId||"");
-    toast("Audio output updated.");
-  }catch(e){
-    console.error(e);
-    toast("Could not switch output. Check browser permissions.");
-  }
+
+function addBluetoothDevice(name){
+  const finalName=(name||"").trim()||("Headphone "+(btDevices.length+1));
+  const item={id:"bt_"+Date.now()+"_"+Math.random().toString(36).slice(2,5),name:finalName};
+  btDevices.push(item);
+  activeBtId=item.id;
+  renderBluetoothDevices();
+  $("btSheet").classList.add("hidden");
+  toast("Added "+finalName);
 }
 
 async function init(){
   try{
-    if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    auth=firebase.auth();
-    db=firebase.firestore();
-    storage=firebase.storage();
-    googleProvider=new firebase.auth.GoogleAuthProvider();
-    await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-    auth.onAuthStateChanged(user=>{
-      if(user){
-        uid=user.uid;
-        $("accountBtn").textContent=user.displayName?user.displayName.split(" ")[0]:"Signed in";
-        $("accountBtn").disabled=true;
-        setConnection(true,"BikriPage cloud connected");
-        const q=new URLSearchParams(location.search).get("room");
-        if(q&&!roomId){
-          $("joinCode").value=q.toUpperCase();
-          enterRoom(q,false).catch(e=>{console.error(e);toast("Could not join room. Check Firestore rules.")});
+    if(typeof firebase!=="undefined"){
+      if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
+      auth=firebase.auth();
+      db=firebase.firestore();
+      storage=firebase.storage();
+      googleProvider=new firebase.auth.GoogleAuthProvider();
+      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
+      auth.onAuthStateChanged(user=>{
+        if(user){
+          uid=user.uid;
+          $("accountBtn").textContent=user.displayName?user.displayName.split(" ")[0]:"Signed in";
+          $("accountBtn").disabled=true;
+          setConnection(true,"Cloud connected");
+          const q=new URLSearchParams(location.search).get("room");
+          if(q&&!roomId){
+            $("joinCode").value=q.toUpperCase();
+            enterRoom(q,false).catch(()=>{});
+          }
+        }else{
+          uid="";
+          $("accountBtn").textContent="Sign in";
+          $("accountBtn").disabled=false;
+          setConnection(true,"Ready");
+          const q=new URLSearchParams(location.search).get("room");
+          if(q&&!roomId){
+            $("joinCode").value=q.toUpperCase();
+            enterRoom(q,false).catch(()=>{});
+          }
         }
-      }else{
-        uid="";
-        $("accountBtn").textContent="Sign in with Google";
-        $("accountBtn").disabled=false;
-        setConnection(false,"Sign-in required");
-      }
-    });
+      });
+    }else{
+      setConnection(true,"Ready");
+    }
   }catch(e){
-    console.error(e);
-    setConnection(false,"Firebase setup issue");
-    toast("Could not connect to BikriPage Firebase. Check project configuration.");
-    return;
+    console.warn("Firebase init notice:",e);
+    setConnection(true,"Ready");
   }
 
   $("accountBtn").onclick=async()=>{
+    if(!auth||!googleProvider){toast("Sign-in unavailable here.");return}
     try{
       $("accountBtn").disabled=true;
       await auth.signInWithPopup(googleProvider);
     }catch(e){
-      console.error(e);
       $("accountBtn").disabled=false;
-      toast(e.code==="auth/unauthorized-domain"
-        ?"Add this website domain in Firebase Authentication > Settings > Authorized domains."
-        :"Google sign-in failed: "+(e.message||e.code));
+      toast("Sign-in cancelled or restricted on this page.");
     }
   };
 
   $("createBtn").onclick=async()=>{
-    if(!uid){toast("Sign in with your BikriPage Google account first.");return}
     let url=$("mediaUrl").value.trim();
     const file=$("homeFile").files[0];
-    if(file&&url){toast("Choose either a media URL or a local file, not both.");return}
-    if(url&&!validUrl(url)){toast("Enter a valid HTTPS URL.");return}
+    if(file&&url){toast("Choose either a media URL or a file, not both.");return}
+    if(url&&!validUrl(url)){toast("Enter a valid http/https URL.");return}
     const id=cleanCode();
     try{
+      $("createBtn").disabled=true;
       if(file){
-        $("createBtn").disabled=true;
-        url=await uploadMediaFile(file,id,$("homeUploadStatus"));
+        url=await prepareMediaFromFile(file,id,$("homeUploadStatus"));
       }
       pendingMediaUrl=url;
       await enterRoom(id,true);
     }catch(e){
-      console.error(e);
-      toast("Could not create room: "+(e.message||"Check Firebase Storage and Firestore rules."));
+      toast(e.message||"Could not create room.");
     }finally{
       $("createBtn").disabled=false;
     }
   };
 
   $("joinBtn").onclick=()=>{
-    if(!uid){toast("Sign in with your BikriPage Google account first.");return}
     const id=$("joinCode").value.trim().toUpperCase();
-    if(!/^[A-Z0-9]{5}$/.test(id)){toast("Enter a valid 5-character room code.");return}
-    enterRoom(id,false).catch(e=>{console.error(e);toast("Could not join room. Check Firestore rules.")});
+    if(!/^[A-Z0-9]{4,10}$/.test(id)){toast("Enter a valid room code.");return}
+    enterRoom(id,false);
   };
 
   $("leaveBtn").onclick=()=>leaveRoom();
@@ -857,72 +1004,108 @@ async function init(){
     else copyLink();
   };
   $("copyBtn").onclick=copyLink;
-  $("enableAudio").onclick=async()=>{
-    audioEnabled=true;
-    await applyState(true);
-    toast("Audio enabled for this tab.");
-  };
+
   $("playBtn").onclick=async()=>{
-    if(!isHost)return;
     audioEnabled=true;
-    const playing=!roomState.isPlaying;
-    await writeState({isPlaying:playing,currentTime:getCurrent()});
+    if(activeMedia){
+      if(activeMedia.paused){
+        await activeMedia.play().catch(()=>{});
+        await writeState({isPlaying:true,currentTime:getCurrent()});
+      }else{
+        activeMedia.pause();
+        await writeState({isPlaying:false,currentTime:getCurrent()});
+      }
+      return;
+    }
+    if(ytPlayer&&ytPlayer.getPlayerState){
+      const st=ytPlayer.getPlayerState();
+      if(st===1){
+        ytPlayer.pauseVideo();
+        await writeState({isPlaying:false,currentTime:getCurrent()});
+      }else{
+        ytPlayer.playVideo();
+        await writeState({isPlaying:true,currentTime:getCurrent()});
+      }
+      return;
+    }
+    const nextPlaying=!roomState.isPlaying;
+    await writeState({isPlaying:nextPlaying,currentTime:getCurrent()});
     await applyState(true);
   };
+
   $("seek").oninput=()=>{
-    if(!isHost)return;
     const pct=Number($("seek").value)||0;
     setSeekVisual(pct);
     const duration=activeMedia?.duration||(ytPlayer?.getDuration?.()||0);
-    if(duration){
-      const t=duration*pct/100;
-      $("currentTime").textContent=fmt(t);
+    if(duration&&isFinite(duration)){
+      $("currentTime").textContent=fmt(duration*pct/100);
     }
   };
+
   $("seek").onchange=async()=>{
-    if(!isHost)return;
     const pct=Number($("seek").value)||0;
     setSeekVisual(pct);
     const duration=activeMedia?.duration||(ytPlayer?.getDuration?.()||0);
-    if(duration){
+    if(duration&&isFinite(duration)){
       const t=duration*pct/100;
-      await writeState({currentTime:t});
       if(ytPlayer&&ytPlayer.seekTo)ytPlayer.seekTo(t,true);
       else if(activeMedia)activeMedia.currentTime=t;
+      await writeState({currentTime:t});
     }
   };
+
   $("addMedia").onclick=async()=>{
     const url=prompt("Paste a YouTube or direct HTTPS media URL:",roomState.mediaUrl||"");
     if(url===null)return;
-    if(!validUrl(url)){toast("Please enter a valid HTTPS URL.");return}
-    await writeState({mediaUrl:url,isPlaying:false,currentTime:0});
-    renderMedia(url);
+    const trimmed=url.trim();
+    if(!trimmed){
+      await writeState({mediaUrl:"",isPlaying:false,currentTime:0});
+      renderMedia("");
+      return;
+    }
+    if(!validUrl(trimmed)){toast("Enter a valid http/https URL.");return}
+    audioEnabled=true;
+    await writeState({mediaUrl:trimmed,isPlaying:false,currentTime:0});
+    renderMedia(trimmed);
   };
-  $("uploadRoomMedia").onclick=()=>{
-    if(!isHost){toast("Only the host can change room media.");return}
-    $("roomFile").click();
-  };
+
+  $("uploadRoomMedia").onclick=()=>$("roomFile").click();
   $("roomFile").onchange=async()=>{
     const file=$("roomFile").files[0];
     if(!file)return;
     try{
       $("uploadRoomMedia").disabled=true;
-      const url=await uploadMediaFile(file,roomId,$("roomUploadStatus"));
+      audioEnabled=true;
+      const url=await prepareMediaFromFile(file,roomId||cleanCode(),$("roomUploadStatus"));
       await writeState({mediaUrl:url,isPlaying:false,currentTime:0});
       renderMedia(url);
-      toast("Uploaded media shared with the room.");
+      toast("Media loaded in player.");
     }catch(e){
-      console.error(e);
-      toast(e.message||"Upload failed. Check Firebase Storage rules.");
+      toast(e.message||"Could not load file.");
     }finally{
       $("uploadRoomMedia").disabled=false;
       $("roomFile").value="";
     }
   };
-  $("audioDevicesBtn").onclick=refreshAudioOutputs;
-  $("refreshAudioDevices").onclick=refreshAudioOutputs;
-  $("audioOutputSelect").onchange=()=>applyAudioOutput($("audioOutputSelect").value);
-  if(navigator.mediaDevices?.addEventListener)navigator.mediaDevices.addEventListener("devicechange",refreshAudioOutputs);
+
+  // Multiple Bluetooth Devices Sheet Listeners
+  $("addBtBtn").onclick=()=>{
+    $("btNameInput").value="";
+    $("btSheet").classList.remove("hidden");
+    setTimeout(()=>$("btNameInput").focus(),50);
+  };
+  $("closeBtSheet").onclick=()=>$("btSheet").classList.add("hidden");
+  $("cancelBtSheet").onclick=()=>$("btSheet").classList.add("hidden");
+  $("confirmBtSheet").onclick=()=>addBluetoothDevice($("btNameInput").value);
+  $("btNameInput").onkeydown=e=>{
+    if(e.key==="Enter"){e.preventDefault();addBluetoothDevice($("btNameInput").value)}
+  };
+  document.querySelectorAll("[data-bt-preset]").forEach(c=>{
+    c.onclick=()=>addBluetoothDevice(c.getAttribute("data-bt-preset"));
+  });
+  $("btSheet").onclick=e=>{
+    if(e.target===$("btSheet"))$("btSheet").classList.add("hidden");
+  };
 }
 
 async function copyLink(){
@@ -933,6 +1116,7 @@ async function copyLink(){
     toast("Copy not available in this browser.");
   }
 }
+
 window.onYouTubeIframeAPIReady=()=>{
   if(roomState.mediaUrl&&getYouTubeId(roomState.mediaUrl)&&!ytPlayer)renderMedia(roomState.mediaUrl);
 };

@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<meta name="description" content="Create a room, share a link or QR code, and sync media playback with friends.">
+<title>BikriPage Sync — Watch & Listen Together</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<style>
+:root{color-scheme:dark;--bg:#080d19;--panel:#111a2b;--panel2:#172238;--line:#26344d;--muted:#9aa9c0;--text:#f5f7fb;--blue:#78a9ff;--mint:#75e0c0;--danger:#ff7f91}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(900px 500px at 80% -10%,#1b3154 0%,transparent 65%),var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;min-height:100vh}
+button,input{font:inherit}button{cursor:pointer}.shell{width:min(1080px,100% - 32px);margin:auto}.top{height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff12}.brand{display:flex;gap:12px;align-items:center}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#8bb6ff,#5b7cff);display:grid;place-items:center;color:#081326;font-size:20px;font-weight:900}.brand strong{font:700 18px "Space Grotesk"}.brand small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.status{font-size:12px;color:var(--mint);border:1px solid #75e0c044;background:#75e0c011;padding:8px 12px;border-radius:99px}
+.hero{padding:62px 0 30px;max-width:760px}.eyebrow{color:var(--mint);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase}.hero h1{font:700 clamp(38px,7vw,68px)/1.03 "Space Grotesk";letter-spacing:-2.5px;margin:16px 0}.hero h1 span{color:var(--blue)}.hero p{color:var(--muted);font-size:16px;line-height:1.7;max-width:610px}.layout{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;padding-bottom:60px}.card{background:linear-gradient(160deg,#162239,#101827);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:0 20px 60px #0003}.card h2{font:700 19px "Space Grotesk";margin:0 0 8px}.sub{color:var(--muted);font-size:13px;line-height:1.55;margin:0 0 22px}.field{display:block;margin:16px 0}.field span{display:block;color:#c4cede;font-size:12px;font-weight:700;margin-bottom:8px}.field input{width:100%;background:#0b1322;border:1px solid #31415c;border-radius:13px;padding:14px;color:white;outline:none}.field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px #78a9ff20}.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{border:0;border-radius:13px;padding:13px 17px;font-weight:800;font-size:13px;transition:.2s}.btn:active{transform:scale(.98)}.primary{background:linear-gradient(135deg,#8bb6ff,#6d8eff);color:#091326}.secondary{background:#24334d;color:#eef4ff;border:1px solid #3a4c69}.ghost{background:transparent;color:#d9e5fa;border:1px solid #3a4c69}.btn:disabled{opacity:.45;cursor:not-allowed}.divider{height:1px;background:var(--line);margin:22px 0}.roomcode{font:700 25px "Space Grotesk";letter-spacing:4px;color:var(--mint)}.qrwrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}.qrbox{background:white;border-radius:16px;padding:10px;width:142px;height:142px;display:grid;place-items:center}.qrbox canvas{width:122px!important;height:122px!important}.hint{font-size:12px;color:var(--muted);line-height:1.6}.hidden{display:none!important}
+#roomView{padding:24px 0 60px}.roomhead{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px}.roomhead h2{font:700 25px "Space Grotesk";margin:4px 0}.roomgrid{display:grid;grid-template-columns:1.35fr .65fr;gap:18px}.player{background:#050914;border:1px solid #26344d;border-radius:22px;overflow:hidden}.mediaarea{min-height:250px;display:grid;place-items:center;background:#03060d;position:relative}.mediaarea video,.mediaarea audio{width:100%;max-height:420px}.mediaarea iframe{width:100%;aspect-ratio:16/9;border:0}.empty{text-align:center;color:var(--muted);padding:60px 20px}.empty b{display:block;color:white;font:700 20px "Space Grotesk";margin-bottom:8px}.transport{padding:18px;background:#111a2b}.transportline{display:flex;align-items:center;gap:12px}.play{width:48px;height:48px;border-radius:50%;border:0;background:white;color:#0b1020;font-size:17px}.time{font:600 11px monospace;color:#b9c5d8;min-width:36px}.seek{width:100%;accent-color:#8bb6ff}.roomtools{display:grid;gap:14px}.toolrow{display:flex;align-items:center;justify-content:space-between;gap:10px}.tag{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--mint);font-weight:800}.members{color:var(--muted);font-size:13px}.notice{padding:12px 14px;background:#78a9ff12;border:1px solid #78a9ff35;color:#c9d9f6;border-radius:13px;font-size:12px;line-height:1.55}.warn{background:#ffbd6a12;border-color:#ffbd6a44;color:#ffdbad}.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:#eaf1ff;color:#0b1424;padding:12px 17px;border-radius:99px;font-size:13px;font-weight:800;opacity:0;pointer-events:none;transition:.25s;z-index:20;box-shadow:0 12px 40px #0007}.toast.show{opacity:1;transform:translate(-50%,0)}footer{border-top:1px solid #ffffff12;padding:24px 0 36px;color:#8190a8;font-size:11px;line-height:1.6}
+@media(max-width:760px){.hero{padding:42px 0 24px}.layout,.roomgrid{grid-template-columns:1fr}.card{padding:20px}.roomhead{align-items:flex-start}.status{font-size:10px}.mediaarea{min-height:190px}.top{height:66px}}
+</style>
+</head>
+<body>
+<header class="shell top">
+  <div class="brand"><div class="logo">B</div><div><strong>BikriPage <span style="color:var(--blue)">Sync</span></strong><small>Watch and listen together</small></div></div>
+  <div style="display:flex;align-items:center;gap:8px"><button id="accountBtn" class="btn secondary" style="padding:9px 12px;font-size:11px">Sign in</button><div id="connection" class="status">Connecting…</div></div>
+</header>
+<main class="shell">
+<section id="homeView">
+  <div class="hero"><div class="eyebrow">One room. Everyone in sync.</div><h1>Press play.<br><span>Stay together.</span></h1><p>Create a private room, share its QR code or link, and let everyone follow the host’s playback. Works in a modern browser—no app installation required.</p></div>
+  <div class="layout">
+    <section class="card">
+      <h2>Create a sync room</h2><p class="sub">You become the host and control playback for everyone who joins.</p>
+      <label class="field"><span>Room name</span><input id="roomName" maxlength="48" placeholder="Friday music room"></label>
+      <label class="field"><span>Media URL (YouTube or direct media link)</span><input id="mediaUrl" type="url" placeholder="https://…"></label>
+      <label class="field"><span>Or upload a file from this device</span><input id="homeFile" type="file" accept="audio/*,video/*"></label>
+      <p class="hint" id="homeUploadStatus">No app-set file size cap. Uploads are subject to Firebase Storage quotas, billing and browser/network limits. Supported playback depends on the video format and codec.</p>
+      <button class="btn primary" id="createBtn">Create room <span aria-hidden="true">↗</span></button>
+      <div class="divider"></div>
+      <div class="notice">For the most reliable sync, use a public YouTube link or a direct HTTPS audio/video file URL. A file selected from your phone is not automatically shared with other people.</div>
+    </section>
+    <section class="card">
+      <h2>Join a room</h2><p class="sub">Enter the room code shared by your host, or open their invite link.</p>
+      <label class="field"><span>Room code</span><input id="joinCode" maxlength="12" autocomplete="off" placeholder="E.G. 8K4M2Q"></label>
+      <button class="btn secondary" id="joinBtn">Join room</button>
+      <div class="divider"></div>
+      <p class="hint">Joining works from the same link on Android, iPhone, tablet, and desktop. Your browser may ask you to tap Enable audio before playback starts.</p>
+    </section>
+  </div>
+</section>
+
+<section id="roomView" class="hidden">
+  <div class="roomhead">
+    <div><div class="tag" id="roleTag">SYNC ROOM</div><h2 id="roomTitle">Room</h2><div class="hint">Code: <b id="roomCode" class="roomcode"></b></div></div>
+    <div class="actions"><button class="btn secondary" id="shareBtn">Share invite</button><button class="btn ghost" id="leaveBtn">Leave</button></div>
+  </div>
+  <div class="roomgrid">
+    <section class="player">
+      <div class="mediaarea" id="mediaArea"><div class="empty"><b>Ready when you are</b>Host can add a YouTube or direct media URL.</div></div>
+      <div class="transport">
+        <div class="transportline"><button class="play" id="playBtn" aria-label="Play or pause">▶</button><span class="time" id="currentTime">0:00</span><input class="seek" id="seek" type="range" min="0" max="100" value="0"><span class="time" id="duration">0:00</span></div>
+        <div class="actions" style="margin-top:14px"><button class="btn secondary" id="enableAudio">Enable audio</button><button class="btn ghost" id="addMedia">Change media URL</button><button class="btn ghost" id="uploadRoomMedia">Upload local file</button><button class="btn ghost" id="audioDevicesBtn">Audio output</button><input id="roomFile" type="file" accept="audio/*,video/*" hidden></div>
+        <p class="hint" id="roomUploadStatus"></p>
+      </div>
+    </section>
+    <aside class="roomtools">
+      <section class="card">
+        <div class="toolrow"><h2>Invite people</h2><span class="tag">QR / LINK</span></div>
+        <div class="qrwrap"><div class="qrbox"><canvas id="qrCanvas"></canvas></div><div><div class="roomcode" id="sideCode"></div><p class="hint">Scan to join this room.<br>Or share the invite link.</p><button class="btn secondary" id="copyBtn">Copy room link</button></div></div>
+      </section>
+      <section class="card" id="audioOutputCard">
+        <div class="toolrow"><h2>Audio devices</h2><span class="tag">BROWSER SUPPORT</span></div>
+        <p class="hint">Choose an available speaker or Bluetooth output. Your phone may manage paired Bluetooth devices in system settings.</p>
+        <select id="audioOutputSelect" style="width:100%;background:#0b1322;border:1px solid #31415c;border-radius:12px;padding:12px;color:white"><option value="">Default device</option></select>
+        <button class="btn secondary" id="refreshAudioDevices" style="margin-top:10px">Refresh devices</button>
+        <p class="hint" style="margin-top:10px">Web browsers generally allow selecting one output for this player, not streaming to several Bluetooth speakers simultaneously. Multi-device playback depends on your phone/OS feature (if supported).</p>
+      </section>
+      <section class="card">
+        <div class="toolrow"><h2>Room status</h2><span class="tag" id="liveTag">LIVE</span></div>
+        <p class="members" id="memberInfo">Connected to room</p>
+        <div class="notice" id="hostNotice">You are the host. Your playback controls update the room.</div>
+        <div class="notice warn" style="margin-top:10px">Each guest must tap Enable audio once. Playback may be affected by browser autoplay restrictions and network latency.</div>
+      </section>
+    </aside>
+  </div>
+</section>
+</main>
+<footer><div class="shell">BikriPage Sync · Use media you have permission to share. YouTube playback is provided by YouTube’s embedded player. Device audio output selection depends on browser and operating-system support.</div></footer>
+<div id="toast" class="toast"></div>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCWquftO39vqj83ZtYqtF_sDfkHVNpjd3k",
+  authDomain: "bikripage-3aba6.firebaseapp.com",
+  projectId: "bikripage-3aba6",
+  storageBucket: "bikripage-3aba6.firebasestorage.app",
+  messagingSenderId: "900882116436",
+  appId: "1:900882116436:web:8a521d0308347ddcccdc92",
+  measurementId: "G-ZP8L3S5R66"
+};
+let db, auth, storage, uid="", roomId="", isHost=false, roomUnsub=null, ytPlayer=null, activeMedia=null, googleProvider, pendingMediaUrl="";
+let roomState={mediaUrl:"",isPlaying:false,currentTime:0,updatedAt:Date.now()};
+let audioEnabled=false, applyingRemote=false, seekTimer=null, heartbeatTimer=null;
+const $=id=>document.getElementById(id);
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2400)}
+function setConnection(ok,msg){$("connection").textContent=msg;$("connection").style.color=ok?"var(--mint)":"#ffcc8a";$("connection").style.borderColor=ok?"#75e0c044":"#ffbd6a44"}
+function fmt(s){s=Math.max(0,Math.floor(Number(s)||0));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+function cleanCode(){const a=new Uint8Array(5);crypto.getRandomValues(a);return Array.from(a,x=>"ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[x%32]).join("")}
+function roomUrl(id){const u=new URL(location.href);u.search="";u.searchParams.set("room",id);return u.toString()}
+function validUrl(v){try{const u=new URL(v);return ["http:","https:"].includes(u.protocol)}catch{return false}}
+function getYouTubeId(url){try{const u=new URL(url);if(u.hostname.includes("youtu.be"))return u.pathname.slice(1);if(u.hostname.includes("youtube.com"))return u.searchParams.get("v")||u.pathname.split("/").filter(Boolean).pop()}catch{}return ""}
+function isDirectMedia(url){return /\.(mp3|m4a|aac|wav|ogg|mp4|webm|mov)(\?.*)?$/i.test(url)}
+function statePosition(){return roomState.isPlaying?roomState.currentTime+Math.max(0,(Date.now()-roomState.updatedAt)/1000):roomState.currentTime}
+function showRoom(){ $("homeView").classList.add("hidden");$("roomView").classList.remove("hidden");$("roomCode").textContent=roomId;$("sideCode").textContent=roomId;$("roleTag").textContent=isHost?"HOST ROOM":"GUEST ROOM";$("hostNotice").textContent=isHost?"You are the host. Your playback controls update the room.":"You joined as a guest. Playback is controlled by the host."; $("addMedia").classList.toggle("hidden",!isHost);$("playBtn").disabled=!isHost;$("seek").disabled=!isHost; }
+function renderInvite(){QRCode.toCanvas($("qrCanvas"),roomUrl(roomId),{width:122,margin:1,color:{dark:"#0b1020",light:"#ffffff"}}).catch(()=>{});}
+async function writeState(patch){if(!isHost||!roomId)return;roomState={...roomState,...patch,updatedAt:Date.now()};try{await db.collection("syncRooms").doc(roomId).update({...patch,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAtMs:roomState.updatedAt});}catch(e){toast("Could not update room. Check connection.");}}
+function clearPlayer(){if(ytPlayer){try{ytPlayer.destroy()}catch{}ytPlayer=null}if(activeMedia){activeMedia.pause?.();activeMedia.removeAttribute?.("src");activeMedia=null}$("mediaArea").innerHTML='<div class="empty"><b>Ready when you are</b>Waiting for the host to choose media.</div>'}
+function renderMedia(url){clearPlayer();if(!url)return;const yid=getYouTubeId(url);if(yid){const wrap=document.createElement("div");wrap.style.width="100%";wrap.id="ytMount";$("mediaArea").replaceChildren(wrap);if(window.YT&&YT.Player){ytPlayer=new YT.Player("ytMount",{videoId:yid,width:"100%",height:"390",playerVars:{playsinline:1,rel:0},events:{onReady:()=>applyState(true),onStateChange:e=>{if(!isHost||applyingRemote)return;if(e.data===1)writeState({isPlaying:true,currentTime:ytPlayer.getCurrentTime()});if(e.data===2)writeState({isPlaying:false,currentTime:ytPlayer.getCurrentTime()})}}})}return}
+if(isDirectMedia(url)){const ext=/\.(mp3|m4a|aac|wav|ogg)(\?.*)?$/i.test(url);const el=document.createElement(ext?"audio":"video");el.controls=false;el.playsInline=true;el.preload="metadata";el.src=url;el.style.width="100%";if(!ext)el.style.maxHeight="420px";$("mediaArea").replaceChildren(el);activeMedia=el;el.addEventListener("play",()=>{if(isHost&&!applyingRemote)writeState({isPlaying:true,currentTime:el.currentTime})});el.addEventListener("pause",()=>{if(isHost&&!applyingRemote)writeState({isPlaying:false,currentTime:el.currentTime})});el.addEventListener("timeupdate",()=>{if(activeMedia!==el)return;$("currentTime").textContent=fmt(el.currentTime);if(el.duration){$("duration").textContent=fmt(el.duration);$("seek").value=el.currentTime/el.duration*100}});el.addEventListener("error",()=>toast("This media link could not be played in your browser."));el.addEventListener("loadedmetadata",()=>{$("duration").textContent=fmt(el.duration)});applyState(true);return}
+$("mediaArea").innerHTML='<div class="empty"><b>Unsupported media link</b>Use a YouTube URL or a direct HTTPS MP3 / MP4 / WebM link.</div>'}
+function getCurrent(){if(ytPlayer&&ytPlayer.getCurrentTime)return ytPlayer.getCurrentTime();return activeMedia?.currentTime||0}
+async function applyState(forceSeek=false){if(!roomState.mediaUrl)return;const target=statePosition();applyingRemote=true;try{if(ytPlayer&&ytPlayer.seekTo){const now=ytPlayer.getCurrentTime();if(forceSeek||Math.abs(now-target)>1.5)ytPlayer.seekTo(target,true);if(roomState.isPlaying&&audioEnabled)ytPlayer.playVideo();else ytPlayer.pauseVideo()}else if(activeMedia){if(forceSeek||Math.abs(activeMedia.currentTime-target)>1.5){try{activeMedia.currentTime=target}catch{}}if(roomState.isPlaying&&audioEnabled){await activeMedia.play().catch(()=>{})}else activeMedia.pause()}}finally{setTimeout(()=>applyingRemote=false,250)}}
+async function enterRoom(id,host){roomId=id.toUpperCase();isHost=host;showRoom();renderInvite();if(roomUnsub)roomUnsub();const ref=db.collection("syncRooms").doc(roomId);const snap=await ref.get();if(!snap.exists){if(!host){toast("Room not found.");leaveRoom(false);return}await ref.set({roomId,hostUid:uid,title:$("roomName").value.trim()||"Sync Room",mediaUrl:pendingMediaUrl || $("mediaUrl").value.trim(),isPlaying:false,currentTime:0,updatedAtMs:Date.now(),createdAt:firebase.firestore.FieldValue.serverTimestamp()});}
+roomUnsub=ref.onSnapshot(s=>{if(!s.exists){toast("This room is no longer available.");leaveRoom();return}const d=s.data();$("roomTitle").textContent=d.title||"Sync Room";$("memberInfo").textContent="Room is active · "+(isHost?"You control playback":"Following host playback");const changed=d.mediaUrl!==roomState.mediaUrl;if(changed){roomState.mediaUrl=d.mediaUrl||"";renderMedia(roomState.mediaUrl)}const previous=roomState.isPlaying;roomState={...roomState,...d,updatedAt:Number(d.updatedAtMs||Date.now())};if(changed||previous!==roomState.isPlaying)applyState(true);else applyState(false);$("liveTag").textContent=roomState.isPlaying?"PLAYING":"PAUSED";},e=>{console.error(e);toast("Room connection lost. Check Firestore rules.");});}
+function leaveRoom(resetUrl=true){if(roomUnsub){roomUnsub();roomUnsub=null}if(heartbeatTimer)clearInterval(heartbeatTimer);clearPlayer();roomId="";isHost=false;$("roomView").classList.add("hidden");$("homeView").classList.remove("hidden");if(resetUrl){history.replaceState({},document.title,location.pathname)}}
+
+function safeFileName(name){return name.replace(/[^a-zA-Z0-9._-]/g,"_").slice(-100)||"media-file"}
+async function uploadMediaFile(file, roomCode, statusElement){
+  if(!file) throw new Error("Choose a media file first.");
+  const allowed = file.type.startsWith("audio/") || file.type.startsWith("video/");
+  if(!allowed) throw new Error("Choose an audio or video file.");
+  const path = `${uid}/syncRooms/${roomCode}/${Date.now()}_${safeFileName(file.name)}`;
+  const ref = storage.ref().child(path);
+  const task = ref.put(file,{contentType:file.type || "application/octet-stream"});
+  return await new Promise((resolve,reject)=>{
+    task.on("state_changed", snap=>{
+      const pct = Math.round((snap.bytesTransferred/snap.totalBytes)*100);
+      if(statusElement) statusElement.textContent=`Uploading ${file.name}: ${pct}%`;
+    },reject,async()=>{
+      try{
+        const url=await task.snapshot.ref.getDownloadURL();
+        if(statusElement) statusElement.textContent=`Uploaded: ${file.name}`;
+        resolve(url);
+      }catch(e){reject(e)}
+    });
+  });
+}
+async function refreshAudioOutputs(){
+  const select=$("audioOutputSelect");
+  if(!select)return;
+  const old=select.value;
+  select.innerHTML='<option value="">Default device</option>';
+  if(!navigator.mediaDevices?.enumerateDevices){
+    select.innerHTML='<option value="">Audio output selection not supported</option>';
+    return;
+  }
+  try{
+    const devices=await navigator.mediaDevices.enumerateDevices();
+    const outputs=devices.filter(d=>d.kind==="audiooutput");
+    outputs.forEach((d,i)=>{
+      const option=document.createElement("option");
+      option.value=d.deviceId;
+      option.textContent=d.label||`Audio output ${i+1}`;
+      select.appendChild(option);
+    });
+    if(old && [...select.options].some(o=>o.value===old))select.value=old;
+    if(outputs.length<=1 && outputs.every(d=>!d.label)){
+      toast("Device names may appear after audio permission or a browser refresh.");
+    }
+  }catch(e){console.warn("Audio output enumeration unavailable",e);toast("This browser does not expose audio output devices.");}
+}
+async function applyAudioOutput(deviceId){
+  if(!activeMedia){toast("Audio output selection is available for direct audio/video files in supported browsers.");return}
+  if(typeof activeMedia.setSinkId!=="function"){
+    toast("This browser cannot route this player to a selected output. Use phone Bluetooth settings.");
+    return;
+  }
+  try{await activeMedia.setSinkId(deviceId||"");toast("Audio output updated.");}
+  catch(e){console.error(e);toast("Could not switch output. Check browser permissions.");}
+}
+
+async function init(){
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    auth=firebase.auth();
+    db=firebase.firestore();
+    storage=firebase.storage();
+    googleProvider=new firebase.auth.GoogleAuthProvider();
+    await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    auth.onAuthStateChanged(user=>{
+      if(user){
+        uid=user.uid;
+        $("accountBtn").textContent=user.displayName ? user.displayName.split(" ")[0] : "Signed in";
+        $("accountBtn").disabled=true;
+        setConnection(true,"BikriPage cloud connected");
+        const q=new URLSearchParams(location.search).get("room");
+        if(q && !roomId){
+          $("joinCode").value=q.toUpperCase();
+          enterRoom(q,false).catch(e=>{console.error(e);toast("Could not join room. Check Firestore rules.")});
+        }
+      }else{
+        uid="";
+        $("accountBtn").textContent="Sign in with Google";
+        $("accountBtn").disabled=false;
+        setConnection(false,"Sign-in required");
+      }
+    });
+  }catch(e){
+    console.error(e);
+    setConnection(false,"Firebase setup issue");
+    toast("Could not connect to BikriPage Firebase. Check project configuration.");
+    return;
+  }
+
+  $("accountBtn").onclick=async()=>{
+    try{
+      $("accountBtn").disabled=true;
+      await auth.signInWithPopup(googleProvider);
+    }catch(e){
+      console.error(e);
+      $("accountBtn").disabled=false;
+      toast(e.code==="auth/unauthorized-domain"?"Add this website domain in Firebase Authentication > Settings > Authorized domains.":"Google sign-in failed: "+(e.message||e.code));
+    }
+  };
+
+  $("createBtn").onclick=async()=>{
+    if(!uid){toast("Sign in with your BikriPage Google account first.");return}
+    let url=$("mediaUrl").value.trim();
+    const file=$("homeFile").files[0];
+    if(file && url){toast("Choose either a media URL or a local file, not both.");return}
+    if(url&&!validUrl(url)){toast("Enter a valid HTTPS URL.");return}
+    const id=cleanCode();
+    try{
+      if(file){
+        $("createBtn").disabled=true;
+        url=await uploadMediaFile(file,id,$("homeUploadStatus"));
+      }
+      pendingMediaUrl=url;
+      await enterRoom(id,true);
+    }catch(e){console.error(e);toast("Could not create room: "+(e.message||"Check Firebase Storage and Firestore rules."))}
+    finally{$("createBtn").disabled=false}
+  };
+  $("joinBtn").onclick=()=>{
+    if(!uid){toast("Sign in with your BikriPage Google account first.");return}
+    const id=$("joinCode").value.trim().toUpperCase();
+    if(!/^[A-Z0-9]{5}$/.test(id)){toast("Enter a valid 5-character room code.");return}
+    enterRoom(id,false).catch(e=>{console.error(e);toast("Could not join room. Check Firestore rules.")});
+  };
+  $("leaveBtn").onclick=()=>leaveRoom();
+  $("shareBtn").onclick=async()=>{
+    const url=roomUrl(roomId);
+    if(navigator.share){try{await navigator.share({title:"Join my BikriPage Sync room",url})}catch{}}
+    else copyLink();
+  };
+  $("copyBtn").onclick=copyLink;
+  $("enableAudio").onclick=async()=>{audioEnabled=true;await applyState(true);toast("Audio enabled for this tab.")};
+  $("playBtn").onclick=async()=>{if(!isHost)return;const playing=!roomState.isPlaying;await writeState({isPlaying:playing,currentTime:getCurrent()});await applyState(true)};
+  $("seek").oninput=()=>{
+    if(!isHost)return;
+    const duration=activeMedia?.duration||(ytPlayer?.getDuration?.()||0);
+    if(duration){const t=duration*Number($("seek").value)/100;$("currentTime").textContent=fmt(t)}
+  };
+  $("seek").onchange=async()=>{
+    if(!isHost)return;
+    const duration=activeMedia?.duration||(ytPlayer?.getDuration?.()||0);
+    if(duration){const t=duration*Number($("seek").value)/100;await writeState({currentTime:t});if(ytPlayer)ytPlayer.seekTo(t,true);else if(activeMedia)activeMedia.currentTime=t}
+  };
+  $("addMedia").onclick=async()=>{
+    const url=prompt("Paste a YouTube or direct HTTPS media URL:",roomState.mediaUrl||"");
+    if(url===null)return;
+    if(!validUrl(url)){toast("Please enter a valid HTTPS URL.");return}
+    await writeState({mediaUrl:url,isPlaying:false,currentTime:0});
+    renderMedia(url);
+  };
+  $("uploadRoomMedia").onclick=()=>{if(!isHost){toast("Only the host can change room media.");return}$("roomFile").click()};
+  $("roomFile").onchange=async()=>{
+    const file=$("roomFile").files[0];if(!file)return;
+    try{
+      $("uploadRoomMedia").disabled=true;
+      const url=await uploadMediaFile(file,roomId,$("roomUploadStatus"));
+      await writeState({mediaUrl:url,isPlaying:false,currentTime:0});
+      renderMedia(url);toast("Uploaded media shared with the room.");
+    }catch(e){console.error(e);toast(e.message||"Upload failed. Check Firebase Storage rules.");}
+    finally{$("uploadRoomMedia").disabled=false;$("roomFile").value=""}
+  };
+  $("audioDevicesBtn").onclick=refreshAudioOutputs;
+  $("refreshAudioDevices").onclick=refreshAudioOutputs;
+  $("audioOutputSelect").onchange=()=>applyAudioOutput($("audioOutputSelect").value);
+  if(navigator.mediaDevices?.addEventListener)navigator.mediaDevices.addEventListener("devicechange",refreshAudioOutputs);
+}
+async function copyLink(){try{await navigator.clipboard.writeText(roomUrl(roomId));toast("Invite link copied.")}catch{toast("Copy not available in this browser.")}}
+window.onYouTubeIframeAPIReady=()=>{if(roomState.mediaUrl&&getYouTubeId(roomState.mediaUrl)&&!ytPlayer)renderMedia(roomState.mediaUrl)};
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&roomId)applyState(true)});
+init();
+</script>
+</body>
+</html>

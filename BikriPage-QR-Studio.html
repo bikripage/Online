@@ -1035,6 +1035,7 @@
         var currentQrType = "url";
         var currentQrPayload = "https://bikripage.github.io/Online/";
         var qrCenterLogoDataUrl = "";
+        var currentMultiLinkId = "m_" + Math.random().toString(36).substring(2, 8);
         var cardLogoDataUrl = "";
         var currentCardTheme = "classic";
         var publicVCardData = null;
@@ -1480,8 +1481,12 @@
                 if (!mlTitle) { error = "Enter your Brand or Page Name."; }
                 else {
                     var baseUrl = window.location.href.split("?")[0].split("#")[0];
-                    var token = encodeCompactCard(getMultiLinkHubData());
-                    payload = baseUrl + "?c=" + token;
+                    if (firebaseReady && db) {
+                        payload = baseUrl + "?m=" + encodeURIComponent(currentMultiLinkId);
+                    } else {
+                        var token = encodeCompactCard(getMultiLinkHubData());
+                        payload = baseUrl + "?c=" + token;
+                    }
                 }
             } else if (currentQrType === "youtube") {
                 var yt = val("fld-yt-url");
@@ -1712,9 +1717,18 @@
                 currentQrPayload = res.payload;
             }
 
+            if (currentQrType === "multilink" && !res.error) {
+                syncMultiLinkToFirebase(getMultiLinkHubData(), currentMultiLinkId);
+            }
+
             document.getElementById("encoded-payload-preview").textContent = currentQrPayload;
             var canvas = document.getElementById("main-qr-canvas");
-            drawQrOnCanvas(canvas, currentQrPayload, { fg: fg, bg: bg, logoUrl: qrCenterLogoDataUrl });
+            drawQrOnCanvas(canvas, currentQrPayload, {
+                fg: fg,
+                bg: bg,
+                logoUrl: qrCenterLogoDataUrl,
+                ecLevel: currentQrType === "multilink" ? "L" : undefined
+            });
         }
 
         function generatePosterExportCanvas(qrCanvas, bg, fg, title, caption) {
@@ -2305,6 +2319,32 @@
             drawQrOnCanvas(canvas, url, { fg: "#1D1D1F", bg: "#FFFFFF", ecLevel: "L" });
         }
 
+        var mlSyncDebounce = null;
+        function syncMultiLinkToFirebase(hubData, hubId) {
+            if (!firebaseReady || !db) return;
+            clearTimeout(mlSyncDebounce);
+            mlSyncDebounce = setTimeout(function () {
+                db.collection("qr_studio_cards").doc(hubId || currentMultiLinkId).set({
+                    deviceId: DEVICE_ID,
+                    shopName: hubData.shopName,
+                    ownerName: hubData.ownerName || "Quick Links Hub",
+                    phone: "",
+                    whatsapp: hubData.whatsapp || "",
+                    instagram: hubData.instagram || "",
+                    youtube: hubData.youtube || "",
+                    facebook: "",
+                    website: hubData.website || "",
+                    address: "",
+                    mapsUrl: hubData.mapsUrl || "",
+                    description: hubData.description || "",
+                    theme: hubData.theme || "royal",
+                    kind: "multilink",
+                    logo: "",
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true }).catch(function () {});
+            }, 350);
+        }
+
         async function syncDigitalCardToFirebase(data) {
             if (!firebaseReady || !db) return;
             try {
@@ -2493,7 +2533,7 @@
         function returnFromPublicCard() {
             document.getElementById("public-vcard-screen").classList.add("hidden");
             document.getElementById("studio-app-shell").classList.remove("hidden");
-            if (window.location.search.indexOf("c=") !== -1 || window.location.search.indexOf("cid=") !== -1 || window.location.search.indexOf("card=") !== -1) {
+            if (window.location.search.indexOf("c=") !== -1 || window.location.search.indexOf("cid=") !== -1 || window.location.search.indexOf("m=") !== -1 || window.location.search.indexOf("card=") !== -1) {
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
             if (isPreviewModeFromEditor) {
@@ -2858,7 +2898,7 @@
         // -------------------- INITIALIZE APP --------------------
         async function initStudioApp() {
             var params = new URLSearchParams(window.location.search);
-            var cidParam = params.get("cid");
+            var cidParam = params.get("cid") || params.get("m");
             var cardParam = params.get("c") || params.get("card");
 
             if (cidParam) {
@@ -2894,10 +2934,16 @@
 
             document.getElementById("btn-preview-multilink").addEventListener("click", function () {
                 var hubData = getMultiLinkHubData();
+                if (firebaseReady && db) {
+                    db.collection("qr_studio_cards").doc(currentMultiLinkId).set(Object.assign({ deviceId: DEVICE_ID }, hubData), { merge: true }).catch(function () {});
+                }
                 openPublicCardView(hubData, true);
             });
 
             document.getElementById("btn-clear-qr-fields").addEventListener("click", function () {
+                if (currentQrType === "multilink") {
+                    currentMultiLinkId = "m_" + Math.random().toString(36).substring(2, 8);
+                }
                 selectQrType(currentQrType);
                 document.getElementById("qr-custom-title").value = "";
                 document.getElementById("qr-custom-caption").value = "";

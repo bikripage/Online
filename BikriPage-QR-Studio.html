@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BikriPage QR &amp; Barcode Studio Pro | Smart Digital Identity &amp; Labeling</title>
-    <meta name="description" content="Create custom QR codes, bulk product barcodes, aesthetic themed digital visiting cards, multi-link bio pages, and fixed-amount UPI QR codes seamlessly with BikriPage Studio.">
+    <meta name="description" content="Create custom QR codes, bulk product barcodes, aesthetic themed digital visiting cards, and fixed-amount UPI QR codes seamlessly with BikriPage Studio.">
 
     <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -322,7 +322,7 @@
                 <section id="panel-generator" class="tab-panel animate-view space-y-5">
                     <div>
                         <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Custom QR Generator</h1>
-                        <p class="text-xs sm:text-sm text-gray-500">Create high-contrast QR codes for links, Multi-Link Bio pages, YouTube, WhatsApp, vCard &amp; UPI.</p>
+                        <p class="text-xs sm:text-sm text-gray-500">Create high-contrast QR codes for links, YouTube, WhatsApp, Instagram, vCard, Wi-Fi &amp; UPI.</p>
                     </div>
 
                     <div class="ios-card rounded-3xl p-4">
@@ -330,9 +330,6 @@
                         <div id="qr-type-pills" class="flex flex-wrap gap-2">
                             <button type="button" data-qrtype="url" class="qr-type-pill active px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
                                 <i class="fas fa-globe text-blue-600"></i> Website URL
-                            </button>
-                            <button type="button" data-qrtype="multilink" class="qr-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
-                                <i class="fas fa-layer-group text-violet-600"></i> Social Bio / Multi-Link
                             </button>
                             <button type="button" data-qrtype="youtube" class="qr-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
                                 <i class="fab fa-youtube text-red-600"></i> YouTube
@@ -379,9 +376,6 @@
                                         <span id="qr-form-heading">Enter Website URL</span>
                                     </h2>
                                     <div class="flex items-center gap-1.5 shrink-0">
-                                        <button type="button" id="btn-preview-multilink" class="hidden text-[11px] font-bold text-violet-700 hover:bg-violet-100 bg-violet-50 px-2.5 py-1 rounded-lg transition">
-                                            <i class="fas fa-external-link-alt mr-1"></i> Preview Page
-                                        </button>
                                         <button type="button" id="btn-clear-qr-fields" class="text-[11px] font-bold text-gray-600 hover:text-gray-900 bg-gray-100 px-2.5 py-1 rounded-lg transition">
                                             <i class="fas fa-eraser mr-1"></i> Reset
                                         </button>
@@ -1035,7 +1029,6 @@
         var currentQrType = "url";
         var currentQrPayload = "https://bikripage.github.io/Online/";
         var qrCenterLogoDataUrl = "";
-        var currentMultiLinkId = "m_" + Math.random().toString(36).substring(2, 8);
         var cardLogoDataUrl = "";
         var currentCardTheme = "classic";
         var publicVCardData = null;
@@ -1123,18 +1116,6 @@
                 heading: "Enter Website URL",
                 fields: [
                     { id: "fld-url", label: "Website or Link *", type: "url", placeholder: "https://example.com", defaultVal: "https://bikripage.github.io/Online/" }
-                ]
-            },
-            multilink: {
-                heading: "Social Bio / Multi-Link Hub QR",
-                fields: [
-                    { id: "fld-ml-title", label: "Brand / Page Name *", type: "text", placeholder: "e.g. Netaji Jhadu Store" },
-                    { id: "fld-ml-bio", label: "Short Tagline", type: "text", placeholder: "Wholesale & Retail Supplier" },
-                    { id: "fld-ml-wa", label: "WhatsApp Number (with 91)", type: "tel", placeholder: "919876543210" },
-                    { id: "fld-ml-ig", label: "Instagram Username or Link", type: "text", placeholder: "@username" },
-                    { id: "fld-ml-yt", label: "YouTube Channel / Video Link", type: "url", placeholder: "https://youtube.com/@channel" },
-                    { id: "fld-ml-web", label: "Website / Catalog Link", type: "url", placeholder: "https://bikripage.github.io/Online/" },
-                    { id: "fld-ml-maps", label: "Google Maps Location Link", type: "url", placeholder: "https://maps.google.com/?q=..." }
                 ]
             },
             youtube: {
@@ -1399,11 +1380,6 @@
                 btn.classList.toggle("active", btn.getAttribute("data-qrtype") === type);
             });
 
-            var mlPreviewBtn = document.getElementById("btn-preview-multilink");
-            if (mlPreviewBtn) {
-                mlPreviewBtn.classList.toggle("hidden", type !== "multilink");
-            }
-
             var cfg = qrTypeConfigs[type];
             document.getElementById("qr-form-heading").textContent = cfg.heading;
             var container = document.getElementById("dynamic-qr-fields");
@@ -1439,28 +1415,6 @@
             renderLiveQr();
         }
 
-        function getMultiLinkHubData() {
-            var val = function (id) {
-                var el = document.getElementById(id);
-                return el ? el.value.trim() : "";
-            };
-            return {
-                shopName: val("fld-ml-title") || "My Link Hub",
-                ownerName: "Quick Links Hub",
-                phone: "",
-                whatsapp: val("fld-ml-wa"),
-                instagram: val("fld-ml-ig"),
-                youtube: val("fld-ml-yt"),
-                facebook: "",
-                website: val("fld-ml-web"),
-                address: "",
-                mapsUrl: val("fld-ml-maps"),
-                description: val("fld-ml-bio"),
-                theme: "royal",
-                kind: "multilink"
-            };
-        }
-
         function buildPayloadFromCurrentType() {
             var val = function (id) {
                 var el = document.getElementById(id);
@@ -1476,18 +1430,7 @@
                     if (!/^https?:\/\//i.test(u)) u = "https://" + u;
                     payload = u;
                 }
-            } else if (currentQrType === "multilink") {
-                var mlTitle = val("fld-ml-title");
-                if (!mlTitle) { error = "Enter your Brand or Page Name."; }
-                else {
-                    var baseUrl = window.location.href.split("?")[0].split("#")[0];
-                    if (firebaseReady && db) {
-                        payload = baseUrl + "?m=" + encodeURIComponent(currentMultiLinkId);
-                    } else {
-                        var token = encodeCompactCard(getMultiLinkHubData());
-                        payload = baseUrl + "?c=" + token;
-                    }
-                }
+
             } else if (currentQrType === "youtube") {
                 var yt = val("fld-yt-url");
                 var startSec = parseStartTimeToSeconds(val("fld-yt-start"));
@@ -1717,18 +1660,9 @@
                 currentQrPayload = res.payload;
             }
 
-            if (currentQrType === "multilink" && !res.error) {
-                syncMultiLinkToFirebase(getMultiLinkHubData(), currentMultiLinkId);
-            }
-
             document.getElementById("encoded-payload-preview").textContent = currentQrPayload;
             var canvas = document.getElementById("main-qr-canvas");
-            drawQrOnCanvas(canvas, currentQrPayload, {
-                fg: fg,
-                bg: bg,
-                logoUrl: qrCenterLogoDataUrl,
-                ecLevel: currentQrType === "multilink" ? "L" : undefined
-            });
+            drawQrOnCanvas(canvas, currentQrPayload, { fg: fg, bg: bg, logoUrl: qrCenterLogoDataUrl });
         }
 
         function generatePosterExportCanvas(qrCanvas, bg, fg, title, caption) {
@@ -2319,32 +2253,6 @@
             drawQrOnCanvas(canvas, url, { fg: "#1D1D1F", bg: "#FFFFFF", ecLevel: "L" });
         }
 
-        var mlSyncDebounce = null;
-        function syncMultiLinkToFirebase(hubData, hubId) {
-            if (!firebaseReady || !db) return;
-            clearTimeout(mlSyncDebounce);
-            mlSyncDebounce = setTimeout(function () {
-                db.collection("qr_studio_cards").doc(hubId || currentMultiLinkId).set({
-                    deviceId: DEVICE_ID,
-                    shopName: hubData.shopName,
-                    ownerName: hubData.ownerName || "Quick Links Hub",
-                    phone: "",
-                    whatsapp: hubData.whatsapp || "",
-                    instagram: hubData.instagram || "",
-                    youtube: hubData.youtube || "",
-                    facebook: "",
-                    website: hubData.website || "",
-                    address: "",
-                    mapsUrl: hubData.mapsUrl || "",
-                    description: hubData.description || "",
-                    theme: hubData.theme || "royal",
-                    kind: "multilink",
-                    logo: "",
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true }).catch(function () {});
-            }, 350);
-        }
-
         async function syncDigitalCardToFirebase(data) {
             if (!firebaseReady || !db) return;
             try {
@@ -2383,7 +2291,6 @@
             isPreviewModeFromEditor = !!fromEditorPreview;
             publicVCardData = data;
             var th = cardThemes[data.theme] || cardThemes.classic;
-            var isMultiLinkHub = data.kind === "multilink";
 
             document.getElementById("studio-app-shell").classList.add("hidden");
             var screen = document.getElementById("public-vcard-screen");
@@ -2399,8 +2306,8 @@
             var banner = document.getElementById("pub-card-banner");
             banner.className = th.bannerHeight + " bg-gradient-to-r " + th.bannerGrad + " relative transition-all duration-300";
 
-            document.getElementById("pub-badge-label").textContent = isMultiLinkHub ? "Multi-Link Hub" : "Verified Profile";
-            document.getElementById("pub-share-label").textContent = isMultiLinkHub ? "Share Link Hub" : "Share Visiting Card";
+            document.getElementById("pub-badge-label").textContent = "Verified Profile";
+            document.getElementById("pub-share-label").textContent = "Share Visiting Card";
 
             var logoFrame = document.getElementById("pub-logo-frame");
             logoFrame.className = "w-28 h-28 mx-auto " + th.logoShape + " p-1.5 shadow-lg border transition-all duration-300";
@@ -2437,48 +2344,32 @@
             if (data.logo) {
                 logoImg.src = data.logo;
             } else {
-                logoInit.textContent = isMultiLinkHub ? "LH" : (data.shopName || "QR").substring(0, 2).toUpperCase();
+                logoInit.textContent = (data.shopName || "QR").substring(0, 2).toUpperCase();
             }
 
             var cleanPhone = (data.phone || "").replace(/\D/g, "");
             var cleanWa = (data.whatsapp || "").replace(/\D/g, "");
             var contactActionsEl = document.getElementById("pub-contact-actions");
 
-            if (isMultiLinkHub) {
-                vcfBtn.classList.add("hidden");
-                var callBtn = document.getElementById("pub-btn-call");
-                callBtn.classList.add("hidden");
-                var waBtn = document.getElementById("pub-btn-wa");
-                if (cleanWa) {
-                    var waNum = cleanWa.length === 10 ? "91" + cleanWa : cleanWa;
-                    waBtn.href = "https://wa.me/" + waNum + "?text=" + encodeURIComponent("Hi " + (data.shopName || "") + ", opening from your Link Hub!");
-                    waBtn.className = "col-span-2 " + th.primaryBtn + " font-bold py-3.5 px-4 shadow-md flex items-center justify-center gap-2 text-sm transition active:scale-95";
-                    waBtn.classList.remove("hidden");
-                    contactActionsEl.classList.remove("hidden");
-                } else {
-                    contactActionsEl.classList.add("hidden");
-                }
+            vcfBtn.classList.remove("hidden");
+            contactActionsEl.classList.remove("hidden");
+            var callBtn2 = document.getElementById("pub-btn-call");
+            if (cleanPhone) {
+                callBtn2.href = "tel:" + (cleanPhone.length === 10 ? "+91" + cleanPhone : "+" + cleanPhone);
+                callBtn2.className = "bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold py-3 px-4 " + th.linkRadius + " flex items-center justify-center gap-2 text-sm transition active:scale-95";
+                callBtn2.classList.remove("hidden");
             } else {
-                vcfBtn.classList.remove("hidden");
-                contactActionsEl.classList.remove("hidden");
-                var callBtn2 = document.getElementById("pub-btn-call");
-                if (cleanPhone) {
-                    callBtn2.href = "tel:" + (cleanPhone.length === 10 ? "+91" + cleanPhone : "+" + cleanPhone);
-                    callBtn2.className = "bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold py-3 px-4 " + th.linkRadius + " flex items-center justify-center gap-2 text-sm transition active:scale-95";
-                    callBtn2.classList.remove("hidden");
-                } else {
-                    callBtn2.classList.add("hidden");
-                }
+                callBtn2.classList.add("hidden");
+            }
 
-                var waBtn2 = document.getElementById("pub-btn-wa");
-                if (cleanWa) {
-                    var waNum2 = cleanWa.length === 10 ? "91" + cleanWa : cleanWa;
-                    waBtn2.href = "https://wa.me/" + waNum2 + "?text=" + encodeURIComponent("Hi " + (data.shopName || "") + ", I scanned your Digital Visiting Card!");
-                    waBtn2.className = "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold py-3 px-4 " + th.linkRadius + " flex items-center justify-center gap-2 text-sm transition active:scale-95";
-                    waBtn2.classList.remove("hidden", "col-span-2");
-                } else {
-                    waBtn2.classList.add("hidden");
-                }
+            var waBtn2 = document.getElementById("pub-btn-wa");
+            if (cleanWa) {
+                var waNum2 = cleanWa.length === 10 ? "91" + cleanWa : cleanWa;
+                waBtn2.href = "https://wa.me/" + waNum2 + "?text=" + encodeURIComponent("Hi " + (data.shopName || "") + ", I scanned your Digital Visiting Card!");
+                waBtn2.className = "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold py-3 px-4 " + th.linkRadius + " flex items-center justify-center gap-2 text-sm transition active:scale-95";
+                waBtn2.classList.remove("hidden", "col-span-2");
+            } else {
+                waBtn2.classList.add("hidden");
             }
 
             var linksContainer = document.getElementById("pub-links-list");
@@ -2533,11 +2424,11 @@
         function returnFromPublicCard() {
             document.getElementById("public-vcard-screen").classList.add("hidden");
             document.getElementById("studio-app-shell").classList.remove("hidden");
-            if (window.location.search.indexOf("c=") !== -1 || window.location.search.indexOf("cid=") !== -1 || window.location.search.indexOf("m=") !== -1 || window.location.search.indexOf("card=") !== -1) {
+            if (window.location.search.indexOf("c=") !== -1 || window.location.search.indexOf("cid=") !== -1 || window.location.search.indexOf("card=") !== -1) {
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
             if (isPreviewModeFromEditor) {
-                switchTab(publicVCardData && publicVCardData.kind === "multilink" ? "generator" : "vcard");
+                switchTab("vcard");
             }
         }
 
@@ -2898,7 +2789,7 @@
         // -------------------- INITIALIZE APP --------------------
         async function initStudioApp() {
             var params = new URLSearchParams(window.location.search);
-            var cidParam = params.get("cid") || params.get("m");
+            var cidParam = params.get("cid");
             var cardParam = params.get("c") || params.get("card");
 
             if (cidParam) {
@@ -2932,18 +2823,7 @@
                 });
             });
 
-            document.getElementById("btn-preview-multilink").addEventListener("click", function () {
-                var hubData = getMultiLinkHubData();
-                if (firebaseReady && db) {
-                    db.collection("qr_studio_cards").doc(currentMultiLinkId).set(Object.assign({ deviceId: DEVICE_ID }, hubData), { merge: true }).catch(function () {});
-                }
-                openPublicCardView(hubData, true);
-            });
-
             document.getElementById("btn-clear-qr-fields").addEventListener("click", function () {
-                if (currentQrType === "multilink") {
-                    currentMultiLinkId = "m_" + Math.random().toString(36).substring(2, 8);
-                }
                 selectQrType(currentQrType);
                 document.getElementById("qr-custom-title").value = "";
                 document.getElementById("qr-custom-caption").value = "";

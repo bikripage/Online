@@ -3308,6 +3308,7 @@ function updateDynamicPricing(businessType) {
             <li class="flex items-start gap-2"><i class="fas fa-bell text-purple-500 mt-1"></i> <span class="font-bold">Live Order Alert App</span></li>
             <li class="flex items-start gap-2"><i class="fas fa-print text-purple-500 mt-1"></i> <span class="font-bold">Print Shipping Labels</span></li>
             <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-purple-500 mt-1"></i> <span class="font-bold">1-Click Payment Reminders</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-file-alt text-purple-500 mt-1"></i> <span class="font-bold">Resume Studio Access</span></li>
             
             ${catHeader('Analytics & Growth', 'text-purple-400')}
             <li class="flex items-start gap-2"><i class="fas fa-level-up-alt text-purple-500 mt-1"></i> <span>Rank Above Basic Shops</span></li>
@@ -3350,6 +3351,7 @@ function updateDynamicPricing(businessType) {
             <li class="flex items-start gap-2"><i class="fas fa-bell text-purple-500 mt-1"></i> <span class="font-bold">Live Order Alert App</span></li>
             <li class="flex items-start gap-2"><i class="fas fa-print text-purple-500 mt-1"></i> <span class="font-bold">Print Shipping Labels</span></li>
             <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-purple-500 mt-1"></i> <span class="font-bold">1-Click Payment Reminders</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-file-alt text-purple-500 mt-1"></i> <span class="font-bold">Resume Studio Access</span></li>
             
             ${catHeader('Analytics & Growth', 'text-purple-400')}
             <li class="flex items-start gap-2"><i class="fas fa-level-up-alt text-purple-500 mt-1"></i> <span>Rank Above Basic Shops</span></li>
@@ -3392,6 +3394,7 @@ function updateDynamicPricing(businessType) {
             <li class="flex items-start gap-2"><i class="fas fa-bell text-purple-500 mt-1"></i> <span class="font-bold">Live Order Alert App</span></li>
             <li class="flex items-start gap-2"><i class="fas fa-print text-purple-500 mt-1"></i> <span class="font-bold">Print Shipping Labels</span></li>
             <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-purple-500 mt-1"></i> <span class="font-bold">1-Click Payment Reminders</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-file-alt text-purple-500 mt-1"></i> <span class="font-bold">Resume Studio Access</span></li>
             
             ${catHeader('Analytics & Growth', 'text-purple-400')}
             <li class="flex items-start gap-2"><i class="fas fa-level-up-alt text-purple-500 mt-1"></i> <span>Rank Above Basic Shops</span></li>
@@ -3435,6 +3438,7 @@ function updateDynamicPricing(businessType) {
             <li class="flex items-start gap-2"><i class="fas fa-bell text-purple-500 mt-1"></i> <span class="font-bold">Live Order Alert App</span></li>
             <li class="flex items-start gap-2"><i class="fas fa-print text-purple-500 mt-1"></i> <span class="font-bold">Print Shipping Labels</span></li>
             <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-purple-500 mt-1"></i> <span class="font-bold">1-Click Payment Reminders</span></li>
+            <li class="flex items-start gap-2"><i class="fas fa-file-alt text-purple-500 mt-1"></i> <span class="font-bold">Resume Studio Access</span></li>
             
             ${catHeader('Analytics & Growth', 'text-purple-400')}
             <li class="flex items-start gap-2"><i class="fas fa-level-up-alt text-purple-500 mt-1"></i> <span>Rank Above Basic Shops</span></li>
@@ -5227,6 +5231,8 @@ function iosConfirm(title, message, btnText) {
                 <!-- English Video -->
                 <iframe id="video-english" class="w-full h-full object-cover hidden" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
+        </div>
+    </div>
 
 <!-- ✨ iOS STYLE PREMIUM SUCCESS / CONFIRM MODAL ✨ -->
 <div id="ios-confirm-modal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0">
@@ -5246,5 +5252,96 @@ function iosConfirm(title, message, btnText) {
    
    
 
+
+    <script>
+        // Fallback iOS Alert helper if called anywhere on index.html
+        if (typeof window.showIOSAlert !== 'function') {
+            window.showIOSAlert = function(title, message, btnText = 'OK') {
+                if (typeof iosConfirm === 'function') {
+                    iosConfirm(title, message, btnText);
+                } else {
+                    alert(title + ': ' + message);
+                }
+            };
+        }
+
+        // Smooth IntersectionObserver Stagger Reveal for Cards, Pricing, Tools & Grid
+        (function initBikriPageMotionEngine() {
+            const targetSelectors = [
+                '#hero-content section > div',
+                '#hero-content .grid > div',
+                '#marketplace .reveal',
+                '#dynamic-grid > div',
+                '#merchant-upgrade-plans .grid > div',
+                'footer > div'
+            ];
+
+            const io = ('IntersectionObserver' in window)
+                ? new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            const el = entry.target;
+                            el.classList.remove('bp-anim-ready');
+                            el.classList.add('bp-anim-in');
+                            el.classList.add('active');
+                            io.unobserve(el);
+                        }
+                    });
+                }, {
+                    threshold: 0.08,
+                    rootMargin: '0px 0px -30px 0px'
+                })
+                : null;
+
+            function registerElements() {
+                document.querySelectorAll(targetSelectors.join(',')).forEach((el, idx) => {
+                    if (el.dataset.bpMotionBound === '1') return;
+                    el.dataset.bpMotionBound = '1';
+                    el.classList.add('bp-card-hover');
+                    const stagger = (idx % 6) * 65;
+                    el.style.setProperty('--bp-delay', stagger + 'ms');
+
+                    if (io) {
+                        const rect = el.getBoundingClientRect();
+                        if (rect.top < window.innerHeight * 0.94) {
+                            el.classList.add('bp-anim-in', 'active');
+                        } else {
+                            el.classList.add('bp-anim-ready');
+                            io.observe(el);
+                        }
+                    } else {
+                        el.classList.add('active');
+                    }
+                });
+            }
+
+            // Watch dynamically injected hero, shops, products & pricing cards
+            const mo = new MutationObserver(() => {
+                window.requestAnimationFrame(registerElements);
+            });
+
+            window.addEventListener('DOMContentLoaded', () => {
+                registerElements();
+                const mainEl = document.querySelector('main');
+                if (mainEl) {
+                    mo.observe(mainEl, { childList: true, subtree: true });
+                }
+            });
+
+            // Smooth anchor scrolling for any #hash links
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('a[href^="#"]');
+                if (!link) return;
+                const hash = link.getAttribute('href');
+                if (hash && hash.length > 1) {
+                    const target = document.querySelector(hash);
+                    if (target) {
+                        e.preventDefault();
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            });
+        })();
+    </script>
 </body>
 </html> 

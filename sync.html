@@ -421,9 +421,12 @@ footer{border-top:1px solid var(--line);padding:22px 0 34px;color:var(--muted);f
       <section class="card">
         <div class="toolrow">
           <h2>Bluetooth devices</h2>
-          <button type="button" class="pill-btn" id="addBtBtn"><i class="fas fa-plus" style="font-size:10px"></i> Add Bluetooth</button>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button type="button" class="pill-btn" id="scanBtBtn"><i class="fas fa-search" style="font-size:10px"></i> Scan</button>
+            <button type="button" class="pill-btn" id="addBtBtn"><i class="fas fa-plus" style="font-size:10px"></i> Add</button>
+          </div>
         </div>
-        <p class="hint" style="margin-top:0">Add multiple Bluetooth headphones or devices for group listening.</p>
+        <p class="hint" style="margin-top:0">Scan nearby BLE devices or add headphones for session tracking. Browsers play audio through one active OS output; for multi-device audio, join the same room link on each phone.</p>
         <div id="btList" class="bt-list"></div>
       </section>
 
@@ -609,10 +612,14 @@ async function writeState(patch){
   updatePlayIcon(!!roomState.isPlaying);
   $("liveTag").textContent=roomState.isPlaying?"PLAYING":"PAUSED";
   if(db){
+    const cloudPatch={...patch};
+    if(typeof cloudPatch.mediaUrl==="string"&&cloudPatch.mediaUrl.startsWith("blob:")){
+      delete cloudPatch.mediaUrl;
+    }
     try{
       await db.collection("syncRooms").doc(roomId).set({
         roomId,
-        ...patch,
+        ...cloudPatch,
         updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
         updatedAtMs:now
       },{merge:true});
@@ -783,7 +790,7 @@ async function enterRoom(id,host){
           roomId,
           hostUid:uid||"guest",
           title:initialTitle,
-          mediaUrl:initialMedia,
+          mediaUrl:initialMedia.startsWith("blob:")?"":initialMedia,
           isPlaying:false,
           currentTime:0,
           updatedAtMs:Date.now(),
@@ -795,9 +802,11 @@ async function enterRoom(id,host){
         const d=s.data();
         $("roomTitle").textContent=d.title||"Sync Room";
         $("memberInfo").textContent="Room active · "+(isHost?"Host controls":"Synced room");
-        const changed=d.mediaUrl!==roomState.mediaUrl;
+        const incomingUrl=d.mediaUrl||"";
+        const isLocalBlob=roomState.mediaUrl&&roomState.mediaUrl.startsWith("blob:");
+        const changed=!isLocalBlob&&incomingUrl!==roomState.mediaUrl;
         if(changed){
-          roomState.mediaUrl=d.mediaUrl||"";
+          roomState.mediaUrl=incomingUrl;
           renderMedia(roomState.mediaUrl);
         }
         const prevPlaying=roomState.isPlaying;
@@ -846,29 +855,9 @@ async function prepareMediaFromFile(file, roomCode, statusEl){
   if(!file)throw new Error("Choose a media file first.");
   const okType=file.type.startsWith("audio/")||file.type.startsWith("video/")||/\.(mp3|mp4|m4a|aac|wav|ogg|webm|mov)$/i.test(file.name);
   if(!okType)throw new Error("Choose a valid audio or video file.");
-
-  if(storage&&uid){
-    try{
-      const path=`${uid}/syncRooms/${roomCode}/${Date.now()}_${safeFileName(file.name)}`;
-      const ref=storage.ref().child(path);
-      const task=ref.put(file,{contentType:file.type||"application/octet-stream"});
-      return await new Promise((resolve,reject)=>{
-        task.on("state_changed",snap=>{
-          const pct=Math.round((snap.bytesTransferred/snap.totalBytes)*100);
-          if(statusEl)statusEl.textContent=`Uploading ${file.name}: ${pct}%`;
-        },()=>resolve(URL.createObjectURL(file)),async()=>{
-          try{
-            const url=await task.snapshot.ref.getDownloadURL();
-            if(statusEl)statusEl.textContent=`Uploaded: ${file.name}`;
-            resolve(url);
-          }catch{resolve(URL.createObjectURL(file))}
-        });
-      });
-    }catch{
-      return URL.createObjectURL(file);
-    }
-  }
-  return URL.createObjectURL(file);
+  const localUrl=URL.createObjectURL(file);
+  if(statusEl)statusEl.textContent=`Ready (instant local playback): ${file.name}`;
+  return localUrl;
 }
 
 /* Multiple Bluetooth Devices Management */
@@ -908,6 +897,24 @@ function renderBluetoothDevices(){
       toast("Device removed.");
     };
   });
+}
+
+async function scanBluetoothDevices(){
+  if(!navigator.bluetooth||!navigator.bluetooth.requestDevice){
+    toast("Web Bluetooth scanner is not supported in this browser; tap + Add to add by name.");
+    return;
+  }
+  try{
+    const device=await navigator.bluetooth.requestDevice({
+      acceptAllDevices:true,
+      optionalServices:["battery_service"]
+    });
+    if(!device)return;
+    const nm=(device.name&&device.name.trim())?device.name.trim():("Bluetooth Device ("+(device.id?device.id.slice(-4):"BLE")+")");
+    addBluetoothDevice(nm);
+  }catch(e){
+    toast("Scan cancelled or unavailable.");
+  }
 }
 
 function addBluetoothDevice(name){
@@ -1089,6 +1096,7 @@ async function init(){
   };
 
   // Multiple Bluetooth Devices Sheet Listeners
+  $("scanBtBtn").onclick=scanBluetoothDevices;
   $("addBtBtn").onclick=()=>{
     $("btNameInput").value="";
     $("btSheet").classList.remove("hidden");

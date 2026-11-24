@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BikriPage QR Studio | Smart QR &amp; Digital Identity Platform</title>
-    <meta name="description" content="Create custom QR codes, digital visiting cards, fixed-amount UPI QR codes, and scan QR codes seamlessly with BikriPage QR Studio.">
+    <title>BikriPage QR &amp; Barcode Studio Pro | Smart Digital Identity &amp; Labeling</title>
+    <meta name="description" content="Create custom QR codes, bulk product barcodes, aesthetic themed digital visiting cards, multi-link bio pages, and fixed-amount UPI QR codes seamlessly with BikriPage Studio.">
 
     <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,9 +15,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Free QR Generation & Scanning Libraries -->
+    <!-- Free QR & Barcode Generation Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 
     <!-- Firebase v8 SDKs (Short Cloud ID for Visiting Cards + Background Sync) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -110,38 +110,33 @@
             color: #0071E3;
         }
 
-        .qr-type-pill {
+        .qr-type-pill, .bc-type-pill, .filter-pill {
             background-color: #FFFFFF;
             color: #1F2937;
             border: 1.5px solid #E5E7EB;
         }
-        .qr-type-pill:hover {
+        .qr-type-pill:hover, .bc-type-pill:hover, .filter-pill:hover {
             background-color: #F9FAFB;
             border-color: #D1D5DB;
         }
-        .qr-type-pill.active {
+        .qr-type-pill.active, .bc-type-pill.active, .filter-pill.active {
             background-color: #1D1D1F;
             color: #FFFFFF;
             border-color: #1D1D1F;
             box-shadow: 0 4px 12px rgba(29, 29, 31, 0.18);
         }
-        .qr-type-pill.active i {
+        .qr-type-pill.active i, .bc-type-pill.active i {
             color: #38BDF8;
         }
 
-        @keyframes scanLine {
-            0%, 100% { top: 10%; }
-            50% { top: 88%; }
+        .preview-theme-chip {
+            transition: all 0.2s ease;
         }
-        .scanner-laser {
-            position: absolute;
-            left: 8%;
-            right: 8%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #0071E3, #38BDF8, #0071E3, transparent);
-            box-shadow: 0 0 10px #0071E3;
-            animation: scanLine 2.4s ease-in-out infinite;
+        .preview-theme-chip.active {
+            transform: scale(1.04);
+            box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #0071E3;
         }
+
         @keyframes fadeSlideUp {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -153,34 +148,62 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- ==================== PUBLIC DIGITAL VISITING CARD VIEW (WHEN SCANNED OR PREVIEWED) ==================== -->
-    <div id="public-vcard-screen" class="hidden min-h-screen bg-gradient-to-b from-[#EEF2FF] via-[#F5F5F7] to-[#FFFFFF] py-6 px-4 flex flex-col items-center justify-center">
-        <!-- Top Back Bar (Only visible in Card Editor Preview) -->
-        <div id="preview-top-back-bar" class="hidden w-full max-w-md flex items-center justify-between mb-3">
-            <button type="button" id="btn-back-from-preview" class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-bold px-4 py-2.5 rounded-2xl border border-gray-200/80 shadow-sm text-xs active:scale-95 transition">
-                <i class="fas fa-arrow-left text-blue-600"></i>
-                <span>Back to Card Editor</span>
-            </button>
-            <span class="text-[11px] font-bold text-gray-400">Card Preview</span>
+    <!-- ==================== PUBLIC DIGITAL VISITING CARD & MULTI-LINK HUB VIEW ==================== -->
+    <div id="public-vcard-screen" class="hidden min-h-screen bg-gradient-to-b from-[#EEF2FF] via-[#F5F5F7] to-[#FFFFFF] py-6 px-4 flex flex-col items-center justify-center transition-colors duration-300">
+        <!-- Top Bar (Back button + Live Aesthetic Theme Switcher right inside Preview) -->
+        <div id="preview-top-back-bar" class="hidden w-full max-w-md flex flex-col gap-2.5 mb-3">
+            <div class="flex items-center justify-between">
+                <button type="button" id="btn-back-from-preview" class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-bold px-4 py-2.5 rounded-2xl border border-gray-200/80 shadow-sm text-xs active:scale-95 transition">
+                    <i class="fas fa-arrow-left text-blue-600"></i>
+                    <span>Back to Card Editor</span>
+                </button>
+                <span id="pub-theme-badge" class="text-[11px] font-bold text-gray-700 bg-white/90 px-3 py-1.5 rounded-full border border-gray-200/70 shadow-sm">Minimal Light</span>
+            </div>
+
+            <!-- Interactive Theme Switcher Inside Preview -->
+            <div class="bg-white/90 backdrop-blur-md border border-gray-200/80 rounded-2xl p-2 shadow-sm">
+                <div class="flex items-center justify-between px-1.5 mb-1.5">
+                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-gray-500">Preview Theme (Layout, Colors &amp; Style)</span>
+                    <span class="text-[10px] font-bold text-blue-600">Tap to Switch</span>
+                </div>
+                <div id="preview-theme-switcher" class="grid grid-cols-4 gap-1.5">
+                    <button type="button" data-prev-theme="classic" class="preview-theme-chip active py-2 px-2 rounded-xl bg-[#F5F5F7] text-[#111827] text-[10px] font-extrabold flex flex-col items-center gap-1 border border-gray-200">
+                        <span class="w-4 h-4 rounded-full bg-gradient-to-tr from-[#1D1D1F] to-[#0071E3]"></span>
+                        <span>Light</span>
+                    </button>
+                    <button type="button" data-prev-theme="midnight" class="preview-theme-chip py-2 px-2 rounded-xl bg-[#0F172A] text-white text-[10px] font-extrabold flex flex-col items-center gap-1 border border-slate-700">
+                        <span class="w-4 h-4 rounded-full bg-gradient-to-tr from-[#0284C7] to-[#38BDF8]"></span>
+                        <span>Midnight</span>
+                    </button>
+                    <button type="button" data-prev-theme="emerald" class="preview-theme-chip py-2 px-2 rounded-xl bg-[#ECFDF5] text-[#064E3B] text-[10px] font-extrabold flex flex-col items-center gap-1 border border-emerald-200">
+                        <span class="w-4 h-4 rounded-full bg-gradient-to-tr from-[#064E3B] to-[#10B981]"></span>
+                        <span>Emerald</span>
+                    </button>
+                    <button type="button" data-prev-theme="royal" class="preview-theme-chip py-2 px-2 rounded-xl bg-[#FAF5FF] text-[#4C1D95] text-[10px] font-extrabold flex flex-col items-center gap-1 border border-purple-200">
+                        <span class="w-4 h-4 rounded-full bg-gradient-to-tr from-[#4C1D95] to-[#EC4899]"></span>
+                        <span>Royal</span>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div id="public-card-loading" class="hidden w-full max-w-md bg-white rounded-[2rem] p-12 text-center shadow-lg border border-gray-100">
             <i class="fas fa-circle-notch fa-spin text-3xl text-blue-600 mb-3"></i>
-            <p class="text-sm font-bold text-gray-800">Loading Visiting Card...</p>
+            <p class="text-sm font-bold text-gray-800">Loading Page...</p>
         </div>
 
-        <div id="public-card-container" class="w-full max-w-md bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden animate-view">
-            <div class="h-32 bg-gradient-to-r from-[#1D1D1F] via-[#2B2D42] to-[#0071E3] relative">
-                <div class="absolute top-4 left-4 bg-white/15 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-white/20 flex items-center gap-1.5">
-                    <i class="fas fa-check-circle text-sky-300"></i> Verified Profile
+        <div id="public-card-container" class="w-full max-w-md bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden animate-view transition-all duration-300">
+            <div id="pub-card-banner" class="h-32 bg-gradient-to-r from-[#1D1D1F] via-[#2B2D42] to-[#0071E3] relative">
+                <div id="pub-verified-pill" class="absolute top-4 left-4 bg-white/15 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-white/20 flex items-center gap-1.5">
+                    <i class="fas fa-check-circle text-sky-300"></i> <span id="pub-badge-label">Verified Profile</span>
                 </div>
                 <button type="button" id="btn-exit-public-card" class="absolute top-4 right-4 bg-white/15 hover:bg-white/25 backdrop-blur-md text-white text-xs font-semibold px-3 py-1.5 rounded-full border border-white/20 transition">
                     Create Yours
                 </button>
             </div>
 
-            <div class="px-6 pb-8 -mt-14 relative text-center">
-                <div class="w-28 h-28 mx-auto rounded-[1.75rem] bg-white p-1.5 shadow-lg border border-gray-100">
+            <div id="pub-card-body" class="px-6 pb-8 -mt-14 relative text-center">
+                <div id="pub-logo-frame" class="w-28 h-28 mx-auto rounded-[1.75rem] bg-white p-1.5 shadow-lg border border-gray-100 transition-all duration-300">
                     <img id="pub-card-logo" src="" alt="Logo" class="w-full h-full object-cover rounded-[1.4rem] hidden">
                     <div id="pub-card-initials" class="w-full h-full rounded-[1.4rem] bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-black text-3xl flex items-center justify-center">
                         QR
@@ -191,7 +214,7 @@
                 <p id="pub-card-owner" class="text-sm font-semibold text-blue-600 mt-0.5">Owner Name</p>
                 <p id="pub-card-desc" class="text-xs text-gray-500 mt-3 leading-relaxed max-w-xs mx-auto"></p>
 
-                <div class="grid grid-cols-2 gap-3 mt-6">
+                <div id="pub-contact-actions" class="grid grid-cols-2 gap-3 mt-6">
                     <button type="button" id="btn-download-public-vcf" class="col-span-2 bg-[#1D1D1F] hover:bg-black text-white font-bold py-3.5 px-4 rounded-2xl shadow-md flex items-center justify-center gap-2 active:scale-95 transition text-sm">
                         <i class="fas fa-address-book text-sky-400"></i> Save Contact (.vcf)
                     </button>
@@ -218,14 +241,14 @@
                 </div>
 
                 <button type="button" id="btn-share-public-card" class="mt-6 w-full py-3 rounded-2xl border border-gray-200 text-gray-700 hover:bg-gray-50 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95">
-                    <i class="fas fa-share-alt"></i> Share Visiting Card
+                    <i class="fas fa-share-alt"></i> <span id="pub-share-label">Share Visiting Card</span>
                 </button>
             </div>
         </div>
-        <p class="text-[11px] text-gray-400 font-semibold mt-5">Powered by <span class="text-gray-700 font-bold">BikriPage QR Studio</span></p>
+        <p id="pub-footer-text" class="text-[11px] text-gray-400 font-semibold mt-5">Powered by <span class="text-gray-700 font-bold">BikriPage Studio</span></p>
     </div>
 
-    <!-- ==================== MAIN STANDALONE QR STUDIO APP ==================== -->
+    <!-- ==================== MAIN STANDALONE STUDIO APP ==================== -->
     <div id="studio-app-shell" class="flex-1 flex flex-col">
 
         <!-- Header -->
@@ -241,16 +264,21 @@
                     <div class="min-w-0">
                         <div class="flex items-center gap-1.5">
                             <span class="font-black text-base sm:text-lg tracking-tight text-gray-900">BikriPage</span>
-                            <span class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100 shrink-0">QR Studio</span>
+                            <span class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100 shrink-0">Studio Pro</span>
                         </div>
-                        <p class="text-[11px] text-gray-500 font-medium truncate">Custom QR, Digital Card &amp; UPI Generator</p>
+                        <p class="text-[11px] text-gray-500 font-medium truncate">QR, Bulk Barcode, Themed Card &amp; UPI</p>
                     </div>
                 </div>
 
-                <button type="button" data-nav-tab="saved" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-xs font-bold text-gray-800 transition shrink-0">
-                    <i class="fas fa-bookmark text-blue-600"></i>
-                    <span id="header-saved-count">0</span>
-                </button>
+                <div class="flex items-center gap-2 shrink-0">
+                    <button type="button" data-nav-tab="activity" title="Recent Activity" class="lg:hidden w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center text-xs transition">
+                        <i class="fas fa-history"></i>
+                    </button>
+                    <button type="button" data-nav-tab="saved" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-xs font-bold text-gray-800 transition">
+                        <i class="fas fa-bookmark text-blue-600"></i>
+                        <span id="header-saved-count">0</span>
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -264,20 +292,20 @@
                     <button type="button" data-nav-tab="generator" class="nav-item active w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-sm font-bold transition">
                         <i class="fas fa-qrcode w-5 text-center"></i> QR Generator
                     </button>
+                    <button type="button" data-nav-tab="barcode" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-sm font-bold transition">
+                        <i class="fas fa-barcode w-5 text-center"></i> Barcode &amp; Bulk
+                    </button>
                     <button type="button" data-nav-tab="vcard" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-sm font-bold transition">
                         <i class="fas fa-id-card w-5 text-center"></i> Digital Visiting Card
                     </button>
                     <button type="button" data-nav-tab="upi" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-sm font-bold transition">
                         <i class="fas fa-rupee-sign w-5 text-center"></i> UPI Payment QR
                     </button>
-                    <button type="button" data-nav-tab="scanner" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-sm font-bold transition">
-                        <i class="fas fa-expand w-5 text-center"></i> Quick Scanner
-                    </button>
 
                     <div class="border-t border-gray-100 my-2 pt-2">
-                        <p class="px-3 pb-1 text-[10px] font-extrabold uppercase tracking-widest text-gray-400">Library &amp; Logs</p>
+                        <p class="px-3 pb-1 text-[10px] font-extrabold uppercase tracking-widest text-gray-400">Library &amp; Backup</p>
                         <button type="button" data-nav-tab="saved" class="nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-bold transition">
-                            <span class="flex items-center gap-3"><i class="fas fa-bookmark w-5 text-center"></i> Saved QR Codes</span>
+                            <span class="flex items-center gap-3"><i class="fas fa-bookmark w-5 text-center"></i> Saved Codes</span>
                             <span id="sidebar-saved-count" class="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">0</span>
                         </button>
                         <button type="button" data-nav-tab="activity" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-sm font-bold transition">
@@ -294,15 +322,20 @@
                 <section id="panel-generator" class="tab-panel animate-view space-y-5">
                     <div>
                         <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Custom QR Generator</h1>
-                        <p class="text-xs sm:text-sm text-gray-500">Create high-contrast, scannable QR codes for any link, social handle, contact, or payment.</p>
+                        <p class="text-xs sm:text-sm text-gray-500">Create high-contrast QR codes for links, Multi-Link Bio pages, YouTube, WhatsApp, vCard &amp; UPI.</p>
                     </div>
 
-                    <!-- QR Purpose Selector -->
                     <div class="ios-card rounded-3xl p-4">
                         <label class="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2.5">1. Select QR Purpose</label>
                         <div id="qr-type-pills" class="flex flex-wrap gap-2">
                             <button type="button" data-qrtype="url" class="qr-type-pill active px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
                                 <i class="fas fa-globe text-blue-600"></i> Website URL
+                            </button>
+                            <button type="button" data-qrtype="multilink" class="qr-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                                <i class="fas fa-layer-group text-violet-600"></i> Social Bio / Multi-Link
+                            </button>
+                            <button type="button" data-qrtype="youtube" class="qr-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                                <i class="fab fa-youtube text-red-600"></i> YouTube
                             </button>
                             <button type="button" data-qrtype="whatsapp" class="qr-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
                                 <i class="fab fa-whatsapp text-emerald-600"></i> WhatsApp
@@ -338,7 +371,6 @@
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-                        <!-- Left: Dynamic Form + Design Controls -->
                         <div class="lg:col-span-7 space-y-5">
                             <div class="ios-card rounded-3xl p-5 space-y-4">
                                 <div class="flex items-center justify-between gap-2">
@@ -346,9 +378,14 @@
                                         <span class="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs shrink-0">2</span>
                                         <span id="qr-form-heading">Enter Website URL</span>
                                     </h2>
-                                    <button type="button" id="btn-clear-qr-fields" class="text-[11px] font-bold text-gray-600 hover:text-gray-900 bg-gray-100 px-2.5 py-1 rounded-lg transition shrink-0">
-                                        <i class="fas fa-eraser mr-1"></i> Reset
-                                    </button>
+                                    <div class="flex items-center gap-1.5 shrink-0">
+                                        <button type="button" id="btn-preview-multilink" class="hidden text-[11px] font-bold text-violet-700 hover:bg-violet-100 bg-violet-50 px-2.5 py-1 rounded-lg transition">
+                                            <i class="fas fa-external-link-alt mr-1"></i> Preview Page
+                                        </button>
+                                        <button type="button" id="btn-clear-qr-fields" class="text-[11px] font-bold text-gray-600 hover:text-gray-900 bg-gray-100 px-2.5 py-1 rounded-lg transition">
+                                            <i class="fas fa-eraser mr-1"></i> Reset
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div id="dynamic-qr-fields" class="space-y-3.5"></div>
@@ -471,7 +508,7 @@
                                         <i class="fas fa-vector-square text-indigo-600"></i> Download SVG
                                     </button>
                                     <button type="button" id="btn-save-qr" class="col-span-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm active:scale-95 transition">
-                                        <i class="fas fa-bookmark"></i> Save to My QR Codes
+                                        <i class="fas fa-bookmark"></i> Save to My Codes
                                     </button>
                                 </div>
                             </div>
@@ -479,15 +516,210 @@
                     </div>
                 </section>
 
-                <!-- ==================== TAB 2: DIGITAL VISITING CARD ==================== -->
+                <!-- ==================== TAB 2: BARCODE GENERATOR (SINGLE + BULK BATCH MODE) ==================== -->
+                <section id="panel-barcode" class="tab-panel hidden animate-view space-y-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Product &amp; SKU Barcode Studio</h1>
+                            <p class="text-xs sm:text-sm text-gray-500">Create single product tags or generate bulk sticker sheets for 10–50 SKUs at once.</p>
+                        </div>
+                        <div class="inline-flex bg-white p-1 rounded-2xl border border-gray-200 shadow-sm self-start">
+                            <button type="button" id="btn-bc-mode-single" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#1D1D1F] text-white transition">
+                                <i class="fas fa-tag mr-1"></i> Single Label
+                            </button>
+                            <button type="button" id="btn-bc-mode-bulk" class="px-3.5 py-2 rounded-xl text-xs font-bold text-gray-600 hover:text-gray-900 transition">
+                                <i class="fas fa-layer-group mr-1 text-blue-600"></i> Bulk Generator
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Barcode Format Selector -->
+                    <div class="ios-card rounded-3xl p-4">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2.5">1. Select Barcode Standard</label>
+                        <div id="bc-format-pills" class="flex flex-wrap gap-2">
+                            <button type="button" data-bcformat="CODE128" class="bc-type-pill active px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                                <i class="fas fa-barcode text-blue-600"></i> CODE-128 (SKU / Text &amp; Numbers)
+                            </button>
+                            <button type="button" data-bcformat="EAN13" class="bc-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                                <i class="fas fa-shopping-bag text-emerald-600"></i> EAN-13 (12/13 Digits Retail)
+                            </button>
+                            <button type="button" data-bcformat="UPC" class="bc-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                                <i class="fas fa-tag text-indigo-600"></i> UPC-A (11/12 Digits)
+                            </button>
+                            <button type="button" data-bcformat="CODE39" class="bc-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                                <i class="fas fa-warehouse text-amber-600"></i> CODE-39 (Inventory / Warehouse)
+                            </button>
+                            <button type="button" data-bcformat="EAN8" class="bc-type-pill px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                                <i class="fas fa-box text-purple-600"></i> EAN-8 (Small Packs)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SINGLE BARCODE VIEW -->
+                    <div id="bc-single-workspace" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                        <div class="lg:col-span-7 space-y-5">
+                            <div class="ios-card rounded-3xl p-5 space-y-4">
+                                <div class="flex items-center justify-between gap-2">
+                                    <h2 class="text-sm font-extrabold text-gray-900 flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs shrink-0">2</span>
+                                        <span id="bc-form-heading">Enter SKU / Barcode Number</span>
+                                    </h2>
+                                    <button type="button" id="btn-random-bc" class="text-[11px] font-bold text-blue-700 hover:bg-blue-100 bg-blue-50 px-3 py-1.5 rounded-lg transition shrink-0">
+                                        <i class="fas fa-magic mr-1"></i> Auto-Generate Code
+                                    </button>
+                                </div>
+
+                                <div>
+                                    <label id="bc-value-label" class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Barcode Data / Number *</label>
+                                    <input type="text" id="bc-value-input" value="SKU-1001" placeholder="e.g. SKU-1001 or 890123456789" class="w-full ios-input rounded-xl px-3.5 py-3 text-sm font-mono font-bold">
+                                    <p id="bc-format-hint" class="text-[11px] text-gray-500 mt-1.5">Supports letters, numbers, and symbols (-, _, /). Best for shop inventory &amp; price tags.</p>
+                                </div>
+
+                                <div id="bc-validation-msg" class="hidden text-xs font-semibold text-red-600 bg-red-50 border border-red-100 px-3.5 py-2.5 rounded-xl flex items-center gap-2">
+                                    <i class="fas fa-exclamation-circle shrink-0"></i>
+                                    <span></span>
+                                </div>
+
+                                <div class="p-3 rounded-2xl bg-blue-50/70 border border-blue-100 flex items-start gap-2.5">
+                                    <i class="fas fa-info-circle text-blue-600 mt-0.5 shrink-0 text-xs"></i>
+                                    <p class="text-[11px] text-slate-700 leading-relaxed">
+                                        <strong>Usage Note:</strong> Use <strong>CODE-128</strong> or custom numbers freely for your own shop billing, stock &amp; packaging. For national supermarket or e-commerce listings, use an official <strong>GS1 India</strong> registered number.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Label Sticker Customization -->
+                            <div class="ios-card rounded-3xl p-5 space-y-4">
+                                <h2 class="text-sm font-extrabold text-gray-900 flex items-center gap-2">
+                                    <span class="w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs shrink-0">3</span>
+                                    Product Tag &amp; Size Options
+                                </h2>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Product / Shop Name (Top)</label>
+                                        <input type="text" id="bc-product-title" placeholder="e.g. Netaji Special Jhadu" class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">MRP / Price Tag (Bottom)</label>
+                                        <input type="text" id="bc-price-tag" placeholder="e.g. MRP ₹120.00 (Incl. Taxes)" class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Bar Color</label>
+                                        <div class="flex items-center gap-2 ios-input rounded-xl px-3 py-2">
+                                            <input type="color" id="bc-fg-color" value="#111827" class="w-7 h-7 rounded cursor-pointer border-0 bg-transparent">
+                                            <span id="bc-fg-hex" class="text-xs font-mono font-bold text-gray-700">#111827</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Label Background</label>
+                                        <div class="flex items-center gap-2 ios-input rounded-xl px-3 py-2">
+                                            <input type="color" id="bc-bg-color" value="#FFFFFF" class="w-7 h-7 rounded cursor-pointer border-0 bg-transparent">
+                                            <span id="bc-bg-hex" class="text-xs font-mono font-bold text-gray-700">#FFFFFF</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Bar Height: <span id="bc-height-val" class="text-blue-600">75px</span></label>
+                                        <input type="range" id="bc-height-range" min="40" max="130" value="75" class="w-full accent-blue-600 cursor-pointer">
+                                    </div>
+                                    <div class="pt-2 sm:pt-4">
+                                        <label class="inline-flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" id="bc-show-text" checked class="w-4 h-4 accent-blue-600 rounded">
+                                            <span class="text-xs font-bold text-gray-700">Show Numbers Below Bars</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Sticky Barcode Live Preview -->
+                        <div class="lg:col-span-5 lg:sticky lg:top-24">
+                            <div class="ios-card rounded-3xl p-5 sm:p-6 flex flex-col items-center text-center">
+                                <div class="w-full flex items-center justify-between mb-4">
+                                    <span class="text-[11px] font-extrabold uppercase tracking-widest text-gray-400">Label Preview</span>
+                                    <span id="bc-active-badge" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                                        CODE128
+                                    </span>
+                                </div>
+
+                                <div id="bc-sticker-preview" class="w-full rounded-[1.5rem] p-5 border border-gray-200/90 shadow-sm flex flex-col items-center justify-center overflow-x-auto" style="background-color: #FFFFFF;">
+                                    <p id="bc-preview-title" class="text-sm font-black tracking-tight mb-2 hidden" style="color: #111827;"></p>
+                                    <canvas id="main-barcode-canvas" class="max-w-full h-auto"></canvas>
+                                    <p id="bc-preview-price" class="text-xs font-extrabold mt-2 hidden" style="color: #111827;"></p>
+                                </div>
+
+                                <div class="w-full mt-4 bg-[#F7F7F9] rounded-xl p-2.5 border border-gray-200/70 flex items-center justify-between gap-2">
+                                    <code id="bc-encoded-preview" class="text-xs text-gray-700 truncate font-mono font-bold">SKU-1001</code>
+                                    <button type="button" id="btn-copy-bc-val" class="shrink-0 text-xs font-bold text-blue-600 hover:text-blue-800 px-2 py-1 rounded-lg hover:bg-blue-50 transition">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+
+                                <div class="w-full grid grid-cols-2 gap-2.5 mt-4">
+                                    <button type="button" id="btn-download-bc-png" class="bg-[#1D1D1F] hover:bg-black text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm active:scale-95 transition">
+                                        <i class="fas fa-download"></i> Label PNG
+                                    </button>
+                                    <button type="button" id="btn-download-bc-svg" class="bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-95 transition">
+                                        <i class="fas fa-vector-square text-indigo-600"></i> Vector SVG
+                                    </button>
+                                    <button type="button" id="btn-print-bc-sheet" class="col-span-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm active:scale-95 transition">
+                                        <i class="fas fa-print"></i> Print Sticker Sheet (24 Labels)
+                                    </button>
+                                    <button type="button" id="btn-save-bc" class="col-span-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm active:scale-95 transition">
+                                        <i class="fas fa-bookmark"></i> Save to My Codes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BULK BARCODE GENERATOR VIEW -->
+                    <div id="bc-bulk-workspace" class="hidden space-y-5">
+                        <div class="ios-card rounded-3xl p-5 space-y-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div>
+                                    <h2 class="text-sm font-extrabold text-gray-900">2. Enter Multiple Product Codes (One Per Line)</h2>
+                                    <p class="text-[11px] text-gray-500">Format: <code class="bg-gray-100 px-1.5 py-0.5 rounded font-mono">CODE | Product Name | MRP</code> (Name &amp; MRP are optional)</p>
+                                </div>
+                                <button type="button" id="btn-bulk-fill-sample" class="self-start text-[11px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition">
+                                    <i class="fas fa-list-ol mr-1"></i> Load Sample List
+                                </button>
+                            </div>
+
+                            <textarea id="bulk-bc-textarea" rows="5" placeholder="SKU-101 | Phool Jhadu Premium | MRP ₹120&#10;SKU-102 | Teeli Jhadu Heavy | MRP ₹95&#10;SKU-103 | Floor Wiper 18-inch | MRP ₹180" class="w-full ios-input rounded-2xl p-3.5 text-xs font-mono font-semibold leading-relaxed"></textarea>
+
+                            <div class="flex flex-wrap gap-2.5">
+                                <button type="button" id="btn-generate-bulk-bc" class="bg-[#1D1D1F] hover:bg-black text-white font-bold px-5 py-3 rounded-xl text-xs flex items-center gap-2 shadow-sm active:scale-95 transition">
+                                    <i class="fas fa-bolt text-sky-400"></i> Generate All Barcodes
+                                </button>
+                                <button type="button" id="btn-print-bulk-sheet" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-3 rounded-xl text-xs flex items-center gap-2 shadow-sm active:scale-95 transition">
+                                    <i class="fas fa-print"></i> Print All Labels (A4 Sheet)
+                                </button>
+                                <button type="button" id="btn-save-all-bulk" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-3 rounded-xl text-xs flex items-center gap-2 shadow-sm active:scale-95 transition">
+                                    <i class="fas fa-bookmark"></i> Save All to Library
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="bulk-bc-results-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                    </div>
+                </section>
+
+                <!-- ==================== TAB 3: DIGITAL VISITING CARD (THEME SWITCHED INSIDE PREVIEW) ==================== -->
                 <section id="panel-vcard" class="tab-panel hidden animate-view space-y-5">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div>
                             <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Digital Visiting Card</h1>
-                            <p class="text-xs sm:text-sm text-gray-500">Clean, ultra-fast scannable QR code that opens your mobile profile with 1-tap Contact Save &amp; social links.</p>
+                            <p class="text-xs sm:text-sm text-gray-500">Fill your details and open <strong>Preview Full Card</strong> to switch aesthetic themes live.</p>
                         </div>
-                        <button type="button" id="btn-preview-card" class="self-start sm:self-auto bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm active:scale-95 transition">
-                            <i class="fas fa-eye text-blue-600"></i> Preview Full Card
+                        <button type="button" id="btn-preview-card" class="self-start sm:self-auto bg-[#0071E3] hover:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm active:scale-95 transition">
+                            <i class="fas fa-palette"></i> Preview &amp; Style Card
                         </button>
                     </div>
 
@@ -495,10 +727,10 @@
                         <form id="digital-card-form" class="lg:col-span-7 ios-card rounded-3xl p-5 space-y-4">
                             <div class="flex items-center justify-between border-b border-gray-100 pb-3">
                                 <h2 class="text-sm font-extrabold text-gray-900">Card Profile Details</h2>
-                                <span class="text-[11px] font-semibold text-gray-400">Digital Identity</span>
+                                <span id="editor-active-theme-tag" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600">Theme: Minimal Light</span>
                             </div>
 
-                            <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-4 pt-1">
                                 <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-black text-xl flex items-center justify-center overflow-hidden shrink-0 border border-gray-200 shadow-sm">
                                     <img id="dc-logo-preview" src="" class="w-full h-full object-cover hidden">
                                     <span id="dc-logo-initials">QR</span>
@@ -537,10 +769,14 @@
                                     <input type="text" id="dc-instagram" placeholder="@username or URL" class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold">
                                 </div>
                                 <div>
+                                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">YouTube Channel Link</label>
+                                    <input type="text" id="dc-youtube" placeholder="https://youtube.com/@channel" class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold">
+                                </div>
+                                <div>
                                     <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Facebook Page Link</label>
                                     <input type="text" id="dc-facebook" placeholder="facebook.com/yourpage" class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold">
                                 </div>
-                                <div class="sm:col-span-2">
+                                <div>
                                     <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Website / Portfolio Link</label>
                                     <input type="url" id="dc-website" placeholder="https://example.com" class="w-full ios-input rounded-xl px-3.5 py-2.5 text-xs font-semibold">
                                 </div>
@@ -591,11 +827,11 @@
                             <div class="ios-card rounded-3xl p-4 bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-lg">
                                 <div class="flex items-center justify-between mb-3">
                                     <span class="text-[10px] font-bold uppercase tracking-widest text-sky-400">Live Card Mini-Preview</span>
-                                    <span class="text-[10px] text-slate-400">Mobile View</span>
+                                    <span id="mini-dc-theme-label" class="text-[10px] text-slate-300 font-bold">Minimal Light</span>
                                 </div>
-                                <div class="bg-white text-gray-900 rounded-2xl p-4 shadow-inner">
+                                <div id="mini-dc-card-box" class="bg-white text-gray-900 rounded-2xl p-4 shadow-inner transition-colors">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-12 h-12 rounded-xl bg-blue-600 text-white font-black flex items-center justify-center text-base overflow-hidden shrink-0">
+                                        <div id="mini-dc-avatar-bg" class="w-12 h-12 rounded-xl bg-blue-600 text-white font-black flex items-center justify-center text-base overflow-hidden shrink-0">
                                             <img id="mini-dc-logo" src="" class="w-full h-full object-cover hidden">
                                             <span id="mini-dc-initials">QR</span>
                                         </div>
@@ -604,8 +840,8 @@
                                             <p id="mini-dc-owner" class="text-xs font-semibold text-blue-600 truncate">Owner Name</p>
                                         </div>
                                     </div>
-                                    <p id="mini-dc-desc" class="text-[11px] text-gray-500 mt-2.5 line-clamp-2">Your business tagline appears here.</p>
-                                    <div class="grid grid-cols-3 gap-1.5 mt-3 pt-3 border-t border-gray-100 text-center text-[10px] font-bold">
+                                    <p id="mini-dc-desc" class="text-[11px] opacity-75 mt-2.5 line-clamp-2">Your business tagline appears here.</p>
+                                    <div class="grid grid-cols-3 gap-1.5 mt-3 pt-3 border-t border-gray-200/40 text-center text-[10px] font-bold">
                                         <span class="py-1.5 rounded-lg bg-gray-900 text-white"><i class="fas fa-user-plus mr-1"></i>Save</span>
                                         <span class="py-1.5 rounded-lg bg-emerald-50 text-emerald-700"><i class="fab fa-whatsapp mr-1"></i>Chat</span>
                                         <span class="py-1.5 rounded-lg bg-pink-50 text-pink-700"><i class="fab fa-instagram mr-1"></i>Insta</span>
@@ -616,7 +852,7 @@
                     </div>
                 </section>
 
-                <!-- ==================== TAB 3: UPI PAYMENT QR ==================== -->
+                <!-- ==================== TAB 4: UPI PAYMENT QR ==================== -->
                 <section id="panel-upi" class="tab-panel hidden animate-view space-y-5">
                     <div>
                         <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Fixed-Amount UPI Payment QR</h1>
@@ -639,6 +875,14 @@
                                     <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Fixed Amount (INR ₹) *</label>
                                     <input type="number" id="upi-amount-input" min="1" max="100000" step="0.01" placeholder="e.g. 499" class="w-full ios-input rounded-xl px-4 py-3 text-sm font-black text-emerald-700">
                                 </div>
+                            </div>
+
+                            <div class="flex flex-wrap gap-2">
+                                <span class="text-[11px] font-bold text-gray-400 self-center mr-1">Quick Amount:</span>
+                                <button type="button" data-upi-amt="99" class="upi-quick-amt px-3 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-extrabold transition">₹99</button>
+                                <button type="button" data-upi-amt="199" class="upi-quick-amt px-3 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-extrabold transition">₹199</button>
+                                <button type="button" data-upi-amt="499" class="upi-quick-amt px-3 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-extrabold transition">₹499</button>
+                                <button type="button" data-upi-amt="999" class="upi-quick-amt px-3 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-extrabold transition">₹999</button>
                             </div>
 
                             <div>
@@ -689,122 +933,35 @@
                     </div>
                 </section>
 
-                <!-- ==================== TAB 4: QUICK QR SCANNER (ADVANCED AUTO-REDIRECT) ==================== -->
-                <section id="panel-scanner" class="tab-panel hidden animate-view space-y-5">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                        <div>
-                            <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Smart QR Scanner</h1>
-                            <p class="text-xs sm:text-sm text-gray-500">Scans instantly via camera or gallery image and auto-opens links, cards, WhatsApp &amp; UPI.</p>
-                        </div>
-                        <div class="flex flex-wrap items-center gap-2 self-start">
-                            <label class="inline-flex items-center gap-2 bg-white px-3.5 py-2 rounded-2xl border border-gray-200 shadow-sm cursor-pointer">
-                                <input type="checkbox" id="scanner-auto-start-toggle" checked class="w-4 h-4 accent-blue-600 rounded">
-                                <span class="text-xs font-bold text-gray-800">Auto-Start Camera</span>
-                            </label>
-                            <label class="inline-flex items-center gap-2 bg-white px-3.5 py-2 rounded-2xl border border-gray-200 shadow-sm cursor-pointer">
-                                <input type="checkbox" id="scanner-auto-redirect-toggle" checked class="w-4 h-4 accent-blue-600 rounded">
-                                <span class="text-xs font-bold text-gray-800">Auto-Redirect</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-                        <div class="lg:col-span-7 ios-card rounded-3xl p-5 space-y-4">
-                            <div class="flex flex-wrap items-center justify-between gap-2">
-                                <div class="flex items-center gap-2">
-                                    <button type="button" id="start-cam-btn" class="bg-[#0071E3] hover:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm active:scale-95 transition">
-                                        <i class="fas fa-camera"></i> Start Camera
-                                    </button>
-                                    <button type="button" id="stop-cam-btn" class="hidden bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 active:scale-95 transition">
-                                        <i class="fas fa-stop"></i> Stop Camera
-                                    </button>
-                                    <button type="button" id="torch-cam-btn" class="hidden bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold px-3.5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 active:scale-95 transition">
-                                        <i class="fas fa-bolt"></i> Flash
-                                    </button>
-                                </div>
-
-                                <select id="camera-select" class="hidden ios-input rounded-xl px-3 py-2 text-xs font-bold text-gray-700 max-w-[180px]">
-                                    <option value="">Default Camera</option>
-                                </select>
-                            </div>
-
-                            <div class="relative w-full aspect-square max-h-[340px] mx-auto rounded-2xl bg-[#111827] overflow-hidden flex items-center justify-center border border-gray-200">
-                                <video id="scanner-video" class="w-full h-full object-cover hidden" playsinline muted></video>
-                                <canvas id="scanner-hidden-canvas" class="hidden"></canvas>
-
-                                <div id="scanner-overlay" class="hidden absolute inset-0 pointer-events-none">
-                                    <div class="w-60 h-60 border-2 border-white/85 rounded-3xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]">
-                                        <div class="scanner-laser"></div>
-                                    </div>
-                                </div>
-
-                                <div id="scanner-placeholder" class="text-center p-6 text-gray-300">
-                                    <div class="w-14 h-14 rounded-2xl bg-white/10 mx-auto flex items-center justify-center mb-3">
-                                        <i class="fas fa-qrcode text-2xl text-sky-400"></i>
-                                    </div>
-                                    <p class="text-sm font-bold text-white">Camera is Paused</p>
-                                    <p class="text-xs text-gray-400 mt-1 max-w-xs">Click "Start Camera" (HTTPS/localhost) or upload a QR image below.</p>
-                                </div>
-                            </div>
-
-                            <div id="scanner-error-alert" class="hidden text-xs font-semibold text-red-600 bg-red-50 border border-red-100 p-3.5 rounded-xl flex items-start gap-2.5">
-                                <i class="fas fa-exclamation-triangle mt-0.5 shrink-0"></i>
-                                <span id="scanner-error-text"></span>
-                            </div>
-
-                            <div class="pt-1">
-                                <label class="w-full ios-input hover:bg-gray-100 rounded-2xl p-3.5 text-xs font-bold text-gray-700 cursor-pointer flex items-center justify-center gap-2 border-dashed transition">
-                                    <i class="fas fa-file-image text-blue-600 text-base"></i>
-                                    <span>Upload QR Image from Device</span>
-                                    <input type="file" id="scanner-file-input" accept="image/*" class="hidden">
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="lg:col-span-5 ios-card rounded-3xl p-5 space-y-4">
-                            <div class="flex items-center justify-between">
-                                <h2 class="text-sm font-extrabold text-gray-900">Scan Result</h2>
-                                <span id="scan-type-badge" class="hidden text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600">URL</span>
-                            </div>
-
-                            <div id="scan-empty-state" class="py-10 text-center">
-                                <div class="w-12 h-12 rounded-2xl bg-gray-100 text-gray-400 mx-auto flex items-center justify-center mb-3">
-                                    <i class="fas fa-search"></i>
-                                </div>
-                                <p class="text-xs font-bold text-gray-600">Ready to Scan</p>
-                                <p class="text-[11px] text-gray-400 mt-1">Scan any QR code to automatically open links, digital visiting cards, WhatsApp chats, or UPI payments.</p>
-                            </div>
-
-                            <div id="scan-result-box" class="hidden space-y-4">
-                                <div id="scan-redirect-banner" class="hidden p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
-                                    <i class="fas fa-external-link-alt"></i>
-                                    <span id="scan-redirect-msg">Redirecting...</span>
-                                </div>
-
-                                <div class="p-3.5 rounded-2xl bg-[#F7F7F9] border border-gray-200 break-all">
-                                    <p id="scan-raw-output" class="text-xs font-mono font-semibold text-gray-800 whitespace-pre-wrap"></p>
-                                </div>
-
-                                <div id="scan-smart-actions" class="space-y-2"></div>
-
-                                <button type="button" id="btn-copy-scan" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 transition">
-                                    <i class="fas fa-copy"></i> Copy Scanned Text
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- ==================== TAB 5: MY SAVED QR CODES ==================== -->
+                <!-- ==================== TAB 5: MY SAVED CODES (SEARCH, FILTER & JSON BACKUP) ==================== -->
                 <section id="panel-saved" class="tab-panel hidden animate-view space-y-5">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
-                            <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">My Saved QR Codes</h1>
-                            <p class="text-xs sm:text-sm text-gray-500">Your saved QR codes stored on this device and synced in the background.</p>
+                            <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">My Saved Codes</h1>
+                            <p class="text-xs sm:text-sm text-gray-500">Search, filter, download, or export/restore a JSON backup of your codes.</p>
                         </div>
-                        <button type="button" id="btn-saved-create-new" class="self-start sm:self-auto bg-[#1D1D1F] text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm active:scale-95 transition">
-                            <i class="fas fa-plus"></i> Create New QR
-                        </button>
+                        <div class="flex flex-wrap gap-2 self-start sm:self-auto">
+                            <button type="button" id="btn-export-backup" class="bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 font-bold px-3.5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition">
+                                <i class="fas fa-file-export text-emerald-600"></i> Export Backup
+                            </button>
+                            <label class="bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 font-bold px-3.5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-95 transition">
+                                <i class="fas fa-file-import text-blue-600"></i> Restore
+                                <input type="file" id="input-import-backup" accept=".json,application/json" class="hidden">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Search & Filter Bar -->
+                    <div class="ios-card rounded-3xl p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                        <div class="relative flex-1">
+                            <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                            <input type="text" id="saved-search-input" placeholder="Search by product name, SKU, link, or type..." class="w-full ios-input rounded-xl pl-9 pr-3.5 py-2.5 text-xs font-semibold">
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" data-saved-filter="all" class="filter-pill active px-3.5 py-2 rounded-xl text-xs font-bold transition">All</button>
+                            <button type="button" data-saved-filter="qr" class="filter-pill px-3.5 py-2 rounded-xl text-xs font-bold transition">QR Codes</button>
+                            <button type="button" data-saved-filter="barcode" class="filter-pill px-3.5 py-2 rounded-xl text-xs font-bold transition">Barcodes</button>
+                        </div>
                     </div>
 
                     <div id="saved-qr-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
@@ -815,7 +972,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Recent Activity</h1>
-                            <p class="text-xs sm:text-sm text-gray-500">History of generated, downloaded, and scanned QR codes.</p>
+                            <p class="text-xs sm:text-sm text-gray-500">History of generated, downloaded, and saved QR &amp; barcodes.</p>
                         </div>
                         <button type="button" id="btn-clear-activity" class="text-xs font-bold text-red-600 hover:bg-red-50 px-3 py-2 rounded-xl transition">
                             Clear History
@@ -832,7 +989,11 @@
         <nav class="lg:hidden fixed bottom-0 left-0 right-0 ios-glass border-t border-gray-200/80 px-2 py-1.5 z-40 flex items-center justify-around">
             <button type="button" data-nav-tab="generator" class="mobile-nav-item active flex flex-col items-center py-1 px-2">
                 <span class="nav-icon-pill w-9 h-7 rounded-full flex items-center justify-center text-sm mb-0.5 transition"><i class="fas fa-qrcode"></i></span>
-                <span class="text-[10px] font-bold">Create</span>
+                <span class="text-[10px] font-bold">QR</span>
+            </button>
+            <button type="button" data-nav-tab="barcode" class="mobile-nav-item flex flex-col items-center py-1 px-2">
+                <span class="nav-icon-pill w-9 h-7 rounded-full flex items-center justify-center text-sm mb-0.5 transition"><i class="fas fa-barcode"></i></span>
+                <span class="text-[10px] font-bold">Barcode</span>
             </button>
             <button type="button" data-nav-tab="vcard" class="mobile-nav-item flex flex-col items-center py-1 px-2">
                 <span class="nav-icon-pill w-9 h-7 rounded-full flex items-center justify-center text-sm mb-0.5 transition"><i class="fas fa-id-card"></i></span>
@@ -842,17 +1003,9 @@
                 <span class="nav-icon-pill w-9 h-7 rounded-full flex items-center justify-center text-sm mb-0.5 transition"><i class="fas fa-rupee-sign"></i></span>
                 <span class="text-[10px] font-bold">UPI</span>
             </button>
-            <button type="button" data-nav-tab="scanner" class="mobile-nav-item flex flex-col items-center py-1 px-2">
-                <span class="nav-icon-pill w-9 h-7 rounded-full flex items-center justify-center text-sm mb-0.5 transition"><i class="fas fa-expand"></i></span>
-                <span class="text-[10px] font-bold">Scan</span>
-            </button>
             <button type="button" data-nav-tab="saved" class="mobile-nav-item flex flex-col items-center py-1 px-2">
                 <span class="nav-icon-pill w-9 h-7 rounded-full flex items-center justify-center text-sm mb-0.5 transition"><i class="fas fa-bookmark"></i></span>
                 <span class="text-[10px] font-bold">Saved</span>
-            </button>
-            <button type="button" data-nav-tab="activity" class="mobile-nav-item flex flex-col items-center py-1 px-2">
-                <span class="nav-icon-pill w-9 h-7 rounded-full flex items-center justify-center text-sm mb-0.5 transition"><i class="fas fa-history"></i></span>
-                <span class="text-[10px] font-bold">Logs</span>
             </button>
         </nav>
     </div>
@@ -883,20 +1036,111 @@
         var currentQrPayload = "https://bikripage.github.io/Online/";
         var qrCenterLogoDataUrl = "";
         var cardLogoDataUrl = "";
+        var currentCardTheme = "classic";
         var publicVCardData = null;
         var showFieldErrors = false;
         var isPreviewModeFromEditor = false;
 
-        var videoStream = null;
-        var scanAnimFrame = null;
-        var isScanning = false;
-        var torchEnabled = false;
+        // Barcode & Bulk State
+        var currentBcFormat = "CODE128";
+        var currentBcValid = true;
+        var bulkGeneratedItems = [];
+
+        // Saved Filter State
+        var currentSavedFilter = "all";
+
+        // Distinct aesthetic themes with unique layout geometry, surfaces, accents & typography feel
+        var cardThemes = {
+            classic: {
+                label: "Minimal Light",
+                screenBg: "from-[#EEF2FF] via-[#F5F5F7] to-[#FFFFFF]",
+                cardBg: "#FFFFFF",
+                cardText: "#111827",
+                subText: "#6B7280",
+                accentText: "#2563EB",
+                bannerGrad: "from-[#1D1D1F] via-[#2B2D42] to-[#0071E3]",
+                bannerHeight: "h-32",
+                logoShape: "rounded-[1.75rem]",
+                logoInnerShape: "rounded-[1.4rem]",
+                primaryBtn: "bg-[#1D1D1F] hover:bg-black text-white rounded-2xl",
+                linkBg: "#F7F7F9",
+                linkBorder: "rgba(229,231,235,0.7)",
+                linkRadius: "rounded-2xl"
+            },
+            midnight: {
+                label: "Midnight Dark",
+                screenBg: "from-[#020617] via-[#0B1120] to-[#172554]",
+                cardBg: "#0B1120",
+                cardText: "#F8FAFC",
+                subText: "#94A3B8",
+                accentText: "#38BDF8",
+                bannerGrad: "from-[#0369A1] via-[#1E40AF] to-[#312E81]",
+                bannerHeight: "h-28",
+                logoShape: "rounded-full",
+                logoInnerShape: "rounded-full",
+                primaryBtn: "bg-gradient-to-r from-sky-400 to-blue-600 text-slate-950 rounded-full",
+                linkBg: "#111C33",
+                linkBorder: "rgba(56,189,248,0.22)",
+                linkRadius: "rounded-full"
+            },
+            emerald: {
+                label: "Emerald Pro",
+                screenBg: "from-[#D1FAE5] via-[#ECFDF5] to-[#FFFFFF]",
+                cardBg: "#FFFFFF",
+                cardText: "#064E3B",
+                subText: "#4B5563",
+                accentText: "#059669",
+                bannerGrad: "from-[#064E3B] via-[#047857] to-[#10B981]",
+                bannerHeight: "h-36",
+                logoShape: "rounded-3xl rotate-3",
+                logoInnerShape: "rounded-2xl",
+                primaryBtn: "bg-[#059669] hover:bg-[#047857] text-white rounded-xl",
+                linkBg: "#ECFDF5",
+                linkBorder: "rgba(16,185,129,0.25)",
+                linkRadius: "rounded-xl"
+            },
+            royal: {
+                label: "Royal Sunset",
+                screenBg: "from-[#FCE7F3] via-[#F3E8FF] to-[#FFFFFF]",
+                cardBg: "#FFFDFD",
+                cardText: "#2E1065",
+                subText: "#6B7280",
+                accentText: "#C026D3",
+                bannerGrad: "from-[#581C87] via-[#A21CAF] to-[#DB2777]",
+                bannerHeight: "h-32",
+                logoShape: "rounded-[2.25rem]",
+                logoInnerShape: "rounded-[1.85rem]",
+                primaryBtn: "bg-gradient-to-r from-purple-700 via-fuchsia-600 to-pink-600 text-white rounded-2xl",
+                linkBg: "#FDF4FF",
+                linkBorder: "rgba(217,70,239,0.22)",
+                linkRadius: "rounded-3xl"
+            }
+        };
 
         var qrTypeConfigs = {
             url: {
                 heading: "Enter Website URL",
                 fields: [
                     { id: "fld-url", label: "Website or Link *", type: "url", placeholder: "https://example.com", defaultVal: "https://bikripage.github.io/Online/" }
+                ]
+            },
+            multilink: {
+                heading: "Social Bio / Multi-Link Hub QR",
+                fields: [
+                    { id: "fld-ml-title", label: "Brand / Page Name *", type: "text", placeholder: "e.g. Netaji Jhadu Store" },
+                    { id: "fld-ml-bio", label: "Short Tagline", type: "text", placeholder: "Wholesale & Retail Supplier" },
+                    { id: "fld-ml-wa", label: "WhatsApp Number (with 91)", type: "tel", placeholder: "919876543210" },
+                    { id: "fld-ml-ig", label: "Instagram Username or Link", type: "text", placeholder: "@username" },
+                    { id: "fld-ml-yt", label: "YouTube Channel / Video Link", type: "url", placeholder: "https://youtube.com/@channel" },
+                    { id: "fld-ml-web", label: "Website / Catalog Link", type: "url", placeholder: "https://bikripage.github.io/Online/" },
+                    { id: "fld-ml-maps", label: "Google Maps Location Link", type: "url", placeholder: "https://maps.google.com/?q=..." }
+                ]
+            },
+            youtube: {
+                heading: "YouTube Video / Channel QR",
+                fields: [
+                    { id: "fld-yt-url", label: "YouTube Video, Shorts, or Channel URL *", type: "url", placeholder: "https://www.youtube.com/watch?v=... or @handle" },
+                    { id: "fld-yt-start", label: "Start Video At (Optional — Seconds or mm:ss)", type: "text", placeholder: "e.g. 90 or 1:30 (leave blank for start)" }
                 ]
             },
             whatsapp: {
@@ -974,7 +1218,73 @@
             }
         };
 
-        // Compact Base64URL encoding for ultra-short, clean QR codes
+        var bcFormatMeta = {
+            CODE128: {
+                heading: "Enter SKU / Barcode Number",
+                placeholder: "e.g. SKU-1001 or ITEM2026",
+                hint: "Supports letters, numbers, and symbols (-, _, /). Best for shop inventory & price tags.",
+                sample: "SKU-1001"
+            },
+            EAN13: {
+                heading: "Enter 12 or 13 Digits (EAN-13)",
+                placeholder: "e.g. 8901063370074 (12 digits auto-calculates check digit)",
+                hint: "Enter 12 digits (13th check digit is added automatically) or a valid 13-digit retail EAN code.",
+                sample: "890106337007"
+            },
+            UPC: {
+                heading: "Enter 11 or 12 Digits (UPC-A)",
+                placeholder: "e.g. 012345678905",
+                hint: "Enter 11 digits (12th check digit is calculated automatically) or a valid 12-digit UPC code.",
+                sample: "01234567890"
+            },
+            CODE39: {
+                heading: "Enter Warehouse / Asset Code",
+                placeholder: "e.g. BOX-409",
+                hint: "Supports uppercase letters (A-Z), numbers (0-9), space, and - . $ / + %.",
+                sample: "BOX-409"
+            },
+            EAN8: {
+                heading: "Enter 7 or 8 Digits (EAN-8)",
+                placeholder: "e.g. 96385074",
+                hint: "Compact 8-digit retail barcode for small packets. Enter 7 or 8 digits.",
+                sample: "9638507"
+            }
+        };
+
+        function parseStartTimeToSeconds(raw) {
+            var s = (raw || "").trim();
+            if (!s) return 0;
+            if (/^\d+$/.test(s)) return parseInt(s, 10);
+            var parts = s.split(":");
+            if (parts.length === 2 && /^\d+$/.test(parts[0]) && /^\d+$/.test(parts[1])) {
+                return (parseInt(parts[0], 10) * 60) + parseInt(parts[1], 10);
+            }
+            if (parts.length === 3 && /^\d+$/.test(parts[0]) && /^\d+$/.test(parts[1]) && /^\d+$/.test(parts[2])) {
+                return (parseInt(parts[0], 10) * 3600) + (parseInt(parts[1], 10) * 60) + parseInt(parts[2], 10);
+            }
+            return 0;
+        }
+
+        function appendYouTubeStartParam(urlStr, sec) {
+            if (!sec || sec <= 0) return urlStr;
+            try {
+                var u = new URL(urlStr);
+                if (u.hostname.indexOf("youtu.be") !== -1) {
+                    u.searchParams.set("t", String(sec));
+                    return u.toString();
+                }
+                if (u.pathname.indexOf("/shorts/") !== -1) {
+                    u.searchParams.set("t", String(sec));
+                    return u.toString();
+                }
+                u.searchParams.set("t", sec + "s");
+                return u.toString();
+            } catch (e) {
+                var sep = urlStr.indexOf("?") === -1 ? "?" : "&";
+                return urlStr + sep + "t=" + sec + "s";
+            }
+        }
+
         function toBase64Url(str) {
             var bytes = new TextEncoder().encode(str);
             var binStr = "";
@@ -996,7 +1306,6 @@
         }
 
         function encodeCompactCard(data) {
-            // Short keys keep the QR code small and crisp even offline
             var mini = [
                 data.shopName || "",
                 data.ownerName || "",
@@ -1007,7 +1316,10 @@
                 data.website || "",
                 data.address || "",
                 data.mapsUrl || "",
-                data.description || ""
+                data.description || "",
+                data.theme || "classic",
+                data.youtube || "",
+                data.kind || "vcard"
             ];
             return toBase64Url(JSON.stringify(mini));
         }
@@ -1026,6 +1338,9 @@
                     address: parsed[7] || "",
                     mapsUrl: parsed[8] || "",
                     description: parsed[9] || "",
+                    theme: parsed[10] || "classic",
+                    youtube: parsed[11] || "",
+                    kind: parsed[12] || "vcard",
                     logo: ""
                 };
             }
@@ -1034,7 +1349,8 @@
 
         function escapeHtml(str) {
             return String(str || "").replace(/[&<>"']/g, function (m) {
-                return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[m];
+                var map = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+                return map[m];
             });
         }
 
@@ -1056,10 +1372,6 @@
         }
 
         function switchTab(tabName) {
-            if (tabName !== "scanner" && isScanning) {
-                stopCameraScanner();
-            }
-
             document.querySelectorAll(".tab-panel").forEach(function (p) {
                 p.classList.add("hidden");
             });
@@ -1070,20 +1382,14 @@
                 btn.classList.toggle("active", btn.getAttribute("data-nav-tab") === tabName);
             });
 
-            if (tabName === "scanner") {
-                var autoStartEl = document.getElementById("scanner-auto-start-toggle");
-                if (!autoStartEl || autoStartEl.checked) {
-                    setTimeout(function () {
-                        if (!isScanning) startCameraScanner();
-                    }, 120);
-                }
-            }
+            if (tabName === "barcode") renderLiveBarcode();
             if (tabName === "vcard") renderDigitalCardQr();
             if (tabName === "upi") renderUpiQr();
             if (tabName === "saved") renderSavedQrCodes();
             if (tabName === "activity") renderActivityFeed();
         }
 
+        // -------------------- QR GENERATOR LOGIC --------------------
         function selectQrType(type) {
             currentQrType = type;
             showFieldErrors = false;
@@ -1091,6 +1397,11 @@
             document.querySelectorAll(".qr-type-pill").forEach(function (btn) {
                 btn.classList.toggle("active", btn.getAttribute("data-qrtype") === type);
             });
+
+            var mlPreviewBtn = document.getElementById("btn-preview-multilink");
+            if (mlPreviewBtn) {
+                mlPreviewBtn.classList.toggle("hidden", type !== "multilink");
+            }
 
             var cfg = qrTypeConfigs[type];
             document.getElementById("qr-form-heading").textContent = cfg.heading;
@@ -1127,6 +1438,28 @@
             renderLiveQr();
         }
 
+        function getMultiLinkHubData() {
+            var val = function (id) {
+                var el = document.getElementById(id);
+                return el ? el.value.trim() : "";
+            };
+            return {
+                shopName: val("fld-ml-title") || "My Link Hub",
+                ownerName: "Quick Links Hub",
+                phone: "",
+                whatsapp: val("fld-ml-wa"),
+                instagram: val("fld-ml-ig"),
+                youtube: val("fld-ml-yt"),
+                facebook: "",
+                website: val("fld-ml-web"),
+                address: "",
+                mapsUrl: val("fld-ml-maps"),
+                description: val("fld-ml-bio"),
+                theme: "royal",
+                kind: "multilink"
+            };
+        }
+
         function buildPayloadFromCurrentType() {
             var val = function (id) {
                 var el = document.getElementById(id);
@@ -1141,6 +1474,22 @@
                 else {
                     if (!/^https?:\/\//i.test(u)) u = "https://" + u;
                     payload = u;
+                }
+            } else if (currentQrType === "multilink") {
+                var mlTitle = val("fld-ml-title");
+                if (!mlTitle) { error = "Enter your Brand or Page Name."; }
+                else {
+                    var baseUrl = window.location.href.split("?")[0].split("#")[0];
+                    var token = encodeCompactCard(getMultiLinkHubData());
+                    payload = baseUrl + "?c=" + token;
+                }
+            } else if (currentQrType === "youtube") {
+                var yt = val("fld-yt-url");
+                var startSec = parseStartTimeToSeconds(val("fld-yt-start"));
+                if (!yt) { error = "Enter a YouTube URL or @channel handle."; }
+                else {
+                    var fullYt = /^https?:\/\//i.test(yt) ? yt : "https://youtube.com/" + (yt.startsWith("@") ? yt : "@" + yt);
+                    payload = appendYouTubeStartParam(fullYt, startSec);
                 }
             } else if (currentQrType === "whatsapp") {
                 var p = val("fld-wa-phone").replace(/\D/g, "");
@@ -1267,8 +1616,7 @@
                 return;
             }
 
-            // Use Level L for long URLs without logos to keep QR modules large and crisp, Level H only when center logo is present
-            var ecLevel = logoUrl ? "H" : (options.ecLevel || "M");
+            var ecLevel = logoUrl ? "H" : (options.ecLevel || (text.length > 160 ? "L" : "M"));
             var qr = qrcode(0, ecLevel);
             qr.addData(text || "https://bikripage.github.io/Online/");
             qr.make();
@@ -1427,7 +1775,7 @@
                 link.download = "BikriPage-QR-" + currentQrType + "-" + Date.now() + ".png";
                 link.href = exportCanvas.toDataURL("image/png");
                 link.click();
-                logActivity("Downloaded PNG", currentQrType.toUpperCase() + " QR exported as PNG");
+                logActivity("Downloaded QR PNG", currentQrType.toUpperCase() + " QR exported as PNG");
                 showToast("PNG downloaded!");
             }, 140);
         }
@@ -1469,11 +1817,389 @@
             link.href = url;
             link.click();
             URL.revokeObjectURL(url);
-            logActivity("Downloaded SVG", currentQrType.toUpperCase() + " vector SVG downloaded");
+            logActivity("Downloaded QR SVG", currentQrType.toUpperCase() + " vector SVG downloaded");
             showToast("SVG vector downloaded!");
         }
 
-        // -------------------- DIGITAL VISITING CARD (ULTRA-CLEAN SHORT QR) --------------------
+        // -------------------- BARCODE GENERATOR (SINGLE + BULK) --------------------
+        function switchBarcodeMode(mode) {
+            var singleBtn = document.getElementById("btn-bc-mode-single");
+            var bulkBtn = document.getElementById("btn-bc-mode-bulk");
+            var singleWs = document.getElementById("bc-single-workspace");
+            var bulkWs = document.getElementById("bc-bulk-workspace");
+
+            if (mode === "bulk") {
+                bulkBtn.className = "px-3.5 py-2 rounded-xl text-xs font-bold bg-[#1D1D1F] text-white transition";
+                singleBtn.className = "px-3.5 py-2 rounded-xl text-xs font-bold text-gray-600 hover:text-gray-900 transition";
+                singleWs.classList.add("hidden");
+                bulkWs.classList.remove("hidden");
+            } else {
+                singleBtn.className = "px-3.5 py-2 rounded-xl text-xs font-bold bg-[#1D1D1F] text-white transition";
+                bulkBtn.className = "px-3.5 py-2 rounded-xl text-xs font-bold text-gray-600 hover:text-gray-900 transition";
+                bulkWs.classList.add("hidden");
+                singleWs.classList.remove("hidden");
+                renderLiveBarcode();
+            }
+        }
+
+        function selectBarcodeFormat(fmt) {
+            currentBcFormat = fmt;
+            document.querySelectorAll(".bc-type-pill").forEach(function (btn) {
+                btn.classList.toggle("active", btn.getAttribute("data-bcformat") === fmt);
+            });
+            var meta = bcFormatMeta[fmt] || bcFormatMeta.CODE128;
+            document.getElementById("bc-form-heading").textContent = meta.heading;
+            document.getElementById("bc-value-input").placeholder = meta.placeholder;
+            document.getElementById("bc-format-hint").textContent = meta.hint;
+            document.getElementById("bc-active-badge").textContent = fmt;
+
+            var curVal = document.getElementById("bc-value-input").value.trim();
+            if (!curVal) {
+                document.getElementById("bc-value-input").value = meta.sample;
+            }
+            renderLiveBarcode();
+        }
+
+        function generateRandomBarcodeValue(fmt) {
+            if (fmt === "EAN13") {
+                var base = "890" + String(Math.floor(100000000 + Math.random() * 900000000));
+                return base.substring(0, 12);
+            } else if (fmt === "UPC") {
+                return String(Math.floor(10000000000 + Math.random() * 89999999999));
+            } else if (fmt === "EAN8") {
+                return String(Math.floor(1000000 + Math.random() * 8999999));
+            } else if (fmt === "CODE39") {
+                return "ITEM-" + Math.floor(1000 + Math.random() * 9000);
+            } else {
+                return "SKU-" + Math.floor(10000 + Math.random() * 90000);
+            }
+        }
+
+        function renderBarcodeOnCanvas(canvas, value, options) {
+            if (!canvas) return false;
+            options = options || {};
+            var fmt = options.format || "CODE128";
+            var fg = options.fg || "#111827";
+            var bg = options.bg || "#FFFFFF";
+            var height = options.height || 75;
+            var displayValue = options.displayValue !== false;
+            var width = options.barWidth || 2;
+
+            if (typeof JsBarcode === "undefined") return false;
+
+            try {
+                JsBarcode(canvas, value, {
+                    format: fmt,
+                    lineColor: fg,
+                    background: bg,
+                    width: width,
+                    height: height,
+                    displayValue: displayValue,
+                    font: "Inter, monospace",
+                    fontOptions: "bold",
+                    fontSize: 15,
+                    margin: 12
+                });
+                return true;
+            } catch (err) {
+                return false;
+            }
+        }
+
+        function renderLiveBarcode() {
+            var val = document.getElementById("bc-value-input").value.trim();
+            var fg = document.getElementById("bc-fg-color").value;
+            var bg = document.getElementById("bc-bg-color").value;
+            var height = parseInt(document.getElementById("bc-height-range").value, 10) || 75;
+            var showText = document.getElementById("bc-show-text").checked;
+            var title = document.getElementById("bc-product-title").value.trim();
+            var price = document.getElementById("bc-price-tag").value.trim();
+
+            document.getElementById("bc-fg-hex").textContent = fg.toUpperCase();
+            document.getElementById("bc-bg-hex").textContent = bg.toUpperCase();
+            document.getElementById("bc-height-val").textContent = height + "px";
+
+            var sticker = document.getElementById("bc-sticker-preview");
+            var titleEl = document.getElementById("bc-preview-title");
+            var priceEl = document.getElementById("bc-preview-price");
+            sticker.style.backgroundColor = bg;
+            titleEl.style.color = fg;
+            priceEl.style.color = fg;
+
+            if (title) {
+                titleEl.textContent = title;
+                titleEl.classList.remove("hidden");
+            } else {
+                titleEl.classList.add("hidden");
+            }
+
+            if (price) {
+                priceEl.textContent = price;
+                priceEl.classList.remove("hidden");
+            } else {
+                priceEl.classList.add("hidden");
+            }
+
+            var errBox = document.getElementById("bc-validation-msg");
+            var canvas = document.getElementById("main-barcode-canvas");
+
+            if (!val) {
+                errBox.querySelector("span").textContent = "Please enter barcode data or click Auto-Generate Code.";
+                errBox.classList.remove("hidden");
+                currentBcValid = false;
+                return;
+            }
+
+            var ok = renderBarcodeOnCanvas(canvas, val, {
+                format: currentBcFormat,
+                fg: fg,
+                bg: bg,
+                height: height,
+                displayValue: showText,
+                barWidth: 2
+            });
+
+            if (!ok) {
+                var hint = (bcFormatMeta[currentBcFormat] && bcFormatMeta[currentBcFormat].hint) || "Invalid input for selected barcode format.";
+                errBox.querySelector("span").textContent = "Invalid format for " + currentBcFormat + ". " + hint;
+                errBox.classList.remove("hidden");
+                currentBcValid = false;
+            } else {
+                errBox.classList.add("hidden");
+                currentBcValid = true;
+                document.getElementById("bc-encoded-preview").textContent = val;
+            }
+        }
+
+        function buildCustomBarcodeExportCanvas(val, fmt, fg, bg, heightPx, showText, title, price, scaleMultiplier) {
+            var rawCanvas = document.createElement("canvas");
+            var ok = renderBarcodeOnCanvas(rawCanvas, val, {
+                format: fmt,
+                fg: fg,
+                bg: bg,
+                height: heightPx * scaleMultiplier,
+                displayValue: showText,
+                barWidth: 2 * scaleMultiplier
+            });
+            if (!ok) return null;
+
+            var pad = 18 * scaleMultiplier;
+            var titleH = title ? (24 * scaleMultiplier) : 0;
+            var priceH = price ? (22 * scaleMultiplier) : 0;
+            var outW = Math.max(rawCanvas.width + pad * 2, 240 * scaleMultiplier);
+            var outH = rawCanvas.height + pad * 2 + titleH + priceH;
+
+            var out = document.createElement("canvas");
+            out.width = outW;
+            out.height = outH;
+            var ctx = out.getContext("2d");
+
+            ctx.fillStyle = bg;
+            ctx.fillRect(0, 0, outW, outH);
+
+            ctx.fillStyle = fg;
+            ctx.textAlign = "center";
+
+            if (title) {
+                ctx.font = "800 " + (14 * scaleMultiplier) + "px Inter, sans-serif";
+                ctx.fillText(title, outW / 2, pad + (13 * scaleMultiplier));
+            }
+
+            var bx = (outW - rawCanvas.width) / 2;
+            ctx.drawImage(rawCanvas, bx, pad + titleH);
+
+            if (price) {
+                ctx.font = "700 " + (12 * scaleMultiplier) + "px Inter, sans-serif";
+                ctx.fillText(price, outW / 2, pad + titleH + rawCanvas.height + (15 * scaleMultiplier));
+            }
+
+            return out;
+        }
+
+        function buildBarcodeExportCanvas(scaleMultiplier) {
+            return buildCustomBarcodeExportCanvas(
+                document.getElementById("bc-value-input").value.trim(),
+                currentBcFormat,
+                document.getElementById("bc-fg-color").value,
+                document.getElementById("bc-bg-color").value,
+                parseInt(document.getElementById("bc-height-range").value, 10) || 75,
+                document.getElementById("bc-show-text").checked,
+                document.getElementById("bc-product-title").value.trim(),
+                document.getElementById("bc-price-tag").value.trim(),
+                scaleMultiplier
+            );
+        }
+
+        function downloadBarcodePng() {
+            if (!currentBcValid) {
+                showToast("Fix barcode input before downloading", "error");
+                return;
+            }
+            var val = document.getElementById("bc-value-input").value.trim();
+            var exportCanvas = buildBarcodeExportCanvas(2);
+            var link = document.createElement("a");
+            link.download = "Barcode-" + currentBcFormat + "-" + val.replace(/[^a-zA-Z0-9_-]/g, "") + ".png";
+            link.href = exportCanvas.toDataURL("image/png");
+            link.click();
+            logActivity("Downloaded Barcode PNG", currentBcFormat + " (" + val + ") exported");
+            showToast("Barcode Label PNG downloaded!");
+        }
+
+        function downloadBarcodeSvg() {
+            if (!currentBcValid) {
+                showToast("Fix barcode input before downloading", "error");
+                return;
+            }
+            var val = document.getElementById("bc-value-input").value.trim();
+            var fg = document.getElementById("bc-fg-color").value;
+            var bg = document.getElementById("bc-bg-color").value;
+            var height = parseInt(document.getElementById("bc-height-range").value, 10) || 75;
+            var showText = document.getElementById("bc-show-text").checked;
+
+            var svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            JsBarcode(svgEl, val, {
+                format: currentBcFormat,
+                lineColor: fg,
+                background: bg,
+                width: 2,
+                height: height,
+                displayValue: showText,
+                font: "Inter, monospace",
+                fontOptions: "bold",
+                fontSize: 15,
+                margin: 12
+            });
+
+            var serializer = new XMLSerializer();
+            var svgStr = '<?xml version="1.0" encoding="UTF-8"?>' + serializer.serializeToString(svgEl);
+            var blob = new Blob([svgStr], { type: "image/svg+xml;charset=utf-8" });
+            var url = URL.createObjectURL(blob);
+            var link = document.createElement("a");
+            link.download = "Barcode-" + currentBcFormat + "-" + val.replace(/[^a-zA-Z0-9_-]/g, "") + ".svg";
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+            logActivity("Downloaded Barcode SVG", currentBcFormat + " (" + val + ") vector SVG");
+            showToast("Barcode SVG downloaded!");
+        }
+
+        function openPrintWindowWithImages(imgDataUrls) {
+            var labelsHtml = imgDataUrls.map(function (src) {
+                return '<div class="cell"><img src="' + src + '" /></div>';
+            }).join("");
+
+            var win = window.open("", "_blank");
+            if (!win) {
+                showToast("Please allow popups to print sticker sheet", "error");
+                return;
+            }
+            win.document.write(
+                '<!DOCTYPE html><html><head><title>Print Barcode Labels</title>' +
+                '<style>' +
+                '@page { size: A4; margin: 10mm; }' +
+                'body { margin: 0; font-family: sans-serif; }' +
+                '.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }' +
+                '.cell { border: 1px dashed #cbd5e1; padding: 8px; display: flex; align-items: center; justify-content: center; border-radius: 6px; page-break-inside: avoid; }' +
+                '.cell img { max-width: 100%; max-height: 95px; height: auto; }' +
+                '</style></head><body><div class="grid">' + labelsHtml + '</div>' +
+                '<script>window.onload = function() { setTimeout(function(){ window.print(); }, 250); };<\/script>' +
+                '</body></html>'
+            );
+            win.document.close();
+        }
+
+        function printBarcodeStickerSheet() {
+            if (!currentBcValid) {
+                showToast("Fix barcode input before printing", "error");
+                return;
+            }
+            var exportCanvas = buildBarcodeExportCanvas(2);
+            var dataUrl = exportCanvas.toDataURL("image/png");
+            var arr = [];
+            for (var i = 0; i < 24; i++) arr.push(dataUrl);
+            openPrintWindowWithImages(arr);
+            logActivity("Printed Sticker Sheet", "24 labels generated for printing");
+        }
+
+        function generateBulkBarcodes() {
+            var raw = document.getElementById("bulk-bc-textarea").value.trim();
+            if (!raw) {
+                showToast("Enter at least one barcode line", "error");
+                return;
+            }
+            var lines = raw.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+            var grid = document.getElementById("bulk-bc-results-grid");
+            bulkGeneratedItems = [];
+            var validCount = 0;
+
+            grid.innerHTML = lines.map(function (line, idx) {
+                var parts = line.split("|").map(function (p) { return p.trim(); });
+                var code = parts[0] || "";
+                var title = parts[1] || "";
+                var price = parts[2] || "";
+                var canvas = buildCustomBarcodeExportCanvas(code, currentBcFormat, "#111827", "#FFFFFF", 65, true, title, price, 2);
+                if (!canvas) {
+                    return '<div class="ios-card rounded-2xl p-4 border-red-200 bg-red-50/50 text-xs font-bold text-red-600">' +
+                        '<i class="fas fa-exclamation-triangle mr-1"></i> Invalid ' + currentBcFormat + ': ' + escapeHtml(code) + '</div>';
+                }
+                validCount++;
+                var dataUrl = canvas.toDataURL("image/png");
+                bulkGeneratedItems.push({
+                    code: code,
+                    title: title || (currentBcFormat + " • " + code),
+                    price: price || code,
+                    format: currentBcFormat,
+                    dataUrl: dataUrl
+                });
+                return '<div class="ios-card rounded-2xl p-4 flex flex-col items-center justify-between gap-2 text-center">' +
+                    '<img src="' + dataUrl + '" class="max-h-28 w-auto object-contain rounded-lg border border-gray-100">' +
+                    '<div class="w-full flex items-center justify-between pt-2 border-t border-gray-100">' +
+                    '<span class="text-[11px] font-mono font-bold text-gray-700 truncate">' + escapeHtml(code) + '</span>' +
+                    '<a href="' + dataUrl + '" download="Label-' + escapeHtml(code) + '.png" class="text-[11px] font-bold text-blue-600 hover:underline"><i class="fas fa-download"></i> PNG</a>' +
+                    '</div></div>';
+            }).join("");
+
+            var printBtn = document.getElementById("btn-print-bulk-sheet");
+            var saveAllBtn = document.getElementById("btn-save-all-bulk");
+            if (validCount > 0) {
+                printBtn.classList.remove("hidden");
+                saveAllBtn.classList.remove("hidden");
+                logActivity("Bulk Barcodes Generated", validCount + " " + currentBcFormat + " labels created");
+                showToast(validCount + " barcodes generated!");
+            } else {
+                printBtn.classList.add("hidden");
+                saveAllBtn.classList.add("hidden");
+                showToast("No valid codes matched " + currentBcFormat, "error");
+            }
+        }
+
+        // -------------------- DIGITAL VISITING CARD & MULTI-LINK HUB --------------------
+        function applyCardThemeSelection(themeKey, persistToStorage) {
+            currentCardTheme = cardThemes[themeKey] ? themeKey : "classic";
+            var th = cardThemes[currentCardTheme];
+
+            var tagEl = document.getElementById("editor-active-theme-tag");
+            if (tagEl) tagEl.textContent = "Theme: " + th.label;
+
+            document.querySelectorAll(".preview-theme-chip").forEach(function (chip) {
+                chip.classList.toggle("active", chip.getAttribute("data-prev-theme") === currentCardTheme);
+            });
+
+            if (persistToStorage) {
+                try {
+                    var saved = JSON.parse(localStorage.getItem(STORAGE_CARD_KEY)) || {};
+                    saved.theme = currentCardTheme;
+                    localStorage.setItem(STORAGE_CARD_KEY, JSON.stringify(saved));
+                } catch (e) {}
+            }
+
+            updateDigitalCardLive();
+            if (publicVCardData) {
+                publicVCardData.theme = currentCardTheme;
+                openPublicCardView(publicVCardData, isPreviewModeFromEditor);
+            }
+        }
+
         function loadDigitalCard() {
             var saved = null;
             try { saved = JSON.parse(localStorage.getItem(STORAGE_CARD_KEY)); } catch (e) {}
@@ -1483,14 +2209,14 @@
             document.getElementById("dc-phone").value = (saved && saved.phone) || "";
             document.getElementById("dc-whatsapp").value = (saved && saved.whatsapp) || "";
             document.getElementById("dc-instagram").value = (saved && saved.instagram) || "";
+            document.getElementById("dc-youtube").value = (saved && saved.youtube) || "";
             document.getElementById("dc-facebook").value = (saved && saved.facebook) || "";
             document.getElementById("dc-website").value = (saved && saved.website) || "";
             document.getElementById("dc-address").value = (saved && saved.address) || "";
             document.getElementById("dc-maps-url").value = (saved && saved.mapsUrl) || "";
             document.getElementById("dc-description").value = (saved && saved.description) || "";
             cardLogoDataUrl = (saved && saved.logo) || "";
-
-            updateDigitalCardLive();
+            applyCardThemeSelection((saved && saved.theme) || "classic", false);
         }
 
         function getDigitalCardObject(includeLogo) {
@@ -1499,6 +2225,7 @@
             var phone = document.getElementById("dc-phone").value.trim();
             var whatsapp = document.getElementById("dc-whatsapp").value.trim() || phone;
             var instagram = document.getElementById("dc-instagram").value.trim();
+            var youtube = document.getElementById("dc-youtube").value.trim();
             var facebook = document.getElementById("dc-facebook").value.trim();
             var website = document.getElementById("dc-website").value.trim();
             var address = document.getElementById("dc-address").value.trim();
@@ -1511,22 +2238,23 @@
                 phone: phone,
                 whatsapp: whatsapp,
                 instagram: instagram,
+                youtube: youtube,
                 facebook: facebook,
                 website: website,
                 address: address,
                 mapsUrl: mapsUrl,
                 description: description,
+                theme: currentCardTheme,
+                kind: "vcard",
                 logo: includeLogo ? cardLogoDataUrl : ""
             };
         }
 
         function buildDigitalCardShareUrl() {
             var baseUrl = window.location.href.split("?")[0].split("#")[0];
-            // When Firebase is ready, use ultra-short ?cid=DEVICE_ID (~60 chars total -> low-density QR!)
             if (firebaseReady && db) {
                 return baseUrl + "?cid=" + encodeURIComponent(DEVICE_ID);
             }
-            // Offline fallback: compact array encoding with Error Correction L
             var compactToken = encodeCompactCard(getDigitalCardObject(false));
             return baseUrl + "?c=" + compactToken;
         }
@@ -1534,9 +2262,17 @@
         function updateDigitalCardLive() {
             var data = getDigitalCardObject(true);
             var initials = data.shopName.substring(0, 2).toUpperCase();
+            var th = cardThemes[data.theme] || cardThemes.classic;
+
+            document.getElementById("mini-dc-theme-label").textContent = th.label;
+            var miniBox = document.getElementById("mini-dc-card-box");
+            miniBox.style.backgroundColor = th.cardBg;
+            miniBox.style.color = th.cardText;
 
             document.getElementById("mini-dc-shop").textContent = data.shopName;
-            document.getElementById("mini-dc-owner").textContent = data.ownerName;
+            var miniOwner = document.getElementById("mini-dc-owner");
+            miniOwner.textContent = data.ownerName;
+            miniOwner.style.color = th.accentText;
             document.getElementById("mini-dc-desc").textContent = data.description || "Your business tagline appears here.";
 
             var logoPreview = document.getElementById("dc-logo-preview");
@@ -1566,7 +2302,6 @@
         function renderDigitalCardQr() {
             var url = buildDigitalCardShareUrl();
             var canvas = document.getElementById("vcard-qr-canvas");
-            // Do NOT cover Visiting Card QR with center logo & use Level L so modules are super clean and fast to scan
             drawQrOnCanvas(canvas, url, { fg: "#1D1D1F", bg: "#FFFFFF", ecLevel: "L" });
         }
 
@@ -1580,11 +2315,13 @@
                     phone: data.phone,
                     whatsapp: data.whatsapp,
                     instagram: data.instagram,
+                    youtube: data.youtube || "",
                     facebook: data.facebook,
                     website: data.website,
                     address: data.address,
                     mapsUrl: data.mapsUrl,
                     description: data.description,
+                    theme: data.theme || "classic",
                     logo: data.logo || "",
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
@@ -1598,59 +2335,110 @@
             await syncDigitalCardToFirebase(data);
 
             renderDigitalCardQr();
-            logActivity("Saved Digital Card", "Updated visiting card for " + data.shopName);
+            logActivity("Saved Digital Card", "Updated visiting card (" + (cardThemes[data.theme] || cardThemes.classic).label + ")");
             showToast("Digital Visiting Card saved!");
         }
 
         function openPublicCardView(data, fromEditorPreview) {
             isPreviewModeFromEditor = !!fromEditorPreview;
             publicVCardData = data;
+            var th = cardThemes[data.theme] || cardThemes.classic;
+            var isMultiLinkHub = data.kind === "multilink";
 
             document.getElementById("studio-app-shell").classList.add("hidden");
-            document.getElementById("public-vcard-screen").classList.remove("hidden");
+            var screen = document.getElementById("public-vcard-screen");
+            screen.className = "min-h-screen bg-gradient-to-b " + th.screenBg + " py-6 px-4 flex flex-col items-center justify-center transition-colors duration-300";
+
             document.getElementById("public-card-loading").classList.add("hidden");
-            document.getElementById("public-card-container").classList.remove("hidden");
+            var container = document.getElementById("public-card-container");
+            container.classList.remove("hidden");
+            container.style.backgroundColor = th.cardBg;
+            container.style.color = th.cardText;
+            container.style.borderColor = th.linkBorder;
+
+            var banner = document.getElementById("pub-card-banner");
+            banner.className = th.bannerHeight + " bg-gradient-to-r " + th.bannerGrad + " relative transition-all duration-300";
+
+            document.getElementById("pub-badge-label").textContent = isMultiLinkHub ? "Multi-Link Hub" : "Verified Profile";
+            document.getElementById("pub-share-label").textContent = isMultiLinkHub ? "Share Link Hub" : "Share Visiting Card";
+
+            var logoFrame = document.getElementById("pub-logo-frame");
+            logoFrame.className = "w-28 h-28 mx-auto " + th.logoShape + " p-1.5 shadow-lg border transition-all duration-300";
+            logoFrame.style.backgroundColor = th.cardBg;
+            logoFrame.style.borderColor = th.linkBorder;
 
             var previewBackBar = document.getElementById("preview-top-back-bar");
             if (previewBackBar) {
                 previewBackBar.classList.toggle("hidden", !isPreviewModeFromEditor);
                 previewBackBar.classList.toggle("flex", !!isPreviewModeFromEditor);
             }
+            document.getElementById("pub-theme-badge").textContent = th.label;
 
-            document.getElementById("pub-card-shop").textContent = data.shopName || "Business Card";
-            document.getElementById("pub-card-owner").textContent = data.ownerName || "";
-            document.getElementById("pub-card-desc").textContent = data.description || "";
+            var shopEl = document.getElementById("pub-card-shop");
+            shopEl.textContent = data.shopName || "Business Name";
+            shopEl.style.color = th.cardText;
+
+            var ownerEl = document.getElementById("pub-card-owner");
+            ownerEl.textContent = data.ownerName || "";
+            ownerEl.style.color = th.accentText;
+
+            var descEl = document.getElementById("pub-card-desc");
+            descEl.textContent = data.description || "";
+            descEl.style.color = th.subText;
+
+            var vcfBtn = document.getElementById("btn-download-public-vcf");
+            vcfBtn.className = "col-span-2 " + th.primaryBtn + " font-bold py-3.5 px-4 shadow-md flex items-center justify-center gap-2 active:scale-95 transition text-sm";
 
             var logoImg = document.getElementById("pub-card-logo");
             var logoInit = document.getElementById("pub-card-initials");
+            logoImg.className = "w-full h-full object-cover " + th.logoInnerShape + (data.logo ? "" : " hidden");
+            logoInit.className = "w-full h-full " + th.logoInnerShape + " bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-black text-3xl flex items-center justify-center" + (data.logo ? " hidden" : "");
+
             if (data.logo) {
                 logoImg.src = data.logo;
-                logoImg.classList.remove("hidden");
-                logoInit.classList.add("hidden");
             } else {
-                logoImg.classList.add("hidden");
-                logoInit.classList.remove("hidden");
-                logoInit.textContent = (data.shopName || "QR").substring(0, 2).toUpperCase();
+                logoInit.textContent = isMultiLinkHub ? "LH" : (data.shopName || "QR").substring(0, 2).toUpperCase();
             }
 
             var cleanPhone = (data.phone || "").replace(/\D/g, "");
-            var cleanWa = (data.whatsapp || data.phone || "").replace(/\D/g, "");
+            var cleanWa = (data.whatsapp || "").replace(/\D/g, "");
+            var contactActionsEl = document.getElementById("pub-contact-actions");
 
-            var callBtn = document.getElementById("pub-btn-call");
-            if (cleanPhone) {
-                callBtn.href = "tel:" + (cleanPhone.length === 10 ? "+91" + cleanPhone : "+" + cleanPhone);
-                callBtn.classList.remove("hidden");
-            } else {
+            if (isMultiLinkHub) {
+                vcfBtn.classList.add("hidden");
+                var callBtn = document.getElementById("pub-btn-call");
                 callBtn.classList.add("hidden");
-            }
-
-            var waBtn = document.getElementById("pub-btn-wa");
-            if (cleanWa) {
-                var waNum = cleanWa.length === 10 ? "91" + cleanWa : cleanWa;
-                waBtn.href = "https://wa.me/" + waNum + "?text=" + encodeURIComponent("Hi " + (data.shopName || "") + ", I scanned your Digital Visiting Card!");
-                waBtn.classList.remove("hidden");
+                var waBtn = document.getElementById("pub-btn-wa");
+                if (cleanWa) {
+                    var waNum = cleanWa.length === 10 ? "91" + cleanWa : cleanWa;
+                    waBtn.href = "https://wa.me/" + waNum + "?text=" + encodeURIComponent("Hi " + (data.shopName || "") + ", opening from your Link Hub!");
+                    waBtn.className = "col-span-2 " + th.primaryBtn + " font-bold py-3.5 px-4 shadow-md flex items-center justify-center gap-2 text-sm transition active:scale-95";
+                    waBtn.classList.remove("hidden");
+                    contactActionsEl.classList.remove("hidden");
+                } else {
+                    contactActionsEl.classList.add("hidden");
+                }
             } else {
-                waBtn.classList.add("hidden");
+                vcfBtn.classList.remove("hidden");
+                contactActionsEl.classList.remove("hidden");
+                var callBtn2 = document.getElementById("pub-btn-call");
+                if (cleanPhone) {
+                    callBtn2.href = "tel:" + (cleanPhone.length === 10 ? "+91" + cleanPhone : "+" + cleanPhone);
+                    callBtn2.className = "bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold py-3 px-4 " + th.linkRadius + " flex items-center justify-center gap-2 text-sm transition active:scale-95";
+                    callBtn2.classList.remove("hidden");
+                } else {
+                    callBtn2.classList.add("hidden");
+                }
+
+                var waBtn2 = document.getElementById("pub-btn-wa");
+                if (cleanWa) {
+                    var waNum2 = cleanWa.length === 10 ? "91" + cleanWa : cleanWa;
+                    waBtn2.href = "https://wa.me/" + waNum2 + "?text=" + encodeURIComponent("Hi " + (data.shopName || "") + ", I scanned your Digital Visiting Card!");
+                    waBtn2.className = "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold py-3 px-4 " + th.linkRadius + " flex items-center justify-center gap-2 text-sm transition active:scale-95";
+                    waBtn2.classList.remove("hidden", "col-span-2");
+                } else {
+                    waBtn2.classList.add("hidden");
+                }
             }
 
             var linksContainer = document.getElementById("pub-links-list");
@@ -1660,32 +2448,46 @@
                 var igUrl = /^https?:\/\//i.test(data.instagram) ? data.instagram : "https://instagram.com/" + data.instagram.replace(/^@/, "");
                 links.push({ label: "Follow on Instagram", sub: data.instagram, href: igUrl, icon: "fab fa-instagram", color: "text-pink-600 bg-pink-50" });
             }
+            if (data.youtube) {
+                var ytUrl = /^https?:\/\//i.test(data.youtube) ? data.youtube : "https://youtube.com/" + (data.youtube.startsWith("@") ? data.youtube : "@" + data.youtube);
+                links.push({ label: "Watch on YouTube", sub: data.youtube, href: ytUrl, icon: "fab fa-youtube", color: "text-red-600 bg-red-50" });
+            }
             if (data.facebook) {
                 var fbUrl = /^https?:\/\//i.test(data.facebook) ? data.facebook : "https://facebook.com/" + data.facebook.replace(/^@/, "");
                 links.push({ label: "Visit Facebook Page", sub: data.facebook, href: fbUrl, icon: "fab fa-facebook", color: "text-blue-600 bg-blue-50" });
             }
             if (data.website) {
                 var webUrl = /^https?:\/\//i.test(data.website) ? data.website : "https://" + data.website;
-                links.push({ label: "Visit Website", sub: data.website, href: webUrl, icon: "fas fa-globe", color: "text-indigo-600 bg-indigo-50" });
+                links.push({ label: "Visit Website / Catalog", sub: data.website, href: webUrl, icon: "fas fa-globe", color: "text-indigo-600 bg-indigo-50" });
             }
 
             linksContainer.innerHTML = links.map(function (l) {
-                return '<a href="' + escapeHtml(l.href) + '" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-3.5 rounded-2xl bg-[#F7F7F9] hover:bg-gray-100 border border-gray-200/70 transition">' +
+                return '<a href="' + escapeHtml(l.href) + '" target="_blank" rel="noopener noreferrer" style="background-color:' + th.linkBg + ';border-color:' + th.linkBorder + ';" class="flex items-center justify-between p-3.5 ' + th.linkRadius + ' border transition hover:opacity-90">' +
                     '<div class="flex items-center gap-3 min-w-0">' +
                     '<div class="w-10 h-10 rounded-xl ' + l.color + ' flex items-center justify-center text-lg shrink-0"><i class="' + l.icon + '"></i></div>' +
-                    '<div class="min-w-0"><p class="text-xs font-extrabold text-gray-900">' + escapeHtml(l.label) + '</p>' +
-                    '<p class="text-[11px] text-gray-500 truncate">' + escapeHtml(l.sub) + '</p></div></div>' +
-                    '<i class="fas fa-chevron-right text-xs text-gray-400"></i></a>';
+                    '<div class="min-w-0"><p class="text-xs font-extrabold" style="color:' + th.cardText + ';">' + escapeHtml(l.label) + '</p>' +
+                    '<p class="text-[11px] truncate" style="color:' + th.subText + ';">' + escapeHtml(l.sub) + '</p></div></div>' +
+                    '<i class="fas fa-chevron-right text-xs opacity-50"></i></a>';
             }).join("");
 
             var addrBox = document.getElementById("pub-address-box");
             if (data.address || data.mapsUrl) {
                 addrBox.classList.remove("hidden");
-                document.getElementById("pub-card-address").textContent = data.address || "Open in Google Maps";
+                addrBox.className = "mt-5 p-4 " + th.linkRadius + " border text-left";
+                addrBox.style.backgroundColor = th.linkBg;
+                addrBox.style.borderColor = th.linkBorder;
+                var addrText = document.getElementById("pub-card-address");
+                addrText.textContent = data.address || "Open in Google Maps";
+                addrText.style.color = th.cardText;
                 document.getElementById("pub-btn-maps").href = data.mapsUrl || "https://maps.google.com/?q=" + encodeURIComponent(data.address);
             } else {
                 addrBox.classList.add("hidden");
             }
+
+            var shareBtn = document.getElementById("btn-share-public-card");
+            shareBtn.className = "mt-6 w-full py-3 " + th.linkRadius + " border font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95";
+            shareBtn.style.borderColor = th.linkBorder;
+            shareBtn.style.color = th.cardText;
         }
 
         function returnFromPublicCard() {
@@ -1695,7 +2497,7 @@
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
             if (isPreviewModeFromEditor) {
-                switchTab("vcard");
+                switchTab(publicVCardData && publicVCardData.kind === "multilink" ? "generator" : "vcard");
             }
         }
 
@@ -1732,7 +2534,7 @@
         function initUpiSection() {
             var savedUpi = localStorage.getItem(STORAGE_UPI_KEY) || "";
             if (savedUpi) document.getElementById("upi-id-input").value = savedUpi;
-            document.getElementById("upi-payee-input").value = "BikriPage QR Studio";
+            document.getElementById("upi-payee-input").value = "BikriPage Studio";
             document.getElementById("upi-amount-input").value = "100";
             renderUpiQr();
         }
@@ -1786,232 +2588,6 @@
             drawQrOnCanvas(canvas, targetUri, { fg: "#111827", bg: "#FFFFFF" });
         }
 
-        // -------------------- ADVANCED QR SCANNER WITH AUTO-REDIRECT --------------------
-        async function startCameraScanner() {
-            var errAlert = document.getElementById("scanner-error-alert");
-            var errText = document.getElementById("scanner-error-text");
-            errAlert.classList.add("hidden");
-
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                errText.textContent = "Camera API is not supported on this browser or requires HTTPS / localhost. You can still upload a QR image below.";
-                errAlert.classList.remove("hidden");
-                return;
-            }
-
-            try {
-                stopCameraScanner();
-                var selectedDeviceId = document.getElementById("camera-select").value;
-                var constraints = {
-                    video: selectedDeviceId
-                        ? { deviceId: { exact: selectedDeviceId }, width: { ideal: 640, max: 960 }, height: { ideal: 480, max: 720 }, frameRate: { ideal: 30, max: 30 } }
-                        : { facingMode: { ideal: "environment" }, width: { ideal: 640, max: 960 }, height: { ideal: 480, max: 720 }, frameRate: { ideal: 30, max: 30 } }
-                };
-
-                videoStream = await navigator.mediaDevices.getUserMedia(constraints);
-                var video = document.getElementById("scanner-video");
-                video.srcObject = videoStream;
-                await video.play();
-
-                video.classList.remove("hidden");
-                document.getElementById("scanner-overlay").classList.remove("hidden");
-                document.getElementById("scanner-placeholder").classList.add("hidden");
-                document.getElementById("start-cam-btn").classList.add("hidden");
-                document.getElementById("stop-cam-btn").classList.remove("hidden");
-
-                // Check flashlight (torch) support
-                var track = videoStream.getVideoTracks()[0];
-                if (track && track.getCapabilities && track.getCapabilities().torch) {
-                    document.getElementById("torch-cam-btn").classList.remove("hidden");
-                } else {
-                    document.getElementById("torch-cam-btn").classList.add("hidden");
-                }
-
-                var devices = await navigator.mediaDevices.enumerateDevices();
-                var videoInputs = devices.filter(function (d) { return d.kind === "videoinput"; });
-                var camSelect = document.getElementById("camera-select");
-                if (videoInputs.length > 1) {
-                    camSelect.innerHTML = videoInputs.map(function (d, idx) {
-                        return '<option value="' + d.deviceId + '"' + (d.deviceId === selectedDeviceId ? " selected" : "") + '>' + escapeHtml(d.label || "Camera " + (idx + 1)) + '</option>';
-                    }).join("");
-                    camSelect.classList.remove("hidden");
-                }
-
-                isScanning = true;
-                tickCameraScan();
-            } catch (err) {
-                errText.textContent = "Camera permission denied or unavailable (" + err.message + "). Allow camera access or upload a QR image.";
-                errAlert.classList.remove("hidden");
-            }
-        }
-
-        function stopCameraScanner() {
-            isScanning = false;
-            torchEnabled = false;
-            if (scanAnimFrame) cancelAnimationFrame(scanAnimFrame);
-            if (videoStream) {
-                videoStream.getTracks().forEach(function (t) { t.stop(); });
-                videoStream = null;
-            }
-            var video = document.getElementById("scanner-video");
-            video.classList.add("hidden");
-            document.getElementById("scanner-overlay").classList.add("hidden");
-            document.getElementById("scanner-placeholder").classList.remove("hidden");
-            document.getElementById("start-cam-btn").classList.remove("hidden");
-            document.getElementById("stop-cam-btn").classList.add("hidden");
-            document.getElementById("torch-cam-btn").classList.add("hidden");
-        }
-
-        var lastScanDecodeTime = 0;
-        var scanWorkCanvas = document.createElement("canvas");
-        scanWorkCanvas.width = 480;
-        scanWorkCanvas.height = 480;
-        var scanWorkCtx = scanWorkCanvas.getContext("2d", { willReadFrequently: true });
-
-        function tickCameraScan() {
-            if (!isScanning) return;
-            var video = document.getElementById("scanner-video");
-            var now = performance.now();
-
-            // Decode at ~12 fps on a lightweight 480x480 frame while video preview stays 100% smooth
-            if (video.readyState === video.HAVE_ENOUGH_DATA && typeof jsQR !== "undefined" && (now - lastScanDecodeTime) >= 80) {
-                lastScanDecodeTime = now;
-                var vw = video.videoWidth;
-                var vh = video.videoHeight;
-                var side = Math.min(vw, vh);
-                var sx = (vw - side) / 2;
-                var sy = (vh - side) / 2;
-
-                scanWorkCtx.drawImage(video, sx, sy, side, side, 0, 0, 480, 480);
-                var imgData = scanWorkCtx.getImageData(0, 0, 480, 480);
-                var code = jsQR(imgData.data, 480, 480, { inversionAttempts: "dontInvert" });
-
-                if (code && code.data) {
-                    if (navigator.vibrate) {
-                        try { navigator.vibrate(120); } catch (e) {}
-                    }
-                    stopCameraScanner();
-                    handleDetectedQrContent(code.data, "Camera Scan");
-                    return;
-                }
-            }
-            scanAnimFrame = requestAnimationFrame(tickCameraScan);
-        }
-
-        function handleDetectedQrContent(rawText, source) {
-            document.getElementById("scan-empty-state").classList.add("hidden");
-            document.getElementById("scan-result-box").classList.remove("hidden");
-            document.getElementById("scan-raw-output").textContent = rawText;
-
-            var badge = document.getElementById("scan-type-badge");
-            var actions = document.getElementById("scan-smart-actions");
-            var redirectBanner = document.getElementById("scan-redirect-banner");
-            var redirectMsg = document.getElementById("scan-redirect-msg");
-
-            badge.classList.remove("hidden");
-            redirectBanner.classList.add("hidden");
-            actions.innerHTML = "";
-
-            var detectedType = "TEXT";
-            var autoRedirect = document.getElementById("scanner-auto-redirect-toggle").checked;
-            var isDigitalCardUrl = false;
-            var redirectTargetUrl = "";
-
-            // Check if scanned QR is a BikriPage Digital Visiting Card URL
-            try {
-                if (/^https?:\/\//i.test(rawText)) {
-                    var parsedUrl = new URL(rawText);
-                    var cid = parsedUrl.searchParams.get("cid");
-                    var cTok = parsedUrl.searchParams.get("c") || parsedUrl.searchParams.get("card");
-                    if (cid || cTok) {
-                        isDigitalCardUrl = true;
-                        detectedType = "DIGITAL CARD";
-                        redirectTargetUrl = rawText;
-                    }
-                }
-            } catch (e) {}
-
-            if (isDigitalCardUrl) {
-                actions.innerHTML = '<button type="button" id="btn-open-scanned-card" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-id-card"></i> Open Digital Visiting Card</button>';
-                setTimeout(function () {
-                    var btn = document.getElementById("btn-open-scanned-card");
-                    if (btn) btn.addEventListener("click", function () {
-                        loadCardFromUrlString(rawText);
-                    });
-                }, 0);
-            } else if (/^upi:\/\/pay/i.test(rawText)) {
-                detectedType = "UPI PAYMENT";
-                redirectTargetUrl = rawText;
-                actions.innerHTML = '<a href="' + escapeHtml(rawText) + '" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-rupee-sign"></i> Open in UPI App</a>';
-            } else if (/^https?:\/\/wa\.me\//i.test(rawText)) {
-                detectedType = "WHATSAPP";
-                redirectTargetUrl = rawText;
-                actions.innerHTML = '<a href="' + escapeHtml(rawText) + '" target="_blank" rel="noopener noreferrer" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fab fa-whatsapp text-sm"></i> Open WhatsApp Chat</a>';
-            } else if (/^https?:\/\//i.test(rawText)) {
-                detectedType = "WEBSITE LINK";
-                redirectTargetUrl = rawText;
-                actions.innerHTML = '<a href="' + escapeHtml(rawText) + '" target="_blank" rel="noopener noreferrer" class="w-full bg-[#0071E3] hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-external-link-alt"></i> Open Website Link</a>';
-            } else if (/^tel:/i.test(rawText)) {
-                detectedType = "PHONE NUMBER";
-                redirectTargetUrl = rawText;
-                actions.innerHTML = '<a href="' + escapeHtml(rawText) + '" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-phone-alt"></i> Call Number</a>';
-            } else if (/^mailto:/i.test(rawText)) {
-                detectedType = "EMAIL";
-                redirectTargetUrl = rawText;
-                actions.innerHTML = '<a href="' + escapeHtml(rawText) + '" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-envelope"></i> Send Email</a>';
-            } else if (/^BEGIN:VCARD/i.test(rawText)) {
-                detectedType = "CONTACT CARD";
-                actions.innerHTML = '<button type="button" id="btn-save-scanned-vcf" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-address-book"></i> Save Contact (.vcf)</button>';
-                setTimeout(function () {
-                    var btn = document.getElementById("btn-save-scanned-vcf");
-                    if (btn) btn.addEventListener("click", function () {
-                        var blob = new Blob([rawText], { type: "text/vcard;charset=utf-8" });
-                        var url = URL.createObjectURL(blob);
-                        var a = document.createElement("a");
-                        a.href = url;
-                        a.download = "Scanned-Contact-" + Date.now() + ".vcf";
-                        a.click();
-                        URL.revokeObjectURL(url);
-                    });
-                }, 0);
-            }
-
-            badge.textContent = detectedType;
-            logActivity(source, "Scanned " + detectedType + ": " + rawText.substring(0, 48));
-
-            // Instant Direct Redirect when enabled
-            if (autoRedirect && redirectTargetUrl) {
-                redirectBanner.classList.remove("hidden");
-                redirectMsg.textContent = "Opening " + detectedType + "...";
-                showToast("Opening " + detectedType + "...");
-                setTimeout(function () {
-                    if (isDigitalCardUrl) {
-                        loadCardFromUrlString(redirectTargetUrl);
-                    } else {
-                        window.location.href = redirectTargetUrl;
-                    }
-                }, 350);
-            } else {
-                showToast("QR Code detected (" + detectedType + ")");
-            }
-        }
-
-        async function loadCardFromUrlString(urlStr) {
-            try {
-                var u = new URL(urlStr);
-                var cid = u.searchParams.get("cid");
-                var cTok = u.searchParams.get("c") || u.searchParams.get("card");
-
-                if (cid) {
-                    await openCardByCloudId(cid);
-                } else if (cTok) {
-                    var decoded = decodeCompactCard(cTok);
-                    openPublicCardView(decoded, false);
-                }
-            } catch (e) {
-                window.location.href = urlStr;
-            }
-        }
-
         async function openCardByCloudId(cid) {
             document.getElementById("studio-app-shell").classList.add("hidden");
             document.getElementById("public-vcard-screen").classList.remove("hidden");
@@ -2028,7 +2604,6 @@
                 } catch (err) {}
             }
 
-            // Fallback to local saved card if same device
             try {
                 var localSaved = JSON.parse(localStorage.getItem(STORAGE_CARD_KEY));
                 if (localSaved) {
@@ -2039,10 +2614,10 @@
 
             document.getElementById("public-card-loading").innerHTML =
                 '<p class="text-sm font-bold text-red-600 mb-3">Card not found or offline.</p>' +
-                '<button type="button" onclick="returnFromPublicCard()" class="bg-gray-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl">Open QR Studio</button>';
+                '<button type="button" onclick="returnFromPublicCard()" class="bg-gray-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl">Open Studio</button>';
         }
 
-        // -------------------- SAVED QR CODES & RECENT ACTIVITY --------------------
+        // -------------------- SAVED CODES (SEARCH, FILTER & JSON BACKUP) --------------------
         function getSavedQrList() {
             try { return JSON.parse(localStorage.getItem(STORAGE_SAVED_KEY)) || []; } catch (e) { return []; }
         }
@@ -2051,10 +2626,12 @@
             localStorage.setItem(STORAGE_SAVED_KEY, JSON.stringify(list));
         }
 
-        async function saveQrRecord(item) {
+        async function saveQrRecord(item, silent) {
             var record = {
-                id: "qr_" + Date.now(),
+                id: "qr_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
                 deviceId: DEVICE_ID,
+                kind: item.kind || "qr",
+                bcFormat: item.bcFormat || "CODE128",
                 type: item.type,
                 title: item.title,
                 caption: item.caption,
@@ -2074,46 +2651,72 @@
                 } catch (e) {}
             }
 
-            renderSavedQrCodes();
-            logActivity("Saved QR Code", 'Saved "' + record.title + '" (' + record.type.toUpperCase() + ")");
-            showToast("Saved to My QR Codes!");
+            if (!silent) {
+                renderSavedQrCodes();
+                logActivity("Saved Code", 'Saved "' + record.title + '" (' + record.type.toUpperCase() + ")");
+                showToast("Saved to My Codes!");
+            }
         }
 
         function renderSavedQrCodes() {
-            var list = getSavedQrList();
+            var allList = getSavedQrList();
             var sidebarBadge = document.getElementById("sidebar-saved-count");
             var headerBadge = document.getElementById("header-saved-count");
-            if (sidebarBadge) sidebarBadge.textContent = list.length;
-            if (headerBadge) headerBadge.textContent = list.length;
+            if (sidebarBadge) sidebarBadge.textContent = allList.length;
+            if (headerBadge) headerBadge.textContent = allList.length;
 
             var grid = document.getElementById("saved-qr-grid");
             if (!grid) return;
 
-            if (list.length === 0) {
+            var query = (document.getElementById("saved-search-input") ? document.getElementById("saved-search-input").value : "").trim().toLowerCase();
+            var filtered = allList.filter(function (item) {
+                var kind = item.kind || "qr";
+                if (currentSavedFilter !== "all" && kind !== currentSavedFilter) return false;
+                if (!query) return true;
+                return (item.title || "").toLowerCase().indexOf(query) !== -1 ||
+                       (item.caption || "").toLowerCase().indexOf(query) !== -1 ||
+                       (item.payload || "").toLowerCase().indexOf(query) !== -1 ||
+                       (item.type || "").toLowerCase().indexOf(query) !== -1;
+            });
+
+            if (filtered.length === 0) {
                 grid.innerHTML = '<div class="col-span-full ios-card rounded-3xl p-10 text-center">' +
                     '<div class="w-12 h-12 rounded-2xl bg-gray-100 text-gray-400 mx-auto flex items-center justify-center mb-3"><i class="fas fa-bookmark text-lg"></i></div>' +
-                    '<h3 class="text-sm font-extrabold text-gray-800">No Saved QR Codes Yet</h3>' +
-                    '<p class="text-xs text-gray-500 mt-1 max-w-xs mx-auto">Generate any QR code and click "Save to My QR Codes" to store and download it anytime.</p></div>';
+                    '<h3 class="text-sm font-extrabold text-gray-800">' + (allList.length === 0 ? "No Saved Codes Yet" : "No Matching Codes Found") + '</h3>' +
+                    '<p class="text-xs text-gray-500 mt-1 max-w-xs mx-auto">' + (allList.length === 0 ? 'Generate any QR code or Product Barcode and click "Save to My Codes" to store it here.' : 'Try clearing your search or changing the filter tab.') + '</p></div>';
                 return;
             }
 
-            grid.innerHTML = list.map(function (item) {
+            grid.innerHTML = filtered.map(function (item) {
+                var isBarcode = item.kind === "barcode";
+                var canvasDims = isBarcode ? 'width="220" height="90" class="max-w-full h-auto"' : 'width="150" height="150"';
                 return '<div class="ios-card rounded-3xl p-4 flex flex-col justify-between gap-3">' +
                     '<div class="flex items-start justify-between gap-2">' +
                     '<div class="min-w-0">' +
-                    '<span class="inline-block text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 mb-1">' + escapeHtml(item.type) + '</span>' +
+                    '<span class="inline-block text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full ' + (isBarcode ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-600') + ' mb-1">' + escapeHtml(item.type) + '</span>' +
                     '<h3 class="text-sm font-extrabold text-gray-900 truncate">' + escapeHtml(item.title) + '</h3>' +
                     '<p class="text-[11px] text-gray-500 truncate">' + escapeHtml(item.caption) + '</p></div>' +
                     '<button type="button" data-del-qr="' + item.id + '" class="w-7 h-7 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500 flex items-center justify-center transition" title="Delete"><i class="fas fa-trash-alt text-xs"></i></button></div>' +
-                    '<div class="p-3 rounded-2xl border border-gray-100 flex items-center justify-center" style="background-color: ' + item.bg + ';"><canvas id="saved-canvas-' + item.id + '" width="150" height="150"></canvas></div>' +
+                    '<div class="p-3 rounded-2xl border border-gray-100 flex items-center justify-center min-h-[150px]" style="background-color: ' + item.bg + ';"><canvas id="saved-canvas-' + item.id + '" ' + canvasDims + '></canvas></div>' +
                     '<div class="grid grid-cols-2 gap-2">' +
                     '<button type="button" data-dl-qr="' + item.id + '" class="bg-[#1D1D1F] hover:bg-black text-white font-bold py-2 rounded-xl text-[11px] flex items-center justify-center gap-1.5"><i class="fas fa-download"></i> PNG</button>' +
                     '<button type="button" data-cp-qr="' + item.id + '" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2 rounded-xl text-[11px] flex items-center justify-center gap-1.5"><i class="fas fa-copy"></i> Copy</button></div></div>';
             }).join("");
 
-            list.forEach(function (item) {
+            filtered.forEach(function (item) {
                 var c = document.getElementById("saved-canvas-" + item.id);
-                if (c) drawQrOnCanvas(c, item.payload, { fg: item.fg, bg: item.bg });
+                if (!c) return;
+                if (item.kind === "barcode") {
+                    renderBarcodeOnCanvas(c, item.payload, {
+                        format: item.bcFormat || "CODE128",
+                        fg: item.fg,
+                        bg: item.bg,
+                        height: 55,
+                        barWidth: 1.6
+                    });
+                } else {
+                    drawQrOnCanvas(c, item.payload, { fg: item.fg, bg: item.bg });
+                }
             });
 
             grid.querySelectorAll("[data-del-qr]").forEach(function (btn) {
@@ -2121,7 +2724,7 @@
                     var id = btn.getAttribute("data-del-qr");
                     setSavedQrList(getSavedQrList().filter(function (x) { return x.id !== id; }));
                     renderSavedQrCodes();
-                    showToast("Removed from saved QR codes");
+                    showToast("Removed from saved codes");
                 });
             });
 
@@ -2130,18 +2733,28 @@
                     var id = btn.getAttribute("data-dl-qr");
                     var item = getSavedQrList().find(function (x) { return x.id === id; });
                     if (!item) return;
-                    var c = document.createElement("canvas");
-                    c.width = 512;
-                    c.height = 512;
-                    drawQrOnCanvas(c, item.payload, { fg: item.fg, bg: item.bg });
-                    setTimeout(function () {
-                        var poster = generatePosterExportCanvas(c, item.bg, item.fg, item.title, item.caption);
+
+                    if (item.kind === "barcode") {
+                        var bcCanvas = buildCustomBarcodeExportCanvas(item.payload, item.bcFormat || "CODE128", item.fg, item.bg, 80, true, item.title, item.caption, 2);
                         var a = document.createElement("a");
                         a.download = item.title.replace(/\s+/g, "-") + ".png";
-                        a.href = poster.toDataURL("image/png");
+                        a.href = bcCanvas.toDataURL("image/png");
                         a.click();
-                        showToast("Saved QR downloaded!");
-                    }, 100);
+                        showToast("Saved Barcode downloaded!");
+                    } else {
+                        var c = document.createElement("canvas");
+                        c.width = 512;
+                        c.height = 512;
+                        drawQrOnCanvas(c, item.payload, { fg: item.fg, bg: item.bg });
+                        setTimeout(function () {
+                            var poster = generatePosterExportCanvas(c, item.bg, item.fg, item.title, item.caption);
+                            var a = document.createElement("a");
+                            a.download = item.title.replace(/\s+/g, "-") + ".png";
+                            a.href = poster.toDataURL("image/png");
+                            a.click();
+                            showToast("Saved QR downloaded!");
+                        }, 100);
+                    }
                 });
             });
 
@@ -2149,9 +2762,62 @@
                 btn.addEventListener("click", function () {
                     var id = btn.getAttribute("data-cp-qr");
                     var item = getSavedQrList().find(function (x) { return x.id === id; });
-                    if (item) navigator.clipboard.writeText(item.payload).then(function () { showToast("QR content copied!"); });
+                    if (item) navigator.clipboard.writeText(item.payload).then(function () { showToast("Content copied!"); });
                 });
             });
+        }
+
+        function exportStudioBackup() {
+            var backup = {
+                app: "BikriPage Studio Pro",
+                exportedAt: new Date().toISOString(),
+                savedCodes: getSavedQrList(),
+                digitalCard: JSON.parse(localStorage.getItem(STORAGE_CARD_KEY) || "null"),
+                upiId: localStorage.getItem(STORAGE_UPI_KEY) || ""
+            };
+            var blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement("a");
+            a.href = url;
+            a.download = "BikriPage-Studio-Backup-" + new Date().toISOString().slice(0, 10) + ".json";
+            a.click();
+            URL.revokeObjectURL(url);
+            logActivity("Exported JSON Backup", backup.savedCodes.length + " saved codes backed up");
+            showToast("Backup JSON downloaded!");
+        }
+
+        function importStudioBackup(file) {
+            var reader = new FileReader();
+            reader.onload = function (ev) {
+                try {
+                    var data = JSON.parse(ev.target.result);
+                    if (Array.isArray(data.savedCodes)) {
+                        var existing = getSavedQrList();
+                        var merged = data.savedCodes.concat(existing);
+                        var seen = {};
+                        var unique = merged.filter(function (item) {
+                            if (seen[item.id]) return false;
+                            seen[item.id] = true;
+                            return true;
+                        });
+                        setSavedQrList(unique);
+                    }
+                    if (data.digitalCard) {
+                        localStorage.setItem(STORAGE_CARD_KEY, JSON.stringify(data.digitalCard));
+                        loadDigitalCard();
+                    }
+                    if (data.upiId) {
+                        localStorage.setItem(STORAGE_UPI_KEY, data.upiId);
+                        initUpiSection();
+                    }
+                    renderSavedQrCodes();
+                    logActivity("Restored Backup", "Imported data from JSON backup");
+                    showToast("Backup restored successfully!");
+                } catch (err) {
+                    showToast("Invalid backup JSON file", "error");
+                }
+            };
+            reader.readAsText(file);
         }
 
         // -------------------- RECENT ACTIVITY --------------------
@@ -2175,7 +2841,7 @@
             if (!container) return;
 
             if (list.length === 0) {
-                container.innerHTML = '<div class="p-10 text-center"><p class="text-xs font-bold text-gray-600">No Recent Activity</p><p class="text-[11px] text-gray-400 mt-1">Your QR creations, downloads, and scans will appear here.</p></div>';
+                container.innerHTML = '<div class="p-10 text-center"><p class="text-xs font-bold text-gray-600">No Recent Activity</p><p class="text-[11px] text-gray-400 mt-1">Your QR &amp; barcode creations, downloads, and saves will appear here.</p></div>';
                 return;
             }
 
@@ -2205,12 +2871,12 @@
             }
 
             selectQrType("url");
+            selectBarcodeFormat("CODE128");
             loadDigitalCard();
             initUpiSection();
             renderSavedQrCodes();
             renderActivityFeed();
 
-            // Auto-sync current card to Firebase silently so ?cid= QR always works immediately
             syncDigitalCardToFirebase(getDigitalCardObject(true));
 
             document.querySelectorAll("[data-nav-tab]").forEach(function (btn) {
@@ -2219,10 +2885,16 @@
                 });
             });
 
+            // QR Events
             document.querySelectorAll(".qr-type-pill").forEach(function (btn) {
                 btn.addEventListener("click", function () {
                     selectQrType(btn.getAttribute("data-qrtype"));
                 });
+            });
+
+            document.getElementById("btn-preview-multilink").addEventListener("click", function () {
+                var hubData = getMultiLinkHubData();
+                openPublicCardView(hubData, true);
             });
 
             document.getElementById("btn-clear-qr-fields").addEventListener("click", function () {
@@ -2285,6 +2957,7 @@
                 var title = document.getElementById("qr-custom-title").value.trim() || (currentQrType.toUpperCase() + " QR");
                 var caption = document.getElementById("qr-custom-caption").value.trim() || currentQrPayload.substring(0, 32);
                 saveQrRecord({
+                    kind: "qr",
                     type: currentQrType,
                     title: title,
                     caption: caption,
@@ -2294,7 +2967,103 @@
                 });
             });
 
-            ["dc-shop-name", "dc-owner-name", "dc-phone", "dc-whatsapp", "dc-instagram", "dc-facebook", "dc-website", "dc-address", "dc-maps-url", "dc-description"].forEach(function (id) {
+            // Barcode & Bulk Events
+            document.getElementById("btn-bc-mode-single").addEventListener("click", function () { switchBarcodeMode("single"); });
+            document.getElementById("btn-bc-mode-bulk").addEventListener("click", function () { switchBarcodeMode("bulk"); });
+
+            document.querySelectorAll(".bc-type-pill").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    var fmt = btn.getAttribute("data-bcformat");
+                    document.getElementById("bc-value-input").value = (bcFormatMeta[fmt] && bcFormatMeta[fmt].sample) || "SKU-1001";
+                    selectBarcodeFormat(fmt);
+                });
+            });
+
+            document.getElementById("btn-random-bc").addEventListener("click", function () {
+                document.getElementById("bc-value-input").value = generateRandomBarcodeValue(currentBcFormat);
+                renderLiveBarcode();
+                showToast("Generated new " + currentBcFormat + " code");
+            });
+
+            ["bc-value-input", "bc-product-title", "bc-price-tag", "bc-fg-color", "bc-bg-color", "bc-height-range"].forEach(function (id) {
+                document.getElementById(id).addEventListener("input", renderLiveBarcode);
+            });
+            document.getElementById("bc-show-text").addEventListener("change", renderLiveBarcode);
+
+            document.getElementById("btn-copy-bc-val").addEventListener("click", function () {
+                var val = document.getElementById("bc-value-input").value.trim();
+                navigator.clipboard.writeText(val).then(function () {
+                    showToast("Barcode number copied!");
+                });
+            });
+            document.getElementById("btn-download-bc-png").addEventListener("click", downloadBarcodePng);
+            document.getElementById("btn-download-bc-svg").addEventListener("click", downloadBarcodeSvg);
+            document.getElementById("btn-print-bc-sheet").addEventListener("click", printBarcodeStickerSheet);
+            document.getElementById("btn-save-bc").addEventListener("click", function () {
+                if (!currentBcValid) {
+                    showToast("Fix barcode input before saving", "error");
+                    return;
+                }
+                var val = document.getElementById("bc-value-input").value.trim();
+                var title = document.getElementById("bc-product-title").value.trim() || (currentBcFormat + " • " + val);
+                var caption = document.getElementById("bc-price-tag").value.trim() || val;
+                saveQrRecord({
+                    kind: "barcode",
+                    bcFormat: currentBcFormat,
+                    type: currentBcFormat,
+                    title: title,
+                    caption: caption,
+                    payload: val,
+                    fg: document.getElementById("bc-fg-color").value,
+                    bg: document.getElementById("bc-bg-color").value
+                });
+            });
+
+            document.getElementById("btn-bulk-fill-sample").addEventListener("click", function () {
+                if (currentBcFormat === "EAN13") {
+                    document.getElementById("bulk-bc-textarea").value = "890106337001 | Phool Jhadu Gold | MRP ₹120\n890106337002 | Teeli Jhadu Pro | MRP ₹95\n890106337003 | Floor Wiper XL | MRP ₹180";
+                } else {
+                    document.getElementById("bulk-bc-textarea").value = "SKU-101 | Phool Jhadu Premium | MRP ₹120\nSKU-102 | Teeli Jhadu Heavy | MRP ₹95\nSKU-103 | Floor Wiper 18-inch | MRP ₹180\nSKU-104 | Dustpan Set | MRP ₹75";
+                }
+                generateBulkBarcodes();
+            });
+            document.getElementById("btn-generate-bulk-bc").addEventListener("click", generateBulkBarcodes);
+            document.getElementById("btn-print-bulk-sheet").addEventListener("click", function () {
+                if (bulkGeneratedItems.length === 0) return;
+                openPrintWindowWithImages(bulkGeneratedItems.map(function (x) { return x.dataUrl; }));
+                logActivity("Printed Bulk Sheet", bulkGeneratedItems.length + " custom labels printed");
+            });
+            document.getElementById("btn-save-all-bulk").addEventListener("click", async function () {
+                if (bulkGeneratedItems.length === 0) return;
+                for (var i = 0; i < bulkGeneratedItems.length; i++) {
+                    var item = bulkGeneratedItems[i];
+                    await saveQrRecord({
+                        kind: "barcode",
+                        bcFormat: item.format,
+                        type: item.format,
+                        title: item.title,
+                        caption: item.price,
+                        payload: item.code,
+                        fg: "#111827",
+                        bg: "#FFFFFF"
+                    }, true);
+                }
+                renderSavedQrCodes();
+                logActivity("Bulk Saved Codes", bulkGeneratedItems.length + " barcodes saved to library");
+                showToast(bulkGeneratedItems.length + " barcodes saved to My Codes!");
+            });
+
+            // Preview Theme Switcher Events (Inside Preview Screen)
+            document.querySelectorAll(".preview-theme-chip").forEach(function (chip) {
+                chip.addEventListener("click", function () {
+                    var tKey = chip.getAttribute("data-prev-theme");
+                    applyCardThemeSelection(tKey, true);
+                    syncDigitalCardToFirebase(getDigitalCardObject(true));
+                    showToast("Applied " + (cardThemes[tKey] ? cardThemes[tKey].label : tKey) + " theme");
+                });
+            });
+
+            ["dc-shop-name", "dc-owner-name", "dc-phone", "dc-whatsapp", "dc-instagram", "dc-youtube", "dc-facebook", "dc-website", "dc-address", "dc-maps-url", "dc-description"].forEach(function (id) {
                 document.getElementById(id).addEventListener("input", updateDigitalCardLive);
             });
 
@@ -2364,7 +3133,6 @@
 
             document.getElementById("btn-back-from-preview").addEventListener("click", returnFromPublicCard);
             document.getElementById("btn-exit-public-card").addEventListener("click", returnFromPublicCard);
-
             document.getElementById("btn-download-public-vcf").addEventListener("click", downloadPublicVCard);
 
             document.getElementById("btn-share-public-card").addEventListener("click", function () {
@@ -2377,8 +3145,15 @@
                 }
             });
 
+            // UPI Events
             ["upi-id-input", "upi-payee-input", "upi-amount-input", "upi-note-input"].forEach(function (id) {
                 document.getElementById(id).addEventListener("input", renderUpiQr);
+            });
+            document.querySelectorAll(".upi-quick-amt").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    document.getElementById("upi-amount-input").value = btn.getAttribute("data-upi-amt");
+                    renderUpiQr();
+                });
             });
 
             document.getElementById("btn-download-upi").addEventListener("click", function () {
@@ -2417,6 +3192,7 @@
                 var res = buildUpiUri();
                 if (!res) { showToast("Enter valid UPI details first", "error"); return; }
                 saveQrRecord({
+                    kind: "qr",
                     type: "upi",
                     title: "UPI ₹" + res.am + " • " + res.pn,
                     caption: res.pa,
@@ -2426,62 +3202,27 @@
                 });
             });
 
-            document.getElementById("start-cam-btn").addEventListener("click", startCameraScanner);
-            document.getElementById("stop-cam-btn").addEventListener("click", stopCameraScanner);
-            document.getElementById("torch-cam-btn").addEventListener("click", async function () {
-                if (!videoStream) return;
-                var track = videoStream.getVideoTracks()[0];
-                if (track && track.applyConstraints) {
-                    torchEnabled = !torchEnabled;
-                    try {
-                        await track.applyConstraints({ advanced: [{ torch: torchEnabled }] });
-                    } catch (e) {}
-                }
+            // Saved Search, Filter & Backup Events
+            document.getElementById("saved-search-input").addEventListener("input", renderSavedQrCodes);
+            document.querySelectorAll("[data-saved-filter]").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    currentSavedFilter = btn.getAttribute("data-saved-filter");
+                    document.querySelectorAll("[data-saved-filter]").forEach(function (b) {
+                        b.classList.toggle("active", b.getAttribute("data-saved-filter") === currentSavedFilter);
+                    });
+                    renderSavedQrCodes();
+                });
             });
-            document.getElementById("camera-select").addEventListener("change", function () {
-                if (isScanning) startCameraScanner();
-            });
-
-            document.getElementById("scanner-file-input").addEventListener("change", function (e) {
+            document.getElementById("btn-export-backup").addEventListener("click", exportStudioBackup);
+            document.getElementById("input-import-backup").addEventListener("change", function (e) {
                 var file = e.target.files[0];
-                if (!file) return;
-                var errAlert = document.getElementById("scanner-error-alert");
-                var errText = document.getElementById("scanner-error-text");
-                errAlert.classList.add("hidden");
-
-                var reader = new FileReader();
-                reader.onload = function (ev) {
-                    var img = new Image();
-                    img.onload = function () {
-                        var canvas = document.getElementById("scanner-hidden-canvas");
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        var ctx = canvas.getContext("2d");
-                        ctx.drawImage(img, 0, 0);
-                        var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                        var code = typeof jsQR !== "undefined" ? jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: "attemptBoth" }) : null;
-                        if (code && code.data) {
-                            handleDetectedQrContent(code.data, "Image Upload Scan");
-                        } else {
-                            errText.textContent = "No readable QR code found in the uploaded image. Try a clearer image.";
-                            errAlert.classList.remove("hidden");
-                        }
-                    };
-                    img.src = ev.target.result;
-                };
-                reader.readAsDataURL(file);
+                if (file) importStudioBackup(file);
                 e.target.value = "";
-            });
-
-            document.getElementById("btn-copy-scan").addEventListener("click", function () {
-                var raw = document.getElementById("scan-raw-output").textContent;
-                navigator.clipboard.writeText(raw).then(function () { showToast("Scanned content copied!"); });
             });
 
             var headerBackBtn = document.getElementById("btn-studio-header-back");
             if (headerBackBtn) {
                 headerBackBtn.addEventListener("click", function () {
-                    if (isScanning) stopCameraScanner();
                     if (window.history.length > 1) {
                         window.history.back();
                     } else {
@@ -2492,6 +3233,9 @@
 
             document.getElementById("btn-saved-create-new").addEventListener("click", function () {
                 switchTab("generator");
+            });
+            document.getElementById("btn-saved-create-bc").addEventListener("click", function () {
+                switchTab("barcode");
             });
 
             document.getElementById("btn-clear-activity").addEventListener("click", function () {

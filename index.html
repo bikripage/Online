@@ -110,11 +110,184 @@
             50% { filter: drop-shadow(0 0 6px rgba(255, 255, 255, 1)); }
         }
         .animate-lite-crown { animation: liteCrownShine 2s infinite ease-in-out; }
-/* Ye heavy sections ko tabhi render karega jab user wahan scroll karke pahuchega */
-#hero-content, #merchant-upgrade-plans {
-    content-visibility: auto;
-    contain-intrinsic-size: 800px;
-}
+        /* =========================================================
+           🍎 iOS MINIMALIST MOTION, SMOOTH SCROLL & LOADER SYSTEM
+           ========================================================= */
+        html {
+            scroll-behavior: smooth !important;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: auto;
+        }
+        body {
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y pinch-zoom;
+        }
+        /* Eliminate mobile scroll lag from heavy blur layers */
+        @media (max-width: 768px) {
+            header.backdrop-blur-md {
+                background-color: rgba(255, 255, 255, 0.94) !important;
+                backdrop-filter: saturate(180%) blur(10px) !important;
+                -webkit-backdrop-filter: saturate(180%) blur(10px) !important;
+            }
+            footer .backdrop-blur-2xl,
+            footer .backdrop-blur-xl {
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+            }
+            .blur-3xl, .blur-\[80px\], .blur-\[70px\] {
+                display: none !important;
+            }
+        }
+
+        /* 1. Apple 8-Blade Minimalist Activity Indicator */
+        @keyframes iosBladeFade {
+            0% { opacity: 1; }
+            100% { opacity: 0.16; }
+        }
+        .ios-spinner {
+            position: relative;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+        .ios-spinner.ios-spinner-sm {
+            width: 14px;
+            height: 14px;
+        }
+        .ios-spinner span {
+            position: absolute;
+            left: 50%;
+            top: 12%;
+            width: 1.7px;
+            height: 24%;
+            margin-left: -0.85px;
+            border-radius: 999px;
+            background: currentColor;
+            transform-origin: center 158%;
+            animation: iosBladeFade 0.8s linear infinite;
+        }
+        .ios-spinner span:nth-child(1) { transform: rotate(0deg); animation-delay: -0.7s; }
+        .ios-spinner span:nth-child(2) { transform: rotate(45deg); animation-delay: -0.6s; }
+        .ios-spinner span:nth-child(3) { transform: rotate(90deg); animation-delay: -0.5s; }
+        .ios-spinner span:nth-child(4) { transform: rotate(135deg); animation-delay: -0.4s; }
+        .ios-spinner span:nth-child(5) { transform: rotate(180deg); animation-delay: -0.3s; }
+        .ios-spinner span:nth-child(6) { transform: rotate(225deg); animation-delay: -0.2s; }
+        .ios-spinner span:nth-child(7) { transform: rotate(270deg); animation-delay: -0.1s; }
+        .ios-spinner span:nth-child(8) { transform: rotate(315deg); animation-delay: 0s; }
+
+        .ios-loader-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: #F5F5F7;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            color: #6E6E73;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        }
+
+        /* 2. Minimalist iOS Shimmer Skeleton Cards */
+        @keyframes iosShimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .ios-skeleton-card {
+            background: #FFFFFF;
+            border: 1px solid #F2F2F7;
+            border-radius: 22px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .ios-skel-avatar, .ios-skel-line, .ios-skel-btn {
+            background: linear-gradient(90deg, #F2F2F7 25%, #E5E5EA 50%, #F2F2F7 75%);
+            background-size: 200% 100%;
+            animation: iosShimmer 1.45s ease-in-out infinite;
+        }
+        .ios-skel-avatar { width: 56px; height: 56px; border-radius: 999px; }
+        .ios-skel-line { height: 11px; border-radius: 999px; }
+        .ios-skel-btn { width: 100%; height: 34px; border-radius: 12px; margin-top: 6px; }
+
+        /* 3. Smooth Scroll Reveal (No Instant Pop-in on Scroll!) */
+        .bp-scroll-hidden {
+            opacity: 0;
+            transform: translate3d(0, 34px, 0) scale(0.965);
+            will-change: transform, opacity;
+        }
+        .bp-scroll-visible {
+            opacity: 1;
+            transform: translate3d(0, 0, 0) scale(1);
+            transition:
+                opacity 0.68s cubic-bezier(0.22, 1, 0.36, 1) var(--bp-delay, 0ms),
+                transform 0.68s cubic-bezier(0.22, 1, 0.36, 1) var(--bp-delay, 0ms);
+        }
+
+        /* 4. iOS Tactile Spring Micro-interactions for Small Elements */
+        button, a, input, textarea, [onclick] {
+            -webkit-tap-highlight-color: transparent;
+        }
+        button, a[href], [onclick] {
+            transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.22s ease, box-shadow 0.25s ease, opacity 0.2s ease;
+        }
+        button:active, [onclick]:active {
+            transform: scale(0.965);
+        }
+        input:focus, textarea:focus {
+            transform: translateY(-1px);
+            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s ease, box-shadow 0.25s ease;
+        }
+
+        /* 5. Header Subtle Scroll Elevation */
+        header.bp-scrolled {
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06) !important;
+            border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+        }
+
+        /* 6. Minimalist iOS Toast Banner for Brief Feedback */
+        @keyframes iosToastIn {
+            0% { opacity: 0; transform: translate3d(-50%, -18px, 0) scale(0.94); }
+            100% { opacity: 1; transform: translate3d(-50%, 0, 0) scale(1); }
+        }
+        @keyframes iosToastOut {
+            0% { opacity: 1; transform: translate3d(-50%, 0, 0) scale(1); }
+            100% { opacity: 0; transform: translate3d(-50%, -14px, 0) scale(0.96); }
+        }
+        #bp-ios-toast {
+            position: fixed;
+            top: 74px;
+            left: 50%;
+            transform: translate3d(-50%, 0, 0);
+            z-index: 10000;
+            background: rgba(29, 29, 31, 0.92);
+            color: #FFFFFF;
+            padding: 10px 18px;
+            border-radius: 999px;
+            font-size: 12.5px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+            animation: iosToastIn 0.36s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        #bp-ios-toast.bp-toast-hide {
+            animation: iosToastOut 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .bp-scroll-hidden { opacity: 1 !important; transform: none !important; }
+        }
 
     </style>
         <!-- Schema Markup -->
@@ -349,7 +522,7 @@
                     <h2 class="text-[16px] font-black text-gray-900 tracking-wide">Ratings & Reviews</h2>
                 </div>
                 <div class="flex items-center gap-4 mb-5" id="overall-rating-container">
-                    <p class="text-[13px] text-gray-500 font-medium"><i class="fas fa-spinner fa-spin"></i> Loading reviews...</p>
+                    <p class="text-[13px] text-gray-500 font-medium"><span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span> Loading reviews...</p>
                 </div>
                 <div id="product-reviews-list" class="flex overflow-x-auto gap-3 pb-4 snap-x custom-scrollbar"></div>
             </div>
@@ -595,9 +768,17 @@
                 <!-- Product Grid -->
                 <div id="dynamic-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
 
-                    <div class="col-span-full text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
-                        <i class="fas fa-circle-notch fa-spin text-4xl text-blue-600 mb-3"></i>
-                        <p class="text-gray-500 font-medium">Loading...</p>
+                    <div class="col-span-full py-12 px-4 flex flex-col items-center justify-center">
+                        <div class="ios-loader-pill mb-6">
+                            <span class="ios-spinner" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
+                            <span>Loading storefront</span>
+                        </div>
+                        <div class="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+                            <div class="ios-skeleton-card"><div class="ios-skel-avatar"></div><div class="ios-skel-line w-3/4"></div><div class="ios-skel-line w-1/2"></div><div class="ios-skel-btn"></div></div>
+                            <div class="ios-skeleton-card"><div class="ios-skel-avatar"></div><div class="ios-skel-line w-2/3"></div><div class="ios-skel-line w-1/2"></div><div class="ios-skel-btn"></div></div>
+                            <div class="ios-skeleton-card hidden sm:flex"><div class="ios-skel-avatar"></div><div class="ios-skel-line w-3/4"></div><div class="ios-skel-line w-1/2"></div><div class="ios-skel-btn"></div></div>
+                            <div class="ios-skeleton-card hidden lg:flex"><div class="ios-skel-avatar"></div><div class="ios-skel-line w-2/3"></div><div class="ios-skel-line w-1/2"></div><div class="ios-skel-btn"></div></div>
+                        </div>
                     </div>
                 </div>
 
@@ -953,7 +1134,7 @@ let authTemp = { email: '', name: '', photoURL: '', uid: '' };
 function loginWithGoogle(event) {
     const btn = event ? event.currentTarget : null;
     const originalHtml = btn ? btn.innerHTML : '';
-    if (btn) btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Authenticating...`;
+    if (btn) btn.innerHTML = `<span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span> Authenticating...`;
     
     auth.signInWithPopup(googleProvider).then(async (result) => {
         const user = result.user;
@@ -992,7 +1173,7 @@ function loginWithGoogle(event) {
         console.error(error);
         if (btn) btn.innerHTML = originalHtml;
         if(error.code !== 'auth/popup-closed-by-user') {
-            alert("Login Failed: " + error.message);
+            showIOSAlert("Login Failed", error.message, "OK");
         }
     });
 }
@@ -1005,7 +1186,7 @@ async function handleShopSubmit(e) {
     e.preventDefault();
     const shopName = document.getElementById('final-shop-name').value.trim();
     const btn = document.getElementById('final-shop-btn');
-    btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Creating Store...`;
+    btn.innerHTML = `<span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span> Creating Store...`;
     btn.disabled = true;
 
     const shopSlug = shopName.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(1000 + Math.random() * 9000);
@@ -1031,7 +1212,7 @@ async function handleShopSubmit(e) {
         
         window.location.href = `dashboard.html?shop=${shopSlug}`;
     } catch (error) { 
-        alert(error.message); 
+        showIOSAlert("Something Went Wrong", error.message, "OK"); 
         btn.innerHTML = `Launch Store <i class="fas fa-rocket"></i>`;
         btn.disabled = false; 
     }
@@ -1117,7 +1298,7 @@ async function handleShopSubmit(e) {
             }
             
             const originalHTML = btnElement.innerHTML;
-            btnElement.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Locating...`;
+            btnElement.innerHTML = `<span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span> Locating...`;
             btnElement.disabled = true;
 
             navigator.geolocation.getCurrentPosition(
@@ -1920,7 +2101,7 @@ function getVIPBadge(isVerified, plan) {
     btn.dataset.adding = "true";
 
     let origHtml = `<i class="fas fa-cart-plus text-sm"></i> Cart`;
-    btn.innerHTML = `<i class="fas fa-check text-lg"></i> Added`;
+    btn.innerHTML = `<i class="fas fa-check"></i> Added`; if(typeof showIOSToast==="function") showIOSToast("Added to cart");
     
     btn.classList.add('bg-purple-600', 'text-white', 'shadow-md', 'border-purple-600');
     btn.classList.remove('bg-purple-50', 'text-purple-600', 'hover:bg-purple-100', 'border-purple-100');
@@ -1989,19 +2170,19 @@ function getVIPBadge(isVerified, plan) {
 async function sendAlertToShop(shopId, customerName, totalAmount) {
     try {
         if (!shopId) {
-            alert("❌ Error: Shop ID missing!");
+            showIOSAlert("Error", "Shop ID is missing.", "OK");
             return;
         }
         
         const shopDoc = await db.collection('shops').doc(shopId).get();
         if (!shopDoc.exists) {
-            alert("❌ Error: Shop document nahi mila!");
+            showIOSAlert("Not Found", "Shop record could not be found.", "OK");
             return;
         }
         
         const pushToken = shopDoc.data().expoPushToken;
         if (!pushToken) {
-            alert("❌ Error: Firebase me Push Token nahi hai! App me Logout karke Login karein.");
+            showIOSAlert("Notification Unavailable", "Push token not registered for this shop yet.", "OK");
             return;
         }
 
@@ -2049,7 +2230,7 @@ async function sendAlertToShop(shopId, customerName, totalAmount) {
         }
 
     } catch (error) {
-        alert("❌ Notification Error: " + error.message);
+        showIOSAlert("Notification Error", error.message, "OK");
         console.error("Notification fail:", error);
     }
 }
@@ -2067,14 +2248,14 @@ async function checkoutCartInApp() {
     }
 
     let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
-    if(cart.length === 0) { alert("Cart is empty!"); return; }
+    if(cart.length === 0) { showIOSAlert("Empty Cart", "Your cart is currently empty. Add items to continue.", "OK"); return; }
     
     let address = document.getElementById('cart-address').value.trim();
     let custName = document.getElementById('cart-cust-name').value.trim();
     let custWhatsApp = document.getElementById('cart-cust-phone').value.trim();
     
-    if(!custName || !custWhatsApp) { alert("Please enter your name and WhatsApp number!"); return; }
-    if(!address) { alert("Please enter delivery address!"); return; }
+    if(!custName || !custWhatsApp) { showIOSAlert("Missing Details", "Please enter your name and 10-digit WhatsApp number.", "OK"); return; }
+    if(!address) { showIOSAlert("Address Required", "Please select or fetch your delivery address.", "OK"); return; }
 
     
 
@@ -2087,7 +2268,7 @@ async function checkoutCartInApp() {
 
     const btn = document.getElementById('cart-main-btn');
     const origHTML = btn.innerHTML;
-    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`; 
+    btn.innerHTML = `<span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span> Processing...`; 
     btn.disabled = true;
     
     const ordersByShop = {};
@@ -2130,7 +2311,7 @@ async function checkoutCartInApp() {
         showOrderSuccessModal(); 
         
     } catch (error) { 
-        alert("Error placing order: " + error.message); 
+        showIOSAlert("Order Failed", error.message, "OK"); 
     } finally { 
         btn.innerHTML = origHTML; 
         btn.disabled = false; 
@@ -2140,14 +2321,14 @@ async function checkoutCartInApp() {
 
         function checkoutCartWhatsApp() {
             let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
-            if(cart.length === 0) { alert("Cart is empty!"); return; }
+            if(cart.length === 0) { showIOSAlert("Empty Cart", "Your cart is currently empty. Add items to continue.", "OK"); return; }
             
             let address = document.getElementById('cart-address').value.trim();
             let custName = document.getElementById('cart-cust-name').value.trim();
             let custPhone = document.getElementById('cart-cust-phone').value.trim();
             
-            if(!custName || !custPhone) { alert("Please enter your name and WhatsApp number!"); return; }
-            if(!address) { alert("Please enter delivery address!"); return; }
+            if(!custName || !custPhone) { showIOSAlert("Missing Details", "Please enter your name and 10-digit WhatsApp number.", "OK"); return; }
+            if(!address) { showIOSAlert("Address Required", "Please select or fetch your delivery address.", "OK"); return; }
 
             const ordersByShop = {};
             cart.forEach(item => {
@@ -2265,7 +2446,7 @@ async function submitOrder(e) {
     const address = document.getElementById('order-address').value.trim();
     
     if(!custName || !custWhatsApp || !address) {
-        alert("Please fill all details!");
+        showIOSAlert("Incomplete Details", "Please fill in your name, WhatsApp number, and address.", "OK");
         return;
     }
 
@@ -2274,7 +2455,7 @@ async function submitOrder(e) {
     
     const btn = document.getElementById('main-order-btn');
     const origHtml = btn.innerHTML;
-    btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Placing...`;
+    btn.innerHTML = `<span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span> Placing...`;
     btn.disabled = true;
 
     // ✨ NAYA: Customer details save kar lo taaki next time auto-fill ho jaye
@@ -2308,7 +2489,7 @@ async function submitOrder(e) {
         showOrderSuccessModal(); 
         
     } catch (error) {
-        alert("Error placing order: " + error.message);
+        showIOSAlert("Order Failed", error.message, "OK");
     } finally {
         btn.innerHTML = origHtml;
         btn.disabled = false;
@@ -2325,7 +2506,7 @@ async function submitOrder(e) {
             
             const total = parseInt(currentOrder.itemPrice) * parseInt(qty);
             const phone = String(currentOrder.shopPhone || '').replace(/\D/g, '');
-            if (!phone) { alert('Seller WhatsApp number is unavailable. Please use Place Order Now.'); return; }
+            if (!phone) { showIOSAlert("WhatsApp Unavailable", "Seller WhatsApp number is unavailable. Please use Place Order Now.", "OK"); return; }
             
             const waMessage = `🛍️ *NEW ORDER via BikriPage*\n\n*Item:* ${currentOrder.itemName}\n*Quantity:* ${qty}\n*Total Amount:* ₹${total}\n\n*Customer Details:*\nName: ${custName}\nPhone: ${custPhone}\nAddress: ${address}\n\nPlease confirm my order!`;
             window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(waMessage)}`, '_blank');
@@ -2349,7 +2530,8 @@ async function submitOrder(e) {
         }
 
                         function logoutUser() {
-            if(confirm("Are you sure you want to logout?")) {
+            if (typeof showLogoutModal === 'function') { showLogoutModal(); return; }
+            if (true) {
                
               
                 
@@ -2375,11 +2557,11 @@ async function submitOrder(e) {
             const addrInput = document.getElementById(inputId);
 
             if (!navigator.geolocation) {
-                alert("GPS is not supported by your browser.");
+                showIOSAlert("Location Unsupported", "GPS geolocation is not supported by your browser.", "OK");
                 return;
             }
 
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Locating...`;
+            btn.innerHTML = `<span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span> Locating...`;
             btn.disabled = true;
 
             navigator.geolocation.getCurrentPosition(
@@ -2415,7 +2597,7 @@ async function submitOrder(e) {
                     }, 3000);
                 },
                 (error) => {
-                    alert("⚠️ Please allow location access in your browser to use Auto-Fetch.");
+                    showIOSAlert("Location Access Required", "Please allow location access in your browser to auto-fetch your address.", "OK");
                     btn.innerHTML = `<i class="fas fa-location-crosshairs"></i> Locate Me`;
                     btn.disabled = false;
                 },
@@ -2530,7 +2712,7 @@ async function submitOrder(e) {
 
             const btn = document.getElementById('save-addr-btn');
             const orig = btn.innerHTML;
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
+            btn.innerHTML = `<span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span> Saving...`;
             
             // 🚀 FIREBASE ME UPLOAD LOGIC
             const customerPhone = localStorage.getItem('BikriPage_customer_phone');
@@ -2548,7 +2730,7 @@ async function submitOrder(e) {
                 } catch (e) { console.log("Firebase sync issue", e); }
             }
 
-            btn.innerHTML = `<i class="fas fa-check-circle"></i> Details Saved!`;
+            btn.innerHTML = `<i class="fas fa-check-circle"></i> Details Saved!`; if(typeof showIOSToast==="function") showIOSToast("Delivery details saved");
             btn.classList.replace('bg-gray-900', 'bg-green-500');
             setTimeout(() => { btn.innerHTML = orig; btn.classList.replace('bg-green-500', 'bg-gray-900'); }, 2000);
         }
@@ -2557,9 +2739,9 @@ async function submitOrder(e) {
         function fetchProfileGPS() {
             const btn = document.getElementById('prof-gps-btn'); 
             const addrInput = document.getElementById('saved-address');
-            if (!navigator.geolocation) { alert("GPS not supported."); return; }
+            if (!navigator.geolocation) { showIOSAlert("Location Unsupported", "GPS geolocation is not supported on this device.", "OK"); return; }
             
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`; btn.disabled = true;
+            btn.innerHTML = `<span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>`; btn.disabled = true;
             navigator.geolocation.getCurrentPosition(
                 async (pos) => {
                     const lat = pos.coords.latitude; const lng = pos.coords.longitude;
@@ -2576,7 +2758,7 @@ async function submitOrder(e) {
                     } catch(e) { addrInput.value = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`; btn.innerHTML = `<i class="fas fa-check"></i>`; }
                     setTimeout(() => { btn.innerHTML = `<i class="fas fa-location-crosshairs"></i> Auto-Fetch`; btn.classList.replace('text-green-600', 'text-blue-600'); btn.classList.replace('bg-green-50', 'bg-blue-50'); btn.disabled = false; }, 3000);
                 },
-                (error) => { alert("Allow location access for GPS."); btn.innerHTML = `<i class="fas fa-location-crosshairs"></i> Auto-Fetch`; btn.disabled = false; },
+                (error) => { showIOSAlert("Location Access Required", "Please allow location permission to fetch your address.", "OK"); btn.innerHTML = `<i class="fas fa-location-crosshairs"></i> Auto-Fetch`; btn.disabled = false; },
                 { enableHighAccuracy: true, timeout: 10000 }
             );
         }
@@ -2588,7 +2770,7 @@ async function uploadProfileImage(event) {
     const initEl = document.getElementById('prof-initial');
     const imgEl = document.getElementById('prof-img-preview');
     
-    initEl.innerHTML = '<i class="fas fa-spinner fa-spin text-sm"></i>'; 
+    initEl.innerHTML = '<span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>'; 
     imgEl.classList.add('hidden');
     initEl.style.display = 'flex';
 
@@ -2684,9 +2866,9 @@ async function uploadProfileImage(event) {
             const activeShop = localStorage.getItem('BikriPage_active_shop');
             const customerPhone = localStorage.getItem('BikriPage_customer_phone');
             
-            if(!newName) return alert("Name is required!");
+            if(!newName) { showIOSAlert("Name Required", "Please enter your full name.", "OK"); return; }
             const btn = event.currentTarget; const orig = btn.innerText;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+            btn.innerHTML = '<span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>'; btn.disabled = true;
 
             try {
                 if (activeShop) {
@@ -2705,7 +2887,7 @@ async function uploadProfileImage(event) {
                 if (navInitials) navInitials.innerText = getInitials(newName);
                 
                 toggleProfEdit();
-            } catch(e) { alert("Error: " + e.message); } 
+            } catch(e) { showIOSAlert("Update Failed", e.message, "OK"); } 
             finally { btn.innerText = orig; btn.disabled = false; }
         }
 
@@ -3017,9 +3199,9 @@ async function uploadProfileImage(event) {
             const activeShop = localStorage.getItem('BikriPage_active_shop');
             const customerPhone = localStorage.getItem('BikriPage_customer_phone');
             
-            if(!newName) return alert("Name is required!");
+            if(!newName) { showIOSAlert("Name Required", "Please enter your full name.", "OK"); return; }
             const btn = event.currentTarget; const orig = btn.innerText;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+            btn.innerHTML = '<span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>'; btn.disabled = true;
 
             try {
                 if (activeShop) {
@@ -3038,7 +3220,7 @@ async function uploadProfileImage(event) {
                 if (navInitials) navInitials.innerText = getInitials(newName);
                 
                 toggleProfEdit();
-            } catch(e) { alert("Error: " + e.message); } 
+            } catch(e) { showIOSAlert("Update Failed", e.message, "OK"); } 
             finally { btn.innerText = orig; btn.disabled = false; }
         }
         // ==========================================
@@ -3133,7 +3315,7 @@ function closeLogoutModal() {
             setTimeout(() => modal.classList.remove('opacity-0'), 10);
             
             const preview = document.getElementById('map-address-preview');
-            preview.innerHTML = `<i class="fas fa-circle-notch fa-spin text-purple-500 mr-1"></i> Getting your live location...`;
+            preview.innerHTML = `<span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span> Getting your live location...`;
 
             let existingLat = document.getElementById(latId) ? parseFloat(document.getElementById(latId).value) : null;
             let existingLng = document.getElementById(lngId) ? parseFloat(document.getElementById(lngId).value) : null;
@@ -3213,7 +3395,7 @@ function closeLogoutModal() {
                     selectedLng = center.lng;
                     
                     const preview = document.getElementById('map-address-preview');
-                    preview.innerHTML = `<i class="fas fa-circle-notch fa-spin text-purple-500 mr-1"></i> Fetching exact address...`;
+                    preview.innerHTML = `<span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span> Fetching exact address...`;
                     
                     try {
                         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${selectedLat}&lon=${selectedLng}`);
@@ -3237,7 +3419,7 @@ function closeLogoutModal() {
         // ✨ NAYA: Map ke andar wala GPS crosshair button ✨
         function goToLiveLocation() {
             const btn = document.getElementById('live-gps-btn');
-            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin text-xl"></i>`;
+            btn.innerHTML = `<span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>`;
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
@@ -3250,7 +3432,7 @@ function closeLogoutModal() {
                         btn.innerHTML = `<i class="fas fa-crosshairs text-xl"></i>`;
                     },
                     (err) => {
-                        alert("⚠️ Please turn on your GPS Location.");
+                        showIOSAlert("GPS Disabled", "Please turn on your device location services.", "OK");
                         btn.innerHTML = `<i class="fas fa-crosshairs text-xl"></i>`;
                     },
                     { enableHighAccuracy: true, timeout: 5000 }
@@ -3661,7 +3843,7 @@ function handleGlobalSearch(query) {
     const searchInput = document.getElementById('top-search-input'); // 👈 Note: Yahan bhi ID 'top-search-input' kar di hai
     const grid = document.getElementById('dynamic-grid');
     
-    if(grid) grid.innerHTML = `<div class="col-span-full text-center py-20 bg-white rounded-3xl"><i class="fas fa-circle-notch fa-spin text-4xl text-blue-600 mb-3"></i><p class="text-gray-500 font-medium">Loading...</p></div>`;
+    if(grid) grid.innerHTML = `<div class="col-span-full py-12 flex flex-col items-center justify-center"><div class="ios-loader-pill mb-5"><span class="ios-spinner"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span><span>Updating feed</span></div><div class="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5"><div class="ios-skeleton-card"><div class="ios-skel-avatar"></div><div class="ios-skel-line w-3/4"></div><div class="ios-skel-btn"></div></div><div class="ios-skeleton-card"><div class="ios-skel-avatar"></div><div class="ios-skel-line w-2/3"></div><div class="ios-skel-btn"></div></div></div></div>`;
 
     if (tabName === 'all') {
         if(title) title.innerText = "Trending Products";
@@ -3990,7 +4172,7 @@ slider.addEventListener('scroll', () => {
             const container = document.getElementById('similar-products-list');
             const btn = document.getElementById('modal-load-more-btn');
             
-            container.innerHTML = '<div class="w-full text-center py-6"><i class="fas fa-spinner fa-spin text-purple-500"></i> Loading...</div>';
+            container.innerHTML = '<div class="w-full text-center py-6"><span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span> Loading...</div>';
             if (btn) btn.classList.add('hidden');
 
             await fetchAndRenderModalProducts(true);
@@ -3999,7 +4181,7 @@ slider.addEventListener('scroll', () => {
         async function loadMoreModalProducts() {
             if (!modalSimilarHasMore) return;
             const btn = document.getElementById('modal-load-more-btn');
-            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Loading...`;
+            btn.innerHTML = `<span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span> Loading...`;
             await fetchAndRenderModalProducts(false);
         }
            async function fetchAndRenderModalProducts(isFirstLoad) {
@@ -4079,7 +4261,7 @@ slider.addEventListener('scroll', () => {
     const badge = document.getElementById('product-rating-badge');
     if(badge) { badge.classList.add('hidden'); badge.classList.remove('flex'); }
     
-    document.getElementById('overall-rating-container').innerHTML = `<p class="text-[13px] text-gray-500 font-medium"><i class="fas fa-spinner fa-spin"></i> Loading reviews...</p>`;
+    document.getElementById('overall-rating-container').innerHTML = `<p class="text-[13px] text-gray-500 font-medium"><span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span> Loading reviews...</p>`;
     document.getElementById('product-reviews-list').innerHTML = '';
 
     // 🔥 GHOST DATA CLEANUP (Ye sabhi users ke phone se purana local kachra delete kar dega)
@@ -4263,7 +4445,7 @@ slider.addEventListener('scroll', () => {
         async function likeReview(orderId, btnElement) {
             const userEmail = localStorage.getItem('BikriPage_customer_phone');
             if (!userEmail) {
-                alert("Please login to like reviews!");
+                showIOSAlert("Login Required", "Please log in to like customer reviews.", "OK");
                 return;
             }
 
@@ -4324,7 +4506,7 @@ slider.addEventListener('scroll', () => {
             const badge = document.getElementById('product-rating-badge');
             if(badge) { badge.classList.add('hidden'); badge.classList.remove('flex'); }
             
-            document.getElementById('overall-rating-container').innerHTML = `<p class="text-[13px] text-gray-500 font-medium"><i class="fas fa-spinner fa-spin"></i> Loading reviews...</p>`;
+            document.getElementById('overall-rating-container').innerHTML = `<p class="text-[13px] text-gray-500 font-medium"><span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span> Loading reviews...</p>`;
             document.getElementById('product-reviews-list').innerHTML = '';
 
             try {
@@ -4448,7 +4630,7 @@ slider.addEventListener('scroll', () => {
         
         <!-- Footer -->
         <div class="bg-white p-5 shadow-[0_-10px_20px_rgba(0,0,0,0.1)] z-10 shrink-0 rounded-t-3xl">
-            <p id="map-address-preview" class="text-xs text-gray-600 font-semibold mb-3 line-clamp-2 leading-relaxed"><i class="fas fa-spinner fa-spin mr-1"></i> Finding your location...</p>
+            <p id="map-address-preview" class="text-xs text-gray-600 font-semibold mb-3 line-clamp-2 leading-relaxed"><span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span> Finding your location...</p>
             <button onclick="confirmMapLocation()" id="map-confirm-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-xl active:scale-95 transition shadow-lg flex items-center justify-center gap-2">
                 Confirm Location <i class="fas fa-check-circle text-green-400"></i>
             </button>
@@ -4614,7 +4796,7 @@ const videoModal = document.getElementById('video-tutorial-modal');
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             
             if (!SpeechRecognition) {
-                alert("Aapka browser Voice Search support nahi karta. Kripya Chrome ya Safari use karein.");
+                showIOSAlert("Voice Search Unavailable", "Your browser does not support voice search. Please try Chrome or Safari.", "OK");
                 return;
             }
 
@@ -5060,7 +5242,7 @@ let isPaymentSuccess = false;
 function initiateRazorpayPayment(planType, amountInINR) {
     const user = firebase.auth().currentUser;
     if (!user) {
-        alert("Session expired! Please log in again.");
+        showIOSAlert("Session Expired", "Your session has expired. Please log in again to continue.", "OK");
         return;
     }
 
@@ -5132,7 +5314,7 @@ function initiateRazorpayPayment(planType, amountInINR) {
     const rzp = new Razorpay(options);
     
     rzp.on('payment.failed', function (response) {
-        alert("Payment Failed: " + response.error.description);
+        showIOSAlert("Payment Failed", response.error.description, "OK");
     });
     
     rzp.open();
@@ -5253,95 +5435,196 @@ function iosConfirm(title, message, btnText) {
    
 
 
+
+    <!-- ✨ MINIMALIST iOS ENGLISH ALERT MODAL ✨ -->
+    <div id="bp-ios-alert-modal" class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/35 px-4 transition-opacity duration-300 opacity-0" onclick="if(event.target===this) closeBpIOSAlert()">
+        <div id="bp-ios-alert-card" class="bg-white/95 w-full max-w-[285px] rounded-[20px] shadow-[0_24px_60px_rgba(0,0,0,0.22)] border border-gray-200/80 transform scale-90 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] text-center overflow-hidden">
+            <div class="px-5 pt-5 pb-4">
+                <div class="w-10 h-10 rounded-full bg-[#F5F5F7] text-[#1D1D1F] flex items-center justify-center mx-auto mb-3 text-base">
+                    <i id="bp-ios-alert-icon" class="fas fa-info-circle text-[#007AFF]"></i>
+                </div>
+                <h3 id="bp-ios-alert-title" class="text-[16px] font-bold text-[#1D1D1F] tracking-tight leading-snug mb-1">Notice</h3>
+                <p id="bp-ios-alert-message" class="text-[13px] text-[#6E6E73] font-medium leading-relaxed">Message</p>
+            </div>
+            <div class="border-t border-gray-200/80">
+                <button id="bp-ios-alert-btn" onclick="closeBpIOSAlert()" class="w-full py-3.5 text-[16px] text-[#007AFF] font-semibold hover:bg-gray-50 active:bg-gray-100 transition-colors">OK</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Fallback iOS Alert helper if called anywhere on index.html
-        if (typeof window.showIOSAlert !== 'function') {
-            window.showIOSAlert = function(title, message, btnText = 'OK') {
-                if (typeof iosConfirm === 'function') {
-                    iosConfirm(title, message, btnText);
-                } else {
-                    alert(title + ': ' + message);
-                }
-            };
+        // =========================================================
+        // 🍎 MINIMALIST iOS ALERT & TOAST SYSTEM (100% ENGLISH)
+        // =========================================================
+        let bpAlertCallback = null;
+
+        function showIOSAlert(title, message, btnText = 'OK', onClose = null) {
+            const modal = document.getElementById('bp-ios-alert-modal');
+            const card = document.getElementById('bp-ios-alert-card');
+            const titleEl = document.getElementById('bp-ios-alert-title');
+            const msgEl = document.getElementById('bp-ios-alert-message');
+            const btnEl = document.getElementById('bp-ios-alert-btn');
+            const iconEl = document.getElementById('bp-ios-alert-icon');
+
+            if (!modal || !card) return;
+
+            const cleanTitle = String(title || 'Notice').replace(/[❌⚠️📍🚀🎉🛍️]+/g, '').trim() || 'Notice';
+            const cleanMsg = String(message || '').replace(/[❌⚠️📍🚀🎉🛍️]+/g, '').trim();
+
+            titleEl.innerText = cleanTitle;
+            msgEl.innerText = cleanMsg;
+            btnEl.innerText = btnText || 'OK';
+            bpAlertCallback = typeof onClose === 'function' ? onClose : null;
+
+            const lower = (cleanTitle + ' ' + cleanMsg).toLowerCase();
+            if (lower.includes('fail') || lower.includes('error') || lower.includes('denied') || lower.includes('not allowed') || lower.includes('expired')) {
+                iconEl.className = 'fas fa-exclamation-circle text-[#FF3B30]';
+            } else if (lower.includes('success') || lower.includes('found') || lower.includes('saved')) {
+                iconEl.className = 'fas fa-check-circle text-[#34C759]';
+            } else {
+                iconEl.className = 'fas fa-info-circle text-[#007AFF]';
+            }
+
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-90');
+                card.classList.add('scale-100');
+            });
         }
 
-        // Smooth IntersectionObserver Stagger Reveal for Cards, Pricing, Tools & Grid
-        (function initBikriPageMotionEngine() {
-            const targetSelectors = [
-                '#hero-content section > div',
+        function closeBpIOSAlert() {
+            const modal = document.getElementById('bp-ios-alert-modal');
+            const card = document.getElementById('bp-ios-alert-card');
+            if (!modal || !card) return;
+
+            modal.classList.add('opacity-0');
+            card.classList.remove('scale-100');
+            card.classList.add('scale-90');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                if (bpAlertCallback) {
+                    const cb = bpAlertCallback;
+                    bpAlertCallback = null;
+                    cb();
+                }
+            }, 260);
+        }
+
+        window.alert = function(msg) {
+            showIOSAlert('Notice', String(msg || ''), 'OK');
+        };
+
+        function showIOSToast(text, iconClass = 'fas fa-check-circle text-[#34C759]', duration = 2200) {
+            const existing = document.getElementById('bp-ios-toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.id = 'bp-ios-toast';
+            toast.innerHTML = `<i class="${iconClass}"></i><span>${text}</span>`;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('bp-toast-hide');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        // =========================================================
+        // 🌊 TRUE SCROLL-TRIGGERED REVEAL ENGINE (NO INSTANT LOAD)
+        // =========================================================
+        (function initSmoothScrollMotion() {
+            let userHasScrolled = false;
+            const markScrolled = () => {
+                userHasScrolled = true;
+                const header = document.querySelector('header');
+                if (header) {
+                    if (window.scrollY > 12) header.classList.add('bp-scrolled');
+                    else header.classList.remove('bp-scrolled');
+                }
+            };
+            window.addEventListener('scroll', markScrolled, { passive: true });
+            window.addEventListener('touchmove', () => { userHasScrolled = true; }, { passive: true });
+            window.addEventListener('wheel', () => { userHasScrolled = true; }, { passive: true });
+
+            const selectors = [
                 '#hero-content .grid > div',
-                '#marketplace .reveal',
+                '#marketplace > div > div:first-child',
                 '#dynamic-grid > div',
+                '#merchant-upgrade-plans > div',
                 '#merchant-upgrade-plans .grid > div',
                 'footer > div'
             ];
 
-            const io = ('IntersectionObserver' in window)
+            const observer = ('IntersectionObserver' in window)
                 ? new IntersectionObserver((entries) => {
                     entries.forEach((entry) => {
-                        if (entry.isIntersecting) {
-                            const el = entry.target;
-                            el.classList.remove('bp-anim-ready');
-                            el.classList.add('bp-anim-in');
-                            el.classList.add('active');
-                            io.unobserve(el);
-                        }
+                        if (!entry.isIntersecting) return;
+                        const el = entry.target;
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                el.classList.remove('bp-scroll-hidden');
+                                el.classList.add('bp-scroll-visible', 'active');
+                            });
+                        });
+                        observer.unobserve(el);
                     });
                 }, {
                     threshold: 0.08,
-                    rootMargin: '0px 0px -30px 0px'
+                    rootMargin: '0px 0px -45px 0px'
                 })
                 : null;
 
-            function registerElements() {
-                document.querySelectorAll(targetSelectors.join(',')).forEach((el, idx) => {
-                    if (el.dataset.bpMotionBound === '1') return;
-                    el.dataset.bpMotionBound = '1';
-                    el.classList.add('bp-card-hover');
-                    const stagger = (idx % 6) * 65;
-                    el.style.setProperty('--bp-delay', stagger + 'ms');
+            function bindScrollElements() {
+                const nodes = document.querySelectorAll(selectors.join(','));
+                let belowFoldBatch = 0;
 
-                    if (io) {
-                        const rect = el.getBoundingClientRect();
-                        if (rect.top < window.innerHeight * 0.94) {
-                            el.classList.add('bp-anim-in', 'active');
-                        } else {
-                            el.classList.add('bp-anim-ready');
-                            io.observe(el);
-                        }
+                nodes.forEach((el) => {
+                    if (el.dataset.bpRevealReady === '1') return;
+                    if (el.querySelector('.ios-skeleton-card') || el.classList.contains('ios-skeleton-card')) return;
+
+                    el.dataset.bpRevealReady = '1';
+
+                    const rect = el.getBoundingClientRect();
+                    const isAboveFold = rect.top < window.innerHeight * 0.86 && !userHasScrolled;
+
+                    if (isAboveFold) {
+                        el.style.setProperty('--bp-delay', '40ms');
+                        el.classList.add('bp-scroll-hidden');
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                el.classList.remove('bp-scroll-hidden');
+                                el.classList.add('bp-scroll-visible', 'active');
+                            });
+                        });
                     } else {
-                        el.classList.add('active');
+                        const delay = (belowFoldBatch % 4) * 75;
+                        belowFoldBatch++;
+                        el.style.setProperty('--bp-delay', delay + 'ms');
+                        el.classList.add('bp-scroll-hidden');
+                        if (observer) {
+                            observer.observe(el);
+                        } else {
+                            el.classList.remove('bp-scroll-hidden');
+                            el.classList.add('bp-scroll-visible', 'active');
+                        }
                     }
                 });
             }
 
-            // Watch dynamically injected hero, shops, products & pricing cards
-            const mo = new MutationObserver(() => {
-                window.requestAnimationFrame(registerElements);
+            const domWatcher = new MutationObserver(() => {
+                requestAnimationFrame(bindScrollElements);
             });
 
             window.addEventListener('DOMContentLoaded', () => {
-                registerElements();
-                const mainEl = document.querySelector('main');
-                if (mainEl) {
-                    mo.observe(mainEl, { childList: true, subtree: true });
-                }
-            });
-
-            // Smooth anchor scrolling for any #hash links
-            document.addEventListener('click', (e) => {
-                const link = e.target.closest('a[href^="#"]');
-                if (!link) return;
-                const hash = link.getAttribute('href');
-                if (hash && hash.length > 1) {
-                    const target = document.querySelector(hash);
-                    if (target) {
-                        e.preventDefault();
-                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
+                bindScrollElements();
+                const main = document.querySelector('main');
+                if (main) {
+                    domWatcher.observe(main, { childList: true, subtree: true });
                 }
             });
         })();
     </script>
 </body>
-</html> 
+</html>

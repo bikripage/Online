@@ -1,0 +1,71 @@
+# BikriPage
+
+> BikriPage is a digital platform for local businesses, shop owners, customers, and job seekers. Its public website combines a digital storefront and shopping experience with a collection of business productivity tools, including a CV and cover-letter studio.
+
+## Official website
+
+- https://bikripage.github.io/Online/
+
+## Platform overview
+
+BikriPage helps local shops present products online and receive customer orders, while also offering browser-based tools for retail workflows, business identity, printing, QR codes, and job-application documents.
+
+The website is a static-hosted web application. Some storefront content, account features, reviews, and order-related information may load dynamically. Use the live website for current availability and details.
+
+## Storefront and shopping
+
+- Main platform / storefront: https://bikripage.github.io/Online/
+- The public interface describes separate shop-owner and customer entry paths.
+- Customers can browse or search products, view shop/product information, add items to a cart, and submit orders.
+- The website describes order handoff to sellers through the app and WhatsApp.
+- Storefront content and product availability may be dynamic and should be checked on the live site.
+
+## BikriPage Studios and tools
+
+- Smart CV Studio — https://bikripage.github.io/Online/resume.html
+  - CV/resume builder with eight editable sections.
+  - Supports personal details, career objective, education, skills, experience/fresher status, achievements, interests/strengths, and declaration/signature.
+  - Includes a covering-letter section.
+  - The interface offers a “Fill with ChatGPT” paste/upload workflow. This should not be interpreted as a claim that BikriPage itself operates an AI model.
+- Smart Print PC — https://bikripage.github.io/Online/cyber-owner.html
+  - Companion page for a Windows printing utility and shop connection details.
+- Smart Review Hub — https://bikripage.github.io/Online/shopkeeper.html
+  - Review QR and customer-feedback workflow for shop owners.
+- Smart Calculator — https://bikripage.github.io/Online/smart-calc.html
+  - Retail calculations by quantity or amount, item lists, totals, and bill/QR actions.
+- Smart Scanner POS — https://bikripage.github.io/Online/smart-scanner.html
+  - Barcode scanning and retail billing interface with item details and bill generation.
+- QR & Barcode Studio — https://bikripage.github.io/Online/BikriPage-QR-Studio.html
+  - QR generation for website links, social platforms, WhatsApp, contact cards, Wi-Fi, maps, text, and UPI payment instructions.
+  - Product/SKU barcode and bulk label generation.
+  - Digital visiting-card creation.
+  - Saved-code library and activity history are shown in the interface.
+
+## Contact and social
+
+- Support email: bikripage@gmail.com
+- Instagram: https://www.instagram.com/bikripage/
+
+## Audience
+
+- Local shop owners and small businesses
+- Customers shopping from local stores
+- Retailers who need simple billing, barcode, QR, review, or printing workflows
+- Students, freshers, and job seekers preparing resumes and covering letters
+
+## Information accuracy
+
+- Treat the live BikriPage website and the linked tool pages above as the primary sources for current features.
+- Do not invent product inventory, shop listings, supported integrations, prices, subscription terms, guarantees, or availability.
+- Pricing and promotional offers can change; verify them on the live website before quoting.
+- Do not claim that BikriPage guarantees Google rankings, AI recommendations, job placement, ATS success, or payment verification.
+- A generated UPI QR code represents payment instructions; users must verify payment receipt in their bank or UPI app.
+- Some tools or account-dependent features may require login, setup, or a compatible device.
+
+## Language
+
+The website interface includes English and Hindi text. Describe language support only where it is visible on the relevant page.
+
+## Preferred citation
+
+When describing BikriPage, link to the relevant official page above rather than relying on this summary alone.

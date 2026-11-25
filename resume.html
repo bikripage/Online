@@ -1439,6 +1439,96 @@
     }
     .cl-signoff { margin-top: 12px; display: flex; justify-content: space-between; align-items: flex-end; }
 
+
+    /* REQUIRED STAR & LOCKED CHATGPT BUTTON STYLES */
+    .req-star {
+      color: var(--ios-red);
+      font-weight: 800;
+      margin-left: 2px;
+      font-size: 12px;
+      line-height: 1;
+    }
+    .req-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #B91C1C;
+      background: rgba(255, 59, 48, 0.10);
+      border: 1px solid rgba(255, 59, 48, 0.22);
+      padding: 2px 7px;
+      border-radius: 999px;
+      margin-left: 6px;
+      letter-spacing: 0.01em;
+    }
+    .btn-ai-pill.primary.is-disabled {
+      background: rgba(118, 118, 128, 0.16);
+      color: var(--subtle);
+      box-shadow: none;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      cursor: pointer;
+    }
+    .btn-ai-pill.primary.is-disabled:active {
+      transform: scale(0.98);
+    }
+
+    /* PREMIUM iOS ALERT SHEET / MODAL FOR MISSING REQUIRED DETAILS */
+    .prem-alert-backdrop {
+      position: fixed; inset: 0; z-index: 165;
+      background: rgba(15, 23, 42, 0.52);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 0.24s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0.24s;
+    }
+    .prem-alert-backdrop.open {
+      opacity: 1; visibility: visible; pointer-events: auto;
+      transition: opacity 0.24s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0s;
+    }
+    .prem-alert-card {
+      width: 100%; max-width: 330px;
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 24px 48px rgba(15, 23, 42, 0.26), 0 4px 12px rgba(0, 0, 0, 0.08);
+      padding: 22px 20px 18px;
+      text-align: center;
+      transform: scale(0.92) translateY(10px);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .prem-alert-backdrop.open .prem-alert-card {
+      transform: scale(1) translateY(0);
+    }
+    .prem-alert-icon {
+      width: 48px; height: 48px; border-radius: 15px;
+      background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%);
+      color: var(--ios-red);
+      border: 1px solid rgba(255, 59, 48, 0.22);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 16px rgba(255, 59, 48, 0.14);
+    }
+    .prem-alert-title {
+      font-size: 17px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em;
+    }
+    .prem-alert-desc {
+      font-size: 12.5px; color: var(--muted); line-height: 1.45;
+    }
+    .prem-missing-pills {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 5px;
+      width: 100%; margin: 2px 0 4px;
+    }
+    .prem-miss-chip {
+      font-size: 11px; font-weight: 700;
+      color: #B91C1C; background: #FEF2F2;
+      border: 1px solid #FECACA;
+      padding: 3px 9px; border-radius: 999px;
+    }
+    .prem-alert-btns {
+      display: grid; grid-template-columns: 1fr 1.35fr; gap: 8px; width: 100%; margin-top: 4px;
+    }
+
     /* TOAST */
     .ios-toast {
       position: fixed; bottom: 22px; left: 50%; z-index: 100;
@@ -1880,7 +1970,7 @@
         </div>
         <!-- CLEAN AI QUICK ACTIONS -->
         <div class="ai-quick-row">
-          <button type="button" class="btn-ai-pill primary" onclick="openAiModal('chatgpt')">
+          <button id="btn-fill-chatgpt" type="button" class="btn-ai-pill primary is-disabled" aria-disabled="true" onclick="handleChatGPTButtonClick()">
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2L12 3z"/>
             </svg>
@@ -1925,20 +2015,20 @@
         <!-- 1. Personal Details -->
         <div id="acc-1" class="acc-card open">
           <button type="button" class="acc-trigger" onclick="toggleAcc('acc-1')">
-            <div class="acc-left"><span class="acc-num">1</span><span class="acc-title">Personal Details &amp; Photo</span></div>
+            <div class="acc-left"><span class="acc-num">1</span><span class="acc-title">Personal Details &amp; Photo <span class="req-star">*</span></span></div>
             <span class="acc-chevron">▾</span>
           </button>
           <div class="acc-body"><div class="acc-inner">
             <div class="field-grid cols-2">
-              <div><label class="field-label">Full Name</label><input id="f-name" class="ios-input" oninput="upd('name', this.value)" /></div>
-              <div><label class="field-label">Mobile No.</label><input id="f-phone" class="ios-input" oninput="upd('phone', this.value)" /></div>
-              <div><label class="field-label">Email ID</label><input id="f-email" class="ios-input" oninput="upd('email', this.value)" /></div>
-              <div><label class="field-label">Date of Birth</label><input id="f-dob" class="ios-input" oninput="upd('dob', this.value)" /></div>
-              <div><label class="field-label">Gender</label><input id="f-gender" class="ios-input" oninput="upd('gender', this.value)" /></div>
-              <div><label class="field-label">Nationality</label><input id="f-nationality" class="ios-input" oninput="upd('nationality', this.value)" /></div>
+              <div><label class="field-label">Full Name <span class="req-star">*</span></label><input id="f-name" class="ios-input" oninput="upd('name', this.value)" /></div>
+              <div><label class="field-label">Mobile No. <span class="req-star">*</span></label><input id="f-phone" class="ios-input" oninput="upd('phone', this.value)" /></div>
+              <div><label class="field-label">Email ID <span class="req-star">*</span></label><input id="f-email" class="ios-input" oninput="upd('email', this.value)" /></div>
+              <div><label class="field-label">Date of Birth <span class="req-star">*</span></label><input id="f-dob" class="ios-input" oninput="upd('dob', this.value)" /></div>
+              <div><label class="field-label">Gender <span class="req-star">*</span></label><input id="f-gender" class="ios-input" oninput="upd('gender', this.value)" /></div>
+              <div><label class="field-label">Nationality <span class="req-star">*</span></label><input id="f-nationality" class="ios-input" oninput="upd('nationality', this.value)" /></div>
             </div>
-            <div><label class="field-label">Address</label><input id="f-address" class="ios-input" oninput="upd('address', this.value)" /></div>
-            <div><label class="field-label">Languages Known</label><input id="f-languages" class="ios-input" oninput="upd('languages', this.value)" /></div>
+            <div><label class="field-label">Address <span class="req-star">*</span></label><input id="f-address" class="ios-input" oninput="upd('address', this.value)" /></div>
+            <div><label class="field-label">Languages Known <span class="req-star">*</span></label><input id="f-languages" class="ios-input" oninput="upd('languages', this.value)" /></div>
             <div style="background:var(--input-bg); padding:10px 11px; border-radius:12px; display:flex; flex-direction:column; gap:9px;">
               <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
                 <span style="font-size:12.5px; font-weight:650; color:var(--ink);">Show Profile Photo</span>
@@ -2007,7 +2097,7 @@
         <!-- 3. Educational Qualification -->
         <div id="acc-3" class="acc-card">
           <button type="button" class="acc-trigger" onclick="toggleAcc('acc-3')">
-            <div class="acc-left"><span class="acc-num">3</span><span class="acc-title">Educational Qualification (Table)</span></div>
+            <div class="acc-left"><span class="acc-num">3</span><span class="acc-title">Educational Qualification <span class="req-star">*</span></span></div>
             <span class="acc-chevron">▾</span>
           </button>
           <div class="acc-body"><div class="acc-inner">
@@ -2034,7 +2124,7 @@
         <!-- 5. Experience -->
         <div id="acc-5" class="acc-card">
           <button type="button" class="acc-trigger" onclick="toggleAcc('acc-5')">
-            <div class="acc-left"><span class="acc-num">5</span><span class="acc-title">Experience</span></div>
+            <div class="acc-left"><span class="acc-num">5</span><span class="acc-title">Experience / Fresher <span class="req-star">*</span></span></div>
             <span class="acc-chevron">▾</span>
           </button>
           <div class="acc-body"><div class="acc-inner">
@@ -2088,7 +2178,7 @@
             <div><label class="field-label">Declaration Text</label><textarea id="f-declaration" rows="2" class="ios-textarea" oninput="upd('declaration', this.value)"></textarea></div>
             <div class="field-grid cols-2">
               <div><label class="field-label">Date</label><input id="f-date" class="ios-input" oninput="upd('declDate', this.value)" /></div>
-              <div><label class="field-label">Place</label><input id="f-place" class="ios-input" oninput="upd('declPlace', this.value)" /></div>
+              <div><label class="field-label">Place <span class="req-star">*</span></label><input id="f-place" class="ios-input" oninput="upd('declPlace', this.value)" /></div>
             </div>
             <div><label class="field-label">Signature Name</label><input id="f-signature" class="ios-input" oninput="upd('signature', this.value)" /></div>
           </div></div>
@@ -2099,7 +2189,7 @@
       <!-- COVERING LETTER EDITOR -->
       <div id="cl-editor-group" class="card hidden">
         <div class="card-title">Covering Letter Details</div>
-        <div><label class="field-label">To (Recipient Address — one per line)</label><textarea id="cl-to" rows="3" class="ios-textarea" oninput="updCL('to', this.value)"></textarea></div>
+        <div><label class="field-label">To (Company Name &amp; Address — optional)</label><textarea id="cl-to" rows="3" class="ios-textarea" placeholder="The HR Manager,&#10;Company Name (or leave blank for universal),&#10;City, State" oninput="updCL('to', this.value)"></textarea></div>
         <div><label class="field-label">Subject</label><input id="cl-subject" class="ios-input" oninput="updCL('subject', this.value)" /></div>
         <div><label class="field-label">Salutation</label><input id="cl-salutation" class="ios-input" oninput="updCL('salutation', this.value)" /></div>
         <div><label class="field-label">Paragraph 1 (Opening)</label><textarea id="cl-p1" rows="3" class="ios-textarea" oninput="updCL('p1', this.value)"></textarea></div>
@@ -2425,7 +2515,7 @@
         <button id="ai-tab-import" type="button" class="seg-btn" onclick="switchAiTab('import')">2. Paste &amp; Upload</button>
       </div>
 
-      <!-- VIEW 1: FILL WITH CHATGPT (NO PROMPT EXPOSED) -->
+      <!-- VIEW 1: FILL WITH CHATGPT -->
       <div id="ai-view-chatgpt" class="ai-clean-box">
         <div>
           <label class="field-label" style="font-size:12px; color:var(--ink); margin-bottom:5px;">What type of job are you looking for?</label>
@@ -2437,8 +2527,11 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/>
           </svg>
         </button>
+        <button type="button" class="btn-soft" style="background:#FFF; height:38px; font-size:12px;" onclick="copyPromptOnly()">
+          <span>Copy Prompt (If using ChatGPT App)</span>
+        </button>
         <p style="font-size:11.5px; color:var(--muted); line-height:1.45; text-align:center;">
-          ChatGPT aapki details lekar ek ready file dega. Copy karke <strong>Paste &amp; Upload</strong> tab me daal dein.
+          ChatGPT aapki details se ready code dega. Copy karke <strong>Paste &amp; Upload</strong> tab me daal dein.
         </p>
       </div>
 
@@ -2485,6 +2578,26 @@
       </div>
       <div class="ios-alert-actions single">
         <button type="button" class="ios-alert-btn" onclick="closeIosNotice()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREMIUM ALERT MODAL FOR REQUIRED DETAILS -->
+  <div id="prem-req-modal" class="prem-alert-backdrop no-print" onclick="if(event.target===this) closePremiumReqAlert()">
+    <div class="prem-alert-card" role="alertdialog" aria-modal="true" aria-labelledby="prem-req-title">
+      <div class="prem-alert-icon">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+        </svg>
+      </div>
+      <div id="prem-req-title" class="prem-alert-title">Fill Important Details First</div>
+      <p class="prem-alert-desc">
+        ChatGPT aapki personal details khud nahi jaanta. <span style="color:var(--ios-red); font-weight:700;">*</span> wale sections pehle bharein taaki accurate resume bane:
+      </p>
+      <div id="prem-missing-list" class="prem-missing-pills"></div>
+      <div class="prem-alert-btns">
+        <button type="button" class="btn-soft" style="height:42px; font-size:13px;" onclick="closePremiumReqAlert()">Close</button>
+        <button type="button" class="btn-primary" style="height:42px; font-size:13px; box-shadow:0 4px 12px rgba(0,122,255,0.26);" onclick="goToMissingRequiredDetail()">Fill Now</button>
       </div>
     </div>
   </div>
@@ -3100,36 +3213,186 @@
             });
           }
         }
+        if (d.coverLetter && isStrFilled(d.coverLetter.to)) {
+          facts.coverLetterCompanyTo = String(d.coverLetter.to).trim();
+        }
         return facts;
       }
 
+      function getRequiredMissingItems() {
+        const d = state.data;
+        const missing = [];
+
+        const personalChecks = [
+          { ok: isStrFilled(d.name), label: 'Full Name', accId: 'acc-1', targetId: 'f-name' },
+          { ok: isStrFilled(d.phone), label: 'Mobile No.', accId: 'acc-1', targetId: 'f-phone' },
+          { ok: isStrFilled(d.email), label: 'Email ID', accId: 'acc-1', targetId: 'f-email' },
+          { ok: isStrFilled(d.dob), label: 'Date of Birth', accId: 'acc-1', targetId: 'f-dob' },
+          { ok: isStrFilled(d.gender), label: 'Gender', accId: 'acc-1', targetId: 'f-gender' },
+          { ok: isStrFilled(d.nationality), label: 'Nationality', accId: 'acc-1', targetId: 'f-nationality' },
+          { ok: isStrFilled(d.address), label: 'Address', accId: 'acc-1', targetId: 'f-address' },
+          { ok: isStrFilled(d.languages), label: 'Languages Known', accId: 'acc-1', targetId: 'f-languages' }
+        ];
+
+        personalChecks.forEach(function (item) {
+          if (!item.ok) missing.push(item);
+        });
+
+        const validEdu = (d.education || []).filter(function (r) {
+          return r && isStrFilled(r.qual) && isStrFilled(r.board) && isStrFilled(r.year) && isStrFilled(r.pct);
+        });
+        if (validEdu.length === 0) {
+          missing.push({
+            label: 'Education (Row)',
+            accId: 'acc-3',
+            targetSelector: '#edu-list input'
+          });
+        }
+
+        if (!d.isFresher) {
+          const validExp = (d.experience || []).filter(function (e) {
+            return e && isStrFilled(e.role) && isStrFilled(e.company) && isStrFilled(e.duration);
+          });
+          if (validExp.length === 0) {
+            missing.push({
+              label: 'Experience / Fresher',
+              accId: 'acc-5',
+              targetSelector: '#exp-list input'
+            });
+          }
+        }
+
+        if (!isStrFilled(d.declPlace)) {
+          missing.push({
+            label: 'Place (Declaration)',
+            accId: 'acc-8',
+            targetId: 'f-place'
+          });
+        }
+
+        return missing;
+      }
+
+      function syncChatGPTButtonState() {
+        const btn = document.getElementById('btn-fill-chatgpt');
+        if (!btn) return;
+        const missing = getRequiredMissingItems();
+        const isReady = missing.length === 0;
+        btn.classList.toggle('is-disabled', !isReady);
+        btn.setAttribute('aria-disabled', isReady ? 'false' : 'true');
+      }
+
+      let _firstMissingReqItem = null;
+
+      window.showPremiumReqAlert = function (missingList) {
+        const items = missingList || getRequiredMissingItems();
+        _firstMissingReqItem = items[0] || null;
+        const listEl = document.getElementById('prem-missing-list');
+        const modal = document.getElementById('prem-req-modal');
+        if (listEl) {
+          listEl.innerHTML = items.map(function (it) {
+            return '<span class="prem-miss-chip">' + esc(it.label) + ' *</span>';
+          }).join('');
+        }
+        if (modal) modal.classList.add('open');
+      };
+
+      window.closePremiumReqAlert = function () {
+        const modal = document.getElementById('prem-req-modal');
+        if (modal) modal.classList.remove('open');
+      };
+
+      window.goToMissingRequiredDetail = function () {
+        const target = _firstMissingReqItem || getRequiredMissingItems()[0];
+        closePremiumReqAlert();
+        if (!target) return;
+
+        if (target.switchToCl) {
+          if (state.editTab !== 'cl') setEditTab('cl');
+        } else if (state.editTab !== 'cv') {
+          setEditTab('cv');
+        }
+        if (target.accId) {
+          const acc = document.getElementById(target.accId);
+          if (acc && !acc.classList.contains('open')) {
+            acc.classList.add('open');
+          }
+        }
+
+        setTimeout(function () {
+          let el = target.targetId ? document.getElementById(target.targetId) : null;
+          if (!el && target.targetSelector) {
+            const inputs = document.querySelectorAll(target.targetSelector);
+            for (let i = 0; i < inputs.length; i++) {
+              if (!isStrFilled(inputs[i].value)) {
+                el = inputs[i];
+                break;
+              }
+            }
+            if (!el && inputs.length) el = inputs[0];
+          }
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            highlightTargetElement(el);
+            if (typeof el.focus === 'function' && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) {
+              setTimeout(function () {
+                try { el.focus({ preventScroll: true }); } catch (e) {}
+              }, 340);
+            }
+          }
+        }, 120);
+      };
+
+      window.handleChatGPTButtonClick = function () {
+        const missing = getRequiredMissingItems();
+        if (missing.length > 0) {
+          showPremiumReqAlert(missing);
+          return;
+        }
+        openAiModal('chatgpt');
+      };
+
       function buildChatGPTMasterPrompt(jobRole) {
-        const role = (jobRole || '').trim() || 'Not specified yet';
+        const role = (jobRole || '').trim() || 'Data Entry Operator';
         const facts = getPersonalFactsOnly();
-        const filledList = Object.keys(facts).filter(function (k) { return k !== 'isFresher'; });
+        const todayStr = new Date().toLocaleDateString('en-GB');
+        const place = facts.declPlace || 'New Delhi';
+        const defaultTo = facts.coverLetterCompanyTo || ('The HR Manager,\nThe Hiring Team,\n' + place);
+        const expSchema = (!facts.isFresher && Array.isArray(facts.experience) && facts.experience.length)
+          ? facts.experience.map(function (e) {
+              return {
+                role: e.role || '',
+                company: e.company || '',
+                duration: e.duration || '',
+                bullets: ['<Action bullet 1 for ' + (e.role || role) + '>', '<Action bullet 2 for ' + (e.role || role) + '>', '<Action bullet 3 for ' + (e.role || role) + '>']
+              };
+            })
+          : [];
 
         return [
-          'You are an expert Indian HR & ATS Resume + Covering Letter Assistant for BikriPage Smart CV Studio.',
-          'Target Job Role: ' + role,
-          filledList.length ? ('USER PERSONAL DETAILS (ALREADY KNOWN — DO NOT ASK AGAIN):\n' + JSON.stringify(facts, null, 2)) : '',
-          '',
-          'STRICT RULES:',
-          '1. FIRST REPLY: Greet briefly and ask ONLY ONE question: Do you want (1) Resume / CV only, (2) Covering Letter only, or (3) Both Resume & Covering Letter? Wait for user reply.',
-          '2. SECOND REPLY: Ask ONLY missing personal facts that ChatGPT cannot know (from: Name, Phone, Email, City/Address, Qualification, Fresher/Experience, and Company Name if Cover Letter selected). NEVER ask any detail already in USER PERSONAL DETAILS above! NEVER ask Objective, Skills, Achievements, Hobbies, Interest, Strengths, or Cover Letter text — you must write all of those yourself tailored to "' + role + '". Tell user: "Jo skip karna ho chhod dein." Never ask follow-up questions.',
-          '3. CONCISE WORD & ITEM LIMITS (SO FONT NEVER SHRINKS ON 1-PAGE A4):',
-          '   - objective: strictly 1–2 short crisp sentences (max 28 words total).',
-          '   - education: max 3 concise rows (qual, board, year, pct only).',
-          '   - skills: max 6 short skill items (2–4 words each).',
-          '   - fresherNote: max 2 short sentences (max 26 words).',
-          '   - experience: max 2 entries, and at most 2–3 short bullets per entry (max 10 words per bullet).',
-          '   - achievements: max 3 short bullet lines (max 9 words each).',
-          '   - hobbies, interest, strengths: keep each field short (2–5 words).',
-          '   - coverLetter paragraphs (p1, p2, p3): keep each paragraph concise (2–3 crisp sentences, ~35–45 words per para) so Covering Letter fits cleanly on 1 A4 page with large readable font.',
-          '4. FINAL OUTPUT: Combine USER PERSONAL DETAILS + user replies, auto-write concise Objective, Skills, fresherNote/experience bullets, Achievements, Hobbies, Interest, Strengths, signature (= name), and concise Cover Letter (if needed) tailored to "' + role + '" following ALL length limits above. Output ONLY a single clean ```json ... ``` block with this exact schema:',
-          '{"docMode":"cv|cl|both","name":"","phone":"","email":"","dob":"","gender":"","nationality":"Indian","address":"","languages":"Hindi, English","objective":"","education":[{"qual":"","board":"","year":"","pct":""}],"skills":[],"isFresher":true,"fresherNote":"","experience":[{"role":"","company":"","duration":"","bullets":[]}],"achievements":[],"hobbies":"","interest":"","strengths":"","declaration":"I hereby declare that the above information is true and correct to the best of my knowledge and belief.","declDate":"","declPlace":"","signature":"","coverLetter":{"to":"","subject":"","salutation":"Respected Sir/Madam,","p1":"","p2":"","p3":"","closing":"Thank you for your time and consideration. I look forward to hearing from you.","signoff":"Yours faithfully,","enclosure":"Curriculum Vitae (CV)"}}',
-          'After the JSON block, write 1 line: "Upar Copy code dabakar BikriPage Studio me Paste & Upload karein!"'
-        ].filter(Boolean).join('\n');
+          'Indian HR & ATS Resume + Covering Letter JSON Generator for BikriPage Studio.',
+          'Target Role: ' + role,
+          'Candidate Data (keep 100% exact): ' + JSON.stringify(facts),
+          'Step 1: Greet ' + (facts.name ? facts.name.split(' ')[0] : 'candidate') + ' briefly and ask ONLY: "Do you want (1) CV only, (2) Covering Letter only, or (3) Both?" Wait for reply.',
+          'Step 2: Output ONLY a single ```json ... ``` block filling ALL fields below (write 3 crisp action-verb bullets for each experience entry; NEVER leave any string or array empty):',
+          '{"docMode":"cv|cl|both","name":"' + (facts.name || '') + '","phone":"' + (facts.phone || '') + '","email":"' + (facts.email || '') + '","dob":"' + (facts.dob || '') + '","gender":"' + (facts.gender || '') + '","nationality":"' + (facts.nationality || 'Indian') + '","address":"' + (facts.address || '') + '","languages":"' + (facts.languages || 'Hindi, English') + '","objective":"<2 crisp sentences for ' + role + '>","education":' + JSON.stringify(facts.education || []) + ',"skills":["<6 ATS skills for ' + role + '>"],"isFresher":' + JSON.stringify(Boolean(facts.isFresher)) + ',"fresherNote":"<2 crisp fresher readiness sentences>","experience":' + JSON.stringify(expSchema) + ',"achievements":["<3 realistic achievements>"],"hobbies":"<3 hobbies>","interest":"<2-3 interests for ' + role + '>","strengths":"<3 strengths>","declaration":"I hereby declare that the above information is true and correct to the best of my knowledge and belief.","declDate":"' + (facts.declDate || todayStr) + '","declPlace":"' + place + '","signature":"' + (facts.name || '') + '","coverLetter":{"to":' + JSON.stringify(defaultTo) + ',"subject":"Application for the Position of ' + role + '.","salutation":"Respected Sir/Madam,","p1":"<Opening para 2-3 sentences>","p2":"<Skills & education para 2-3 sentences>","p3":"<Interview request para 2 sentences>","closing":"Thank you for your time and consideration. I look forward to hearing from you.","signoff":"Yours faithfully,","enclosure":"Curriculum Vitae (CV)"}}',
+          'End with: "Copy code dabakar BikriPage Studio me Paste & Upload karein!"'
+        ].join('\n');
       }
+
+      window.copyPromptOnly = function () {
+        const inp = document.getElementById('ai-job-input');
+        const job = inp ? inp.value.trim() : '';
+        if (!job) {
+          toast('Pehle job role likhein (e.g. Data Entry Operator)');
+          if (inp) inp.focus();
+          return;
+        }
+        const prompt = buildChatGPTMasterPrompt(job);
+        copyTextSilently(prompt);
+        switchAiTab('import');
+        toast('Prompt copied! Ab ChatGPT app me paste karein');
+      };
 
       window.switchAiTab = function (tab) {
         const isChat = tab !== 'import';
@@ -3152,6 +3415,13 @@
 
       window.openAiModal = function (tab) {
         const targetTab = tab === 'import' ? 'import' : 'chatgpt';
+        if (targetTab === 'chatgpt') {
+          const missing = getRequiredMissingItems();
+          if (missing.length > 0) {
+            showPremiumReqAlert(missing);
+            return;
+          }
+        }
         switchAiTab(targetTab);
         const modal = document.getElementById('ai-studio-modal');
         if (modal) modal.classList.add('open');
@@ -3239,13 +3509,40 @@
         const fenceMatch = txt.match(/```(?:json)?\s*([\s\S]*?)```/i);
         if (fenceMatch && fenceMatch[1]) {
           txt = fenceMatch[1].trim();
+        } else {
+          txt = txt.replace(/^```(?:json)?/i, '').replace(/```$/i, '').trim();
         }
         const firstBrace = txt.indexOf('{');
         const lastBrace = txt.lastIndexOf('}');
         if (firstBrace !== -1 && lastBrace > firstBrace) {
           txt = txt.slice(firstBrace, lastBrace + 1);
         }
+        txt = txt
+          .replace(/[\u201C\u201D]/g, '"')
+          .replace(/[\u2018\u2019]/g, "'")
+          .replace(/,\s*([}\]])/g, '$1');
         return JSON.parse(txt);
+      }
+
+      function coerceToCleanString(v) {
+        if (typeof v === 'string') return v.trim();
+        if (Array.isArray(v)) {
+          return v.map(function (x) { return coerceToCleanString(x); }).filter(Boolean).join(', ');
+        }
+        if (v && typeof v === 'object') {
+          return Object.values(v).map(function (x) { return coerceToCleanString(x); }).filter(Boolean).join(' - ');
+        }
+        return '';
+      }
+
+      function coerceToStringArray(v) {
+        if (Array.isArray(v)) {
+          return v.map(function (x) { return coerceToCleanString(x); }).filter(Boolean);
+        }
+        if (typeof v === 'string' && v.trim()) {
+          return v.split(/\r?\n|,/).map(function (x) { return x.replace(/^[-•*]\s*/, '').trim(); }).filter(Boolean);
+        }
+        return [];
       }
 
       window.importAiResumeData = function () {
@@ -3269,12 +3566,36 @@
 
         const d = state.data;
 
-        const strFields = ['name', 'address', 'phone', 'email', 'dob', 'gender', 'nationality', 'languages', 'objective', 'fresherNote', 'hobbies', 'interest', 'strengths', 'declaration', 'declDate', 'declPlace', 'signature'];
-        strFields.forEach(function (k) {
-          if (typeof parsed[k] === 'string') {
-            const val = parsed[k].trim();
-            if (val) {
-              d[k] = val;
+        const fieldAliases = {
+          name: ['name', 'fullName', 'full_name'],
+          address: ['address', 'location', 'city'],
+          phone: ['phone', 'mobile', 'phoneNumber', 'phone_number'],
+          email: ['email', 'emailId', 'email_id'],
+          dob: ['dob', 'dateOfBirth', 'date_of_birth'],
+          gender: ['gender', 'sex'],
+          nationality: ['nationality'],
+          languages: ['languages', 'languagesKnown', 'languages_known'],
+          objective: ['objective', 'careerObjective', 'career_objective', 'summary', 'profileSummary'],
+          fresherNote: ['fresherNote', 'fresher_note', 'fresherSummary', 'fresher_summary', 'experienceSummary'],
+          hobbies: ['hobbies', 'hobby'],
+          interest: ['interest', 'interests', 'areasOfInterest'],
+          strengths: ['strengths', 'strength', 'keyStrengths'],
+          declaration: ['declaration'],
+          declDate: ['declDate', 'decl_date', 'date'],
+          declPlace: ['declPlace', 'decl_place', 'place'],
+          signature: ['signature']
+        };
+
+        Object.keys(fieldAliases).forEach(function (targetKey) {
+          const keys = fieldAliases[targetKey];
+          for (let i = 0; i < keys.length; i++) {
+            const rawVal = parsed[keys[i]];
+            if (rawVal !== undefined && rawVal !== null) {
+              const val = coerceToCleanString(rawVal);
+              if (val) {
+                d[targetKey] = val;
+                break;
+              }
             }
           }
         });
@@ -3282,73 +3603,110 @@
 
         if (typeof parsed.isFresher === 'boolean') {
           d.isFresher = parsed.isFresher;
+        } else if (typeof parsed.isFresher === 'string') {
+          d.isFresher = parsed.isFresher.toLowerCase() === 'true';
         }
 
-        if (Array.isArray(parsed.education)) {
-          const validEdu = parsed.education.map(function (row) {
+        const eduRaw = parsed.education || parsed.educationalQualification || parsed.qualifications;
+        if (Array.isArray(eduRaw)) {
+          const validEdu = eduRaw.map(function (row) {
             return {
-              qual: String((row && (row.qual || row.qualification || row.degree)) || '').trim(),
-              board: String((row && (row.board || row.university || row.institute)) || '').trim(),
-              year: String((row && (row.year || row.passingYear)) || '').trim(),
-              pct: String((row && (row.pct || row.percentage || row.marks || row.cgpa)) || '').trim()
+              qual: coerceToCleanString(row && (row.qual || row.qualification || row.degree || row.exam)),
+              board: coerceToCleanString(row && (row.board || row.university || row.institute || row.school)),
+              year: coerceToCleanString(row && (row.year || row.passingYear || row.passing_year)),
+              pct: coerceToCleanString(row && (row.pct || row.percentage || row.marks || row.cgpa))
             };
           }).filter(function (r) { return r.qual || r.board || r.year || r.pct; });
           if (validEdu.length) {
-            d.education = validEdu.length ? validEdu : [{ qual: '', board: '', year: '', pct: '' }];
+            d.education = validEdu;
           }
         }
 
-        if (Array.isArray(parsed.skills)) {
-          const validSkills = parsed.skills.map(function (s) { return String(s || '').trim(); }).filter(Boolean);
-          if (validSkills.length) {
-            d.skills = validSkills;
-          }
+        const skillsArr = coerceToStringArray(parsed.skills || parsed.keySkills || parsed.technicalSkills);
+        if (skillsArr.length) {
+          d.skills = skillsArr;
         }
 
-        if (Array.isArray(parsed.experience)) {
-          const validExp = parsed.experience.map(function (ex) {
+        const expRaw = parsed.experience || parsed.workExperience || parsed.work_experience;
+        if (Array.isArray(expRaw)) {
+          const validExp = expRaw.map(function (ex) {
             return {
-              role: String((ex && (ex.role || ex.title || ex.position)) || '').trim(),
-              company: String((ex && (ex.company || ex.organization)) || '').trim(),
-              duration: String((ex && (ex.duration || ex.period || ex.years)) || '').trim(),
-              bullets: Array.isArray(ex && ex.bullets)
-                ? ex.bullets.map(function (b) { return String(b || '').trim(); }).filter(Boolean)
-                : []
+              role: coerceToCleanString(ex && (ex.role || ex.title || ex.position)),
+              company: coerceToCleanString(ex && (ex.company || ex.organization)),
+              duration: coerceToCleanString(ex && (ex.duration || ex.period || ex.years)),
+              bullets: coerceToStringArray(ex && (ex.bullets || ex.responsibilities || ex.description))
             };
           }).filter(function (e) { return e.role || e.company || e.duration || e.bullets.length; });
           if (validExp.length) {
-            d.experience = validExp.length ? validExp : [{ role: '', company: '', duration: '', bullets: [] }];
+            d.experience = validExp;
           }
         }
 
-        if (Array.isArray(parsed.achievements)) {
-          const validAch = parsed.achievements.map(function (a) { return String(a || '').trim(); }).filter(Boolean);
-          if (validAch.length) {
-            d.achievements = validAch;
-          }
+        const achArr = coerceToStringArray(parsed.achievements || parsed.accomplishments || parsed.certifications);
+        if (achArr.length) {
+          d.achievements = achArr;
         }
 
-        if (parsed.coverLetter && typeof parsed.coverLetter === 'object') {
-          const cl = parsed.coverLetter;
-          ['to', 'subject', 'salutation', 'p1', 'p2', 'p3', 'closing', 'signoff', 'enclosure'].forEach(function (ck) {
-            if (typeof cl[ck] === 'string') {
-              const val = cl[ck].trim();
-              if (val) {
-                d.coverLetter[ck] = val;
+        const cl = parsed.coverLetter || parsed.coveringLetter || parsed.cover_letter || parsed.covering_letter;
+        if (cl && typeof cl === 'object') {
+          const clAliases = {
+            to: ['to', 'recipient', 'company'],
+            subject: ['subject', 'sub'],
+            salutation: ['salutation', 'greeting'],
+            p1: ['p1', 'para1', 'paragraph1', 'opening'],
+            p2: ['p2', 'para2', 'paragraph2', 'body'],
+            p3: ['p3', 'para3', 'paragraph3', 'closingPara'],
+            closing: ['closing', 'closingLine'],
+            signoff: ['signoff', 'signOff', 'sign_off'],
+            enclosure: ['enclosure', 'enclosures']
+          };
+          Object.keys(clAliases).forEach(function (ck) {
+            const keys = clAliases[ck];
+            for (let i = 0; i < keys.length; i++) {
+              if (cl[keys[i]] !== undefined && cl[keys[i]] !== null) {
+                const val = coerceToCleanString(cl[keys[i]]);
+                if (val) {
+                  d.coverLetter[ck] = val;
+                  break;
+                }
               }
             }
           });
+          if (Array.isArray(cl.paragraphs)) {
+            if (cl.paragraphs[0]) d.coverLetter.p1 = coerceToCleanString(cl.paragraphs[0]);
+            if (cl.paragraphs[1]) d.coverLetter.p2 = coerceToCleanString(cl.paragraphs[1]);
+            if (cl.paragraphs[2]) d.coverLetter.p3 = coerceToCleanString(cl.paragraphs[2]);
+          }
         }
 
-        if (parsed.docMode && ['cv', 'cl', 'both'].indexOf(parsed.docMode) !== -1) {
-          setDocMode(parsed.docMode);
+        if (!isStrFilled(d.declaration)) {
+          d.declaration = 'I hereby declare that the above information is true and correct to the best of my knowledge and belief.';
+        }
+        if (!isStrFilled(d.declDate)) {
+          d.declDate = new Date().toLocaleDateString('en-GB');
+        }
+        if (!isStrFilled(d.signature) && isStrFilled(d.name)) {
+          d.signature = d.name;
+        }
+        if (d.coverLetter) {
+          if (!isStrFilled(d.coverLetter.to)) d.coverLetter.to = 'The HR Manager,\nThe Hiring Team,\n' + (d.declPlace || 'New Delhi');
+          if (!isStrFilled(d.coverLetter.salutation)) d.coverLetter.salutation = 'Respected Sir/Madam,';
+          if (!isStrFilled(d.coverLetter.closing)) d.coverLetter.closing = 'Thank you for your time and consideration. I look forward to hearing from you.';
+          if (!isStrFilled(d.coverLetter.signoff)) d.coverLetter.signoff = 'Yours faithfully,';
+          if (!isStrFilled(d.coverLetter.enclosure)) d.coverLetter.enclosure = 'Curriculum Vitae (CV)';
         }
 
         syncForm();
+
+        const modeRaw = coerceToCleanString(parsed.docMode || parsed.mode).toLowerCase();
+        if (['cv', 'cl', 'both'].indexOf(modeRaw) !== -1) {
+          setDocMode(modeRaw);
+        }
+
         renderPreview();
         save();
         closeAiModal();
-        toast('Resume auto-filled!');
+        toast('Resume & Cover Letter auto-filled!');
         if (window.innerWidth < 980) {
           setMobileView('preview');
         }
@@ -3887,11 +4245,11 @@
           return '<div class="sub-card">' +
             '<div class="sub-head"><span>Experience ' + (i + 1) + '</span><button type="button" class="btn-danger" onclick="delExp(' + i + ')">Delete</button></div>' +
             '<div class="field-grid cols-2">' +
-              '<input class="ios-input" placeholder="Role" value="' + esc(ex.role) + '" oninput="updExp(' + i + ',\'role\',this.value)" />' +
-              '<input class="ios-input" placeholder="Company" value="' + esc(ex.company) + '" oninput="updExp(' + i + ',\'company\',this.value)" />' +
+              '<div><label class="field-label">Role <span class="req-star">*</span></label><input class="ios-input" placeholder="e.g. Data Entry Operator" value="' + esc(ex.role) + '" oninput="updExp(' + i + ',\'role\',this.value)" /></div>' +
+              '<div><label class="field-label">Company <span class="req-star">*</span></label><input class="ios-input" placeholder="e.g. ABC Pvt. Ltd." value="' + esc(ex.company) + '" oninput="updExp(' + i + ',\'company\',this.value)" /></div>' +
             '</div>' +
-            '<input class="ios-input" placeholder="Duration (e.g. May 2024 - July 2024)" value="' + esc(ex.duration) + '" oninput="updExp(' + i + ',\'duration\',this.value)" />' +
-            '<textarea rows="3" class="ios-textarea" placeholder="One bullet per line" oninput="updExpBullets(' + i + ',this.value)">' + esc((ex.bullets || []).join('\n')) + '</textarea>' +
+            '<div><label class="field-label">Duration <span class="req-star">*</span></label><input class="ios-input" placeholder="e.g. May 2024 - July 2024" value="' + esc(ex.duration) + '" oninput="updExp(' + i + ',\'duration\',this.value)" /></div>' +
+            '<div><label class="field-label">Work Summary / Bullets (AI auto-writes if left blank)</label><textarea rows="3" class="ios-textarea" placeholder="One bullet per line (or leave blank for ChatGPT AI)" oninput="updExpBullets(' + i + ',this.value)">' + esc((ex.bullets || []).join('\n')) + '</textarea></div>' +
           '</div>';
         }).join('');
       }
@@ -5438,6 +5796,7 @@
           const previewMissing = info.missing.slice(0, 2).join(' · ') + (info.missing.length > 2 ? ' +' + (info.missing.length - 2) : '');
           subEl.innerHTML = 'Remaining: ' + esc(previewMissing) + ' <span class="cv-prog-jump-hint">Tap to fill &rsaquo;</span>';
         }
+        syncChatGPTButtonState();
       }
 
       function renderPreview() {
@@ -5571,6 +5930,7 @@
         bindCropPointerEvents();
         renderSwatches();
         syncForm();
+        syncChatGPTButtonState();
         setDocMode(state.docMode);
         setLayout(state.layout, true);
         syncFontSizeUI();

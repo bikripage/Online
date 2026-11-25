@@ -286,91 +286,92 @@
         }
 
 
-        /* 7. Aesthetic iOS Floating Dynamic Island Navigation Pill */
-        @keyframes bpPillBarSweep {
-            0% { transform: translateX(-100%); }
-            60% { transform: translateX(-15%); }
-            100% { transform: translateX(-3%); }
+        /* 7. Minimalist iOS Fade Circle Navigation Loader */
+        @keyframes bpCircleRippleFade {
+            0% {
+                opacity: 0.72;
+                transform: translate3d(-50%, -50%, 0) scale(0.35);
+            }
+            100% {
+                opacity: 0;
+                transform: translate3d(-50%, -50%, 0) scale(2.15);
+            }
         }
-        @keyframes bpOrbPulse {
-            0%, 100% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.18); opacity: 1; }
+        @keyframes bpCircleCoreBreath {
+            0%, 100% {
+                opacity: 0.95;
+                transform: translate3d(-50%, -50%, 0) scale(0.94);
+            }
+            50% {
+                opacity: 0.55;
+                transform: translate3d(-50%, -50%, 0) scale(1.06);
+            }
         }
         #bp-nav-splash {
             position: fixed;
             inset: 0;
             z-index: 99999;
-            background: rgba(252, 252, 253, 0.55);
+            background: rgba(252, 252, 253, 0.68);
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
-            transition: opacity 0.24s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.24s ease;
+            transition: opacity 0.22s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.22s ease;
         }
         #bp-nav-splash.bp-splash-active {
             opacity: 1;
             visibility: visible;
             pointer-events: auto;
         }
-        .bp-aesthetic-pill {
+        .bp-fade-circle-stage {
             position: fixed;
-            top: 20px;
+            top: 50%;
             left: 50%;
-            transform: translate3d(-50%, -18px, 0) scale(0.92);
-            display: inline-flex;
-            align-items: center;
-            gap: 11px;
-            padding: 9px 18px 9px 11px;
+            width: 88px;
+            height: 88px;
+            transform: translate3d(-50%, -50%, 0);
+            pointer-events: none;
+        }
+        .bp-fade-ring {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 64px;
+            height: 64px;
             border-radius: 999px;
-            background: rgba(24, 24, 27, 0.94);
-            color: #FFFFFF;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            box-shadow: 0 16px 38px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
+            border: 1.5px solid rgba(99, 102, 241, 0.55);
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.14) 0%, rgba(99, 102, 241, 0) 70%);
             opacity: 0;
-            transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.26s ease;
+            transform: translate3d(-50%, -50%, 0) scale(0.35);
             will-change: transform, opacity;
         }
-        #bp-nav-splash.bp-splash-active .bp-aesthetic-pill {
-            opacity: 1;
-            transform: translate3d(-50%, 0, 0) scale(1);
+        .bp-fade-ring.bp-ring-secondary {
+            border-color: rgba(59, 130, 246, 0.45);
         }
-        .bp-pill-orb {
-            width: 24px;
-            height: 24px;
+        #bp-nav-splash.bp-splash-active .bp-fade-ring {
+            animation: bpCircleRippleFade 1.25s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+        }
+        #bp-nav-splash.bp-splash-active .bp-fade-ring.bp-ring-secondary {
+            animation-delay: -0.62s;
+        }
+        .bp-fade-core-circle {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 42px;
+            height: 42px;
             border-radius: 999px;
-            background: linear-gradient(135deg, #3B82F6, #6366F1, #8B5CF6);
+            background: #FFFFFF;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 10px 28px rgba(79, 70, 229, 0.14);
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
-            box-shadow: 0 0 14px rgba(99, 102, 241, 0.55);
-            animation: bpOrbPulse 1.4s ease-in-out infinite;
+            color: #4F46E5;
+            transform: translate3d(-50%, -50%, 0);
+            will-change: transform, opacity;
         }
-        .bp-pill-label {
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: -0.015em;
-            color: #F4F4F5;
-            white-space: nowrap;
-            padding-right: 4px;
-        }
-        .bp-pill-shimmer-line {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.08);
-            overflow: hidden;
-        }
-        .bp-pill-shimmer-fill {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, #60A5FA, #A78BFA, #F472B6);
-            transform: translateX(-100%);
-        }
-        #bp-nav-splash.bp-splash-active .bp-pill-shimmer-fill {
-            animation: bpPillBarSweep 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        #bp-nav-splash.bp-splash-active .bp-fade-core-circle {
+            animation: bpCircleCoreBreath 1.25s ease-in-out infinite;
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -5715,15 +5716,13 @@ function iosConfirm(title, message, btnText) {
         })();
     </script>
 
-    <!-- ✨ AESTHETIC iOS DYNAMIC PILL LOADER ✨ -->
+    <!-- ✨ MINIMALIST iOS FADE CIRCLE LOADER ✨ -->
     <div id="bp-nav-splash" aria-hidden="true">
-        <div class="bp-aesthetic-pill">
-            <div class="bp-pill-orb">
-                <span class="ios-spinner ios-spinner-sm text-white"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
-            </div>
-            <span id="bp-pill-text" class="bp-pill-label">Opening...</span>
-            <div class="bp-pill-shimmer-line">
-                <div class="bp-pill-shimmer-fill"></div>
+        <div class="bp-fade-circle-stage">
+            <div class="bp-fade-ring"></div>
+            <div class="bp-fade-ring bp-ring-secondary"></div>
+            <div class="bp-fade-core-circle">
+                <span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
             </div>
         </div>
     </div>
@@ -5745,7 +5744,7 @@ function iosConfirm(title, message, btnText) {
             });
         }
 
-        function navigateWithSplash(event, targetUrl, title = 'Opening...') {
+        function navigateWithSplash(event, targetUrl) {
             if (event) {
                 if (event.metaKey || event.ctrlKey || event.shiftKey || event.button === 1) {
                     return true;
@@ -5763,9 +5762,6 @@ function iosConfirm(title, message, btnText) {
             }
 
             const splash = document.getElementById('bp-nav-splash');
-            const labelEl = document.getElementById('bp-pill-text');
-            if (labelEl) labelEl.innerText = title || 'Opening...';
-
             if (splash) {
                 splash.classList.add('bp-splash-active');
                 splash.setAttribute('aria-hidden', 'false');

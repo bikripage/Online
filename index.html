@@ -286,64 +286,62 @@
         }
 
 
-        /* 7. Minimalist iOS Page Transition Loading Screen */
-        @keyframes bpSplashProgress {
-            0% { transform: translateX(-100%); }
-            55% { transform: translateX(-18%); }
-            100% { transform: translateX(-4%); }
+        /* 7. Ultra-Clean Minimalist Apple Top Progress Bar & Soft Backdrop */
+        @keyframes bpTopBarGlide {
+            0% { transform: translate3d(-100%, 0, 0); }
+            65% { transform: translate3d(-18%, 0, 0); }
+            100% { transform: translate3d(-4%, 0, 0); }
         }
         #bp-nav-splash {
             position: fixed;
             inset: 0;
             z-index: 99999;
-            background: rgba(252, 252, 253, 0.96);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            background: rgba(255, 255, 255, 0.72);
             opacity: 0;
+            visibility: hidden;
             pointer-events: none;
-            transition: opacity 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+            transition: opacity 0.18s ease, visibility 0.18s ease;
         }
         #bp-nav-splash.bp-splash-active {
             opacity: 1;
+            visibility: visible;
             pointer-events: auto;
         }
-        #bp-nav-splash-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            padding: 28px 32px;
-            border-radius: 28px;
-            background: #FFFFFF;
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.07);
-            transform: scale(0.94) translateY(8px);
-            transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
-            min-width: 240px;
-            max-width: 300px;
-        }
-        #bp-nav-splash.bp-splash-active #bp-nav-splash-card {
-            transform: scale(1) translateY(0);
-        }
-        .bp-splash-track {
-            width: 120px;
-            height: 3.5px;
-            background: #E5E5EA;
-            border-radius: 999px;
+        .bp-top-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(0, 113, 227, 0.12);
             overflow: hidden;
-            margin-top: 16px;
         }
-        .bp-splash-bar {
+        .bp-top-progress-bar {
             width: 100%;
             height: 100%;
             background: linear-gradient(90deg, #0071E3, #5E5CE6);
-            border-radius: 999px;
-            transform: translateX(-100%);
+            border-radius: 0 999px 999px 0;
+            transform: translate3d(-100%, 0, 0);
+            will-change: transform;
         }
-        #bp-nav-splash.bp-splash-active .bp-splash-bar {
-            animation: bpSplashProgress 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        #bp-nav-splash.bp-splash-active .bp-top-progress-bar {
+            animation: bpTopBarGlide 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        .bp-minimal-loader-dot {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate3d(-50%, -50%, 0);
+            width: 44px;
+            height: 44px;
+            border-radius: 999px;
+            background: #FFFFFF;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1D1D1F;
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -5688,60 +5686,73 @@ function iosConfirm(title, message, btnText) {
         })();
     </script>
 
-    <!-- ✨ MINIMALIST iOS PAGE TRANSITION LOADING SCREEN ✨ -->
+    <!-- ✨ ULTRA-CLEAN MINIMALIST iOS NAVIGATION LOADER ✨ -->
     <div id="bp-nav-splash" aria-hidden="true">
-        <div id="bp-nav-splash-card">
-            <div class="w-12 h-12 rounded-[16px] bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-700 flex items-center justify-center text-white shadow-[0_8px_20px_rgba(59,130,246,0.35)] mb-4">
-                <span class="ios-spinner text-white"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
-            </div>
-            <h4 id="bp-nav-splash-title" class="text-[16px] font-bold text-[#1D1D1F] tracking-tight leading-snug">Loading</h4>
-            <p id="bp-nav-splash-sub" class="text-[12px] text-[#86868B] font-medium mt-1">Please wait a moment...</p>
-            <div class="bp-splash-track">
-                <div class="bp-splash-bar"></div>
-            </div>
+        <div class="bp-top-progress">
+            <div class="bp-top-progress-bar"></div>
+        </div>
+        <div class="bp-minimal-loader-dot">
+            <span class="ios-spinner"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
         </div>
     </div>
 
     <script>
-        // Minimalist iOS Transition Screen for Dashboard & Storefront Navigation
-        function navigateWithSplash(event, targetUrl, title = 'Loading', subtitle = 'Please wait a moment...') {
-            if (event) {
-                // Allow Ctrl/Cmd/middle-click new tab behavior normally
-                if (event.metaKey || event.ctrlKey || event.shiftKey || event.button === 1) {
-                    return true;
-                }
-                event.preventDefault();
-                event.stopPropagation();
-            }
-
-            const splash = document.getElementById('bp-nav-splash');
-            const titleEl = document.getElementById('bp-nav-splash-title');
-            const subEl = document.getElementById('bp-nav-splash-sub');
-
-            if (titleEl) titleEl.innerText = title;
-            if (subEl) subEl.innerText = subtitle;
-
-            if (splash) {
-                splash.classList.add('bp-splash-active');
-                splash.setAttribute('aria-hidden', 'false');
-            }
-
-            // Let the minimalist loading screen paint smoothly before navigating so there is zero white blink
-            setTimeout(() => {
-                window.location.href = targetUrl;
-            }, 340);
-
-            return false;
-        }
-
-        // Hide splash cleanly if user navigates back (bfcache restore)
-        window.addEventListener('pageshow', () => {
+        function hideNavSplash() {
             const splash = document.getElementById('bp-nav-splash');
             if (splash) {
                 splash.classList.remove('bp-splash-active');
                 splash.setAttribute('aria-hidden', 'true');
             }
+            // Reset any button loading states if user came back via browser Back button
+            document.querySelectorAll('[data-bp-nav-busy="1"]').forEach((el) => {
+                el.dataset.bpNavBusy = '0';
+                if (el.dataset.bpOrigHtml) {
+                    el.innerHTML = el.dataset.bpOrigHtml;
+                }
+                el.style.pointerEvents = '';
+                el.style.opacity = '';
+            });
+        }
+
+        function navigateWithSplash(event, targetUrl) {
+            if (event) {
+                if (event.metaKey || event.ctrlKey || event.shiftKey || event.button === 1) {
+                    return true;
+                }
+                event.preventDefault();
+                event.stopPropagation();
+
+                const trigger = event.currentTarget;
+                if (trigger && trigger.dataset.bpNavBusy !== '1') {
+                    trigger.dataset.bpNavBusy = '1';
+                    trigger.dataset.bpOrigHtml = trigger.innerHTML;
+                    trigger.style.pointerEvents = 'none';
+                    trigger.innerHTML = `<span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>`;
+                }
+            }
+
+            const splash = document.getElementById('bp-nav-splash');
+            if (splash) {
+                splash.classList.add('bp-splash-active');
+                splash.setAttribute('aria-hidden', 'false');
+            }
+
+            setTimeout(() => {
+                window.location.href = targetUrl;
+            }, 220);
+
+            return false;
+        }
+
+        // Clean up immediately on Back button / bfcache / tab visibility / pagehide
+        window.addEventListener('pageshow', hideNavSplash);
+        window.addEventListener('pagehide', hideNavSplash);
+        window.addEventListener('popstate', hideNavSplash);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') hideNavSplash();
         });
+        // Ensure hidden on initial load
+        hideNavSplash();
     </script>
 </body>
 </html>

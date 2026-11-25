@@ -286,62 +286,91 @@
         }
 
 
-        /* 7. Ultra-Clean Minimalist Apple Top Progress Bar & Soft Backdrop */
-        @keyframes bpTopBarGlide {
-            0% { transform: translate3d(-100%, 0, 0); }
-            65% { transform: translate3d(-18%, 0, 0); }
-            100% { transform: translate3d(-4%, 0, 0); }
+        /* 7. Aesthetic iOS Floating Dynamic Island Navigation Pill */
+        @keyframes bpPillBarSweep {
+            0% { transform: translateX(-100%); }
+            60% { transform: translateX(-15%); }
+            100% { transform: translateX(-3%); }
+        }
+        @keyframes bpOrbPulse {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.18); opacity: 1; }
         }
         #bp-nav-splash {
             position: fixed;
             inset: 0;
             z-index: 99999;
-            background: rgba(255, 255, 255, 0.72);
+            background: rgba(252, 252, 253, 0.55);
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
-            transition: opacity 0.18s ease, visibility 0.18s ease;
+            transition: opacity 0.24s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.24s ease;
         }
         #bp-nav-splash.bp-splash-active {
             opacity: 1;
             visibility: visible;
             pointer-events: auto;
         }
-        .bp-top-progress {
+        .bp-aesthetic-pill {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: rgba(0, 113, 227, 0.12);
-            overflow: hidden;
-        }
-        .bp-top-progress-bar {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, #0071E3, #5E5CE6);
-            border-radius: 0 999px 999px 0;
-            transform: translate3d(-100%, 0, 0);
-            will-change: transform;
-        }
-        #bp-nav-splash.bp-splash-active .bp-top-progress-bar {
-            animation: bpTopBarGlide 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-        .bp-minimal-loader-dot {
-            position: fixed;
-            top: 50%;
+            top: 20px;
             left: 50%;
-            transform: translate3d(-50%, -50%, 0);
-            width: 44px;
-            height: 44px;
+            transform: translate3d(-50%, -18px, 0) scale(0.92);
+            display: inline-flex;
+            align-items: center;
+            gap: 11px;
+            padding: 9px 18px 9px 11px;
             border-radius: 999px;
-            background: #FFFFFF;
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+            background: rgba(24, 24, 27, 0.94);
+            color: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 0 16px 38px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            opacity: 0;
+            transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.26s ease;
+            will-change: transform, opacity;
+        }
+        #bp-nav-splash.bp-splash-active .bp-aesthetic-pill {
+            opacity: 1;
+            transform: translate3d(-50%, 0, 0) scale(1);
+        }
+        .bp-pill-orb {
+            width: 24px;
+            height: 24px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #3B82F6, #6366F1, #8B5CF6);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #1D1D1F;
+            flex-shrink: 0;
+            box-shadow: 0 0 14px rgba(99, 102, 241, 0.55);
+            animation: bpOrbPulse 1.4s ease-in-out infinite;
+        }
+        .bp-pill-label {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: -0.015em;
+            color: #F4F4F5;
+            white-space: nowrap;
+            padding-right: 4px;
+        }
+        .bp-pill-shimmer-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+        }
+        .bp-pill-shimmer-fill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #60A5FA, #A78BFA, #F472B6);
+            transform: translateX(-100%);
+        }
+        #bp-nav-splash.bp-splash-active .bp-pill-shimmer-fill {
+            animation: bpPillBarSweep 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -5686,13 +5715,16 @@ function iosConfirm(title, message, btnText) {
         })();
     </script>
 
-    <!-- ✨ ULTRA-CLEAN MINIMALIST iOS NAVIGATION LOADER ✨ -->
+    <!-- ✨ AESTHETIC iOS DYNAMIC PILL LOADER ✨ -->
     <div id="bp-nav-splash" aria-hidden="true">
-        <div class="bp-top-progress">
-            <div class="bp-top-progress-bar"></div>
-        </div>
-        <div class="bp-minimal-loader-dot">
-            <span class="ios-spinner"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
+        <div class="bp-aesthetic-pill">
+            <div class="bp-pill-orb">
+                <span class="ios-spinner ios-spinner-sm text-white"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
+            </div>
+            <span id="bp-pill-text" class="bp-pill-label">Opening...</span>
+            <div class="bp-pill-shimmer-line">
+                <div class="bp-pill-shimmer-fill"></div>
+            </div>
         </div>
     </div>
 
@@ -5703,7 +5735,6 @@ function iosConfirm(title, message, btnText) {
                 splash.classList.remove('bp-splash-active');
                 splash.setAttribute('aria-hidden', 'true');
             }
-            // Reset any button loading states if user came back via browser Back button
             document.querySelectorAll('[data-bp-nav-busy="1"]').forEach((el) => {
                 el.dataset.bpNavBusy = '0';
                 if (el.dataset.bpOrigHtml) {
@@ -5714,7 +5745,7 @@ function iosConfirm(title, message, btnText) {
             });
         }
 
-        function navigateWithSplash(event, targetUrl) {
+        function navigateWithSplash(event, targetUrl, title = 'Opening...') {
             if (event) {
                 if (event.metaKey || event.ctrlKey || event.shiftKey || event.button === 1) {
                     return true;
@@ -5727,11 +5758,14 @@ function iosConfirm(title, message, btnText) {
                     trigger.dataset.bpNavBusy = '1';
                     trigger.dataset.bpOrigHtml = trigger.innerHTML;
                     trigger.style.pointerEvents = 'none';
-                    trigger.innerHTML = `<span class="ios-spinner ios-spinner-sm"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>`;
+                    trigger.style.opacity = '0.82';
                 }
             }
 
             const splash = document.getElementById('bp-nav-splash');
+            const labelEl = document.getElementById('bp-pill-text');
+            if (labelEl) labelEl.innerText = title || 'Opening...';
+
             if (splash) {
                 splash.classList.add('bp-splash-active');
                 splash.setAttribute('aria-hidden', 'false');
@@ -5739,19 +5773,17 @@ function iosConfirm(title, message, btnText) {
 
             setTimeout(() => {
                 window.location.href = targetUrl;
-            }, 220);
+            }, 240);
 
             return false;
         }
 
-        // Clean up immediately on Back button / bfcache / tab visibility / pagehide
         window.addEventListener('pageshow', hideNavSplash);
         window.addEventListener('pagehide', hideNavSplash);
         window.addEventListener('popstate', hideNavSplash);
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') hideNavSplash();
         });
-        // Ensure hidden on initial load
         hideNavSplash();
     </script>
 </body>

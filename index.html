@@ -379,23 +379,68 @@
         }
 
     </style>
-        <!-- Schema Markup -->
-    <script type="application/ld+json">
+        
+<!-- BikriPage SEO Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
     {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
+      "@type": "Organization",
+      "@id": "https://bikripage.github.io/Online/#organization",
       "name": "BikriPage",
-      "applicationCategory": "BusinessApplication",
-      "operatingSystem": "Web, Android",
       "url": "https://bikripage.github.io/Online/",
-      "description": "A smart storefront builder empowering growing businesses to create online stores and manage orders directly via WhatsApp and App.",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "INR"
-      }
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://bikripage.github.io/Online/logo.png"
+      },
+      "email": "bikripage@gmail.com",
+      "sameAs": [
+        "https://instagram.com/bikripage"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://bikripage.github.io/Online/#website",
+      "url": "https://bikripage.github.io/Online/",
+      "name": "BikriPage",
+      "description": "BikriPage provides digital storefront solutions and useful online tools for businesses, shop owners, customers and job seekers.",
+      "publisher": {
+        "@id": "https://bikripage.github.io/Online/#organization"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://bikripage.github.io/Online/#software",
+      "name": "BikriPage",
+      "url": "https://bikripage.github.io/Online/",
+      "image": "https://bikripage.github.io/Online/logo.png",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web browser",
+      "description": "BikriPage is a digital storefront and business tools platform that helps local shop owners showcase products, manage customer orders through app and WhatsApp workflows, and access tools for billing, QR codes, printing, reviews and resume creation.",
+      "publisher": {
+        "@id": "https://bikripage.github.io/Online/#organization"
+      },
+      "featureList": [
+        "Digital Storefront",
+        "Local Shop Discovery",
+        "Product Catalog",
+        "Customer Ordering",
+        "WhatsApp Order Integration",
+        "Resume and Cover Letter Studio",
+        "Smart Calculator",
+        "Smart Scanner POS",
+        "QR and Barcode Studio",
+        "Smart Review Hub",
+        "Smart Print Desk"
+      ],
+      "inLanguage": "en"
     }
-    </script>
+  ]
+}
+</script>
+
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
 

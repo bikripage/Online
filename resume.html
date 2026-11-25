@@ -14,7 +14,7 @@
   <!-- Curated Google Fonts (graceful offline fallback) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Lato:wght@400;700;900&family=Lora:wght@400;600;700&family=Merriweather:wght@400;700;900&family=Montserrat:wght@400;600;700;800&family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Poppins:wght@400;500;600;700;800&family=Raleway:wght@400;600;700;800&family=Roboto+Slab:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Lato:wght@400;700;900&family=Lora:wght@400;600;700&family=Merriweather:wght@400;700;900&family=Montserrat:wght@400;600;700;800&family=Nunito:wght@400;600;700;800&family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Poppins:wght@400;500;600;700;800&family=Raleway:wght@400;600;700;800&family=Roboto+Slab:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -475,18 +475,19 @@
       width: 100%; display: flex; flex-direction: column; gap: 10px;
     }
     .swatch-strip {
-      display: flex; align-items: flex-start; gap: 10px; overflow-x: auto; padding: 2px;
+      display: flex; align-items: flex-start; gap: 10px; overflow-x: auto; overflow-y: visible;
+      padding: 6px 6px 4px;
       -webkit-overflow-scrolling: touch;
     }
     .swatch-item {
       display: flex; flex-direction: column; align-items: center; gap: 4px;
-      flex-shrink: 0; width: 52px;
+      flex-shrink: 0; width: 52px; padding-top: 2px;
     }
     .swatch-disc {
       width: 26px; height: 26px; border-radius: 999px; border: 1.5px solid rgba(0,0,0,0.12);
       display: flex; align-items: center; justify-content: center; transition: transform 0.15s ease;
     }
-    .swatch-item.active .swatch-disc { transform: scale(1.1); box-shadow: 0 0 0 2px #FFF, 0 0 0 4px var(--ios-blue); }
+    .swatch-item.active .swatch-disc { transform: scale(1.06); box-shadow: 0 0 0 2px #FFF, 0 0 0 3.5px var(--ios-blue); }
     .swatch-dot { width: 6px; height: 6px; border-radius: 999px; background: #FFF; opacity: 0; }
     .swatch-item.active .swatch-dot { opacity: 1; }
     .swatch-label { font-size: 9.5px; font-weight: 500; color: var(--muted); white-space: nowrap; }
@@ -550,6 +551,27 @@
     .a4-sheet.measuring-natural .lay-aura,
     .a4-sheet.measuring-natural .lay-glass,
     .a4-sheet.measuring-natural .lay-diplomat,
+    .a4-sheet.measuring-natural .lay-folio,
+    .a4-sheet.measuring-natural .lay-velvet,
+    .a4-sheet.measuring-natural .lay-opus,
+    .a4-sheet.measuring-natural .lay-aurora2,
+    .a4-sheet.measuring-natural .lay-crest,
+    .a4-sheet.measuring-natural .lay-slate,
+    .a4-sheet.measuring-natural .lay-pearl,
+    .a4-sheet.measuring-natural .lay-nova,
+    .a4-sheet.measuring-natural .lay-meridian,
+    .a4-sheet.measuring-natural .lay-ivory,
+    .a4-sheet.measuring-natural .lay-quartz,
+    .a4-sheet.measuring-natural .lay-botanical,
+    .a4-sheet.measuring-natural .lay-oxford,
+    .a4-sheet.measuring-natural .ox-frame,
+    .a4-sheet.measuring-natural .lay-cobalt,
+    .a4-sheet.measuring-natural .lay-solaris,
+    .a4-sheet.measuring-natural .lay-celeste,
+    .a4-sheet.measuring-natural .lay-monolith,
+    .a4-sheet.measuring-natural .lay-zenith2,
+    .a4-sheet.measuring-natural .lay-velour,
+    .a4-sheet.measuring-natural .lay-horizon2,
     .a4-sheet.measuring-natural .cl-wrap {
       min-height: 0 !important;
     }
@@ -624,36 +646,125 @@
     .a4-sheet.font-dmsans { --r-font: "DM Sans", var(--font-sans); }
     .a4-sheet.font-nunito { --r-font: "Nunito", var(--font-sans); }
     .a4-sheet.font-serif { --r-font: var(--font-serif); }
-    .a4-sheet.font-editorial { --r-font: "Playfair Display", Georgia, serif; }
+    .a4-sheet.font-editorial { --r-font: "Cormorant Garamond", Georgia, serif; }
     .a4-sheet.font-merriweather { --r-font: "Merriweather", Georgia, serif; }
     .a4-sheet.font-lora { --r-font: "Lora", Georgia, serif; }
     .a4-sheet.font-slab { --r-font: "Roboto Slab", Georgia, serif; }
     .a4-sheet.font-mono { --r-font: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
 
+    /* ============================================================
+       SINGLE VS COMBINE FONT STYLE SELECTOR & MULTI-FONT PAIRING
+       ============================================================ */
+    .font-mode-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 6px 8px;
+    }
+    .font-mode-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink);
+      padding-left: 4px;
+      white-space: nowrap;
+    }
+    .font-mode-seg {
+      display: inline-flex;
+      background: rgba(118, 118, 128, 0.14);
+      padding: 2px;
+      border-radius: 9px;
+      gap: 2px;
+    }
+    .font-mode-seg .seg-btn {
+      padding: 5px 11px;
+      font-size: 11px;
+      font-weight: 650;
+      border-radius: 7px;
+    }
+
+    /* Multi-font pairing hooks inside .a4-sheet when fontMode === 'combine' */
+    .a4-sheet.font-pair-active {
+      --r-font-head: var(--r-font);
+      --r-font-body: var(--r-font);
+      --r-font-meta: var(--r-font);
+    }
+    .a4-sheet.font-pair-active h1,
+    .a4-sheet.font-pair-active .min-name,
+    .a4-sheet.font-pair-active .nordic-name,
+    .a4-sheet.font-pair-active .ed-name,
+    .a4-sheet.font-pair-active .vogue-name,
+    .a4-sheet.font-pair-active .aura-name,
+    .a4-sheet.font-pair-active .prism-name,
+    .a4-sheet.font-pair-active .luxe-name,
+    .a4-sheet.font-pair-active .folio-name,
+    .a4-sheet.font-pair-active .velvet-name,
+    .a4-sheet.font-pair-active .opus-name,
+    .a4-sheet.font-pair-active .au2-name,
+    .a4-sheet.font-pair-active .pearl-name,
+    .a4-sheet.font-pair-active .ivory-name,
+    .a4-sheet.font-pair-active .cv-doc-title,
+    .a4-sheet.font-pair-active .cv-sec-head,
+    .a4-sheet.font-pair-active .cl-sender-name,
+    .a4-sheet.font-pair-active .cl-subject {
+      font-family: var(--r-font-head);
+    }
+    .a4-sheet.font-pair-active .sheet-content {
+      font-family: var(--r-font-body);
+    }
+    .a4-sheet.font-pair-active .kv-grid,
+    .a4-sheet.font-pair-active .edu-table,
+    .a4-sheet.font-pair-active .cv-bullets,
+    .a4-sheet.font-pair-active .skills-2col,
+    .a4-sheet.font-pair-active p,
+    .a4-sheet.font-pair-active .cl-wrap {
+      font-family: var(--r-font-body);
+    }
+    .a4-sheet.font-pair-active .nordic-chip,
+    .a4-sheet.font-pair-active .vogue-pill,
+    .a4-sheet.font-pair-active .hz-pill,
+    .a4-sheet.font-pair-active .glass-pill,
+    .a4-sheet.font-pair-active .split-pill,
+    .a4-sheet.font-pair-active .opus-pill,
+    .a4-sheet.font-pair-active .slate-pill,
+    .a4-sheet.font-pair-active .cl-badge {
+      font-family: var(--r-font-meta);
+    }
+
     /* FONT SIZE ADJUST BAR */
     .font-size-bar {
-      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      display: flex; align-items: center; justify-content: space-between; gap: 6px;
       background: var(--input-bg); border: 1px solid var(--border);
-      border-radius: 12px; padding: 7px 10px; flex-wrap: wrap;
+      border-radius: 12px; padding: 7px 9px; flex-wrap: nowrap; overflow: hidden;
     }
-    .fs-left { display: flex; align-items: center; gap: 6px; }
-    .fs-title { font-size: 11.5px; font-weight: 700; color: var(--ink); }
+    .fs-left { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+    .fs-title { font-size: 11px; font-weight: 700; color: var(--ink); white-space: nowrap; }
     .fs-badge {
-      font-size: 10.5px; font-weight: 750; color: var(--ios-blue);
-      background: rgba(0,122,255,0.11); padding: 2px 7px; border-radius: 999px;
-      min-width: 42px; text-align: center;
+      font-size: 10px; font-weight: 750; color: var(--ios-blue);
+      background: rgba(0,122,255,0.11); padding: 2px 6px; border-radius: 999px;
+      min-width: 38px; text-align: center; flex-shrink: 0;
     }
-    .fs-controls { display: flex; align-items: center; gap: 6px; flex: 1; justify-content: flex-end; min-width: 170px; }
+    .fs-max-hint {
+      font-size: 9.5px; font-weight: 650; color: var(--muted);
+      white-space: nowrap; letter-spacing: -0.01em;
+    }
+    .fs-controls {
+      display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0; justify-content: flex-end;
+    }
     .fs-btn {
-      height: 28px; min-width: 30px; padding: 0 8px; border-radius: 8px;
+      height: 26px; min-width: 26px; padding: 0 6px; border-radius: 7px;
       background: #FFF; border: 1px solid rgba(0,0,0,0.10); color: var(--ink);
-      font-size: 12px; font-weight: 750; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 11.5px; font-weight: 750; display: inline-flex; align-items: center; justify-content: center;
       box-shadow: 0 1px 2px rgba(0,0,0,0.04); transition: transform 0.12s ease, background 0.14s ease;
+      flex-shrink: 0;
     }
     .fs-btn:active { transform: scale(0.93); background: rgba(0,122,255,0.10); color: var(--ios-blue); }
-    .fs-btn.reset { font-size: 10.5px; font-weight: 650; color: var(--muted); }
+    .fs-btn.reset { font-size: 10px; font-weight: 650; color: var(--muted); padding: 0 6px; }
     .fs-range {
-      flex: 1; max-width: 120px; min-width: 72px; accent-color: var(--ios-blue);
+      flex: 1; min-width: 36px; max-width: 96px; accent-color: var(--ios-blue);
       cursor: pointer; height: 4px;
     }
     .ios-alert-actions.single { grid-template-columns: 1fr; }
@@ -923,6 +1034,302 @@
     .zen-panel { border: 1px solid var(--r-border); border-radius: 12px; padding: 12px 14px; background: #FAFAFC; }
     .lay-zenith .cv-sec-head { border-bottom: none; margin-bottom: 6px; padding-bottom: 0; }
     .lay-zenith .cv-sec-num { background: var(--r-secondary); border-radius: 6px; }
+
+    /* LAYOUT 21: FOLIO CLEAN (AIRY 115%+ FRIENDLY) */
+    .lay-folio { padding: calc(var(--d-pad) - 8px) 38px; display: flex; flex-direction: column; gap: calc(var(--d-gap) - 3px); }
+    .folio-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+      padding: 12px 16px; border-radius: 14px; background: var(--r-tint); border-left: 5px solid var(--r-primary);
+    }
+    .folio-name { font-size: calc(27px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary); letter-spacing: -0.02em; line-height: 1.08; }
+    .folio-sub { font-size: calc(12.6px * var(--fs-scale, 1)); color: var(--r-body); margin-top: 3px; }
+    .folio-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .lay-folio .cv-sec-head { margin-bottom: 5px; padding-bottom: 3px; font-size: calc(12.4px * var(--fs-scale, 1)); }
+    .lay-folio .edu-table th, .lay-folio .edu-table td { padding: 5px 8px; }
+    .lay-folio .decl-footer { margin-top: 10px; }
+    .lay-folio .photo-frame { width: 92px; height: 110px; }
+
+    /* LAYOUT 22: VELVET STUDIO (ATTRACTIVE MODERN ACCENT) */
+    .lay-velvet { padding: calc(var(--d-pad) - 8px) 38px; display: flex; flex-direction: column; gap: calc(var(--d-gap) - 3px); }
+    .velvet-top {
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+      padding-bottom: 10px; border-bottom: 2px solid var(--r-primary);
+    }
+    .velvet-kicker {
+      display: inline-block; font-size: calc(11px * var(--fs-scale, 1)); font-weight: 800;
+      letter-spacing: 0.16em; text-transform: uppercase; color: #FFF;
+      background: var(--r-secondary); padding: 2px 8px; border-radius: 999px; margin-bottom: 4px;
+    }
+    .velvet-name { font-size: calc(27px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary); line-height: 1.08; }
+    .velvet-box {
+      background: #FAFAFC; border: 1px solid var(--r-border); border-radius: 12px; padding: 9px 12px;
+    }
+    .velvet-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .lay-velvet .cv-sec-head { margin-bottom: 4px; padding-bottom: 2px; font-size: calc(12.2px * var(--fs-scale, 1)); }
+    .lay-velvet .edu-table th, .lay-velvet .edu-table td { padding: 5px 8px; }
+    .lay-velvet .decl-footer { margin-top: 10px; }
+    .lay-velvet .photo-frame { width: 92px; height: 110px; }
+
+    /* LAYOUT 23: OPUS EDITORIAL (CLEAN & SPACIOUS 115%+ READY) */
+    .lay-opus { padding: calc(var(--d-pad) - 8px) 38px; display: flex; flex-direction: column; gap: calc(var(--d-gap) - 3px); border-top: 6px solid var(--r-primary); }
+    .opus-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+      padding: 10px 0; border-bottom: 1.5px solid var(--r-border);
+    }
+    .opus-name { font-size: calc(27px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary); letter-spacing: -0.02em; line-height: 1.08; }
+    .opus-pill {
+      display: inline-block; padding: 3px 9px; border-radius: 999px;
+      background: var(--r-tint); color: var(--r-primary); border: 1px solid var(--r-border);
+      font-size: calc(12px * var(--fs-scale, 1)); font-weight: 650;
+    }
+    .opus-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .lay-opus .cv-sec-head { margin-bottom: 5px; padding-bottom: 2px; font-size: calc(12.2px * var(--fs-scale, 1)); }
+    .lay-opus .edu-table th, .lay-opus .edu-table td { padding: 5px 8px; }
+    .lay-opus .decl-footer { margin-top: 10px; }
+    .lay-opus .photo-frame { width: 92px; height: 110px; }
+
+    /* ============================================================
+       15 HIGH-CAPACITY (110%–120%+) AESTHETIC A4 LAYOUTS
+       ============================================================ */
+
+    /* 1. AURORA GRADIENT */
+    .lay-aurora2 { padding: 24px 36px; display: flex; flex-direction: column; gap: 10px; }
+    .au2-hero {
+      background: linear-gradient(135deg, var(--r-primary) 0%, var(--r-secondary) 100%);
+      color: #FFF; border-radius: 16px; padding: 16px 22px;
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+    }
+    .au2-name { font-size: calc(27px * var(--fs-scale, 1)); font-weight: 850; letter-spacing: -0.02em; line-height: 1.08; }
+    .au2-sub { font-size: calc(12.4px * var(--fs-scale, 1)); opacity: 0.92; margin-top: 3px; }
+    .au2-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .lay-aurora2 .cv-sec-head { margin-bottom: 4px; padding-bottom: 2px; font-size: calc(12.2px * var(--fs-scale, 1)); }
+    .lay-aurora2 .edu-table th, .lay-aurora2 .edu-table td { padding: 5px 8px; }
+    .lay-aurora2 .decl-footer { margin-top: 8px; }
+    .lay-aurora2 .photo-frame { width: 88px; height: 104px; border-color: rgba(255,255,255,0.4); }
+
+    /* 2. ROYAL CREST (MONOGRAM + DOUBLE LINE) */
+    .lay-crest { padding: 24px 38px; display: flex; flex-direction: column; gap: 10px; }
+    .crest-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+      padding: 12px 16px; background: var(--r-tint); border-top: 3.5px solid var(--r-primary); border-bottom: 1.5px solid var(--r-primary);
+    }
+    .crest-mono {
+      width: 52px; height: 52px; border-radius: 13px; background: var(--r-primary); color: #FFF;
+      display: flex; align-items: center; justify-content: center; font-size: calc(20px * var(--fs-scale, 1)); font-weight: 850; flex-shrink: 0;
+    }
+    .crest-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .lay-crest .cv-sec-head { margin-bottom: 4px; padding-bottom: 2px; font-size: calc(12.2px * var(--fs-scale, 1)); }
+    .lay-crest .edu-table th, .lay-crest .edu-table td { padding: 5px 8px; }
+    .lay-crest .decl-footer { margin-top: 8px; }
+    .lay-crest .photo-frame { width: 88px; height: 104px; }
+
+    /* 3. SLATE SIDEBAR (SLEEK SPLIT 115%+) */
+    .lay-slate { display: grid; grid-template-columns: 235px 1fr; min-height: 1123px; }
+    .slate-side {
+      background: var(--r-tint); border-right: 1.5px solid var(--r-border);
+      padding: 24px 16px; display: flex; flex-direction: column; gap: 12px;
+    }
+    .slate-main { padding: 24px 26px; display: flex; flex-direction: column; gap: 10px; }
+    .slate-pill {
+      display: inline-block; padding: 3px 8px; border-radius: 6px; background: #FFF;
+      border: 1px solid var(--r-border); font-size: calc(11.6px * var(--fs-scale, 1)); font-weight: 600; color: var(--r-primary);
+    }
+    .lay-slate .cv-sec-head { margin-bottom: 4px; padding-bottom: 2px; font-size: calc(12px * var(--fs-scale, 1)); }
+    .lay-slate .edu-table th, .lay-slate .edu-table td { padding: 5px 7px; }
+    .lay-slate .decl-footer { margin-top: 8px; }
+    .lay-slate .photo-frame { width: 92px; height: 108px; }
+
+    /* 4. PEARL MINIMAL (SWISS HAIRLINE) */
+    .lay-pearl { padding: 26px 40px; display: flex; flex-direction: column; gap: 10px; }
+    .pearl-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+      padding-bottom: 10px; border-bottom: 1.5px solid var(--r-primary);
+    }
+    .pearl-name { font-size: calc(29px * var(--fs-scale, 1)); font-weight: 850; letter-spacing: -0.03em; color: var(--r-primary); line-height: 1.06; }
+    .pearl-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .lay-pearl .cv-sec-head { border-bottom: none; margin-bottom: 3px; padding-bottom: 0; font-size: calc(11.8px * var(--fs-scale, 1)); letter-spacing: 0.14em; color: var(--r-secondary); }
+    .lay-pearl .cv-sec-num { display: none; }
+    .lay-pearl .edu-table th, .lay-pearl .edu-table td { padding: 5px 8px; }
+    .lay-pearl .decl-footer { margin-top: 8px; }
+    .lay-pearl .photo-frame { width: 88px; height: 104px; }
+
+    /* 5. NOVA CARDS (MODERN BENTO 115%+) */
+    .lay-nova { padding: 20px 26px; display: flex; flex-direction: column; gap: 9px; background: #F8F9FC; min-height: 1123px; }
+    .nova-card {
+      background: #FFF; border: 1px solid var(--r-border); border-radius: 13px; padding: 10px 14px;
+    }
+    .nova-card.tint { background: var(--r-tint); }
+    .nova-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .lay-nova .cv-sec-head { border-bottom: none; margin-bottom: 4px; padding-bottom: 0; font-size: calc(12px * var(--fs-scale, 1)); }
+    .lay-nova .edu-table th, .lay-nova .edu-table td { padding: 5px 8px; }
+    .lay-nova .decl-footer { margin-top: 8px; }
+    .lay-nova .photo-frame { width: 86px; height: 102px; }
+
+    /* 6. MERIDIAN BAND (DARK TOP HEADER + CLEAN GRID) */
+    .lay-meridian { display: flex; flex-direction: column; min-height: 1123px; }
+    .mer-banner {
+      background: var(--r-primary); color: #FFF; padding: 20px 36px;
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    }
+    .mer-strip { height: 4px; background: var(--r-secondary); }
+    .mer-body { padding: 20px 36px; display: flex; flex-direction: column; gap: 10px; }
+    .mer-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .lay-meridian .cv-sec-head { margin-bottom: 4px; padding-bottom: 2px; font-size: calc(12.2px * var(--fs-scale, 1)); }
+    .lay-meridian .edu-table th, .lay-meridian .edu-table td { padding: 5px 8px; }
+    .lay-meridian .decl-footer { margin-top: 8px; }
+    .lay-meridian .photo-frame { width: 88px; height: 104px; border-color: rgba(255,255,255,0.35); }
+
+    /* 7. IVORY EDITORIAL (MAGAZINE MASTHEAD) */
+    .lay-ivory { padding: 24px 38px; display: flex; flex-direction: column; gap: 10px; }
+    .ivory-mast {
+      text-align: center; padding: 10px 0;
+      border-top: 3px solid var(--r-primary); border-bottom: 1.5px solid var(--r-primary);
+    }
+    .ivory-name { font-size: calc(29px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary); letter-spacing: 0.02em; }
+    .ivory-meta { font-size: calc(12.4px * var(--fs-scale, 1)); color: var(--r-muted); margin-top: 3px; }
+    .ivory-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .lay-ivory .cv-sec-head { border-bottom: 1px solid var(--r-primary); margin-bottom: 4px; padding-bottom: 2px; font-size: calc(12px * var(--fs-scale, 1)); letter-spacing: 0.12em; }
+    .lay-ivory .cv-sec-num { display: none; }
+    .lay-ivory .edu-table th, .lay-ivory .edu-table td { padding: 5px 8px; }
+    .lay-ivory .decl-footer { margin-top: 8px; }
+    .lay-ivory .photo-frame { width: 86px; height: 102px; }
+
+    /* 8. QUARTZ MODERN (PRISM ACCENT BAR) */
+    .lay-quartz { padding: 22px 36px; display: flex; flex-direction: column; gap: 10px; }
+    .quartz-bar { height: 5px; border-radius: 999px; background: linear-gradient(90deg, var(--r-primary), var(--r-secondary)); }
+    .quartz-head { display: flex; justify-content: space-between; align-items: center; gap: 14px; }
+    .quartz-box { background: var(--r-tint); border-radius: 11px; padding: 9px 13px; border: 1px solid var(--r-border); }
+    .quartz-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .lay-quartz .cv-sec-head { border-bottom: none; margin-bottom: 4px; padding-bottom: 0; font-size: calc(12.2px * var(--fs-scale, 1)); }
+    .lay-quartz .edu-table th, .lay-quartz .edu-table td { padding: 5px 8px; }
+    .lay-quartz .decl-footer { margin-top: 8px; }
+    .lay-quartz .photo-frame { width: 88px; height: 104px; }
+
+    /* 9. BOTANICAL AIR (SOFT PILL HEADINGS) */
+    .lay-botanical { padding: 24px 38px; display: flex; flex-direction: column; gap: 10px; }
+    .bot-head {
+      background: var(--r-tint); border-radius: 16px; padding: 14px 18px;
+      display: flex; justify-content: space-between; align-items: center; gap: 14px; border: 1px solid var(--r-border);
+    }
+    .bot-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .lay-botanical .cv-sec-head {
+      border-bottom: none; background: var(--r-tint); padding: 3px 9px; border-radius: 999px;
+      margin-bottom: 5px; font-size: calc(12px * var(--fs-scale, 1)); width: fit-content;
+    }
+    .lay-botanical .cv-sec-num { border-radius: 999px; width: calc(18px * var(--fs-scale, 1)); height: calc(18px * var(--fs-scale, 1)); font-size: calc(10.5px * var(--fs-scale, 1)); }
+    .lay-botanical .edu-table th, .lay-botanical .edu-table td { padding: 5px 8px; }
+    .lay-botanical .decl-footer { margin-top: 8px; }
+    .lay-botanical .photo-frame { width: 88px; height: 104px; }
+
+    /* 10. OXFORD ACADEMIC (FRAMED CLASSIC 115%+) */
+    .lay-oxford { padding: 18px 22px; min-height: 1123px; display: flex; flex-direction: column; }
+    .ox-frame {
+      border: 2px solid var(--r-primary); padding: 18px 22px; flex: 1;
+      display: flex; flex-direction: column; gap: 9px;
+    }
+    .ox-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .lay-oxford .cv-sec-head {
+      background: var(--r-tint); padding: 3px 8px; border-bottom: none; border-left: 3.5px solid var(--r-primary);
+      margin-bottom: 4px; font-size: calc(12px * var(--fs-scale, 1));
+    }
+    .lay-oxford .edu-table th, .lay-oxford .edu-table td { padding: 5px 7px; }
+    .lay-oxford .decl-footer { margin-top: 8px; }
+    .lay-oxford .photo-frame { width: 86px; height: 102px; }
+
+    /* 11. COBALT GRID (METRO SOLID HEADINGS) */
+    .lay-cobalt { padding: 24px 36px; display: flex; flex-direction: column; gap: 10px; }
+    .cob-top { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: stretch; }
+    .cob-id {
+      background: var(--r-primary); color: #FFF; padding: 14px 18px; border-radius: 8px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .cob-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .lay-cobalt .cv-sec-head {
+      background: var(--r-primary); color: #FFF; padding: 3px 9px; border-bottom: none; border-radius: 4px;
+      margin-bottom: 5px; font-size: calc(12px * var(--fs-scale, 1));
+    }
+    .lay-cobalt .cv-sec-num { background: rgba(255,255,255,0.22); }
+    .lay-cobalt .edu-table th, .lay-cobalt .edu-table td { padding: 5px 8px; }
+    .lay-cobalt .decl-footer { margin-top: 8px; }
+    .lay-cobalt .photo-frame { width: 88px; height: 104px; }
+
+    /* 12. SOLARIS RIBBON (GRADIENT SIDE EDGE) */
+    .lay-solaris { display: grid; grid-template-columns: 14px 1fr; min-height: 1123px; }
+    .sol-bar { background: linear-gradient(180deg, var(--r-primary) 0%, var(--r-secondary) 100%); }
+    .sol-body { padding: 24px 34px; display: flex; flex-direction: column; gap: 10px; }
+    .sol-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+      padding-bottom: 10px; border-bottom: 2px solid var(--r-tint);
+    }
+    .sol-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .lay-solaris .cv-sec-head { border-bottom: 1px dashed var(--r-border); margin-bottom: 4px; padding-bottom: 2px; font-size: calc(12.2px * var(--fs-scale, 1)); }
+    .lay-solaris .edu-table th, .lay-solaris .edu-table td { padding: 5px 8px; }
+    .lay-solaris .decl-footer { margin-top: 8px; }
+    .lay-solaris .photo-frame { width: 88px; height: 104px; }
+
+
+    /* 16. CELESTE PILL */
+    .lay-celeste { padding: 24px 36px; display: flex; flex-direction: column; gap: 10px; }
+    .cel-head {
+      background: var(--r-tint); border-radius: 16px; padding: 14px 18px; border-left: 5px solid var(--r-secondary);
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+    }
+    .cel-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .lay-celeste .cv-sec-head { margin-bottom: 4px; padding-bottom: 2px; font-size: calc(12px * var(--fs-scale, 1)); }
+    .lay-celeste .edu-table th, .lay-celeste .edu-table td { padding: 5px 8px; }
+    .lay-celeste .decl-footer { margin-top: 8px; }
+    .lay-celeste .photo-frame { width: 88px; height: 104px; }
+
+    /* 17. MONOLITH BAR */
+    .lay-monolith { padding: 24px 36px; display: flex; flex-direction: column; gap: 10px; }
+    .mono2-head {
+      padding-bottom: 10px; border-bottom: 2.5px solid var(--r-primary);
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+    }
+    .mono2-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .lay-monolith .cv-sec-head {
+      background: var(--r-tint); padding: 3px 9px; border-radius: 6px; border-bottom: none;
+      margin-bottom: 5px; font-size: calc(12px * var(--fs-scale, 1));
+    }
+    .lay-monolith .edu-table th, .lay-monolith .edu-table td { padding: 5px 8px; }
+    .lay-monolith .decl-footer { margin-top: 8px; }
+    .lay-monolith .photo-frame { width: 88px; height: 104px; }
+
+    /* 18. ZENITH FRAME */
+    .lay-zenith2 { padding: 24px 38px; display: flex; flex-direction: column; gap: 10px; border-top: 6px solid var(--r-secondary); }
+    .zen2-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+      padding-bottom: 10px; border-bottom: 1.5px solid var(--r-primary);
+    }
+    .zen2-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .lay-zenith2 .cv-sec-head { margin-bottom: 4px; padding-bottom: 2px; font-size: calc(12px * var(--fs-scale, 1)); }
+    .lay-zenith2 .edu-table th, .lay-zenith2 .edu-table td { padding: 5px 8px; }
+    .lay-zenith2 .decl-footer { margin-top: 8px; }
+    .lay-zenith2 .photo-frame { width: 88px; height: 104px; }
+
+    /* 19. VELOUR SPLIT */
+    .lay-velour { padding: 24px 36px; display: flex; flex-direction: column; gap: 10px; background: #FAFBFD; }
+    .vlr-head {
+      background: #FFF; border: 1px solid var(--r-border); border-radius: 14px; padding: 14px 18px;
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+    }
+    .vlr-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .lay-velour .cv-sec-head { border-bottom: none; margin-bottom: 4px; padding-bottom: 0; font-size: calc(12px * var(--fs-scale, 1)); }
+    .lay-velour .edu-table th, .lay-velour .edu-table td { padding: 5px 8px; }
+    .lay-velour .decl-footer { margin-top: 8px; }
+    .lay-velour .photo-frame { width: 88px; height: 104px; }
+
+    /* 20. HORIZON EDGE */
+    .lay-horizon2 { padding: 24px 36px; display: flex; flex-direction: column; gap: 10px; border-bottom: 6px solid var(--r-primary); }
+    .hz2-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+      padding: 12px 16px; border-radius: 14px; background: var(--r-tint);
+    }
+    .hz2-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .lay-horizon2 .cv-sec-head { margin-bottom: 4px; padding-bottom: 2px; font-size: calc(12px * var(--fs-scale, 1)); }
+    .lay-horizon2 .edu-table th, .lay-horizon2 .edu-table td { padding: 5px 8px; }
+    .lay-horizon2 .decl-footer { margin-top: 8px; }
+    .lay-horizon2 .photo-frame { width: 88px; height: 104px; }
 
     /* Shared CV Elements */
     .cv-doc-title {
@@ -1718,28 +2125,28 @@
           <button id="doc-both" type="button" class="seg-btn" onclick="setDocMode('both')">Both (2 Pages)</button>
         </div>
 
-        <!-- 20 Aesthetic Premium Layouts -->
-        <div class="pill-strip no-scrollbar" role="radiogroup" aria-label="Layouts">
-          <button id="lay-classic" type="button" class="seg-btn active" onclick="setLayout('classic')">Classic</button>
-          <button id="lay-executive" type="button" class="seg-btn" onclick="setLayout('executive')">Exec</button>
-          <button id="lay-split" type="button" class="seg-btn" onclick="setLayout('split')">Split</button>
-          <button id="lay-bento" type="button" class="seg-btn" onclick="setLayout('bento')">Bento</button>
-          <button id="lay-formal" type="button" class="seg-btn" onclick="setLayout('formal')">Formal</button>
-          <button id="lay-minimal" type="button" class="seg-btn" onclick="setLayout('minimal')">Minimal</button>
-          <button id="lay-timeline" type="button" class="seg-btn" onclick="setLayout('timeline')">Timeline</button>
-          <button id="lay-nordic" type="button" class="seg-btn" onclick="setLayout('nordic')">Nordic</button>
-          <button id="lay-editorial" type="button" class="seg-btn" onclick="setLayout('editorial')">Editorial</button>
-          <button id="lay-vogue" type="button" class="seg-btn" onclick="setLayout('vogue')">Vogue</button>
-          <button id="lay-ribbon" type="button" class="seg-btn" onclick="setLayout('ribbon')">Ribbon</button>
-          <button id="lay-monogram" type="button" class="seg-btn" onclick="setLayout('monogram')">Monogram</button>
-          <button id="lay-horizon" type="button" class="seg-btn" onclick="setLayout('horizon')">Horizon</button>
-          <button id="lay-metro" type="button" class="seg-btn" onclick="setLayout('metro')">Metro</button>
-          <button id="lay-aura" type="button" class="seg-btn" onclick="setLayout('aura')">Aura</button>
-          <button id="lay-glass" type="button" class="seg-btn" onclick="setLayout('glass')">Frosted</button>
-          <button id="lay-prism" type="button" class="seg-btn" onclick="setLayout('prism')">Prism</button>
-          <button id="lay-luxe" type="button" class="seg-btn" onclick="setLayout('luxe')">Luxe</button>
-          <button id="lay-diplomat" type="button" class="seg-btn" onclick="setLayout('diplomat')">Diplomat</button>
-          <button id="lay-zenith" type="button" class="seg-btn" onclick="setLayout('zenith')">Zenith</button>
+        <!-- 23 Aesthetic Premium Layouts + Custom Layout Builder -->
+        <div id="layout-pill-strip" class="pill-strip no-scrollbar" role="radiogroup" aria-label="Layouts">
+          <button id="lay-folio" type="button" class="seg-btn active" onclick="setLayout('folio')">Folio</button>
+          <button id="lay-velvet" type="button" class="seg-btn" onclick="setLayout('velvet')">Velvet</button>
+          <button id="lay-opus" type="button" class="seg-btn" onclick="setLayout('opus')">Opus</button>
+          <button id="lay-aurora2" type="button" class="seg-btn" onclick="setLayout('aurora2')">Aurora</button>
+          <button id="lay-crest" type="button" class="seg-btn" onclick="setLayout('crest')">Crest</button>
+          <button id="lay-slate" type="button" class="seg-btn" onclick="setLayout('slate')">Slate Split</button>
+          <button id="lay-pearl" type="button" class="seg-btn" onclick="setLayout('pearl')">Pearl</button>
+          <button id="lay-nova" type="button" class="seg-btn" onclick="setLayout('nova')">Nova Cards</button>
+          <button id="lay-meridian" type="button" class="seg-btn" onclick="setLayout('meridian')">Meridian</button>
+          <button id="lay-ivory" type="button" class="seg-btn" onclick="setLayout('ivory')">Ivory</button>
+          <button id="lay-quartz" type="button" class="seg-btn" onclick="setLayout('quartz')">Quartz</button>
+          <button id="lay-botanical" type="button" class="seg-btn" onclick="setLayout('botanical')">Botanical</button>
+          <button id="lay-oxford" type="button" class="seg-btn" onclick="setLayout('oxford')">Oxford</button>
+          <button id="lay-cobalt" type="button" class="seg-btn" onclick="setLayout('cobalt')">Cobalt</button>
+          <button id="lay-solaris" type="button" class="seg-btn" onclick="setLayout('solaris')">Solaris</button>
+          <button id="lay-celeste" type="button" class="seg-btn" onclick="setLayout('celeste')">Celeste</button>
+          <button id="lay-monolith" type="button" class="seg-btn" onclick="setLayout('monolith')">Monolith</button>
+          <button id="lay-zenith2" type="button" class="seg-btn" onclick="setLayout('zenith2')">Zenith</button>
+          <button id="lay-velour" type="button" class="seg-btn" onclick="setLayout('velour')">Velour</button>
+          <button id="lay-horizon2" type="button" class="seg-btn" onclick="setLayout('horizon2')">Horizon</button>
         </div>
 
         <!-- 12 Preset + Custom Color Combinations -->
@@ -1760,7 +2167,16 @@
           </div>
         </div>
 
-        <!-- 14 Curated Fonts -->
+        <!-- Single vs Combine Font Style Mode -->
+        <div class="font-mode-bar">
+          <span class="font-mode-label">Font Style</span>
+          <div class="font-mode-seg" role="radiogroup" aria-label="Font Style Mode">
+            <button id="fmode-single" type="button" class="seg-btn active" onclick="setFontMode('single')">Single (14)</button>
+            <button id="fmode-combine" type="button" class="seg-btn" onclick="setFontMode('combine')">Combine (10)</button>
+          </div>
+        </div>
+
+        <!-- 14 Curated Fonts / 10 Combined Aesthetic Font Pairs -->
         <div class="pill-strip no-scrollbar" role="radiogroup" aria-label="Fonts">
           <button id="fnt-sans" type="button" class="seg-btn active" style="font-family:'Inter',sans-serif;" onclick="setFont('sans')">Inter Sans</button>
           <button id="fnt-jakarta" type="button" class="seg-btn" style="font-family:'Plus Jakarta Sans',sans-serif;" onclick="setFont('jakarta')">Jakarta</button>
@@ -1771,23 +2187,24 @@
           <button id="fnt-dmsans" type="button" class="seg-btn" style="font-family:'DM Sans',sans-serif;" onclick="setFont('dmsans')">DM Sans</button>
           <button id="fnt-nunito" type="button" class="seg-btn" style="font-family:'Nunito',sans-serif;" onclick="setFont('nunito')">Nunito</button>
           <button id="fnt-serif" type="button" class="seg-btn" style="font-family:Georgia,serif;" onclick="setFont('serif')">Classic Serif</button>
-          <button id="fnt-editorial" type="button" class="seg-btn" style="font-family:'Playfair Display',serif;" onclick="setFont('editorial')">Playfair</button>
+          <button id="fnt-editorial" type="button" class="seg-btn" style="font-family:'Cormorant Garamond',serif;" onclick="setFont('editorial')">Cormorant</button>
           <button id="fnt-merriweather" type="button" class="seg-btn" style="font-family:'Merriweather',serif;" onclick="setFont('merriweather')">Merriweather</button>
           <button id="fnt-lora" type="button" class="seg-btn" style="font-family:'Lora',serif;" onclick="setFont('lora')">Lora</button>
           <button id="fnt-slab" type="button" class="seg-btn" style="font-family:'Roboto Slab',serif;" onclick="setFont('slab')">Roboto Slab</button>
           <button id="fnt-mono" type="button" class="seg-btn" style="font-family:'JetBrains Mono',monospace;" onclick="setFont('mono')">Mono Tech</button>
         </div>
 
-        <!-- Font Size Adjuster (Strict 1-Page A4 Limit) -->
+        <!-- Font Size Adjuster (Strict 1-Page A4 Dynamic Limit per Layout) -->
         <div class="font-size-bar">
           <div class="fs-left">
             <span class="fs-title">Font Size</span>
             <span id="fs-val-badge" class="fs-badge">100%</span>
+            <span id="fs-max-hint" class="fs-max-hint">75–100%</span>
           </div>
           <div class="fs-controls">
-            <button type="button" class="fs-btn" onclick="stepFontSize(-0.05)" aria-label="Decrease Font Size">A-</button>
-            <input id="fs-slider" type="range" class="fs-range" min="75" max="145" step="5" value="100" oninput="onFontSizeSlider(this.value)" aria-label="Font Size Slider" />
-            <button type="button" class="fs-btn" onclick="stepFontSize(0.05)" aria-label="Increase Font Size">A+</button>
+            <button id="fs-btn-dec" type="button" class="fs-btn" onclick="stepFontSize(-0.05)" aria-label="Decrease Font Size">A-</button>
+            <input id="fs-slider" type="range" class="fs-range" min="75" max="100" step="5" value="100" oninput="onFontSizeSlider(this.value)" aria-label="Font Size Slider" />
+            <button id="fs-btn-inc" type="button" class="fs-btn" onclick="stepFontSize(0.05)" aria-label="Increase Font Size">A+</button>
             <button type="button" class="fs-btn reset" onclick="resetFontSize()">Reset</button>
           </div>
         </div>
@@ -2183,4 +2600,2995 @@
         emerald:    { name: 'Emerald',    primary: '#065F46', secondary: '#C59B27', tint: '#EDF7F3' },
         plum:       { name: 'Plum',       primary: '#581C87', secondary: '#9333EA', tint: '#F9F3FF' },
         titanium:   { name: 'Titanium',   primary: '#4B453F', secondary: '#8C8275', tint: '#F6F4F1' },
-        slateCyan:  { name: 'Slate Cyan', primary: '#1E293B', secondary: '#0891B2
+        slateCyan:  { name: 'Slate Cyan', primary: '#1E293B', secondary: '#0891B2', tint: '#F0F9FC' },
+        roseGold:   { name: 'Rose Gold',  primary: '#831843', secondary: '#E11D48', tint: '#FFF1F2' },
+        oliveMoss:  { name: 'Olive Moss', primary: '#365314', secondary: '#65A30D', tint: '#F7FEE7' },
+        cobaltGold: { name: 'Cobalt Gold',primary: '#1E3A8A', secondary: '#CA8A04', tint: '#EFF6FF' },
+        velvetWine: { name: 'Velvet Wine',primary: '#4A044E', secondary: '#C026D3', tint: '#FDF4FF' },
+        nordicSand: { name: 'Nordic Sand',primary: '#57534E', secondary: '#A8A29E', tint: '#F5F5F4' }
+      };
+
+      const STORAGE_KEY = 'smart_cv_locked_studio_v1';
+      const CUSTOM_DEFAULT_KEY = 'smart_cv_custom_default_v1';
+
+      function getDefaultData() {
+        return {
+          name: 'Rohit Sharma',
+          address: '123, Green Park, New Delhi - 110016',
+          phone: '+91 98765 43210',
+          email: 'rohitsharma@gmail.com',
+          dob: '12 March 2003',
+          gender: 'Male',
+          nationality: 'Indian',
+          languages: 'Hindi, English',
+          showPhoto: true,
+          photoShape: 'square',
+          photoBorder: 'thin',
+          photo: '',
+          objective: 'To secure a challenging position in a reputed organization where I can contribute my skills and knowledge, learn new things and grow professionally while making a positive impact.',
+          education: [
+            { qual: 'B.A. (Programme)', board: 'University of Delhi', year: '2024', pct: '72%' },
+            { qual: '12th (Science)', board: 'CBSE', year: '2021', pct: '85%' },
+            { qual: '10th', board: 'CBSE', year: '2019', pct: '82%' }
+          ],
+          skills: [
+            'Communication Skills',
+            'Microsoft Office (Word, Excel, PowerPoint)',
+            'Teamwork',
+            'Basic Computer Knowledge',
+            'Time Management',
+            'Problem Solving'
+          ],
+          isFresher: false,
+          fresherNote: 'Currently seeking my first professional opportunity as a Data Entry Operator. I am eager to apply my computer knowledge, learn new systems, and perform assigned tasks with accuracy, dedication, and responsibility.',
+          experience: [
+            {
+              role: 'Content Writer (Intern)',
+              company: 'ABC Media Pvt. Ltd.',
+              duration: 'May 2024 - July 2024',
+              bullets: [
+                'Created engaging content for social media and blogs.',
+                'Assisted in research and analysis of topics.',
+                'Worked with the team to meet content deadlines.'
+              ]
+            }
+          ],
+          achievements: [
+            'Completed a certificate course in MS Excel.',
+            'Participated in college cultural events.',
+            'Won 2nd prize in inter-college debate competition.'
+          ],
+          hobbies: 'Reading, Travelling, Photography',
+          interest: 'Business Analysis, Data & Research',
+          strengths: 'Hardworking, Quick Learner, Positive Attitude',
+          declaration: 'I hereby declare that the above information is true and correct to the best of my knowledge and belief.',
+          declDate: '10/04/2025',
+          declPlace: 'New Delhi',
+          signature: 'Rohit Sharma',
+          coverLetter: {
+            to: 'The HR Manager,\nXYZ Multinational Company,\nGurugram, Haryana.',
+            subject: 'Application for the Position of Business Analyst.',
+            salutation: 'Respected Sir/Madam,',
+            p1: "In response to your advertisement published in 'The Times of India' dated 12 October 2026, I wish to apply for the position of Business Analyst in your esteemed organization.",
+            p2: 'I have completed my graduation and possess good communication, analytical and problem-solving skills. I am also familiar with basic computer applications and data analysis. I am eager to apply my knowledge, learn new skills and contribute to the growth of your organization.',
+            p3: 'I have enclosed my CV for your kind consideration. I would be grateful if you could provide me with an opportunity to appear for an interview.',
+            closing: 'Thank you for your time and consideration. I look forward to hearing from you.',
+            signoff: 'Yours faithfully,',
+            enclosure: 'Curriculum Vitae (CV)'
+          }
+        };
+      }
+
+      function loadSaved() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          return raw ? JSON.parse(raw) : null;
+        } catch (e) { return null; }
+      }
+
+      const ALL_LAYOUTS = ['folio', 'velvet', 'opus', 'aurora2', 'crest', 'slate', 'pearl', 'nova', 'meridian', 'ivory', 'quartz', 'botanical', 'oxford', 'cobalt', 'solaris', 'celeste', 'monolith', 'zenith2', 'velour', 'horizon2'];
+
+      const LAYOUT_SMART_PRESETS = {
+        folio:     { theme: 'emerald',    font: 'jakarta',      scale: 1.05 },
+        velvet:    { theme: 'roseGold',   font: 'poppins',      scale: 1.05 },
+        opus:      { theme: 'indigo',     font: 'dmsans',       scale: 1.05 },
+        aurora2:   { theme: 'iosBlue',    font: 'jakarta',      scale: 1.05 },
+        crest:     { theme: 'cobaltGold', font: 'merriweather', scale: 1.00 },
+        slate:     { theme: 'teal',       font: 'poppins',      scale: 1.05 },
+        pearl:     { theme: 'slateCyan',  font: 'sans',         scale: 1.05 },
+        nova:      { theme: 'indigo',     font: 'dmsans',       scale: 1.05 },
+        meridian:  { theme: 'midnight',   font: 'jakarta',      scale: 1.05 },
+        ivory:     { theme: 'burgundy',   font: 'editorial',    scale: 1.00 },
+        quartz:    { theme: 'terracotta', font: 'montserrat',   scale: 1.05 },
+        botanical: { theme: 'sage',       font: 'nunito',       scale: 1.05 },
+        oxford:    { theme: 'graphite',   font: 'serif',        scale: 1.00 },
+        cobalt:    { theme: 'cobaltGold', font: 'lato',         scale: 1.05 },
+        solaris:   { theme: 'velvetWine', font: 'raleway',      scale: 1.05 },
+        celeste:   { theme: 'iosBlue',    font: 'dmsans',       scale: 1.05 },
+        monolith:  { theme: 'slateCyan',  font: 'montserrat',   scale: 1.05 },
+        zenith2:   { theme: 'oliveMoss',  font: 'jakarta',      scale: 1.05 },
+        velour:    { theme: 'plum',       font: 'poppins',      scale: 1.05 },
+        horizon2:  { theme: 'emerald',    font: 'lato',         scale: 1.05 }
+      };
+
+      const saved = loadSaved();
+      const state = {
+        layout: (saved && saved.layout && ALL_LAYOUTS.indexOf(saved.layout) !== -1) ? saved.layout : 'folio',
+        customLayout: (saved && saved.customLayout) ? Object.assign({
+          header: 'banner',
+          structure: 'grid2',
+          section: 'pill',
+          frame: 'topaccent',
+          skills: 'pills'
+        }, saved.customLayout) : {
+          header: 'banner',
+          structure: 'grid2',
+          section: 'pill',
+          frame: 'topaccent',
+          skills: 'pills'
+        },
+        theme: (saved && (THEMES[saved.theme] || saved.theme === 'custom')) ? saved.theme : 'midnight',
+        customTheme: (saved && saved.customTheme) ? saved.customTheme : { primary: '#1B2A4A', secondary: '#4A6FA5' },
+        fontMode: (saved && (saved.fontMode === 'single' || saved.fontMode === 'combine')) ? saved.fontMode : 'single',
+        fontPair: (saved && saved.fontPair) || 'editorialJakartaMono',
+        font: (saved && saved.font) || 'sans',
+        fontScale: (saved && typeof saved.fontScale === 'number' && saved.fontScale >= 0.75 && saved.fontScale <= 1.45) ? saved.fontScale : 1,
+        docMode: (saved && saved.docMode) || 'cv',
+        mobileView: 'edit',
+        editTab: 'cv',
+        data: (saved && saved.data) ? Object.assign({
+          showPhoto: true,
+          photoShape: 'square',
+          photoBorder: 'thin',
+          isFresher: false,
+          fresherNote: 'Currently seeking my first professional opportunity as a Data Entry Operator. I am eager to apply my computer knowledge, learn new systems, and perform assigned tasks with accuracy, dedication, and responsibility.'
+        }, saved.data) : getDefaultData()
+      };
+
+      function save() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+      }
+
+      function esc(s) {
+        return String(s == null ? '' : s)
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      }
+
+      function toast(msg) {
+        const el = document.getElementById('ios-toast');
+        if (!el) return;
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(window._tt);
+        window._tt = setTimeout(function () { el.classList.remove('show'); }, 2200);
+      }
+
+      /* NAVIGATION & CONTROLS */
+      window.goBack = function () {
+        if (window.history.length > 1) {
+          window.history.back();
+        } else if (document.referrer) {
+          window.location.href = document.referrer;
+        } else {
+          window.location.href = './';
+        }
+      };
+
+      function syncPhotoToggleUI() {
+        const show = state.data.showPhoto !== false;
+        const shape = state.data.photoShape || 'square';
+        const border = state.data.photoBorder || 'thin';
+        const hasPhoto = Boolean(state.data.photo && String(state.data.photo).trim());
+
+        const bYes = document.getElementById('photo-yes');
+        const bNo = document.getElementById('photo-no');
+        const ctrl = document.getElementById('photo-upload-controls');
+        const badge = document.getElementById('photo-uploaded-badge');
+        const editBtn = document.getElementById('btn-edit-crop-photo');
+
+        const thumbBox = document.getElementById('photo-thumb-box');
+        const thumbImg = document.getElementById('photo-thumb-img');
+
+        if (bYes) bYes.classList.toggle('active', show);
+        if (bNo) bNo.classList.toggle('active', !show);
+        if (ctrl) ctrl.classList.toggle('hidden', !show);
+        if (badge) badge.classList.toggle('hidden', !hasPhoto);
+        if (editBtn) editBtn.classList.toggle('hidden', !hasPhoto);
+
+        if (thumbBox && thumbImg) {
+          thumbBox.classList.toggle('hidden', !hasPhoto);
+          if (hasPhoto) {
+            thumbImg.src = state.data.photo;
+            thumbBox.classList.remove('shape-square', 'shape-rounded', 'shape-circle', 'border-none', 'border-thin', 'border-accent');
+            thumbBox.classList.add('shape-' + shape, 'border-' + border);
+          } else {
+            thumbImg.removeAttribute('src');
+          }
+        }
+
+        ['square', 'rounded', 'circle'].forEach(function (s) {
+          const el = document.getElementById('pshape-' + s);
+          if (el) el.classList.toggle('active', s === shape);
+        });
+        ['none', 'thin', 'accent'].forEach(function (b) {
+          const el = document.getElementById('pborder-' + b);
+          if (el) el.classList.toggle('active', b === border);
+        });
+      }
+
+      /* PHOTO EDIT, BRIGHTNESS & CROP STUDIO */
+      const cropState = {
+        img: null,
+        zoom: 1,
+        brightness: 100,
+        rotation: 0,
+        panX: 0,
+        panY: 0,
+        dragging: false,
+        lastX: 0,
+        lastY: 0
+      };
+
+      function drawCropCanvas(includeGuides) {
+        const canvas = document.getElementById('crop-canvas');
+        if (!canvas || !cropState.img) return;
+        const ctx = canvas.getContext('2d');
+        const cw = canvas.width;
+        const ch = canvas.height;
+        ctx.clearRect(0, 0, cw, ch);
+        ctx.fillStyle = '#111827';
+        ctx.fillRect(0, 0, cw, ch);
+
+        const img = cropState.img;
+        const rad = (cropState.rotation % 360) * Math.PI / 180;
+        const cos = Math.abs(Math.cos(rad));
+        const sin = Math.abs(Math.sin(rad));
+        const rotW = img.naturalWidth * cos + img.naturalHeight * sin;
+        const rotH = img.naturalWidth * sin + img.naturalHeight * cos;
+
+        const baseScale = Math.max(cw / rotW, ch / rotH);
+        const totalScale = baseScale * cropState.zoom;
+        const bVal = cropState.brightness || 100;
+
+        ctx.save();
+        if ('filter' in ctx) {
+          ctx.filter = 'brightness(' + bVal + '%)';
+        }
+        ctx.translate(cw / 2 + cropState.panX, ch / 2 + cropState.panY);
+        ctx.rotate(rad);
+        ctx.scale(totalScale, totalScale);
+        ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
+        ctx.restore();
+
+        // Pixel fallback if browser doesn't support ctx.filter
+        if (!('filter' in ctx) && bVal !== 100) {
+          try {
+            const imgData = ctx.getImageData(0, 0, cw, ch);
+            const data = imgData.data;
+            const factor = bVal / 100;
+            for (let p = 0; p < data.length; p += 4) {
+              data[p] = Math.min(255, data[p] * factor);
+              data[p + 1] = Math.min(255, data[p + 1] * factor);
+              data[p + 2] = Math.min(255, data[p + 2] * factor);
+            }
+            ctx.putImageData(imgData, 0, 0);
+          } catch (e) {}
+        }
+
+        if (includeGuides !== false) {
+          ctx.save();
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+          ctx.lineWidth = 1;
+          for (let i = 1; i <= 2; i++) {
+            const gx = (cw / 3) * i;
+            const gy = (ch / 3) * i;
+            ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, ch); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(cw, gy); ctx.stroke();
+          }
+          ctx.restore();
+        }
+      }
+
+      function syncCropControlsUI() {
+        const range = document.getElementById('crop-zoom-range');
+        const badge = document.getElementById('crop-zoom-badge');
+        const pct = Math.round(cropState.zoom * 100);
+        if (range) range.value = String(pct);
+        if (badge) badge.textContent = pct + '%';
+
+        const bRange = document.getElementById('crop-bright-range');
+        const bBadge = document.getElementById('crop-bright-badge');
+        const bPct = Math.round(cropState.brightness || 100);
+        if (bRange) bRange.value = String(bPct);
+        if (bBadge) bBadge.textContent = bPct + '%';
+      }
+
+      window.openPhotoCropModal = function () {
+        const src = state.data.photo;
+        if (!src) {
+          toast('Pehle photo upload karein');
+          return;
+        }
+
+        cropState.zoom = 1;
+        cropState.brightness = 100;
+        cropState.rotation = 0;
+        cropState.panX = 0;
+        cropState.panY = 0;
+        syncCropControlsUI();
+
+        const openSmoothly = function () {
+          drawCropCanvas(true);
+          requestAnimationFrame(function () {
+            const modal = document.getElementById('photo-crop-modal');
+            if (modal) modal.classList.add('open');
+          });
+        };
+
+        const im = new Image();
+        im.onload = function () {
+          cropState.img = im;
+          openSmoothly();
+        };
+        im.src = src;
+        if (im.complete && im.naturalWidth > 0) {
+          cropState.img = im;
+          openSmoothly();
+        }
+      };
+
+      window.closePhotoCropModal = function () {
+        cropState.dragging = false;
+        const modal = document.getElementById('photo-crop-modal');
+        if (modal) modal.classList.remove('open');
+      };
+
+      window.onCropZoomChange = function (val) {
+        const num = Number(val);
+        if (!isNaN(num)) {
+          cropState.zoom = Math.max(1, Math.min(3, num / 100));
+          syncCropControlsUI();
+          drawCropCanvas(true);
+        }
+      };
+
+      window.onCropBrightnessChange = function (val) {
+        const num = Number(val);
+        if (!isNaN(num)) {
+          cropState.brightness = Math.max(60, Math.min(150, num));
+          syncCropControlsUI();
+          drawCropCanvas(true);
+        }
+      };
+
+      window.rotateCropPhoto = function (deg) {
+        cropState.rotation = (cropState.rotation + (deg || 90)) % 360;
+        cropState.panX = 0;
+        cropState.panY = 0;
+        drawCropCanvas(true);
+      };
+
+      window.resetCropTransform = function () {
+        cropState.zoom = 1;
+        cropState.brightness = 100;
+        cropState.rotation = 0;
+        cropState.panX = 0;
+        cropState.panY = 0;
+        syncCropControlsUI();
+        drawCropCanvas(true);
+      };
+
+      window.applyCroppedPhoto = function () {
+        const canvas = document.getElementById('crop-canvas');
+        if (!canvas || !cropState.img) return;
+        // Draw clean final image without grid guide lines
+        drawCropCanvas(false);
+        try {
+          state.data.photo = canvas.toDataURL('image/jpeg', 0.92);
+          state.data.showPhoto = true;
+          syncPhotoToggleUI();
+          renderPreview();
+          save();
+          closePhotoCropModal();
+          toast('Photo updated');
+        } catch (e) {
+          toast('Could not update photo');
+        }
+      };
+
+      function bindCropPointerEvents() {
+        const wrap = document.getElementById('crop-stage-wrap');
+        if (!wrap) return;
+
+        wrap.addEventListener('pointerdown', function (e) {
+          if (!cropState.img) return;
+          cropState.dragging = true;
+          cropState.lastX = e.clientX;
+          cropState.lastY = e.clientY;
+          try { wrap.setPointerCapture(e.pointerId); } catch (err) {}
+        });
+
+        wrap.addEventListener('pointermove', function (e) {
+          if (!cropState.dragging) return;
+          const dx = e.clientX - cropState.lastX;
+          const dy = e.clientY - cropState.lastY;
+          cropState.lastX = e.clientX;
+          cropState.lastY = e.clientY;
+          cropState.panX += dx;
+          cropState.panY += dy;
+          drawCropCanvas();
+        });
+
+        function stopDrag(e) {
+          if (!cropState.dragging) return;
+          cropState.dragging = false;
+          if (e && e.pointerId !== undefined) {
+            try { wrap.releasePointerCapture(e.pointerId); } catch (err) {}
+          }
+        }
+        wrap.addEventListener('pointerup', stopDrag);
+        wrap.addEventListener('pointercancel', stopDrag);
+      }
+
+      window.setPhotoShape = function (shape) {
+        state.data.photoShape = shape;
+        syncPhotoToggleUI();
+        renderPreview();
+        save();
+      };
+
+      window.setPhotoBorder = function (border) {
+        state.data.photoBorder = border;
+        syncPhotoToggleUI();
+        renderPreview();
+        save();
+      };
+
+      /* ============================================================
+         CHATGPT MASTER PROMPT & 1-CLICK JSON AUTO-FILL ENGINE
+         ============================================================ */
+      function syncStateFromLiveDOM() {
+        const d = state.data;
+        const map = {
+          'f-name': 'name', 'f-phone': 'phone', 'f-email': 'email',
+          'f-dob': 'dob', 'f-gender': 'gender', 'f-nationality': 'nationality',
+          'f-address': 'address', 'f-languages': 'languages', 'f-objective': 'objective',
+          'f-hobbies': 'hobbies', 'f-interest': 'interest', 'f-strengths': 'strengths',
+          'f-declaration': 'declaration', 'f-date': 'declDate', 'f-place': 'declPlace',
+          'f-signature': 'signature', 'f-fresher-note': 'fresherNote'
+        };
+        Object.keys(map).forEach(function (id) {
+          const el = document.getElementById(id);
+          if (el) d[map[id]] = el.value;
+        });
+        const achEl = document.getElementById('f-achievements');
+        if (achEl) {
+          d.achievements = achEl.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
+        }
+        const clMap = {
+          'cl-to': 'to', 'cl-subject': 'subject', 'cl-salutation': 'salutation',
+          'cl-p1': 'p1', 'cl-p2': 'p2', 'cl-p3': 'p3',
+          'cl-closing': 'closing', 'cl-signoff': 'signoff', 'cl-enclosure': 'enclosure'
+        };
+        Object.keys(clMap).forEach(function (id) {
+          const el = document.getElementById(id);
+          if (el && d.coverLetter) d.coverLetter[clMap[id]] = el.value;
+        });
+      }
+
+      function getPersonalFactsOnly() {
+        syncStateFromLiveDOM();
+        const d = state.data;
+        const facts = {};
+        const personalKeys = ['name', 'phone', 'email', 'dob', 'gender', 'nationality', 'address', 'languages', 'declDate', 'declPlace'];
+        personalKeys.forEach(function (k) {
+          if (d[k] && String(d[k]).trim()) {
+            facts[k] = String(d[k]).trim();
+          }
+        });
+        if (Array.isArray(d.education)) {
+          const validEdu = d.education.filter(function (r) { return r && (r.qual || r.board || r.year || r.pct); });
+          if (validEdu.length) facts.education = validEdu;
+        }
+        facts.isFresher = Boolean(d.isFresher);
+        if (!d.isFresher && Array.isArray(d.experience)) {
+          const validExp = d.experience.filter(function (e) { return e && (e.role || e.company || e.duration); });
+          if (validExp.length) {
+            facts.experience = validExp.map(function (e) {
+              return { role: e.role || '', company: e.company || '', duration: e.duration || '' };
+            });
+          }
+        }
+        return facts;
+      }
+
+      function buildChatGPTMasterPrompt(jobRole) {
+        const role = (jobRole || '').trim() || 'Not specified yet';
+        const facts = getPersonalFactsOnly();
+        const filledList = Object.keys(facts).filter(function (k) { return k !== 'isFresher'; });
+
+        return [
+          'You are an expert Indian HR & ATS Resume + Covering Letter Assistant for BikriPage Smart CV Studio.',
+          'Target Job Role: ' + role,
+          filledList.length ? ('USER PERSONAL DETAILS (ALREADY KNOWN — DO NOT ASK AGAIN):\n' + JSON.stringify(facts, null, 2)) : '',
+          '',
+          'STRICT RULES:',
+          '1. FIRST REPLY: Greet briefly and ask ONLY ONE question: Do you want (1) Resume / CV only, (2) Covering Letter only, or (3) Both Resume & Covering Letter? Wait for user reply.',
+          '2. SECOND REPLY: Ask ONLY missing personal facts that ChatGPT cannot know (from: Name, Phone, Email, City/Address, Qualification, Fresher/Experience, and Company Name if Cover Letter selected). NEVER ask any detail already in USER PERSONAL DETAILS above! NEVER ask Objective, Skills, Achievements, Hobbies, Interest, Strengths, or Cover Letter text — you must write all of those yourself tailored to "' + role + '". Tell user: "Jo skip karna ho chhod dein." Never ask follow-up questions.',
+          '3. FINAL OUTPUT: Combine USER PERSONAL DETAILS + user replies, auto-write Objective, Skills, fresherNote/experience bullets, Achievements, Hobbies, Interest, Strengths, signature (= name), and full 3-paragraph Cover Letter (if needed) tailored to "' + role + '". Output ONLY a single clean ```json ... ``` block with this exact schema:',
+          '{"docMode":"cv|cl|both","name":"","phone":"","email":"","dob":"","gender":"","nationality":"Indian","address":"","languages":"Hindi, English","objective":"","education":[{"qual":"","board":"","year":"","pct":""}],"skills":[],"isFresher":true,"fresherNote":"","experience":[{"role":"","company":"","duration":"","bullets":[]}],"achievements":[],"hobbies":"","interest":"","strengths":"","declaration":"I hereby declare that the above information is true and correct to the best of my knowledge and belief.","declDate":"","declPlace":"","signature":"","coverLetter":{"to":"","subject":"","salutation":"Respected Sir/Madam,","p1":"","p2":"","p3":"","closing":"Thank you for your time and consideration. I look forward to hearing from you.","signoff":"Yours faithfully,","enclosure":"Curriculum Vitae (CV)"}}',
+          'After the JSON block, write 1 line: "Upar Copy code dabakar BikriPage Studio me Paste & Upload karein!"'
+        ].filter(Boolean).join('\n');
+      }
+
+      window.switchAiTab = function (tab) {
+        const isChat = tab !== 'import';
+        const tChat = document.getElementById('ai-tab-chatgpt');
+        const tImp = document.getElementById('ai-tab-import');
+        const vChat = document.getElementById('ai-view-chatgpt');
+        const vImp = document.getElementById('ai-view-import');
+        const titleEl = document.getElementById('ai-modal-title');
+        const subEl = document.getElementById('ai-modal-sub');
+
+        if (tChat) tChat.classList.toggle('active', isChat);
+        if (tImp) tImp.classList.toggle('active', !isChat);
+        if (vChat) vChat.classList.toggle('hidden', !isChat);
+        if (vImp) vImp.classList.toggle('hidden', isChat);
+        if (titleEl) titleEl.textContent = isChat ? 'Fill with ChatGPT' : 'Paste & Upload';
+        if (subEl) subEl.textContent = isChat
+          ? 'Apna job role likhein aur ChatGPT se CV ready karein'
+          : 'ChatGPT ka response paste karein ya file upload karein';
+      };
+
+      window.openAiModal = function (tab) {
+        const targetTab = tab === 'import' ? 'import' : 'chatgpt';
+        switchAiTab(targetTab);
+        const modal = document.getElementById('ai-studio-modal');
+        if (modal) modal.classList.add('open');
+        setTimeout(function () {
+          if (targetTab === 'import') {
+            const ta = document.getElementById('ai-import-textarea');
+            if (ta) ta.focus();
+          } else {
+            const inp = document.getElementById('ai-job-input');
+            if (inp) inp.focus();
+          }
+        }, 120);
+      };
+
+      window.closeAiModal = function () {
+        const modal = document.getElementById('ai-studio-modal');
+        if (modal) modal.classList.remove('open');
+      };
+
+      function copyTextSilently(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          return navigator.clipboard.writeText(text).catch(function () {
+            const ta = document.createElement('textarea');
+            ta.value = text; document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); } catch (e) {}
+            document.body.removeChild(ta);
+          });
+        }
+        const ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+        return Promise.resolve();
+      }
+
+      window.launchChatGPTWithPrompt = function () {
+        const inp = document.getElementById('ai-job-input');
+        const job = inp ? inp.value.trim() : '';
+        if (!job) {
+          toast('Pehle job role likhein (e.g. Data Entry Operator)');
+          if (inp) inp.focus();
+          return;
+        }
+        const prompt = buildChatGPTMasterPrompt(job);
+        copyTextSilently(prompt);
+        const chatUrl = 'https://chatgpt.com/?q=' + encodeURIComponent(prompt);
+        window.open(chatUrl, '_blank');
+        switchAiTab('import');
+        toast('Opening ChatGPT...');
+      };
+
+      window.pasteFromClipboardToAi = async function () {
+        const ta = document.getElementById('ai-import-textarea');
+        if (!ta) return;
+        try {
+          if (navigator.clipboard && navigator.clipboard.readText) {
+            const txt = await navigator.clipboard.readText();
+            if (txt) {
+              ta.value = txt;
+              toast('Pasted!');
+              return;
+            }
+          }
+        } catch (e) {}
+        ta.focus();
+        toast('Long-press & Paste in the box');
+      };
+
+      window.handleAiFileUpload = function (e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function () {
+          const ta = document.getElementById('ai-import-textarea');
+          if (ta) ta.value = String(reader.result || '');
+          e.target.value = '';
+          importAiResumeData();
+        };
+        reader.readAsText(file);
+      };
+
+      function extractJsonFromAiText(raw) {
+        let txt = String(raw || '').trim();
+        if (!txt) return null;
+        const fenceMatch = txt.match(/```(?:json)?\s*([\s\S]*?)```/i);
+        if (fenceMatch && fenceMatch[1]) {
+          txt = fenceMatch[1].trim();
+        }
+        const firstBrace = txt.indexOf('{');
+        const lastBrace = txt.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace > firstBrace) {
+          txt = txt.slice(firstBrace, lastBrace + 1);
+        }
+        return JSON.parse(txt);
+      }
+
+      window.importAiResumeData = function () {
+        const ta = document.getElementById('ai-import-textarea');
+        const raw = ta ? ta.value : '';
+        if (!raw.trim()) {
+          toast('Pehle ChatGPT ka response paste ya file upload karein');
+          return;
+        }
+        let parsed = null;
+        try {
+          parsed = extractJsonFromAiText(raw);
+        } catch (err) {
+          showIosNotice('Invalid Format', 'ChatGPT ne jo code diya hai use poora copy karke paste karein.');
+          return;
+        }
+        if (!parsed || typeof parsed !== 'object') {
+          showIosNotice('Invalid Data', 'Valid resume data nahi mila. Dobara try karein.');
+          return;
+        }
+
+        const d = state.data;
+
+        const strFields = ['name', 'address', 'phone', 'email', 'dob', 'gender', 'nationality', 'languages', 'objective', 'fresherNote', 'hobbies', 'interest', 'strengths', 'declaration', 'declDate', 'declPlace', 'signature'];
+        strFields.forEach(function (k) {
+          if (typeof parsed[k] === 'string') {
+            const val = parsed[k].trim();
+            if (val) {
+              d[k] = val;
+            }
+          }
+        });
+        if (!d.signature && d.name) d.signature = d.name;
+
+        if (typeof parsed.isFresher === 'boolean') {
+          d.isFresher = parsed.isFresher;
+        }
+
+        if (Array.isArray(parsed.education)) {
+          const validEdu = parsed.education.map(function (row) {
+            return {
+              qual: String((row && (row.qual || row.qualification || row.degree)) || '').trim(),
+              board: String((row && (row.board || row.university || row.institute)) || '').trim(),
+              year: String((row && (row.year || row.passingYear)) || '').trim(),
+              pct: String((row && (row.pct || row.percentage || row.marks || row.cgpa)) || '').trim()
+            };
+          }).filter(function (r) { return r.qual || r.board || r.year || r.pct; });
+          if (validEdu.length) {
+            d.education = validEdu.length ? validEdu : [{ qual: '', board: '', year: '', pct: '' }];
+          }
+        }
+
+        if (Array.isArray(parsed.skills)) {
+          const validSkills = parsed.skills.map(function (s) { return String(s || '').trim(); }).filter(Boolean);
+          if (validSkills.length) {
+            d.skills = validSkills;
+          }
+        }
+
+        if (Array.isArray(parsed.experience)) {
+          const validExp = parsed.experience.map(function (ex) {
+            return {
+              role: String((ex && (ex.role || ex.title || ex.position)) || '').trim(),
+              company: String((ex && (ex.company || ex.organization)) || '').trim(),
+              duration: String((ex && (ex.duration || ex.period || ex.years)) || '').trim(),
+              bullets: Array.isArray(ex && ex.bullets)
+                ? ex.bullets.map(function (b) { return String(b || '').trim(); }).filter(Boolean)
+                : []
+            };
+          }).filter(function (e) { return e.role || e.company || e.duration || e.bullets.length; });
+          if (validExp.length) {
+            d.experience = validExp.length ? validExp : [{ role: '', company: '', duration: '', bullets: [] }];
+          }
+        }
+
+        if (Array.isArray(parsed.achievements)) {
+          const validAch = parsed.achievements.map(function (a) { return String(a || '').trim(); }).filter(Boolean);
+          if (validAch.length) {
+            d.achievements = validAch;
+          }
+        }
+
+        if (parsed.coverLetter && typeof parsed.coverLetter === 'object') {
+          const cl = parsed.coverLetter;
+          ['to', 'subject', 'salutation', 'p1', 'p2', 'p3', 'closing', 'signoff', 'enclosure'].forEach(function (ck) {
+            if (typeof cl[ck] === 'string') {
+              const val = cl[ck].trim();
+              if (val) {
+                d.coverLetter[ck] = val;
+              }
+            }
+          });
+        }
+
+        if (parsed.docMode && ['cv', 'cl', 'both'].indexOf(parsed.docMode) !== -1) {
+          setDocMode(parsed.docMode);
+        }
+
+        syncForm();
+        renderPreview();
+        save();
+        closeAiModal();
+        toast('Resume auto-filled!');
+        if (window.innerWidth < 980) {
+          setMobileView('preview');
+        }
+      };
+
+      window.setShowPhoto = function (show) {
+        state.data.showPhoto = Boolean(show);
+        syncPhotoToggleUI();
+        renderPreview();
+        save();
+        toast(show ? 'Profile photo shown' : 'Profile photo hidden');
+      };
+      window.setMobileView = function (v) {
+        state.mobileView = v;
+        document.getElementById('tab-edit').classList.toggle('active', v === 'edit');
+        document.getElementById('tab-preview').classList.toggle('active', v === 'preview');
+        if (window.innerWidth < 980) {
+          document.getElementById('edit-pane').classList.toggle('hidden', v !== 'edit');
+          document.getElementById('preview-pane').classList.toggle('hidden', v !== 'preview');
+        }
+        if (v === 'preview') requestAnimationFrame(function () {
+          fitAllSheetsToA4();
+          scaleAllSheets();
+        });
+      };
+
+      window.setEditTab = function (t) {
+        state.editTab = t;
+        document.getElementById('edit-mode-cv').classList.toggle('active', t === 'cv');
+        document.getElementById('edit-mode-cl').classList.toggle('active', t === 'cl');
+        document.getElementById('cv-editor-group').classList.toggle('hidden', t !== 'cv');
+        document.getElementById('cl-editor-group').classList.toggle('hidden', t !== 'cl');
+        updateProgressBar();
+      };
+
+      window.toggleAcc = function (id) {
+        document.getElementById(id).classList.toggle('open');
+      };
+
+      window.setDocMode = function (m) {
+        state.docMode = m;
+        ['cv', 'cl', 'both'].forEach(function (k) {
+          document.getElementById('doc-' + k).classList.toggle('active', k === m);
+        });
+        renderPreview(); save();
+      };
+
+      function computeTintHex(hex) {
+        const h = String(hex || '#1B2A4A').replace('#', '');
+        if (h.length !== 6) return '#F0F4FA';
+        const r = Math.round(parseInt(h.slice(0, 2), 16) * 0.08 + 255 * 0.92);
+        const g = Math.round(parseInt(h.slice(2, 4), 16) * 0.08 + 255 * 0.92);
+        const b = Math.round(parseInt(h.slice(4, 6), 16) * 0.08 + 255 * 0.92);
+        return '#' + [r, g, b].map(function (v) { return v.toString(16).padStart(2, '0'); }).join('');
+      }
+
+      function hexToBorderRgba(hex) {
+        const h = String(hex || '#1B2A4A').replace('#', '');
+        if (h.length !== 6) return 'rgba(27,42,74,0.16)';
+        return 'rgba(' + parseInt(h.slice(0, 2), 16) + ',' + parseInt(h.slice(2, 4), 16) + ',' + parseInt(h.slice(4, 6), 16) + ',0.18)';
+      }
+
+      window.setLayout = function (l, skipAutoStyle) {
+        state.layout = l;
+        ALL_LAYOUTS.forEach(function (k) {
+          const el = document.getElementById('lay-' + k);
+          if (el) el.classList.toggle('active', k === l);
+        });
+        if (!skipAutoStyle && LAYOUT_SMART_PRESETS[l]) {
+          const preset = LAYOUT_SMART_PRESETS[l];
+          const chosenTheme = THEMES[preset.theme] ? preset.theme : 'midnight';
+          const chosenFont = ALL_FONTS.indexOf(preset.font) !== -1 ? preset.font : 'sans';
+          state.theme = chosenTheme;
+          state.font = chosenFont;
+          state.fontScale = 1.0;
+
+          const pIn = document.getElementById('pick-primary');
+          const sIn = document.getElementById('pick-secondary');
+          if (pIn && THEMES[chosenTheme]) pIn.value = THEMES[chosenTheme].primary;
+          if (sIn && THEMES[chosenTheme]) sIn.value = THEMES[chosenTheme].secondary;
+
+          ALL_FONTS.forEach(function (fk) {
+            const fel = document.getElementById('fnt-' + fk);
+            if (fel) fel.classList.toggle('active', fk === state.font);
+          });
+          renderSwatches();
+        }
+
+        renderPreview();
+        if (!skipAutoStyle) {
+          requestAnimationFrame(function () {
+            fitAllSheetsToA4();
+            const fullMax = computeAllowedMaxScale();
+            if (fullMax && fullMax >= 1.0) {
+              state.fontScale = fullMax;
+              syncFontSizeUI();
+              const outer = document.getElementById('preview-scale-outer');
+              if (outer) {
+                outer.querySelectorAll('.a4-sheet').forEach(function (sheet) {
+                  sheet.style.setProperty('--fs-scale', String(state.fontScale));
+                });
+              }
+              fitAllSheetsToA4();
+              scaleAllSheets();
+              save();
+            }
+          });
+        }
+        save();
+      };
+
+      window.setTheme = function (k) {
+        state.theme = k;
+        if (k !== 'custom' && THEMES[k]) {
+          const pIn = document.getElementById('pick-primary');
+          const sIn = document.getElementById('pick-secondary');
+          if (pIn) pIn.value = THEMES[k].primary;
+          if (sIn) sIn.value = THEMES[k].secondary;
+        }
+        renderSwatches();
+        renderPreview(); save();
+      };
+
+      window.applyCustomColors = function () {
+        const pIn = document.getElementById('pick-primary');
+        const sIn = document.getElementById('pick-secondary');
+        if (!pIn || !sIn) return;
+        state.customTheme = { primary: pIn.value, secondary: sIn.value };
+        state.theme = 'custom';
+        renderSwatches();
+        renderPreview(); save();
+      };
+
+      const ALL_FONTS = ['sans', 'jakarta', 'poppins', 'montserrat', 'lato', 'raleway', 'dmsans', 'nunito', 'serif', 'editorial', 'merriweather', 'lora', 'slab', 'mono'];
+
+      const FONT_STACKS = {
+        sans:         '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        jakarta:      '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        poppins:      '"Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        montserrat:   '"Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        lato:         '"Lato", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        raleway:      '"Raleway", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        dmsans:       '"DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        nunito:       '"Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        serif:        'Georgia, "Times New Roman", "Palatino Linotype", serif',
+        editorial:    '"Cormorant Garamond", Georgia, serif',
+        merriweather: '"Merriweather", Georgia, serif',
+        lora:         '"Lora", Georgia, serif',
+        slab:         '"Roboto Slab", Georgia, serif',
+        mono:         '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace'
+      };
+
+      const COMBO_FONT_PAIRS = {
+        cormorantJakartaMono: {
+          name: 'Cormorant + Jakarta + Mono',
+          head: 'editorial',
+          body: 'jakarta',
+          meta: 'mono'
+        },
+        poppinsLoraLato: {
+          name: 'Poppins + Lora + Lato',
+          head: 'poppins',
+          body: 'lora',
+          meta: 'lato'
+        },
+        montserratDmSansMono: {
+          name: 'Montserrat + DM Sans + Mono',
+          head: 'montserrat',
+          body: 'dmsans',
+          meta: 'mono'
+        },
+        loraInterSans: {
+          name: 'Lora + Inter + Sans',
+          head: 'lora',
+          body: 'sans',
+          meta: 'jakarta'
+        },
+        slabNunitoMono: {
+          name: 'Slab + Nunito + Mono',
+          head: 'slab',
+          body: 'nunito',
+          meta: 'mono'
+        },
+        merriweatherSansLato: {
+          name: 'Merriweather + Sans + Lato',
+          head: 'merriweather',
+          body: 'sans',
+          meta: 'lato'
+        },
+        jakartaLoraMono: {
+          name: 'Jakarta + Lora + Mono',
+          head: 'jakarta',
+          body: 'lora',
+          meta: 'mono'
+        },
+        ralewayDmSansSerif: {
+          name: 'Raleway + DM Sans + Serif',
+          head: 'raleway',
+          body: 'dmsans',
+          meta: 'serif'
+        },
+        cormorantInterLato: {
+          name: 'Cormorant + Inter + Lato',
+          head: 'editorial',
+          body: 'sans',
+          meta: 'lato'
+        },
+        poppinsNunitoMono: {
+          name: 'Poppins + Nunito + Mono',
+          head: 'poppins',
+          body: 'nunito',
+          meta: 'mono'
+        }
+      };
+      const FONT_SCALE_MIN = 0.75;
+      const FONT_SCALE_MAX = 1.45;
+      const A4_SAFE_HEIGHT = 1120;
+      const A4_SAFE_WIDTH = 800;
+      let currentAllowedMaxScale = 1.0;
+
+      function showIosNotice(title, msg) {
+        const tEl = document.getElementById('ios-notice-title');
+        const mEl = document.getElementById('ios-notice-msg');
+        const modal = document.getElementById('ios-notice-modal');
+        if (tEl) tEl.textContent = title || 'Not Possible';
+        if (mEl) mEl.textContent = msg || '';
+        if (modal) modal.classList.add('open');
+      }
+
+      window.closeIosNotice = function () {
+        const modal = document.getElementById('ios-notice-modal');
+        if (modal) modal.classList.remove('open');
+      };
+
+      function computeAllowedMaxScale() {
+        const outer = document.getElementById('preview-scale-outer');
+        if (!outer) return 1.0;
+        const sheets = Array.prototype.slice.call(outer.querySelectorAll('.a4-sheet')).filter(function (s) {
+          return s.getClientRects().length > 0;
+        });
+        if (!sheets.length) return currentAllowedMaxScale || 1.0;
+
+        let maxPossible = 1.0;
+        for (let s = 1.05; s <= FONT_SCALE_MAX + 0.001; s = Math.round((s + 0.05) * 20) / 20) {
+          let allFit = true;
+          for (let i = 0; i < sheets.length; i++) {
+            if (!measureSheetAtScale(sheets[i], s).fits) {
+              allFit = false;
+              break;
+            }
+          }
+          if (allFit) {
+            maxPossible = s;
+          } else {
+            break;
+          }
+        }
+        currentAllowedMaxScale = maxPossible;
+        return maxPossible;
+      }
+
+      function syncFontSizeUI() {
+        const maxScale = computeAllowedMaxScale();
+        const maxPct = Math.round(maxScale * 100);
+        const minPct = Math.round(FONT_SCALE_MIN * 100);
+        const pct = Math.round((state.fontScale || 1) * 100);
+
+        const badge = document.getElementById('fs-val-badge');
+        const slider = document.getElementById('fs-slider');
+        const maxHint = document.getElementById('fs-max-hint');
+        const decBtn = document.getElementById('fs-btn-dec');
+        const incBtn = document.getElementById('fs-btn-inc');
+
+        if (badge) badge.textContent = pct + '%';
+        if (maxHint) maxHint.textContent = minPct + '–' + maxPct + '%';
+        if (slider) {
+          slider.min = String(minPct);
+          slider.max = String(maxPct);
+          slider.value = String(Math.min(pct, maxPct));
+        }
+        if (decBtn) {
+          decBtn.style.opacity = pct <= minPct ? '0.45' : '1';
+        }
+        if (incBtn) {
+          incBtn.style.opacity = pct >= maxPct ? '0.45' : '1';
+        }
+      }
+
+      function measureSheetAtScale(sheet, testScale) {
+        const content = sheet.querySelector('.sheet-content');
+        if (!content) return { fits: true, needsCompact: false, height: 0 };
+
+        const prevScale = sheet.style.getPropertyValue('--fs-scale');
+        const prevCompact = sheet.classList.contains('auto-fit-compact');
+        const prevTransform = content.style.transform;
+
+        sheet.classList.add('measuring-natural');
+        sheet.classList.remove('auto-fit-compact');
+        sheet.style.setProperty('--fs-scale', String(testScale));
+        content.style.transform = 'none';
+        content.style.width = '100%';
+        void content.offsetHeight;
+
+        let h = Math.max(content.scrollHeight, content.offsetHeight);
+        let w = content.scrollWidth;
+        let needsCompact = false;
+
+        if (h > A4_SAFE_HEIGHT) {
+          sheet.classList.add('auto-fit-compact');
+          void content.offsetHeight;
+          h = Math.max(content.scrollHeight, content.offsetHeight);
+          w = content.scrollWidth;
+          needsCompact = true;
+        }
+
+        sheet.classList.remove('measuring-natural');
+        if (prevCompact) sheet.classList.add('auto-fit-compact');
+        else sheet.classList.remove('auto-fit-compact');
+        if (prevScale) sheet.style.setProperty('--fs-scale', prevScale);
+        else sheet.style.removeProperty('--fs-scale');
+        content.style.transform = prevTransform;
+
+        return {
+          fits: (h <= A4_SAFE_HEIGHT && w <= A4_SAFE_WIDTH),
+          needsCompact: needsCompact,
+          height: h,
+          width: w
+        };
+      }
+
+      function canScaleFitAllSheets(testScale) {
+        const outer = document.getElementById('preview-scale-outer');
+        if (!outer) return true;
+        const sheets = Array.prototype.slice.call(outer.querySelectorAll('.a4-sheet'));
+        if (!sheets.length) return true;
+        for (let i = 0; i < sheets.length; i++) {
+          if (!sheets[i].getClientRects().length) continue;
+          const res = measureSheetAtScale(sheets[i], testScale);
+          if (!res.fits) return false;
+        }
+        return true;
+      }
+
+      function applyFontSizeChange(rawScale, fromSlider) {
+        const dynamicMax = computeAllowedMaxScale();
+        const maxPct = Math.round(dynamicMax * 100);
+        let target = Math.round(rawScale * 20) / 20;
+        const current = Math.round((state.fontScale || 1) * 20) / 20;
+
+        if (target < FONT_SCALE_MIN) {
+          syncFontSizeUI();
+          showIosNotice('Not Possible', 'Not possible! Minimum font size limit (75%) aa gayi hai.');
+          return;
+        }
+        if (target > dynamicMax) {
+          if (fromSlider && dynamicMax > current) {
+            target = dynamicMax;
+          } else {
+            syncFontSizeUI();
+            showIosNotice('Max Limit Reached', 'Is layout ke liye maximum font size ' + maxPct + '% tak hi possible hai.');
+            return;
+          }
+        }
+        if (target === current) {
+          syncFontSizeUI();
+          return;
+        }
+
+        state.fontScale = target;
+        syncFontSizeUI();
+        const outer = document.getElementById('preview-scale-outer');
+        if (outer) {
+          outer.querySelectorAll('.a4-sheet').forEach(function (sheet) {
+            sheet.style.setProperty('--fs-scale', String(state.fontScale));
+          });
+        }
+        fitAllSheetsToA4();
+        scaleAllSheets();
+        save();
+      }
+
+      window.stepFontSize = function (delta) {
+        const next = Math.round(((state.fontScale || 1) + delta) * 20) / 20;
+        applyFontSizeChange(next, false);
+      };
+
+      window.onFontSizeSlider = function (val) {
+        const num = Number(val) / 100;
+        if (!isNaN(num)) applyFontSizeChange(num, true);
+      };
+
+      window.resetFontSize = function () {
+        state.fontScale = 1;
+        syncFontSizeUI();
+        const outer = document.getElementById('preview-scale-outer');
+        if (outer) {
+          outer.querySelectorAll('.a4-sheet').forEach(function (sheet) {
+            sheet.style.setProperty('--fs-scale', '1');
+          });
+        }
+        fitAllSheetsToA4();
+        scaleAllSheets();
+        save();
+        toast('Font size reset to 100%');
+      };
+
+      function renderFontSelectorStrip() {
+        const strip = document.querySelector('[aria-label="Fonts"]');
+        if (!strip) return;
+        const mode = state.fontMode === 'combine' ? 'combine' : 'single';
+
+        const bSingle = document.getElementById('fmode-single');
+        const bCombine = document.getElementById('fmode-combine');
+        if (bSingle) bSingle.classList.toggle('active', mode === 'single');
+        if (bCombine) bCombine.classList.toggle('active', mode === 'combine');
+
+        if (mode === 'combine') {
+          if (!COMBO_FONT_PAIRS[state.fontPair]) {
+            state.fontPair = 'cormorantJakartaMono';
+          }
+          strip.innerHTML = Object.keys(COMBO_FONT_PAIRS).map(function (pk) {
+            const pair = COMBO_FONT_PAIRS[pk];
+            const headFont = FONT_STACKS[pair.head] || FONT_STACKS.sans;
+            const bodyFont = FONT_STACKS[pair.body] || FONT_STACKS.sans;
+            const isAct = state.fontPair === pk;
+            return '<button id="fp-' + pk + '" type="button" class="seg-btn' + (isAct ? ' active' : '') + '" onclick="setFontPair(\'' + pk + '\')">' +
+              '<span style="font-family:' + esc(headFont) + '; font-weight:700;">' + esc(pair.name.split(' + ')[0]) + '</span>' +
+              '<span style="opacity:0.55; margin:0 3px;">+</span>' +
+              '<span style="font-family:' + esc(bodyFont) + ';">' + esc(pair.name.split(' + ').slice(1).join(' + ')) + '</span>' +
+            '</button>';
+          }).join('');
+        } else {
+          strip.innerHTML = ALL_FONTS.map(function (k) {
+            const labelMap = {
+              sans: 'Inter Sans', jakarta: 'Jakarta', poppins: 'Poppins', montserrat: 'Montserrat',
+              lato: 'Lato', raleway: 'Raleway', dmsans: 'DM Sans', nunito: 'Nunito',
+              serif: 'Classic Serif', editorial: 'Cormorant', merriweather: 'Merriweather',
+              lora: 'Lora', slab: 'Roboto Slab', mono: 'Mono Tech'
+            };
+            const ff = FONT_STACKS[k] || FONT_STACKS.sans;
+            const isAct = state.font === k;
+            return '<button id="fnt-' + k + '" type="button" class="seg-btn' + (isAct ? ' active' : '') + '" style="font-family:' + esc(ff) + ';" onclick="setFont(\'' + k + '\')">' + esc(labelMap[k] || k) + '</button>';
+          }).join('');
+        }
+      }
+
+      window.setFontMode = function (mode) {
+        state.fontMode = mode === 'combine' ? 'combine' : 'single';
+        if (state.fontMode === 'combine' && !COMBO_FONT_PAIRS[state.fontPair]) {
+          state.fontPair = 'cormorantJakartaMono';
+        }
+        renderFontSelectorStrip();
+        renderPreview();
+        save();
+        toast(state.fontMode === 'combine' ? 'Combined font pairs active' : 'Single font mode active');
+      };
+
+      window.setFontPair = function (pk) {
+        state.fontMode = 'combine';
+        state.fontPair = COMBO_FONT_PAIRS[pk] ? pk : 'cormorantJakartaMono';
+        renderFontSelectorStrip();
+        renderPreview();
+        save();
+      };
+
+      window.setFont = function (f) {
+        state.fontMode = 'single';
+        state.font = ALL_FONTS.indexOf(f) !== -1 ? f : 'sans';
+        renderFontSelectorStrip();
+        renderPreview(); save();
+      };
+
+      /* FORM UPDATERS */
+      window.upd = function (k, v) { state.data[k] = v; renderPreview(); save(); };
+      window.updCL = function (k, v) { state.data.coverLetter[k] = v; renderPreview(); save(); };
+      window.updLines = function (k, v) {
+        state.data[k] = v.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
+        renderPreview(); save();
+      };
+
+      window.uploadPhoto = function (e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const r = new FileReader();
+        r.onload = function () {
+          state.data.photo = String(r.result || '');
+          state.data.showPhoto = true;
+          e.target.value = '';
+          syncPhotoToggleUI();
+          renderPreview(); save(); toast('Photo uploaded');
+        };
+        r.readAsDataURL(file);
+      };
+      window.clearPhoto = function () {
+        state.data.photo = '';
+        syncPhotoToggleUI();
+        renderPreview(); save(); toast('Photo removed');
+      };
+
+      /* EDUCATION TABLE EDITOR */
+      function renderEduEditor() {
+        document.getElementById('edu-list').innerHTML = state.data.education.map(function (row, i) {
+          return '<div class="sub-card">' +
+            '<div class="sub-head"><span>Row ' + (i + 1) + '</span><button type="button" class="btn-danger" onclick="delEdu(' + i + ')">Delete</button></div>' +
+            '<div class="field-grid cols-2">' +
+              '<input class="ios-input" placeholder="Qualification" value="' + esc(row.qual) + '" oninput="updEdu(' + i + ',\'qual\',this.value)" />' +
+              '<input class="ios-input" placeholder="Board / University" value="' + esc(row.board) + '" oninput="updEdu(' + i + ',\'board\',this.value)" />' +
+              '<input class="ios-input" placeholder="Year" value="' + esc(row.year) + '" oninput="updEdu(' + i + ',\'year\',this.value)" />' +
+              '<input class="ios-input" placeholder="Percentage" value="' + esc(row.pct) + '" oninput="updEdu(' + i + ',\'pct\',this.value)" />' +
+            '</div></div>';
+        }).join('');
+      }
+      window.addEdu = function () { state.data.education.push({ qual: '', board: '', year: '', pct: '' }); renderEduEditor(); renderPreview(); save(); };
+      window.delEdu = function (i) { state.data.education.splice(i, 1); renderEduEditor(); renderPreview(); save(); };
+      window.updEdu = function (i, k, v) { state.data.education[i][k] = v; renderPreview(); save(); };
+
+      /* SKILLS EDITOR */
+      function renderSkillsEditor() {
+        document.getElementById('skills-list').innerHTML = state.data.skills.map(function (s, i) {
+          return '<span class="edit-pill"><span>' + esc(s) + '</span><button type="button" onclick="delSkill(' + i + ')">&times;</button></span>';
+        }).join('');
+      }
+      window.addSkill = function () {
+        const inp = document.getElementById('new-skill');
+        const val = inp.value.trim();
+        if (!val) return;
+        state.data.skills.push(val);
+        inp.value = '';
+        renderSkillsEditor(); renderPreview(); save();
+      };
+      window.delSkill = function (i) { state.data.skills.splice(i, 1); renderSkillsEditor(); renderPreview(); save(); };
+
+      /* EXPERIENCE EDITOR */
+      function renderExpEditor() {
+        document.getElementById('exp-list').innerHTML = state.data.experience.map(function (ex, i) {
+          return '<div class="sub-card">' +
+            '<div class="sub-head"><span>Experience ' + (i + 1) + '</span><button type="button" class="btn-danger" onclick="delExp(' + i + ')">Delete</button></div>' +
+            '<div class="field-grid cols-2">' +
+              '<input class="ios-input" placeholder="Role" value="' + esc(ex.role) + '" oninput="updExp(' + i + ',\'role\',this.value)" />' +
+              '<input class="ios-input" placeholder="Company" value="' + esc(ex.company) + '" oninput="updExp(' + i + ',\'company\',this.value)" />' +
+            '</div>' +
+            '<input class="ios-input" placeholder="Duration (e.g. May 2024 - July 2024)" value="' + esc(ex.duration) + '" oninput="updExp(' + i + ',\'duration\',this.value)" />' +
+            '<textarea rows="3" class="ios-textarea" placeholder="One bullet per line" oninput="updExpBullets(' + i + ',this.value)">' + esc((ex.bullets || []).join('\n')) + '</textarea>' +
+          '</div>';
+        }).join('');
+      }
+      window.addExp = function () { state.data.experience.push({ role: '', company: '', duration: '', bullets: [] }); renderExpEditor(); renderPreview(); save(); };
+      function syncExpModeUI() {
+        const isF = Boolean(state.data.isFresher);
+        const bExp = document.getElementById('exp-mode-exp');
+        const bFr = document.getElementById('exp-mode-fresher');
+        const wExp = document.getElementById('exp-experienced-wrap');
+        const wFr = document.getElementById('exp-fresher-wrap');
+        if (bExp) bExp.classList.toggle('active', !isF);
+        if (bFr) bFr.classList.toggle('active', isF);
+        if (wExp) wExp.classList.toggle('hidden', isF);
+        if (wFr) wFr.classList.toggle('hidden', !isF);
+      }
+
+      window.setExpMode = function (isFresher) {
+        state.data.isFresher = Boolean(isFresher);
+        syncExpModeUI();
+        renderPreview();
+        save();
+        toast(isFresher ? 'Fresher mode active' : 'Experienced mode active');
+      };
+
+      window.delExp = function (i) { state.data.experience.splice(i, 1); renderExpEditor(); renderPreview(); save(); };
+      window.updExp = function (i, k, v) { state.data.experience[i][k] = v; renderPreview(); save(); };
+      window.updExpBullets = function (i, v) { state.data.experience[i].bullets = v.split('\n').map(function (x) { return x.trim(); }).filter(Boolean); renderPreview(); save(); };
+
+      let _confirmResolver = null;
+      function showIosConfirm(title, msg, okText, isDanger) {
+        return new Promise(function (resolve) {
+          _confirmResolver = resolve;
+          const tEl = document.getElementById('ios-confirm-title');
+          const mEl = document.getElementById('ios-confirm-msg');
+          const okEl = document.getElementById('ios-confirm-ok');
+          const modal = document.getElementById('ios-confirm-modal');
+          if (tEl) tEl.textContent = title;
+          if (mEl) mEl.textContent = msg;
+          if (okEl) {
+            okEl.textContent = okText || 'Yes';
+            okEl.classList.toggle('danger', Boolean(isDanger));
+          }
+          if (modal) modal.classList.add('open');
+        });
+      }
+
+      window.closeIosConfirm = function (confirmed) {
+        const modal = document.getElementById('ios-confirm-modal');
+        if (modal) modal.classList.remove('open');
+        if (_confirmResolver) {
+          const fn = _confirmResolver;
+          _confirmResolver = null;
+          fn(Boolean(confirmed));
+        }
+      };
+
+      window.saveAsDefault = async function () {
+        const ok = await showIosConfirm(
+          'Save as Default?',
+          'Are you sure you want to save this resume as your Default template? Purana default replace ho jayega.',
+          'Yes, Save',
+          false
+        );
+        if (!ok) return;
+        try {
+          const snapshot = JSON.parse(JSON.stringify(state.data));
+          localStorage.setItem(CUSTOM_DEFAULT_KEY, JSON.stringify(snapshot));
+          toast('Saved as your Default!');
+        } catch (e) {
+          toast('Could not save default (storage full)');
+        }
+      };
+
+      window.resetToTemplate = function () {
+        let custom = null;
+        try {
+          const raw = localStorage.getItem(CUSTOM_DEFAULT_KEY);
+          if (raw) custom = JSON.parse(raw);
+        } catch (e) { custom = null; }
+
+        if (custom) {
+          state.data = Object.assign({
+            showPhoto: true,
+            isFresher: false,
+            fresherNote: ''
+          }, custom);
+          syncForm(); renderPreview(); save(); toast('Your saved Default restored');
+        } else {
+          state.data = getDefaultData();
+          syncForm(); renderPreview(); save(); toast('Locked template restored');
+        }
+      };
+
+      window.clearAllData = async function () {
+        const ok = await showIosConfirm(
+          'Clear All Fields?',
+          'Are you sure you want to clear all details? Aapka current form data khali ho jayega.',
+          'Yes, Clear',
+          true
+        );
+        if (!ok) return;
+        state.data = {
+          name: '',
+          address: '',
+          phone: '',
+          email: '',
+          dob: '',
+          gender: '',
+          nationality: '',
+          languages: '',
+          showPhoto: state.data.showPhoto !== false,
+          photoShape: state.data.photoShape || 'square',
+          photoBorder: state.data.photoBorder || 'thin',
+          photo: '',
+          objective: '',
+          education: [{ qual: '', board: '', year: '', pct: '' }],
+          skills: [],
+          isFresher: Boolean(state.data.isFresher),
+          fresherNote: '',
+          experience: [{ role: '', company: '', duration: '', bullets: [] }],
+          achievements: [],
+          hobbies: '',
+          interest: '',
+          strengths: '',
+          declaration: '',
+          declDate: '',
+          declPlace: '',
+          signature: '',
+          coverLetter: {
+            to: '',
+            subject: '',
+            salutation: '',
+            p1: '',
+            p2: '',
+            p3: '',
+            closing: '',
+            signoff: '',
+            enclosure: ''
+          }
+        };
+        const skillInp = document.getElementById('new-skill');
+        if (skillInp) skillInp.value = '';
+        syncForm();
+        renderPreview();
+        save();
+        toast('All fields cleared');
+      };
+
+      window.selectPayTier = function (tier) {
+        billing.selectedTier = tier;
+        ['cv', 'cl', 'both'].forEach(function (k) {
+          const el = document.getElementById('pay-opt-' + k);
+          if (el) el.classList.toggle('active', k === tier);
+        });
+        const btn = document.getElementById('btn-pay-now');
+        if (btn) btn.textContent = 'Pay ₹' + EXPORT_PRICES[tier] + ' & Export PDF';
+      };
+
+      window.openPaywall = function (defaultTier) {
+        selectPayTier(defaultTier || state.docMode || 'cv');
+        const m = document.getElementById('paywall-modal');
+        if (m) m.classList.add('open');
+      };
+
+      window.closePaywall = function () {
+        const m = document.getElementById('paywall-modal');
+        if (m) m.classList.remove('open');
+      };
+
+      window.payWithRazorpay = function () {
+        if (typeof Razorpay === 'undefined') {
+          toast('Payment SDK loading... Please check internet');
+          return;
+        }
+        const tier = billing.selectedTier || 'cv';
+        const amountINR = EXPORT_PRICES[tier] || 19;
+        const labelMap = {
+          cv: 'Resume / CV PDF Export',
+          cl: 'Covering Letter PDF Export',
+          both: 'Resume + Covering Letter Pack'
+        };
+
+        const options = {
+          key: RAZORPAY_KEY,
+          amount: amountINR * 100,
+          currency: 'INR',
+          name: 'BikriPage Resume Studio',
+          description: labelMap[tier],
+          theme: { color: '#111827' },
+          prefill: {
+            name: state.data.name || localStorage.getItem('BikriPage_owner_name') || '',
+            email: state.data.email || '',
+            contact: (state.data.phone || '').replace(/[^0-9]/g, '').slice(-10)
+          },
+          handler: function (response) {
+            if (tier === 'both') {
+              billing.unlocked.both = true;
+              billing.unlocked.cv = true;
+              billing.unlocked.cl = true;
+            } else {
+              billing.unlocked[tier] = true;
+            }
+
+            if (db) {
+              db.collection('resume_payments').add({
+                shopId: billing.shopId || 'guest',
+                planAtPurchase: billing.plan,
+                tier: tier,
+                amount: amountINR,
+                paymentId: response.razorpay_payment_id || '',
+                customerName: state.data.name || '',
+                customerPhone: state.data.phone || '',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+              }).catch(function () {});
+            }
+
+            closePaywall();
+            if (state.docMode !== tier) {
+              setDocMode(tier);
+            } else {
+              renderPreview();
+            }
+            toast('Payment successful! Opening PDF...');
+            if (window.innerWidth < 980) setMobileView('preview');
+            setTimeout(function () { executeSingleExport(); }, 350);
+          }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.on('payment.failed', function (res) {
+          toast('Payment failed: ' + (res.error && res.error.description ? res.error.description : 'Try again'));
+        });
+        rzp.open();
+      };
+
+      function relockAfterExport() {
+        if (billing.isPremium) return;
+        billing.unlocked = { cv: false, cl: false, both: false };
+        renderPreview();
+      }
+
+      function executeSingleExport() {
+        const startPrint = function () {
+          fitAllSheetsToA4();
+          scaleAllSheets();
+          requestAnimationFrame(function () {
+            if (!billing.isPremium) {
+              let locked = false;
+              const doLock = function () {
+                if (locked) return;
+                locked = true;
+                window.removeEventListener('afterprint', doLock);
+                relockAfterExport();
+              };
+              window.addEventListener('afterprint', doLock);
+              window.print();
+              setTimeout(doLock, 1200);
+            } else {
+              window.print();
+            }
+          });
+        };
+
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(startPrint).catch(startPrint);
+        } else {
+          startPrint();
+        }
+      }
+
+      window.printResume = function () {
+        if (isDocUnlocked(state.docMode)) {
+          if (window.innerWidth < 980) setMobileView('preview');
+          setTimeout(function () { executeSingleExport(); }, 180);
+        } else {
+          openPaywall(state.docMode);
+        }
+      };
+
+      /* BIKRIPAGE BRANDED QR POSTER & SHARE CONTROLLER */
+      let qrPosterCache = { dataUrl: '', blob: null, url: '' };
+
+      function getStudioShareUrl() {
+        const href = String(window.location.href || '').split('#')[0];
+        if (href.startsWith('http://') || href.startsWith('https://')) {
+          return href;
+        }
+        return 'https://bikripage.github.io/Online/resume.html';
+      }
+
+      function rrect(ctx, x, y, w, h, r) {
+        const rad = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + rad, y);
+        ctx.arcTo(x + w, y, x + w, y + h, rad);
+        ctx.arcTo(x + w, y + h, x, y + h, rad);
+        ctx.arcTo(x, y + h, x, y, rad);
+        ctx.arcTo(x, y, x + w, y, rad);
+        ctx.closePath();
+      }
+
+      function generateQrCanvas(url) {
+        return new Promise(function (resolve) {
+          const mount = document.getElementById('qr-hidden-mount');
+          if (!mount || typeof QRCode === 'undefined') { resolve(null); return; }
+          mount.innerHTML = '';
+          new QRCode(mount, {
+            text: url,
+            width: 340,
+            height: 340,
+            colorDark: '#0F172A',
+            colorLight: '#FFFFFF',
+            correctLevel: QRCode.CorrectLevel.M
+          });
+          setTimeout(function () {
+            const qrCanvas = mount.querySelector('canvas');
+            const qrImg = mount.querySelector('img');
+            if (qrCanvas) { resolve(qrCanvas); return; }
+            if (qrImg && qrImg.src) {
+              const im = new Image();
+              im.onload = function () { resolve(im); };
+              im.onerror = function () { resolve(null); };
+              im.src = qrImg.src;
+              return;
+            }
+            resolve(null);
+          }, 80);
+        });
+      }
+
+      async function buildBikriPageQrPoster(url) {
+        const W = 720, H = 960;
+        const c = document.createElement('canvas');
+        c.width = W; c.height = H;
+        const ctx = c.getContext('2d');
+
+        const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+        bgGrad.addColorStop(0, '#F8FAFF');
+        bgGrad.addColorStop(0.5, '#FFFFFF');
+        bgGrad.addColorStop(1, '#F1F5FF');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, W, H);
+
+        const g1 = ctx.createRadialGradient(90, 90, 10, 90, 90, 300);
+        g1.addColorStop(0, 'rgba(59, 130, 246, 0.16)');
+        g1.addColorStop(1, 'rgba(59, 130, 246, 0)');
+        ctx.fillStyle = g1;
+        ctx.fillRect(0, 0, W, H);
+
+        const g2 = ctx.createRadialGradient(W - 80, H - 120, 10, W - 80, H - 120, 320);
+        g2.addColorStop(0, 'rgba(139, 92, 246, 0.15)');
+        g2.addColorStop(1, 'rgba(139, 92, 246, 0)');
+        ctx.fillStyle = g2;
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.22)';
+        for (let gx = 24; gx < W; gx += 32) {
+          for (let gy = 24; gy < H; gy += 32) {
+            ctx.beginPath();
+            ctx.arc(gx, gy, 1.3, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        const topBar = ctx.createLinearGradient(0, 0, W, 0);
+        topBar.addColorStop(0, '#2563EB');
+        topBar.addColorStop(0.5, '#4F46E5');
+        topBar.addColorStop(1, '#9333EA');
+        ctx.fillStyle = topBar;
+        ctx.fillRect(0, 0, W, 12);
+
+        const bx = 224, by = 58, bs = 52;
+        const badgeGrad = ctx.createLinearGradient(bx, by, bx + bs, by + bs);
+        badgeGrad.addColorStop(0, '#3B82F6');
+        badgeGrad.addColorStop(0.5, '#4F46E5');
+        badgeGrad.addColorStop(1, '#7C3AED');
+        rrect(ctx, bx, by, bs, bs, 15);
+        ctx.fillStyle = badgeGrad;
+        ctx.fill();
+
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '900 29px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('B', bx + bs / 2, by + bs / 2 + 2);
+
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#0F172A';
+        ctx.font = '900 34px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText('BikriPage', bx + bs + 14, by + bs / 2 + 2);
+
+        ctx.textAlign = 'center';
+        rrect(ctx, W / 2 - 156, 134, 312, 32, 16);
+        ctx.fillStyle = '#EFF6FF';
+        ctx.fill();
+        ctx.strokeStyle = '#DBEAFE';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.fillStyle = '#2563EB';
+        ctx.font = '800 13.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText('SMART CV & COVER LETTER STUDIO', W / 2, 151);
+
+        ctx.fillStyle = '#0F172A';
+        ctx.font = '800 31px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText('2 Minute Me Resume Banayein', W / 2, 206);
+
+        const cardX = 118, cardY = 246, cardW = 484, cardH = 492;
+        ctx.save();
+        ctx.shadowColor = 'rgba(15, 23, 42, 0.10)';
+        ctx.shadowBlur = 32;
+        ctx.shadowOffsetY = 12;
+        rrect(ctx, cardX, cardY, cardW, cardH, 34);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fill();
+        ctx.restore();
+
+        rrect(ctx, cardX, cardY, cardW, cardH, 34);
+        ctx.strokeStyle = 'rgba(15, 23, 42, 0.08)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        const qx = W / 2 - 170, qy = cardY + 46, qs = 340, br = 28;
+        ctx.strokeStyle = '#2563EB';
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(qx - 14, qy + br); ctx.lineTo(qx - 14, qy - 14); ctx.lineTo(qx + br, qy - 14); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(qx + qs - br, qy - 14); ctx.lineTo(qx + qs + 14, qy - 14); ctx.lineTo(qx + qs + 14, qy + br); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(qx - 14, qy + qs - br); ctx.lineTo(qx - 14, qy + qs + 14); ctx.lineTo(qx + br, qy + qs + 14); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(qx + qs - br, qy + qs + 14); ctx.lineTo(qx + qs + 14, qy + qs + 14); ctx.lineTo(qx + qs + 14, qy + qs - br); ctx.stroke();
+
+        const qrSrc = await generateQrCanvas(url);
+        if (qrSrc) {
+          ctx.drawImage(qrSrc, qx, qy, qs, qs);
+        }
+
+        rrect(ctx, W / 2 - 140, cardY + 418, 280, 44, 22);
+        const ctaGrad = ctx.createLinearGradient(W / 2 - 140, 0, W / 2 + 140, 0);
+        ctaGrad.addColorStop(0, '#2563EB');
+        ctaGrad.addColorStop(1, '#4F46E5');
+        ctx.fillStyle = ctaGrad;
+        ctx.fill();
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '800 17px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText('SCAN TO CREATE CV', W / 2, cardY + 441);
+
+        const pills = ['20 Layouts', 'Custom Colors', 'Instant A4 PDF'];
+        const pW = 172, pGap = 14;
+        const startX = (W - (pW * 3 + pGap * 2)) / 2;
+        pills.forEach(function (label, idx) {
+          const px = startX + idx * (pW + pGap);
+          rrect(ctx, px, 774, pW, 44, 22);
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fill();
+          ctx.strokeStyle = '#E2E8F0';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          ctx.fillStyle = '#334155';
+          ctx.font = '700 15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+          ctx.fillText(label, px + pW / 2, 797);
+        });
+
+        rrect(ctx, 48, 852, W - 96, 74, 20);
+        ctx.fillStyle = '#0F172A';
+        ctx.fill();
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '700 17px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        const cleanUrl = url.replace(/^https?:\/\//, '');
+        ctx.fillText(cleanUrl.length > 42 ? cleanUrl.slice(0, 42) + '...' : cleanUrl, W / 2, 879);
+        ctx.fillStyle = '#94A3B8';
+        ctx.font = '700 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText('POWERED BY BIKRIPAGE', W / 2, 906);
+
+        const dataUrl = c.toDataURL('image/png');
+        const blob = await new Promise(function (res) { c.toBlob(res, 'image/png'); });
+        return { dataUrl: dataUrl, blob: blob };
+      }
+
+      window.openSupportModal = function () {
+        const m = document.getElementById('support-modal');
+        if (m) m.classList.add('open');
+      };
+
+      window.closeSupportModal = function () {
+        const m = document.getElementById('support-modal');
+        if (m) m.classList.remove('open');
+      };
+
+      window.openShareModal = async function () {
+        const url = getStudioShareUrl();
+        const modal = document.getElementById('share-qr-modal');
+        const linkEl = document.getElementById('share-link-display');
+        const imgEl = document.getElementById('qr-poster-img');
+        if (linkEl) linkEl.textContent = url;
+        if (modal) modal.classList.add('open');
+
+        if (!qrPosterCache.dataUrl || qrPosterCache.url !== url) {
+          const res = await buildBikriPageQrPoster(url);
+          qrPosterCache = { dataUrl: res.dataUrl, blob: res.blob, url: url };
+        }
+        if (imgEl && qrPosterCache.dataUrl) imgEl.src = qrPosterCache.dataUrl;
+      };
+
+      window.closeShareModal = function () {
+        const modal = document.getElementById('share-qr-modal');
+        if (modal) modal.classList.remove('open');
+      };
+
+      window.copyStudioLink = function () {
+        const url = getStudioShareUrl();
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(url).then(function () { toast('Link copied!'); });
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = url; document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); toast('Link copied!'); } catch (e) {}
+          document.body.removeChild(ta);
+        }
+      };
+
+      window.downloadQrPoster = function () {
+        if (!qrPosterCache.dataUrl) { toast('Preparing QR poster...'); return; }
+        const a = document.createElement('a');
+        a.href = qrPosterCache.blob ? URL.createObjectURL(qrPosterCache.blob) : qrPosterCache.dataUrl;
+        a.download = 'BikriPage_Resume_Studio_QR.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        toast('BikriPage QR Poster downloaded!');
+      };
+
+      window.shareQrAndLink = async function () {
+        const url = getStudioShareUrl();
+        const shareText = 'Apna professional Resume & Covering Letter 2 minute me banayein BikriPage Smart CV Studio par: ' + url;
+        try {
+          if (navigator.share) {
+            if (qrPosterCache.blob && navigator.canShare) {
+              const file = new File([qrPosterCache.blob], 'BikriPage_Resume_Studio_QR.png', { type: 'image/png' });
+              if (navigator.canShare({ files: [file] })) {
+                await navigator.share({ title: 'BikriPage Smart CV Studio', text: shareText, files: [file] });
+                return;
+              }
+            }
+            await navigator.share({ title: 'BikriPage Smart CV Studio', text: shareText, url: url });
+            return;
+          }
+        } catch (e) {
+          if (e && e.name === 'AbortError') return;
+        }
+        copyStudioLink();
+      };
+
+      window.shareStudioWhatsApp = function () {
+        const url = getStudioShareUrl();
+        const msg = '*BikriPage Smart CV Studio*\n\nApna professional Resume & Covering Letter 2 minute me banayein (20 Layouts + 12 Aesthetic Colors):\n' + url;
+        window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+      };
+
+      /* SWATCHES */
+      function renderSwatches() {
+        const ct = state.customTheme || { primary: '#1B2A4A', secondary: '#4A6FA5' };
+        let customBtn = '<button type="button" class="swatch-item' + (state.theme === 'custom' ? ' active' : '') + '" onclick="setTheme(\'custom\')">' +
+          '<span class="swatch-disc" style="background:linear-gradient(135deg,' + esc(ct.primary) + ' 50%,' + esc(ct.secondary) + ' 50%);"><span class="swatch-dot"></span></span>' +
+          '<span class="swatch-label">Custom</span></button>';
+        document.getElementById('swatch-strip').innerHTML = customBtn + Object.keys(THEMES).map(function (k) {
+          const t = THEMES[k];
+          return '<button type="button" class="swatch-item' + (state.theme === k ? ' active' : '') + '" onclick="setTheme(\'' + k + '\')">' +
+            '<span class="swatch-disc" style="background:linear-gradient(135deg,' + t.primary + ' 50%,' + t.secondary + ' 50%);"><span class="swatch-dot"></span></span>' +
+            '<span class="swatch-label">' + esc(t.name) + '</span></button>';
+        }).join('');
+      }
+
+      /* SHARED CV BLOCKS */
+      function photoBoxHtml(d) {
+        if (d.showPhoto === false) return '';
+        const shape = ['square', 'rounded', 'circle'].indexOf(d.photoShape) !== -1 ? d.photoShape : 'square';
+        const border = ['none', 'thin', 'accent'].indexOf(d.photoBorder) !== -1 ? d.photoBorder : 'thin';
+        return '<div class="photo-frame shape-' + shape + ' border-' + border + '">' +
+          (d.photo ? '<img src="' + d.photo + '" alt="Photo" />' : '<svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 20a7 7 0 0114 0"/></svg><span style="margin-top:4px;">(Photo)</span>') +
+        '</div>';
+      }
+
+      function personalKV(d) {
+        const rows = [
+          ['Name', d.name], ['Address', d.address], ['Mobile No.', d.phone], ['Email ID', d.email],
+          ['Date of Birth', d.dob], ['Gender', d.gender], ['Nationality', d.nationality], ['Languages Known', d.languages]
+        ];
+        return '<div class="kv-grid">' + rows.map(function (r) {
+          return '<span class="kv-label">' + r[0] + '</span><span class="kv-colon">:</span><span class="kv-val">' + esc(r[1]) + '</span>';
+        }).join('') + '</div>';
+      }
+
+      function eduTableHtml(d) {
+        return '<table class="edu-table"><thead><tr><th>Qualification</th><th>Board / University</th><th>Year of Passing</th><th>Percentage</th></tr></thead><tbody>' +
+          d.education.map(function (e) {
+            return '<tr><td><strong>' + esc(e.qual) + '</strong></td><td>' + esc(e.board) + '</td><td>' + esc(e.year) + '</td><td><strong>' + esc(e.pct) + '</strong></td></tr>';
+          }).join('') + '</tbody></table>';
+      }
+
+      function expBlockHtml(d) {
+        const validExps = (d.experience || []).filter(function (e) {
+          return (e.role && e.role.trim()) || (e.company && e.company.trim()) || (e.bullets && e.bullets.length);
+        });
+        if (d.isFresher || validExps.length === 0) {
+          const note = (d.fresherNote || '').trim();
+          return '<div style="margin-bottom:4px;">' +
+            '<div style="font-size: calc(14.5px * var(--fs-scale, 1)); font-weight:750; color:var(--r-ink); margin-bottom:4px;">Fresher</div>' +
+            (note ? '<p style="font-size:var(--d-text); line-height:var(--d-lh); color:var(--r-body);">' + esc(note) + '</p>' : '') +
+          '</div>';
+        }
+        return validExps.map(function (e) {
+          return '<div style="margin-bottom:8px;">' +
+            '<div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px;">' +
+              '<div style="font-size: calc(14.5px * var(--fs-scale, 1)); font-weight:700; color:var(--r-ink);">' + esc(e.role) + '</div>' +
+              '<div style="font-size: calc(13px * var(--fs-scale, 1)); font-weight:600; color:var(--r-secondary);">' + esc(e.duration) + '</div>' +
+            '</div>' +
+            '<div style="font-size: calc(13.4px * var(--fs-scale, 1)); font-weight:600; color:var(--r-muted);">' + esc(e.company) + '</div>' +
+            '<ul class="cv-bullets">' + (e.bullets || []).map(function (b) { return '<li><span class="dot"></span><span>' + esc(b) + '</span></li>'; }).join('') + '</ul>' +
+          '</div>';
+        }).join('');
+      }
+
+      function achBlockHtml(d) {
+        return '<ul class="cv-bullets">' + (d.achievements || []).map(function (a) {
+          return '<li><span class="dot"></span><span>' + esc(a) + '</span></li>';
+        }).join('') + '</ul>';
+      }
+
+      function extraPersonalKV(d) {
+        const rows = [['Hobbies', d.hobbies], ['Interest', d.interest], ['Strengths', d.strengths]];
+        return '<div class="kv-grid" style="grid-template-columns:116px 10px 1fr;">' + rows.map(function (r) {
+          return '<span class="kv-label">' + r[0] + '</span><span class="kv-colon">:</span><span class="kv-val">' + esc(r[1]) + '</span>';
+        }).join('') + '</div>';
+      }
+
+      function declHtml(d) {
+        return '<p style="font-size:var(--d-text); line-height:var(--d-lh); color:var(--r-body);">' + esc(d.declaration) + '</p>' +
+          '<div class="decl-footer">' +
+            '<div><div><strong>Date :</strong> ' + esc(d.declDate) + '</div><div><strong>Place :</strong> ' + esc(d.declPlace) + '</div></div>' +
+            '<div class="sig-box"><div class="sig-name">' + esc(d.signature || d.name) + '</div><div class="sig-label">(Signature)</div></div>' +
+          '</div>';
+      }
+
+      /* 15 HIGH-CAPACITY (110%+) AESTHETIC CV LAYOUT RENDERERS */
+      function buildCVHtml(d) {
+        const sec = function (n, title, body) {
+          return '<section><div class="cv-sec-head"><span class="cv-sec-num">' + n + '</span><span>' + title + '</span></div>' + body + '</section>';
+        };
+
+        const pCompact = '<div class="kv-grid" style="grid-template-columns:108px 8px 1fr;">' +
+          '<span class="kv-label">DOB</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+          '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
+          '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
+          '<span class="kv-label">Languages</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span></div>';
+
+        const skillsPills = '<div style="display:flex; flex-wrap:wrap; gap:5px;">' +
+          d.skills.map(function (s) { return '<span class="opus-pill">' + esc(s) + '</span>'; }).join('') +
+        '</div>';
+
+        const skillsBullets = '<ul class="cv-bullets">' +
+          d.skills.map(function (s) { return '<li><span class="dot"></span><span>' + esc(s) + '</span></li>'; }).join('') +
+        '</ul>';
+
+        if (state.layout === 'velvet') {
+          return '<div class="lay-velvet">' +
+            '<header class="velvet-top">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<span class="velvet-kicker">Curriculum Vitae</span>' +
+                '<h1 class="velvet-name">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12.8px * var(--fs-scale, 1)); color:var(--r-body); margin-top:3px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="velvet-box">' + sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') + '</div>' +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="velvet-2col">' +
+              '<div class="velvet-box">' + sec(4, 'Skills', skillsBullets) + '</div>' +
+              '<div class="velvet-box">' + sec(5, 'Experience', expBlockHtml(d)) + '</div>' +
+            '</div>' +
+            '<div class="velvet-2col">' +
+              '<div class="velvet-box">' + sec(6, 'Achievements', achBlockHtml(d)) + '</div>' +
+              '<div class="velvet-box">' + sec(1, 'Personal &amp; Interests', '<div class="kv-grid" style="grid-template-columns:105px 8px 1fr;">' +
+                '<span class="kv-label">DOB</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+                '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
+                '<span class="kv-label">Languages</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span>' +
+                '<span class="kv-label">Hobbies</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.hobbies) + '</span>' +
+                '<span class="kv-label">Strengths</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.strengths) + '</span></div>') + '</div>' +
+            '</div>' +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'opus') {
+          return '<div class="lay-opus">' +
+            '<header class="opus-head">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<h1 class="opus-name">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12.8px * var(--fs-scale, 1)); color:var(--r-body); margin-top:3px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
+                '<div style="font-size: calc(12.4px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="opus-2col">' +
+              sec(4, 'Skills', skillsPills) +
+              sec(5, 'Experience', expBlockHtml(d)) +
+            '</div>' +
+            '<div class="opus-2col">' +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+              sec(1, 'Personal &amp; Strengths', '<div class="kv-grid" style="grid-template-columns:105px 8px 1fr;">' +
+                '<span class="kv-label">DOB</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+                '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
+                '<span class="kv-label">Languages</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span>' +
+                '<span class="kv-label">Interest</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.interest) + '</span>' +
+                '<span class="kv-label">Strengths</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.strengths) + '</span></div>') +
+            '</div>' +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'aurora2') {
+          return '<div class="lay-aurora2">' +
+            '<header class="au2-hero">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<div style="font-size: calc(11px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.18em; opacity:0.85; text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 class="au2-name">' + esc(d.name) + '</h1>' +
+                '<div class="au2-sub">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
+                '<div class="au2-sub">' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="au2-2col">' +
+              sec(1, 'Personal Details', pCompact) +
+              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            '</div>' +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="au2-2col">' +
+              sec(4, 'Skills', skillsPills) +
+              sec(5, 'Experience', expBlockHtml(d)) +
+            '</div>' +
+            '<div class="au2-2col">' +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+              sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
+            '</div>' +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'crest') {
+          const initials = (d.name || 'CV').trim().split(/\s+/).map(function (w) { return w[0] || ''; }).join('').slice(0, 2).toUpperCase() || 'CV';
+          return '<div class="lay-crest">' +
+            '<header class="crest-head">' +
+              '<div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">' +
+                '<div class="crest-mono">' + esc(initials) + '</div>' +
+                '<div style="min-width:0;">' +
+                  '<h1 style="font-size: calc(25px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary); line-height:1.1;">' + esc(d.name) + '</h1>' +
+                  '<div style="font-size: calc(12.4px * var(--fs-scale, 1)); color:var(--r-body); margin-top:2px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
+                  '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+                '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="crest-2col">' +
+              sec(1, 'Personal Details', pCompact) +
+              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            '</div>' +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="crest-2col">' +
+              sec(4, 'Skills', skillsBullets) +
+              sec(5, 'Experience', expBlockHtml(d)) +
+            '</div>' +
+            '<div class="crest-2col">' +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+              sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
+            '</div>' +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'slate') {
+          return '<div class="lay-slate">' +
+            '<aside class="slate-side">' +
+              '<div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px;">' +
+                photoBoxHtml(d) +
+                '<h1 style="font-size: calc(19.5px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
+              '</div>' +
+              '<div><div class="cv-sec-head"><span class="cv-sec-num">1</span><span>Personal</span></div>' +
+                '<div style="font-size: calc(12px * var(--fs-scale, 1)); display:flex; flex-direction:column; gap:4px; color:var(--r-body);">' +
+                  '<div><strong>Mobile:</strong> ' + esc(d.phone) + '</div>' +
+                  '<div><strong>Email:</strong> ' + esc(d.email) + '</div>' +
+                  '<div><strong>Address:</strong> ' + esc(d.address) + '</div>' +
+                  '<div><strong>DOB:</strong> ' + esc(d.dob) + '</div>' +
+                  '<div><strong>Gender:</strong> ' + esc(d.gender) + '</div>' +
+                  '<div><strong>Nationality:</strong> ' + esc(d.nationality) + '</div>' +
+                  '<div><strong>Languages:</strong> ' + esc(d.languages) + '</div>' +
+                '</div></div>' +
+              '<div><div class="cv-sec-head"><span class="cv-sec-num">4</span><span>Skills</span></div><div style="display:flex; flex-wrap:wrap; gap:4px;">' +
+                d.skills.map(function (s) { return '<span class="slate-pill">' + esc(s) + '</span>'; }).join('') +
+              '</div></div>' +
+              '<div><div class="cv-sec-head"><span class="cv-sec-num">7</span><span>Interests</span></div>' +
+                '<div style="font-size: calc(12px * var(--fs-scale, 1)); display:flex; flex-direction:column; gap:4px; color:var(--r-body);">' +
+                  '<div><strong>Hobbies:</strong> ' + esc(d.hobbies) + '</div>' +
+                  '<div><strong>Interest:</strong> ' + esc(d.interest) + '</div>' +
+                  '<div><strong>Strengths:</strong> ' + esc(d.strengths) + '</div>' +
+                '</div></div>' +
+            '</aside>' +
+            '<div class="slate-main">' +
+              '<div class="cv-doc-title" style="text-align:left; font-size: calc(15px * var(--fs-scale, 1)); margin-bottom:2px; padding-bottom:6px;">Curriculum Vitae (CV)</div>' +
+              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+              sec(3, 'Educational Qualification', eduTableHtml(d)) +
+              sec(5, 'Experience', expBlockHtml(d)) +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+              sec(8, 'Declaration', declHtml(d)) +
+            '</div>' +
+          '</div>';
+        }
+
+        if (state.layout === 'pearl') {
+          return '<div class="lay-pearl">' +
+            '<header class="pearl-head">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<div style="font-size: calc(11px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.2em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 class="pearl-name">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12.4px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:3px;">' + esc(d.phone) + ' &nbsp;&middot;&nbsp; ' + esc(d.email) + ' &nbsp;&middot;&nbsp; ' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="pearl-2col">' +
+              sec(1, 'Personal Details', pCompact) +
+              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            '</div>' +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="pearl-2col">' +
+              sec(4, 'Skills', skillsBullets) +
+              sec(5, 'Experience', expBlockHtml(d)) +
+            '</div>' +
+            '<div class="pearl-2col">' +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+              sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
+            '</div>' +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'nova') {
+          return '<div class="lay-nova">' +
+            '<div class="nova-card tint">' +
+              '<div style="display:flex; justify-content:space-between; align-items:center; gap:14px;">' +
+                '<div style="flex:1; min-width:0;">' +
+                  '<div style="font-size: calc(10.5px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                  '<h1 style="font-size: calc(26px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
+                  '<div style="font-size: calc(12.4px * var(--fs-scale, 1)); color:var(--r-body); margin-top:2px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
+                  '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+                '</div>' + photoBoxHtml(d) +
+              '</div>' +
+            '</div>' +
+            '<div class="nova-2col">' +
+              '<div class="nova-card">' + sec(1, 'Personal Details', pCompact) + '</div>' +
+              '<div class="nova-card">' + sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') + '</div>' +
+            '</div>' +
+            '<div class="nova-card">' + sec(3, 'Educational Qualification', eduTableHtml(d)) + '</div>' +
+            '<div class="nova-2col">' +
+              '<div class="nova-card tint">' + sec(4, 'Skills', skillsPills) + '</div>' +
+              '<div class="nova-card">' + sec(5, 'Experience', expBlockHtml(d)) + '</div>' +
+            '</div>' +
+            '<div class="nova-2col">' +
+              '<div class="nova-card">' + sec(6, 'Achievements', achBlockHtml(d)) + '</div>' +
+              '<div class="nova-card tint">' + sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) + '</div>' +
+            '</div>' +
+            '<div class="nova-card">' + sec(8, 'Declaration', declHtml(d)) + '</div>' +
+          '</div>';
+        }
+
+        if (state.layout === 'meridian') {
+          return '<div class="lay-meridian">' +
+            '<header class="mer-banner">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:850;">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12.6px * var(--fs-scale, 1)); opacity:0.9; margin-top:3px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
+                '<div style="font-size: calc(12.2px * var(--fs-scale, 1)); opacity:0.85; margin-top:2px;">' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="mer-strip"></div>' +
+            '<div class="mer-body">' +
+              '<div class="mer-2col">' +
+                sec(1, 'Personal Details', pCompact) +
+                sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+              '</div>' +
+              sec(3, 'Educational Qualification', eduTableHtml(d)) +
+              '<div class="mer-2col">' +
+                sec(4, 'Skills', skillsBullets) +
+                sec(5, 'Experience', expBlockHtml(d)) +
+              '</div>' +
+              '<div class="mer-2col">' +
+                sec(6, 'Achievements', achBlockHtml(d)) +
+                sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
+              '</div>' +
+              sec(8, 'Declaration', declHtml(d)) +
+            '</div>' +
+          '</div>';
+        }
+
+        if (state.layout === 'ivory') {
+          return '<div class="lay-ivory">' +
+            '<header class="ivory-mast">' +
+              '<div style="font-size: calc(11px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.24em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+              '<h1 class="ivory-name">' + esc(d.name) + '</h1>' +
+              '<div class="ivory-meta">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
+            '</header>' +
+            '<div style="display:flex; justify-content:space-between; align-items:center; gap:14px;">' +
+              '<div style="flex:1; min-width:0;">' + sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') + '</div>' +
+              photoBoxHtml(d) +
+            '</div>' +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="ivory-2col">' +
+              sec(4, 'Skills', skillsBullets) +
+              sec(5, 'Experience', expBlockHtml(d)) +
+            '</div>' +
+            '<div class="ivory-2col">' +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+              sec(1, 'Personal &amp; Strengths', '<div class="kv-grid" style="grid-template-columns:105px 8px 1fr;">' +
+                '<span class="kv-label">DOB</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
+                '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
+                '<span class="kv-label">Languages</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span>' +
+                '<span class="kv-label">Hobbies</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.hobbies) + '</span>' +
+                '<span class="kv-label">Strengths</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.strengths) + '</span></div>') +
+            '</div>' +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'quartz') {
+          return '<div class="lay-quartz">' +
+            '<div class="quartz-bar"></div>' +
+            '<header class="quartz-head">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<div style="font-size: calc(11px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12.6px * var(--fs-scale, 1)); color:var(--r-body); margin-top:2px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + '</div>' +
+                '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="quartz-2col">' +
+              '<div class="quartz-box">' + sec(1, 'Personal Details', pCompact) + '</div>' +
+              '<div class="quartz-box">' + sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') + '</div>' +
+            '</div>' +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="quartz-2col">' +
+              '<div class="quartz-box">' + sec(4, 'Skills', skillsPills) + '</div>' +
+              '<div class="quartz-box">' + sec(5, 'Experience', expBlockHtml(d)) + '</div>' +
+            '</div>' +
+            '<div class="quartz-2col">' +
+              '<div class="quartz-box">' + sec(6, 'Achievements', achBlockHtml(d)) + '</div>' +
+              '<div class="quartz-box">' + sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) + '</div>' +
+            '</div>' +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'botanical') {
+          return '<div class="lay-botanical">' +
+            '<header class="bot-head">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12.6px * var(--fs-scale, 1)); color:var(--r-body); margin-top:3px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
+                '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="bot-2col">' +
+              sec(1, 'Personal Details', pCompact) +
+              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            '</div>' +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="bot-2col">' +
+              sec(4, 'Skills', skillsPills) +
+              sec(5, 'Experience', expBlockHtml(d)) +
+            '</div>' +
+            '<div class="bot-2col">' +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+              sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
+            '</div>' +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'oxford') {
+          return '<div class="lay-oxford"><div class="ox-frame">' +
+            '<div class="cv-doc-title" style="font-size: calc(19px * var(--fs-scale, 1)); margin-bottom:4px; padding-bottom:6px;">Curriculum Vitae (CV)</div>' +
+            '<div style="display:flex; justify-content:space-between; align-items:center; gap:14px;">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<h1 style="font-size: calc(24px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12.2px * var(--fs-scale, 1)); color:var(--r-body); margin-top:2px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</div>' +
+            '<div class="ox-2col">' +
+              sec(1, 'Personal Details', pCompact) +
+              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            '</div>' +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="ox-2col">' +
+              sec(4, 'Skills', skillsBullets) +
+              sec(5, 'Experience', expBlockHtml(d)) +
+            '</div>' +
+            '<div class="ox-2col">' +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+              sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
+            '</div>' +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div></div>';
+        }
+
+        if (state.layout === 'cobalt') {
+          return '<div class="lay-cobalt">' +
+            '<div class="cob-top">' +
+              '<div class="cob-id">' +
+                '<div style="font-size: calc(10.5px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.18em; opacity:0.82; text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 style="font-size: calc(26px * var(--fs-scale, 1)); font-weight:850;">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12.4px * var(--fs-scale, 1)); opacity:0.92; margin-top:2px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</div>' +
+            '<div class="cob-2col">' +
+              sec(1, 'Personal Details', pCompact) +
+              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            '</div>' +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="cob-2col">' +
+              sec(4, 'Skills', skillsBullets) +
+              sec(5, 'Experience', expBlockHtml(d)) +
+            '</div>' +
+            '<div class="cob-2col">' +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+              sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
+            '</div>' +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'solaris') {
+          return '<div class="lay-solaris">' +
+            '<div class="sol-bar"></div>' +
+            '<div class="sol-body">' +
+              '<header class="sol-head">' +
+                '<div style="flex:1; min-width:0;">' +
+                  '<div style="font-size: calc(11px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                  '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
+                  '<div style="font-size: calc(12.6px * var(--fs-scale, 1)); color:var(--r-body); margin-top:2px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
+                  '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+                '</div>' + photoBoxHtml(d) +
+              '</header>' +
+              '<div class="sol-2col">' +
+                sec(1, 'Personal Details', pCompact) +
+                sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+              '</div>' +
+              sec(3, 'Educational Qualification', eduTableHtml(d)) +
+              '<div class="sol-2col">' +
+                sec(4, 'Skills', skillsPills) +
+                sec(5, 'Experience', expBlockHtml(d)) +
+              '</div>' +
+              '<div class="sol-2col">' +
+                sec(6, 'Achievements', achBlockHtml(d)) +
+                sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
+              '</div>' +
+              sec(8, 'Declaration', declHtml(d)) +
+            '</div>' +
+          '</div>';
+        }
+
+        if (state.layout === 'celeste') {
+          return '<div class="lay-celeste">' +
+            '<header class="cel-head">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12.6px * var(--fs-scale, 1)); color:var(--r-body); margin-top:3px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
+                '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="cel-2col">' +
+              sec(1, 'Personal Details', pCompact) +
+              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            '</div>' +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="cel-2col">' +
+              sec(4, 'Skills', skillsPills) +
+              sec(5, 'Experience', expBlockHtml(d)) +
+            '</div>' +
+            '<div class="cel-2col">' +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+              sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
+            '</div>' +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'monolith') {
+          return '<div class="lay-monolith">' +
+            '<header class="mono2-head">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<div style="font-size: calc(11px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12.6px * var(--fs-scale, 1)); color:var(--r-body); margin-top:2px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="mono2-2col">' +
+              sec(1, 'Personal Details', pCompact) +
+              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            '</div>' +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="mono2-2col">' +
+              sec(4, 'Skills', skillsBullets) +
+              sec(5, 'Experience', expBlockHtml(d)) +
+            '</div>' +
+            '<div class="mono2-2col">' +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+              sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
+            '</div>' +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'zenith2') {
+          return '<div class="lay-zenith2">' +
+            '<header class="zen2-head">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12.6px * var(--fs-scale, 1)); color:var(--r-body); margin-top:3px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
+                '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="zen2-2col">' +
+              sec(1, 'Personal Details', pCompact) +
+              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            '</div>' +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="zen2-2col">' +
+              sec(4, 'Skills', skillsPills) +
+              sec(5, 'Experience', expBlockHtml(d)) +
+            '</div>' +
+            '<div class="zen2-2col">' +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+              sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
+            '</div>' +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'velour') {
+          return '<div class="lay-velour">' +
+            '<header class="vlr-head">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12.6px * var(--fs-scale, 1)); color:var(--r-body); margin-top:3px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="vlr-2col">' +
+              sec(1, 'Personal Details', pCompact) +
+              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            '</div>' +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="vlr-2col">' +
+              sec(4, 'Skills', skillsBullets) +
+              sec(5, 'Experience', expBlockHtml(d)) +
+            '</div>' +
+            '<div class="vlr-2col">' +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+              sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
+            '</div>' +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        if (state.layout === 'horizon2') {
+          return '<div class="lay-horizon2">' +
+            '<header class="hz2-head">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12.6px * var(--fs-scale, 1)); color:var(--r-body); margin-top:3px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
+                '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="hz2-2col">' +
+              sec(1, 'Personal Details', pCompact) +
+              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+            '</div>' +
+            sec(3, 'Educational Qualification', eduTableHtml(d)) +
+            '<div class="hz2-2col">' +
+              sec(4, 'Skills', skillsPills) +
+              sec(5, 'Experience', expBlockHtml(d)) +
+            '</div>' +
+            '<div class="hz2-2col">' +
+              sec(6, 'Achievements', achBlockHtml(d)) +
+              sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
+            '</div>' +
+            sec(8, 'Declaration', declHtml(d)) +
+          '</div>';
+        }
+
+        // DEFAULT: FOLIO (115%+ CAPACITY)
+        return '<div class="lay-folio">' +
+          '<header class="folio-head">' +
+            '<div style="flex:1; min-width:0;">' +
+              '<h1 class="folio-name">' + esc(d.name) + '</h1>' +
+              '<div class="folio-sub">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
+              '<div class="folio-sub" style="color:var(--r-muted);">' + esc(d.address) + '</div>' +
+            '</div>' + photoBoxHtml(d) +
+          '</header>' +
+          '<div class="folio-2col">' +
+            sec(1, 'Personal Details', pCompact) +
+            sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+          '</div>' +
+          sec(3, 'Educational Qualification', eduTableHtml(d)) +
+          '<div class="folio-2col">' +
+            sec(4, 'Skills', skillsPills) +
+            sec(5, 'Experience', expBlockHtml(d)) +
+          '</div>' +
+          '<div class="folio-2col">' +
+            sec(6, 'Achievements', achBlockHtml(d)) +
+            sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
+          '</div>' +
+          sec(8, 'Declaration', declHtml(d)) +
+        '</div>';
+      }
+
+      /* COVERING LETTER RENDERER */
+      function buildCLHtml(d) {
+        const cl = d.coverLetter;
+        return '<div class="cl-wrap">' +
+          '<div class="cl-header">' +
+            '<div><div class="cl-sender-name">' + esc(d.name) + '</div><div style="font-size: calc(13.4px * var(--fs-scale, 1)); color:var(--r-muted);">' + esc(d.address) + '</div></div>' +
+            '<div class="cl-badge">Covering Letter</div>' +
+          '</div>' +
+          '<div><strong>To,</strong><br/>' + esc(cl.to).replace(/\n/g, '<br/>') + '</div>' +
+          '<div class="cl-subject">Subject: ' + esc(cl.subject) + '</div>' +
+          '<div><strong>' + esc(cl.salutation) + '</strong></div>' +
+          '<p>' + esc(cl.p1) + '</p>' +
+          '<p>' + esc(cl.p2) + '</p>' +
+          '<p>' + esc(cl.p3) + '</p>' +
+          '<p>' + esc(cl.closing) + '</p>' +
+          '<div class="cl-signoff">' +
+            '<div><strong>Enclosure:</strong> ' + esc(cl.enclosure) + '</div>' +
+            '<div style="text-align:right;">' +
+              '<div>' + esc(cl.signoff) + '</div>' +
+              '<div style="font-weight:750; color:var(--r-primary); margin-top:6px;">' + esc(d.name) + '</div>' +
+              '<div style="font-size: calc(13.4px * var(--fs-scale, 1));">Contact No.: ' + esc(d.phone) + '</div>' +
+              '<div style="font-size: calc(13.4px * var(--fs-scale, 1));">Email: ' + esc(d.email) + '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }
+
+      function applyThemeStyle(el) {
+        let t;
+        if (state.theme === 'custom' && state.customTheme) {
+          t = {
+            primary: state.customTheme.primary,
+            secondary: state.customTheme.secondary,
+            tint: computeTintHex(state.customTheme.primary)
+          };
+        } else {
+          t = THEMES[state.theme] || THEMES.midnight;
+        }
+        el.style.setProperty('--r-primary', t.primary);
+        el.style.setProperty('--r-secondary', t.secondary);
+        el.style.setProperty('--r-tint', t.tint);
+        el.style.setProperty('--r-border', hexToBorderRgba(t.primary));
+        ALL_FONTS.forEach(function (k) {
+          el.classList.remove('font-' + k);
+        });
+        if (state.fontMode === 'combine' && COMBO_FONT_PAIRS[state.fontPair]) {
+          const pair = COMBO_FONT_PAIRS[state.fontPair];
+          el.classList.add('font-pair-active');
+          el.classList.add('font-' + (pair.body || 'sans'));
+          el.style.setProperty('--r-font-head', FONT_STACKS[pair.head] || FONT_STACKS.sans);
+          el.style.setProperty('--r-font-body', FONT_STACKS[pair.body] || FONT_STACKS.sans);
+          el.style.setProperty('--r-font-meta', FONT_STACKS[pair.meta] || FONT_STACKS.sans);
+        } else {
+          el.classList.remove('font-pair-active');
+          el.classList.add('font-' + (state.font || 'sans'));
+          const singleStack = FONT_STACKS[state.font || 'sans'] || FONT_STACKS.sans;
+          el.style.setProperty('--r-font-head', singleStack);
+          el.style.setProperty('--r-font-body', singleStack);
+          el.style.setProperty('--r-font-meta', singleStack);
+        }
+        el.style.setProperty('--fs-scale', String(state.fontScale || 1));
+      }
+
+      /* LIVE COMPLETION PROGRESS BAR & SMART REDIRECT ENGINE */
+      function isStrFilled(v) {
+        return Boolean(v && String(v).trim().length > 0);
+      }
+
+      function findFirstMissingPersonalTarget(d) {
+        const checks = [
+          { ok: isStrFilled(d.name), id: 'f-name' },
+          { ok: isStrFilled(d.phone), id: 'f-phone' },
+          { ok: isStrFilled(d.email), id: 'f-email' },
+          { ok: isStrFilled(d.dob), id: 'f-dob' },
+          { ok: isStrFilled(d.gender), id: 'f-gender' },
+          { ok: isStrFilled(d.nationality), id: 'f-nationality' },
+          { ok: isStrFilled(d.address), id: 'f-address' },
+          { ok: isStrFilled(d.languages), id: 'f-languages' },
+          { ok: (d.showPhoto === false || isStrFilled(d.photo)), id: 'photo-upload-controls' }
+        ];
+        for (let i = 0; i < checks.length; i++) {
+          if (!checks[i].ok) return checks[i].id;
+        }
+        return 'f-name';
+      }
+
+      function computeCompletionState() {
+        const d = state.data;
+        const activeMode = state.editTab === 'cl' ? 'cl' : 'cv';
+
+        if (activeMode === 'cl') {
+          const cl = d.coverLetter || {};
+          const items = [
+            {
+              label: 'Your Name & Contact',
+              done: isStrFilled(d.name) && isStrFilled(d.phone) && isStrFilled(d.email) && isStrFilled(d.address),
+              switchToCv: true,
+              accId: 'acc-1',
+              targetId: !isStrFilled(d.name) ? 'f-name' : (!isStrFilled(d.phone) ? 'f-phone' : (!isStrFilled(d.email) ? 'f-email' : 'f-address'))
+            },
+            { label: 'Recipient (To)', done: isStrFilled(cl.to), targetId: 'cl-to' },
+            { label: 'Subject & Salutation', done: isStrFilled(cl.subject) && isStrFilled(cl.salutation), targetId: !isStrFilled(cl.subject) ? 'cl-subject' : 'cl-salutation' },
+            { label: 'Opening Paragraph', done: isStrFilled(cl.p1), targetId: 'cl-p1' },
+            { label: 'Skills & Qualification Para', done: isStrFilled(cl.p2), targetId: 'cl-p2' },
+            { label: 'Interview Request & Closing', done: isStrFilled(cl.p3) && isStrFilled(cl.closing), targetId: !isStrFilled(cl.p3) ? 'cl-p3' : 'cl-closing' },
+            { label: 'Sign-off & Enclosure', done: isStrFilled(cl.signoff) && isStrFilled(cl.enclosure), targetId: !isStrFilled(cl.signoff) ? 'cl-signoff' : 'cl-enclosure' }
+          ];
+          const doneCount = items.filter(function (x) { return x.done; }).length;
+          const total = items.length;
+          const missingItems = items.filter(function (x) { return !x.done; });
+          return {
+            mode: 'cl',
+            doneCount: doneCount,
+            total: total,
+            pct: Math.round((doneCount / total) * 100),
+            missing: missingItems.map(function (x) { return x.label; }),
+            missingItems: missingItems
+          };
+        }
+
+        // CV (All 8 Sections — nothing left blank)
+        const s1Personal = isStrFilled(d.name) && isStrFilled(d.phone) && isStrFilled(d.email) &&
+          isStrFilled(d.dob) && isStrFilled(d.gender) && isStrFilled(d.nationality) &&
+          isStrFilled(d.address) && isStrFilled(d.languages) &&
+          (d.showPhoto === false || isStrFilled(d.photo));
+
+        const s2Objective = isStrFilled(d.objective);
+
+        const validEdu = (d.education || []).filter(function (r) {
+          return r && isStrFilled(r.qual) && isStrFilled(r.board) && isStrFilled(r.year) && isStrFilled(r.pct);
+        });
+        const s3Education = validEdu.length > 0;
+
+        const validSkills = (d.skills || []).filter(function (s) { return isStrFilled(s); });
+        const s4Skills = validSkills.length > 0;
+
+        let s5Experience = false;
+        if (d.isFresher) {
+          s5Experience = isStrFilled(d.fresherNote);
+        } else {
+          const validExp = (d.experience || []).filter(function (e) {
+            return e && isStrFilled(e.role) && isStrFilled(e.company) && isStrFilled(e.duration) &&
+              Array.isArray(e.bullets) && e.bullets.some(function (b) { return isStrFilled(b); });
+          });
+          s5Experience = validExp.length > 0;
+        }
+
+        const validAch = (d.achievements || []).filter(function (a) { return isStrFilled(a); });
+        const s6Achievements = validAch.length > 0;
+
+        const s7Interests = isStrFilled(d.hobbies) && isStrFilled(d.interest) && isStrFilled(d.strengths);
+
+        const s8Declaration = isStrFilled(d.declaration) && isStrFilled(d.declDate) &&
+          isStrFilled(d.declPlace) && isStrFilled(d.signature);
+
+        const sections = [
+          {
+            label: '1. Personal Details' + (d.showPhoto !== false && !isStrFilled(d.photo) ? ' & Photo' : ''),
+            done: s1Personal,
+            accId: 'acc-1',
+            targetId: findFirstMissingPersonalTarget(d)
+          },
+          {
+            label: '2. Career Objective',
+            done: s2Objective,
+            accId: 'acc-2',
+            targetId: 'f-objective'
+          },
+          {
+            label: '3. Education',
+            done: s3Education,
+            accId: 'acc-3',
+            targetSelector: '#edu-list input'
+          },
+          {
+            label: '4. Skills',
+            done: s4Skills,
+            accId: 'acc-4',
+            targetId: 'new-skill'
+          },
+          {
+            label: '5. Experience',
+            done: s5Experience,
+            accId: 'acc-5',
+            targetId: d.isFresher ? 'f-fresher-note' : null,
+            targetSelector: d.isFresher ? null : '#exp-list input, #exp-list textarea'
+          },
+          {
+            label: '6. Achievements',
+            done: s6Achievements,
+            accId: 'acc-6',
+            targetId: 'f-achievements'
+          },
+          {
+            label: '7. Hobbies & Strengths',
+            done: s7Interests,
+            accId: 'acc-7',
+            targetId: !isStrFilled(d.hobbies) ? 'f-hobbies' : (!isStrFilled(d.interest) ? 'f-interest' : 'f-strengths')
+          },
+          {
+            label: '8. Declaration & Sign',
+            done: s8Declaration,
+            accId: 'acc-8',
+            targetId: !isStrFilled(d.declaration) ? 'f-declaration' : (!isStrFilled(d.declDate) ? 'f-date' : (!isStrFilled(d.declPlace) ? 'f-place' : 'f-signature'))
+          }
+        ];
+
+        const doneCount = sections.filter(function (x) { return x.done; }).length;
+        const total = sections.length;
+        const missingItems = sections.filter(function (x) { return !x.done; });
+
+        return {
+          mode: 'cv',
+          doneCount: doneCount,
+          total: total,
+          pct: Math.round((doneCount / total) * 100),
+          missing: missingItems.map(function (x) { return x.label; }),
+          missingItems: missingItems
+        };
+      }
+
+      function highlightTargetElement(el) {
+        if (!el) return;
+        el.classList.remove('ios-field-highlight');
+        void el.offsetWidth;
+        el.classList.add('ios-field-highlight');
+        clearTimeout(el._hlTimer);
+        el._hlTimer = setTimeout(function () {
+          el.classList.remove('ios-field-highlight');
+        }, 2150);
+      }
+
+      window.jumpToNextMissing = function () {
+        const info = computeCompletionState();
+        if (!info.missingItems || info.missingItems.length === 0) {
+          toast('Sabhi sections 100% complete hain! Print / Save PDF dabaye.');
+          return;
+        }
+
+        // Pick the nearest missing item based on current scroll position or first remaining
+        let chosen = info.missingItems[0];
+        const viewportRef = 140;
+        let bestDist = Infinity;
+
+        info.missingItems.forEach(function (item) {
+          const probe = item.accId ? document.getElementById(item.accId) : (item.targetId ? document.getElementById(item.targetId) : null);
+          if (probe) {
+            const rect = probe.getBoundingClientRect();
+            const dist = Math.abs(rect.top - viewportRef);
+            if (dist < bestDist) {
+              bestDist = dist;
+              chosen = item;
+            }
+          }
+        });
+
+        if (chosen.switchToCv && state.editTab !== 'cv') {
+          setEditTab('cv');
+        }
+
+        if (chosen.accId) {
+          const acc = document.getElementById(chosen.accId);
+          if (acc && !acc.classList.contains('open')) {
+            acc.classList.add('open');
+          }
+        }
+
+        // Wait slightly for accordion spring expansion so scroll target coordinates are exact
+        setTimeout(function () {
+          let targetEl = null;
+          if (chosen.targetId) {
+            targetEl = document.getElementById(chosen.targetId);
+          }
+          if (!targetEl && chosen.targetSelector) {
+            const candidates = document.querySelectorAll(chosen.targetSelector);
+            for (let i = 0; i < candidates.length; i++) {
+              if (!isStrFilled(candidates[i].value)) {
+                targetEl = candidates[i];
+                break;
+              }
+            }
+            if (!targetEl && candidates.length) targetEl = candidates[0];
+          }
+          if (!targetEl && chosen.accId) {
+            targetEl = document.getElementById(chosen.accId);
+          }
+
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            highlightTargetElement(targetEl);
+            if (typeof targetEl.focus === 'function' && (targetEl.tagName === 'INPUT' || targetEl.tagName === 'TEXTAREA')) {
+              setTimeout(function () {
+                try { targetEl.focus({ preventScroll: true }); } catch (e) {}
+              }, 360);
+            }
+          }
+        }, 120);
+      };
+
+      function updateProgressBar() {
+        const card = document.getElementById('cv-progress-card');
+        const titleEl = document.getElementById('cv-prog-title');
+        const pctEl = document.getElementById('cv-prog-pct');
+        const fillEl = document.getElementById('cv-prog-fill');
+        const subEl = document.getElementById('cv-prog-sub');
+        const iconEl = document.getElementById('cv-prog-icon');
+        if (!card || !titleEl || !pctEl || !fillEl || !subEl || !iconEl) return;
+
+        const info = computeCompletionState();
+        const isComplete = info.doneCount === info.total;
+
+        card.classList.toggle('complete', isComplete);
+        card.classList.toggle('clickable', !isComplete);
+        fillEl.style.width = info.pct + '%';
+        pctEl.textContent = info.pct + '%';
+
+        if (isComplete) {
+          titleEl.textContent = 'Perfect — Ready to Export';
+          iconEl.innerHTML = '<svg width="10.5" height="10.5" fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>';
+          subEl.textContent = info.mode === 'cl'
+            ? 'All covering letter sections filled'
+            : 'All 8 sections filled — ready for A4 PDF';
+        } else {
+          const unit = info.mode === 'cl' ? 'Parts' : 'Sections';
+          titleEl.textContent = info.doneCount + ' of ' + info.total + ' ' + unit;
+          iconEl.innerHTML = '<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="3.2" fill="currentColor"/></svg>';
+          const previewMissing = info.missing.slice(0, 2).join(' · ') + (info.missing.length > 2 ? ' +' + (info.missing.length - 2) : '');
+          subEl.innerHTML = 'Remaining: ' + esc(previewMissing) + ' <span class="cv-prog-jump-hint">Tap to fill &rsaquo;</span>';
+        }
+      }
+
+      function renderPreview() {
+        const outer = document.getElementById('preview-scale-outer');
+        outer.innerHTML = '';
+        const docs = state.docMode === 'both' ? ['cv', 'cl'] : [state.docMode];
+
+        docs.forEach(function (kind) {
+          const box = document.createElement('div');
+          box.className = 'sheet-scale-box';
+          const sheet = document.createElement('article');
+          sheet.className = 'a4-sheet';
+          applyThemeStyle(sheet);
+          const wm = isDocUnlocked(kind) ? '' : watermarkHtml();
+          sheet.innerHTML = '<div class="sheet-content">' +
+            (kind === 'cv' ? buildCVHtml(state.data) : buildCLHtml(state.data)) +
+            '</div>' + wm;
+          box.appendChild(sheet);
+          outer.appendChild(box);
+        });
+        updateProgressBar();
+        requestAnimationFrame(function () {
+          fitAllSheetsToA4();
+          scaleAllSheets();
+        });
+      }
+
+      function fitAllSheetsToA4() {
+        const outer = document.getElementById('preview-scale-outer');
+        if (!outer) return;
+        const sheets = Array.prototype.slice.call(outer.querySelectorAll('.a4-sheet'));
+        const visibleSheets = sheets.filter(function (s) { return s.getClientRects().length > 0; });
+        if (!visibleSheets.length) return;
+
+        let adjusted = false;
+        while ((state.fontScale || 1) > 1.0) {
+          let allFit = true;
+          for (let i = 0; i < visibleSheets.length; i++) {
+            if (!measureSheetAtScale(visibleSheets[i], state.fontScale).fits) {
+              allFit = false;
+              break;
+            }
+          }
+          if (allFit) break;
+          state.fontScale = Math.max(1.0, Math.round((state.fontScale - 0.05) * 20) / 20);
+          adjusted = true;
+        }
+        if (adjusted) {
+          syncFontSizeUI();
+          save();
+        }
+
+        visibleSheets.forEach(function (sheet) {
+          const content = sheet.querySelector('.sheet-content');
+          if (!content) return;
+
+          sheet.style.setProperty('--fs-scale', String(state.fontScale || 1));
+          sheet.classList.add('measuring-natural');
+          content.style.transform = 'none';
+          content.style.width = '100%';
+          sheet.classList.remove('auto-fit-compact');
+          void content.offsetHeight;
+
+          let contentHeight = Math.max(content.scrollHeight, content.offsetHeight);
+
+          if (contentHeight > A4_SAFE_HEIGHT) {
+            sheet.classList.add('auto-fit-compact');
+            void content.offsetHeight;
+            contentHeight = Math.max(content.scrollHeight, content.offsetHeight);
+          }
+
+          sheet.classList.remove('measuring-natural');
+
+          const fitScale = contentHeight > A4_SAFE_HEIGHT ? A4_SAFE_HEIGHT / contentHeight : 1;
+          content.style.transformOrigin = 'top center';
+          content.style.transform = 'scale(' + fitScale.toFixed(4) + ')';
+          sheet.dataset.fitScale = fitScale.toFixed(4);
+        });
+        syncFontSizeUI();
+      }
+
+      function scaleAllSheets() {
+        const outer = document.getElementById('preview-scale-outer');
+        if (!outer) return;
+        const rectW = Math.floor(outer.getBoundingClientRect().width);
+        const availW = rectW > 0 ? rectW : (outer.clientWidth || (window.innerWidth - 24));
+        if (availW <= 0) return;
+        const scale = Math.min(1, availW / 794);
+        outer.querySelectorAll('.sheet-scale-box').forEach(function (box) {
+          const sheet = box.querySelector('.a4-sheet');
+          if (!sheet) return;
+          sheet.style.transform = 'scale(' + scale + ')';
+          box.style.width = Math.round(794 * scale) + 'px';
+          box.style.height = Math.round((sheet.offsetHeight || 1123) * scale) + 'px';
+        });
+      }
+
+      function syncForm() {
+        const d = state.data;
+        const set = function (id, v) { const el = document.getElementById(id); if (el) el.value = v || ''; };
+        set('f-name', d.name); set('f-phone', d.phone); set('f-email', d.email);
+        set('f-dob', d.dob); set('f-gender', d.gender); set('f-nationality', d.nationality);
+        set('f-address', d.address); set('f-languages', d.languages); set('f-objective', d.objective);
+        set('f-achievements', (d.achievements || []).join('\n'));
+        set('f-hobbies', d.hobbies); set('f-interest', d.interest); set('f-strengths', d.strengths);
+        set('f-declaration', d.declaration); set('f-date', d.declDate); set('f-place', d.declPlace); set('f-signature', d.signature);
+
+        const cl = d.coverLetter;
+        set('cl-to', cl.to); set('cl-subject', cl.subject); set('cl-salutation', cl.salutation);
+        set('cl-p1', cl.p1); set('cl-p2', cl.p2); set('cl-p3', cl.p3);
+        set('cl-closing', cl.closing); set('cl-signoff', cl.signoff); set('cl-enclosure', cl.enclosure);
+
+        set('f-fresher-note', d.fresherNote);
+        syncPhotoToggleUI();
+        syncExpModeUI();
+        renderEduEditor();
+        renderSkillsEditor();
+        renderExpEditor();
+      }
+
+      function init() {
+        const pIn = document.getElementById('pick-primary');
+        const sIn = document.getElementById('pick-secondary');
+        if (state.theme === 'custom' && state.customTheme) {
+          if (pIn) pIn.value = state.customTheme.primary;
+          if (sIn) sIn.value = state.customTheme.secondary;
+        } else if (THEMES[state.theme]) {
+          if (pIn) pIn.value = THEMES[state.theme].primary;
+          if (sIn) sIn.value = THEMES[state.theme].secondary;
+        }
+        bindCropPointerEvents();
+        renderSwatches();
+        syncForm();
+        setDocMode(state.docMode);
+        setLayout(state.layout, true);
+        syncFontSizeUI();
+        if (state.fontMode === 'combine') {
+          setFontPair(state.fontPair);
+        } else {
+          setFont(state.font);
+        }
+        setMobileView('edit');
+        detectBikriPagePlan();
+      }
+
+      window.addEventListener('resize', function () {
+        if (window.innerWidth >= 980) {
+          document.getElementById('edit-pane').classList.remove('hidden');
+          document.getElementById('preview-pane').classList.remove('hidden');
+        } else {
+          setMobileView(state.mobileView);
+        }
+        requestAnimationFrame(function () {
+          fitAllSheetsToA4();
+          scaleAllSheets();
+        });
+      });
+
+      document.addEventListener('DOMContentLoaded', init);
+    })();
+  </script>
+</body>
+</html>

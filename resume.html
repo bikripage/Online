@@ -1906,6 +1906,934 @@
       animation: iosFadeSlideUp 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
+
+    /* ============================================================
+       5 NEW MODERN AESTHETIC LAYOUTS (INSPIRED BY VISUAL REFS)
+       ============================================================ */
+
+    /* 21. EMERALD SPLIT (Dark Teal/Emerald Sidebar + Curved Photo Cutout + Pill Headers) */
+    .lay-emeraldsplit { display: grid; grid-template-columns: 245px 1fr; min-height: 1123px; background: #FFF; }
+    .es-side {
+      background: var(--r-primary); color: #FFF;
+      padding: 24px 18px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .es-photo-ring {
+      width: 116px; height: 116px; border-radius: 999px;
+      background: #FFF; padding: 4px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+    }
+    .es-photo-ring .photo-frame { width: 108px; height: 108px; border-radius: 999px !important; border: 3px solid var(--r-secondary) !important; }
+    .es-side-pill {
+      background: var(--r-secondary); color: #FFF; font-weight: 750;
+      font-size: calc(12.2px * var(--fs-scale, 1)); padding: 5px 14px;
+      border-radius: 0 999px 999px 0; margin-left: -18px; width: fit-content; min-width: 150px;
+      letter-spacing: 0.04em; text-transform: uppercase;
+    }
+    .es-main { display: flex; flex-direction: column; }
+    .es-banner {
+      background: var(--r-secondary); color: #FFF; padding: 24px 28px;
+    }
+    .es-banner h1 { font-size: calc(28px * var(--fs-scale, 1)); font-weight: 850; letter-spacing: -0.02em; line-height: 1.08; }
+    .es-banner p { font-size: calc(12.4px * var(--fs-scale, 1)); opacity: 0.94; margin-top: 8px; line-height: 1.45; }
+    .es-body { padding: 20px 26px; display: flex; flex-direction: column; gap: 11px; }
+    .es-main-pill {
+      background: var(--r-primary); color: #FFF; font-weight: 750;
+      font-size: calc(12.2px * var(--fs-scale, 1)); padding: 5px 16px;
+      border-radius: 0 999px 999px 0; margin-left: -26px; width: fit-content; min-width: 195px;
+      margin-bottom: 6px; letter-spacing: 0.04em; text-transform: uppercase;
+    }
+    .lay-emeraldsplit .edu-table th, .lay-emeraldsplit .edu-table td { padding: 5px 7px; }
+    .lay-emeraldsplit .decl-footer { margin-top: 8px; }
+
+    /* 22. ARCH CURVE (Charcoal/Primary Curved Left Wave + Gold/Accent Circular Ring + Tabbed Pills) */
+    .lay-archcurve { display: grid; grid-template-columns: 240px 1fr; min-height: 1123px; background: #FFF; border-top: 12px solid var(--r-primary); }
+    .ac-side {
+      background: var(--r-primary); color: #FFF; padding: 22px 18px;
+      border-radius: 0 0 90px 0; display: flex; flex-direction: column; gap: 13px;
+    }
+    .ac-avatar-wrap {
+      width: 124px; height: 124px; border-radius: 999px; background: var(--r-secondary);
+      padding: 6px; margin: 0 auto; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.22);
+    }
+    .ac-avatar-wrap .photo-frame { width: 112px; height: 112px; border-radius: 999px !important; border: 3px solid #FFF !important; }
+    .ac-tab {
+      background: #FFF; color: var(--r-primary); font-weight: 800;
+      font-size: calc(11.8px * var(--fs-scale, 1)); padding: 5px 14px;
+      border-radius: 999px 0 0 999px; margin-right: -18px; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .ac-main { padding: 22px 28px; display: flex; flex-direction: column; gap: 11px; }
+    .ac-name-box { text-align: center; padding-bottom: 10px; border-bottom: 2px solid var(--r-primary); }
+    .ac-name-box h1 { font-size: calc(28px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary); letter-spacing: 0.04em; text-transform: uppercase; }
+    .ac-name-sub { font-size: calc(11.5px * var(--fs-scale, 1)); font-weight: 700; letter-spacing: 0.16em; color: var(--r-secondary); text-transform: uppercase; margin-top: 3px; }
+    .lay-archcurve .cv-sec-head { border-bottom: 1.5px solid var(--r-primary); margin-bottom: 5px; padding-bottom: 3px; font-size: calc(12.4px * var(--fs-scale, 1)); }
+    .lay-archcurve .edu-table th, .lay-archcurve .edu-table td { padding: 5px 7px; }
+    .lay-archcurve .decl-footer { margin-top: 8px; }
+
+    /* 23. NEO WAVE (Diagonal Split Header + Asymmetric Soft Tint + Floating Pill Tags) */
+    .lay-neowave { padding: 24px 36px; display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden; }
+    .nw-top-wave {
+      background: linear-gradient(125deg, var(--r-primary) 0%, var(--r-primary) 64%, var(--r-secondary) 64.5%, var(--r-secondary) 100%);
+      color: #FFF; border-radius: 18px; padding: 18px 24px;
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    }
+    .nw-top-wave .photo-frame { width: 92px; height: 92px; border-radius: 999px !important; border: 3px solid #FFF !important; }
+    .nw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .nw-card { background: var(--r-tint); border: 1px solid var(--r-border); border-radius: 14px; padding: 10px 14px; }
+    .lay-neowave .cv-sec-head { border-bottom: none; margin-bottom: 4px; padding-bottom: 0; font-size: calc(12px * var(--fs-scale, 1)); }
+    .lay-neowave .cv-sec-num { border-radius: 999px; background: var(--r-secondary); }
+    .lay-neowave .edu-table th, .lay-neowave .edu-table td { padding: 5px 8px; }
+    .lay-neowave .decl-footer { margin-top: 8px; }
+
+    /* 24. GLASS STUDIO (iOS Bento 2.0 + Left Accent Strip + Modern Pill Chips) */
+    .lay-glassstudio { padding: 22px 28px; display: flex; flex-direction: column; gap: 9px; background: linear-gradient(160deg, var(--r-tint) 0%, #FFFFFF 55%, var(--r-tint) 100%); min-height: 1123px; }
+    .gs-hero {
+      background: #FFF; border: 1.5px solid var(--r-border); border-left: 6px solid var(--r-primary);
+      border-radius: 16px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; gap: 14px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+    }
+    .gs-box {
+      background: rgba(255,255,255,0.92); border: 1px solid var(--r-border); border-radius: 14px; padding: 10px 14px;
+    }
+    .gs-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .lay-glassstudio .cv-sec-head { border-bottom: none; margin-bottom: 4px; padding-bottom: 0; font-size: calc(12px * var(--fs-scale, 1)); }
+    .lay-glassstudio .edu-table th, .lay-glassstudio .edu-table td { padding: 5px 8px; }
+    .lay-glassstudio .decl-footer { margin-top: 8px; }
+    .lay-glassstudio .photo-frame { width: 88px; height: 104px; }
+
+    /* 25. ROYAL RIBBON (Dual Vertical Edge Band + Crest Monogram + Crisp 2-Column) */
+    .lay-royalribbon { display: grid; grid-template-columns: 12px 6px 1fr; min-height: 1123px; background: #FFF; }
+    .rr-col1 { background: var(--r-primary); }
+    .rr-col2 { background: var(--r-secondary); }
+    .rr-body { padding: 24px 34px; display: flex; flex-direction: column; gap: 10px; }
+    .rr-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+      padding: 12px 16px; background: var(--r-tint); border-radius: 14px; border: 1px solid var(--r-border);
+    }
+    .rr-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .lay-royalribbon .cv-sec-head {
+      border-bottom: 1.5px solid var(--r-secondary); margin-bottom: 4px; padding-bottom: 2px; font-size: calc(12.2px * var(--fs-scale, 1));
+    }
+    .lay-royalribbon .edu-table th, .lay-royalribbon .edu-table td { padding: 5px 8px; }
+    .lay-royalribbon .decl-footer { margin-top: 8px; }
+    .lay-royalribbon .photo-frame { width: 88px; height: 104px; }
+
+    /* Measuring natural height overrides for 5 new layouts */
+    .a4-sheet.measuring-natural .lay-emeraldsplit,
+    .a4-sheet.measuring-natural .lay-archcurve,
+    .a4-sheet.measuring-natural .lay-neowave,
+    .a4-sheet.measuring-natural .lay-glassstudio,
+    .a4-sheet.measuring-natural .lay-royalribbon {
+      min-height: 0 !important;
+    }
+
+
+    /* ============================================================
+       8 NEW REFERENCE-INSPIRED PREMIUM LAYOUTS (REPLACING 8 OLD ONES)
+       ============================================================ */
+
+    /* 1. AMBER PRO (Ref 1: Charcoal Left + Gold Arch Header + Outlined Capsule Headings + Vertical Timeline) */
+    .lay-amberpro { display: grid; grid-template-columns: 245px 1fr; min-height: 1123px; background: #FFF; border-top: 6px solid var(--r-secondary); border-bottom: 6px solid var(--r-secondary); border-right: 6px solid var(--r-secondary); }
+    .ap-side { background: var(--r-primary); color: #FFF; padding: 0 18px 22px; display: flex; flex-direction: column; gap: 14px; }
+    .ap-arch {
+      background: var(--r-secondary); padding: 22px 12px 16px; margin: 0 14px;
+      border-radius: 0 0 999px 999px; display: flex; justify-content: center;
+    }
+    .ap-arch .photo-frame { width: 108px; height: 108px; border-radius: 999px !important; border: 4px solid #FFF !important; }
+    .ap-side-pill {
+      border: 1.5px solid var(--r-secondary); border-radius: 999px;
+      padding: 4px 12px; font-size: calc(11.8px * var(--fs-scale, 1)); font-weight: 800;
+      letter-spacing: 0.06em; text-transform: uppercase; color: #FFF;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .ap-dot-badge { width: 16px; height: 16px; border-radius: 999px; background: var(--r-secondary); flex-shrink: 0; }
+    .ap-side-list { border-left: 1.5px solid var(--r-secondary); margin-left: 8px; padding-left: 12px; display: flex; flex-direction: column; gap: 6px; font-size: calc(11.6px * var(--fs-scale, 1)); }
+    .ap-main { padding: 24px 26px; display: flex; flex-direction: column; gap: 12px; }
+    .ap-name-band { background: var(--r-tint); padding: 16px 20px; text-align: center; border-radius: 6px; }
+    .ap-name-band h1 { font-size: calc(27px * var(--fs-scale, 1)); font-weight: 900; color: var(--r-primary); letter-spacing: 0.04em; text-transform: uppercase; }
+    .ap-name-band .sub { font-size: calc(11.5px * var(--fs-scale, 1)); font-weight: 700; letter-spacing: 0.16em; color: var(--r-muted); text-transform: uppercase; margin-top: 3px; }
+    .ap-main-pill {
+      border: 1.5px solid var(--r-secondary); border-radius: 999px; padding: 4px 14px;
+      font-size: calc(12px * var(--fs-scale, 1)); font-weight: 800; color: var(--r-primary);
+      text-transform: uppercase; letter-spacing: 0.06em; display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+    }
+    .ap-main-body { border-left: 1.5px solid var(--r-border); margin-left: 9px; padding-left: 14px; }
+    .lay-amberpro .edu-table th, .lay-amberpro .edu-table td { padding: 5px 7px; }
+    .lay-amberpro .decl-footer { margin-top: 8px; }
+
+    /* 2. AZURE WAVE (Ref 2: Deep Navy Left + Diagonal Cyan Corner + Dual-Tone Name + Vertical Line) */
+    .lay-azurewave { display: grid; grid-template-columns: 245px 1fr; min-height: 1123px; background: #FFF; border-top: 5px solid var(--r-secondary); border-bottom: 5px solid var(--r-secondary); border-right: 5px solid var(--r-secondary); }
+    .aw-side {
+      background: var(--r-primary); color: #FFF; padding: 22px 18px;
+      position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 13px;
+    }
+    .aw-corner {
+      position: absolute; top: 0; left: 0; width: 132px; height: 122px;
+      background: var(--r-secondary); border-radius: 0 0 132px 0; z-index: 0;
+    }
+    .lay-azurewave.no-photo .aw-corner {
+      width: 100%; height: 10px; border-radius: 0;
+    }
+    .aw-photo-wrap { position: relative; z-index: 1; display: flex; justify-content: center; margin-top: 4px; margin-bottom: 4px; }
+    .aw-photo-wrap .photo-frame { width: 112px; height: 112px; border-radius: 999px !important; border: 4px solid #FFF !important; box-shadow: 0 6px 16px rgba(0,0,0,0.25); }
+    .aw-side-head {
+      position: relative; z-index: 1; display: flex; align-items: center; gap: 8px;
+      font-size: calc(12px * var(--fs-scale, 1)); font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .aw-side-line { position: relative; z-index: 1; border-left: 1.5px solid var(--r-secondary); margin-left: 7px; padding-left: 12px; display: flex; flex-direction: column; gap: 5px; font-size: calc(11.6px * var(--fs-scale, 1)); word-break: break-word; overflow-wrap: anywhere; }
+    .aw-main { padding: 24px 26px; display: flex; flex-direction: column; gap: 11px; }
+    .aw-name-band { background: var(--r-tint); padding: 16px 20px; text-align: center; }
+    .aw-name-band h1 { font-size: calc(27px * var(--fs-scale, 1)); font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; color: var(--r-primary); }
+    .aw-name-band h1 span { color: var(--r-secondary); }
+    .aw-main-head {
+      display: flex; align-items: center; gap: 8px; font-size: calc(12.2px * var(--fs-scale, 1));
+      font-weight: 800; color: var(--r-primary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;
+    }
+    .aw-main-line { border-left: 1.5px solid var(--r-border); margin-left: 7px; padding-left: 14px; }
+    .lay-azurewave .edu-table th, .lay-azurewave .edu-table td { padding: 5px 7px; }
+    .lay-azurewave .decl-footer { margin-top: 8px; }
+
+    /* 3. CRIMSON RIBBON (Ref 3: Dark Charcoal Left + Overlapping Folded Ribbon Banners on Right) */
+    .lay-crimsonribbon { display: grid; grid-template-columns: 245px 1fr; min-height: 1123px; background: #F7F7F9; }
+    .cr-side { background: var(--r-primary); color: #FFF; padding: 24px 18px; display: flex; flex-direction: column; gap: 13px; }
+    .cr-photo-box { display: flex; justify-content: center; }
+    .cr-photo-box .photo-frame { width: 114px; height: 114px; border-radius: 999px !important; border: 3.5px solid var(--r-secondary) !important; }
+    .cr-name-center { text-align: center; }
+    .cr-name-center h1 { font-size: calc(22px * var(--fs-scale, 1)); font-weight: 850; letter-spacing: 0.03em; text-transform: uppercase; line-height: 1.12; }
+    .cr-name-center .sub { font-size: calc(11.5px * var(--fs-scale, 1)); opacity: 0.85; margin-top: 3px; }
+    .cr-side-head {
+      font-size: calc(12.5px * var(--fs-scale, 1)); font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+      padding-bottom: 5px; border-bottom: 1.5px solid rgba(255,255,255,0.22); display: flex; align-items: center; gap: 7px;
+    }
+    .cr-main { padding: 22px 24px 22px 0; display: flex; flex-direction: column; gap: 11px; }
+    .cr-ribbon {
+      background: var(--r-secondary); color: #FFF; padding: 7px 18px 7px 26px;
+      margin-left: -14px; position: relative; font-size: calc(13px * var(--fs-scale, 1));
+      font-weight: 850; letter-spacing: 0.06em; text-transform: uppercase;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+    }
+    .cr-ribbon::before {
+      content: ""; position: absolute; left: 0; bottom: -10px;
+      border-top: 10px solid rgba(0,0,0,0.45); border-left: 14px solid transparent;
+    }
+    .cr-sec-body { padding-left: 22px; padding-top: 6px; }
+    .lay-crimsonribbon .edu-table th, .lay-crimsonribbon .edu-table td { padding: 5px 7px; }
+    .lay-crimsonribbon .decl-footer { margin-top: 8px; }
+
+    /* 4. ONYX GOLD (Dark Sidebar + Top Accent Arch + Clean Grid) */
+    .lay-onyxgold { display: grid; grid-template-columns: 240px 1fr; min-height: 1123px; background: #FFF; }
+    .og-side { background: var(--r-primary); color: #FFF; padding: 24px 18px; display: flex; flex-direction: column; gap: 13px; }
+    .og-photo-ring {
+      width: 116px; height: 116px; border-radius: 999px; border: 3px solid var(--r-secondary);
+      padding: 4px; margin: 0 auto; display: flex; align-items: center; justify-content: center;
+    }
+    .og-photo-ring .photo-frame { width: 104px; height: 104px; border-radius: 999px !important; border: none !important; }
+    .og-side-pill {
+      background: var(--r-secondary); color: #FFF; font-weight: 800; font-size: calc(11.5px * var(--fs-scale, 1));
+      padding: 4px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .og-main { padding: 24px 28px; display: flex; flex-direction: column; gap: 11px; }
+    .og-header { border-left: 5px solid var(--r-secondary); padding-left: 14px; }
+    .og-header h1 { font-size: calc(28px * var(--fs-scale, 1)); font-weight: 900; color: var(--r-primary); text-transform: uppercase; letter-spacing: 0.02em; }
+    .lay-onyxgold .cv-sec-head { border-bottom: 1.5px solid var(--r-secondary); margin-bottom: 4px; padding-bottom: 2px; font-size: calc(12.2px * var(--fs-scale, 1)); }
+    .lay-onyxgold .edu-table th, .lay-onyxgold .edu-table td { padding: 5px 7px; }
+    .lay-onyxgold .decl-footer { margin-top: 8px; }
+
+    /* 5. COBALT WAVE (Split Header + Dual-Color Name + Timeline Dots) */
+    .lay-cobaltwave { display: grid; grid-template-columns: 240px 1fr; min-height: 1123px; background: #FFF; }
+    .cw-side { background: var(--r-tint); border-right: 3px solid var(--r-secondary); padding: 24px 18px; display: flex; flex-direction: column; gap: 13px; }
+    .cw-photo-ring { display: flex; justify-content: center; align-items: center; width: 100%; margin: 0 auto; }
+    .cw-photo-ring .photo-frame { width: 110px; height: 110px; border-radius: 999px !important; border: 4px solid var(--r-secondary) !important; }
+    .cw-pill {
+      background: var(--r-primary); color: #FFF; padding: 4px 12px; border-radius: 999px;
+      font-size: calc(11.5px * var(--fs-scale, 1)); font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; width: fit-content;
+    }
+    .cw-main { padding: 24px 26px; display: flex; flex-direction: column; gap: 11px; }
+    .cw-hero { background: var(--r-primary); color: #FFF; padding: 16px 20px; border-radius: 12px; border-right: 8px solid var(--r-secondary); }
+    .cw-hero h1 { font-size: calc(26px * var(--fs-scale, 1)); font-weight: 850; letter-spacing: 0.02em; }
+    .lay-cobaltwave .cv-sec-head { border-bottom: 1.5px solid var(--r-border); margin-bottom: 4px; padding-bottom: 2px; font-size: calc(12.2px * var(--fs-scale, 1)); }
+    .lay-cobaltwave .edu-table th, .lay-cobaltwave .edu-table td { padding: 5px 7px; }
+    .lay-cobaltwave .decl-footer { margin-top: 8px; }
+
+    /* 6. SCARLET EDGE (Dark Left Column + Bold Accent Ribbon Bar on Right) */
+    .lay-scarletedge { display: grid; grid-template-columns: 240px 1fr; min-height: 1123px; background: #FFF; border-top: 8px solid var(--r-secondary); }
+    .se-side { background: var(--r-primary); color: #FFF; padding: 22px 18px; display: flex; flex-direction: column; gap: 13px; }
+    .se-side .photo-frame { width: 108px; height: 108px; border-radius: 999px !important; border: 3px solid #FFF !important; margin: 0 auto; }
+    .se-side-bar { background: var(--r-secondary); color: #FFF; padding: 4px 12px; font-weight: 800; font-size: calc(11.8px * var(--fs-scale, 1)); text-transform: uppercase; letter-spacing: 0.06em; border-radius: 4px; }
+    .se-main { padding: 22px 26px; display: flex; flex-direction: column; gap: 11px; }
+    .se-name-wrap { border-bottom: 2.5px solid var(--r-primary); padding-bottom: 8px; }
+    .se-name-wrap h1 { font-size: calc(28px * var(--fs-scale, 1)); font-weight: 900; color: var(--r-primary); text-transform: uppercase; }
+    .se-ribbon-head {
+      background: var(--r-secondary); color: #FFF; padding: 5px 14px; font-weight: 800;
+      font-size: calc(12.2px * var(--fs-scale, 1)); text-transform: uppercase; letter-spacing: 0.06em; border-radius: 4px; margin-bottom: 5px;
+    }
+    .lay-scarletedge .edu-table th, .lay-scarletedge .edu-table td { padding: 5px 7px; }
+    .lay-scarletedge .decl-footer { margin-top: 8px; }
+
+    /* 7. TITAN FRAME (Outlined Capsule Headings + Bordered Frame + Timeline Line) */
+    .lay-titanframe { padding: 22px 34px; display: flex; flex-direction: column; gap: 10px; border: 5px solid var(--r-primary); min-height: 1123px; background: #FFF; }
+    .tf-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+      background: var(--r-primary); color: #FFF; padding: 16px 22px; border-radius: 12px; border-bottom: 5px solid var(--r-secondary);
+    }
+    .tf-head .photo-frame { width: 92px; height: 92px; border-radius: 999px !important; border: 3px solid var(--r-secondary) !important; }
+    .tf-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .tf-cap-head {
+      border: 1.5px solid var(--r-secondary); border-radius: 999px; padding: 3px 13px;
+      font-size: calc(11.8px * var(--fs-scale, 1)); font-weight: 800; color: var(--r-primary);
+      text-transform: uppercase; letter-spacing: 0.06em; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 5px;
+    }
+    .lay-titanframe .edu-table th, .lay-titanframe .edu-table td { padding: 5px 8px; }
+    .lay-titanframe .decl-footer { margin-top: 8px; }
+
+    /* 8. ROYAL CREST PRO (Dark Header + Accent Pill Tags + Clean 2-Column) */
+    .lay-royalcrest { display: flex; flex-direction: column; min-height: 1123px; background: #FFF; }
+    .rc-banner {
+      background: var(--r-primary); color: #FFF; padding: 20px 34px; border-bottom: 6px solid var(--r-secondary);
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    }
+    .rc-banner .photo-frame { width: 94px; height: 94px; border-radius: 999px !important; border: 3px solid var(--r-secondary) !important; }
+    .rc-body { padding: 20px 34px; display: flex; flex-direction: column; gap: 10px; }
+    .rc-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .rc-sec-bar {
+      background: var(--r-tint); border-left: 5px solid var(--r-secondary); padding: 4px 12px;
+      font-size: calc(12.2px * var(--fs-scale, 1)); font-weight: 800; color: var(--r-primary);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;
+    }
+    .lay-royalcrest .edu-table th, .lay-royalcrest .edu-table td { padding: 5px 8px; }
+    .lay-royalcrest .decl-footer { margin-top: 8px; }
+
+    /* Measuring natural height overrides for 8 new layouts */
+    .a4-sheet.measuring-natural .lay-amberpro,
+    .a4-sheet.measuring-natural .lay-azurewave,
+    .a4-sheet.measuring-natural .lay-crimsonribbon,
+    .a4-sheet.measuring-natural .lay-onyxgold,
+    .a4-sheet.measuring-natural .lay-cobaltwave,
+    .a4-sheet.measuring-natural .lay-scarletedge,
+    .a4-sheet.measuring-natural .lay-titanframe,
+    .a4-sheet.measuring-natural .lay-royalcrest {
+      min-height: 0 !important;
+    }
+
+
+    /* ============================================================
+       9 NEW REFERENCE-INSPIRED MODERN PREMIUM LAYOUTS
+       (REPLACING: titanframe, royalcrest, cobaltwave, archcurve,
+                   opus, nova, meridian, ivory, monolith)
+       ============================================================ */
+
+    /* 1. TEAL WAVE STUDIO (Ref 1: Top/Bottom Wave Accent + Circular Ring Avatar + Timeline + Pill Bars) */
+    .lay-tealwave { padding: 20px 30px; display: flex; flex-direction: column; gap: 10px; background: #FFF; position: relative; border-top: 8px solid var(--r-secondary); border-bottom: 8px solid var(--r-secondary); min-height: 1123px; }
+    .tw-grid { display: grid; grid-template-columns: 245px 1fr; gap: 18px; flex: 1; }
+    .tw-left { display: flex; flex-direction: column; gap: 12px; padding-right: 12px; border-right: 1.5px solid var(--r-border); }
+    .tw-avatar-ring { width: 126px; height: 126px; border-radius: 999px; border: 5px solid var(--r-secondary); padding: 4px; margin: 0 auto; display: flex; align-items: center; justify-content: center; background: #FFF; }
+    .tw-avatar-ring .photo-frame { width: 112px; height: 112px; border-radius: 999px !important; border: none !important; }
+    .tw-name-block h1 { font-size: calc(25px * var(--fs-scale, 1)); font-weight: 900; color: var(--r-primary); letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.08; }
+    .tw-name-block .role { font-size: calc(11.5px * var(--fs-scale, 1)); font-weight: 800; letter-spacing: 0.14em; color: var(--r-secondary); text-transform: uppercase; margin-top: 4px; }
+    .tw-head-line { font-size: calc(12.5px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary); text-transform: uppercase; letter-spacing: 0.06em; padding-bottom: 4px; border-bottom: 2px solid var(--r-secondary); margin-bottom: 6px; }
+    .tw-pill-head { background: var(--r-secondary); color: #FFF; font-weight: 800; font-size: calc(12px * var(--fs-scale, 1)); text-transform: uppercase; letter-spacing: 0.08em; padding: 5px 16px; border-radius: 999px; margin-bottom: 6px; display: inline-block; }
+    .tw-tl-box { border-left: 2px solid var(--r-primary); margin-left: 6px; padding-left: 12px; }
+    .lay-tealwave .edu-table th, .lay-tealwave .edu-table td { padding: 5px 7px; }
+    .lay-tealwave .decl-footer { margin-top: 8px; }
+
+    /* 2. NAVY RIBBON SPLIT (Ref 2: Diagonal Top/Bottom Waves + Rounded Pill Section Headers + Left Split) */
+    .lay-navyrb { padding: 20px 28px; display: flex; flex-direction: column; gap: 10px; background: #FFF; border-top: 10px solid var(--r-primary); border-bottom: 10px solid var(--r-secondary); min-height: 1123px; }
+    .nr-top { display: grid; grid-template-columns: 235px 1fr; gap: 18px; align-items: center; padding-bottom: 10px; border-bottom: 2px solid var(--r-tint); }
+    .nr-photo { width: 122px; height: 122px; border-radius: 999px; border: 5px solid var(--r-secondary); padding: 3px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
+    .nr-photo .photo-frame { width: 110px; height: 110px; border-radius: 999px !important; border: none !important; }
+    .nr-hero { background: var(--r-primary); color: #FFF; padding: 16px 20px; border-radius: 12px; border-right: 7px solid var(--r-secondary); }
+    .nr-hero h1 { font-size: calc(27px * var(--fs-scale, 1)); font-weight: 900; letter-spacing: 0.03em; text-transform: uppercase; }
+    .nr-grid { display: grid; grid-template-columns: 235px 1fr; gap: 18px; flex: 1; }
+    .nr-side { background: var(--r-tint); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px; border: 1px solid var(--r-border); }
+    .nr-main { display: flex; flex-direction: column; gap: 10px; }
+    .nr-pill { background: var(--r-primary); color: #FFF; font-weight: 800; font-size: calc(11.8px * var(--fs-scale, 1)); text-transform: uppercase; letter-spacing: 0.08em; padding: 5px 15px; border-radius: 999px; border-right: 8px solid var(--r-secondary); margin-bottom: 5px; display: inline-block; }
+    .lay-navyrb .edu-table th, .lay-navyrb .edu-table td { padding: 5px 7px; }
+    .lay-navyrb .decl-footer { margin-top: 8px; }
+
+    /* 3. AMBER CURVE ARCH (Ref 3: Bold Curved Left Header Arch + Dark Sidebar + Gold Pill Headings + Timeline) */
+    .lay-ambercurve { display: grid; grid-template-columns: 240px 1fr; min-height: 1123px; background: #FFF; border: 6px solid var(--r-tint); }
+    .acv-side { background: var(--r-primary); color: #FFF; display: flex; flex-direction: column; gap: 12px; padding-bottom: 20px; overflow: hidden; }
+    .acv-arch { background: var(--r-secondary); padding: 18px 14px 26px; border-radius: 0 0 120px 0; display: flex; justify-content: center; }
+    .acv-arch .photo-frame { width: 108px; height: 108px; border-radius: 999px !important; border: 4px solid #FFF !important; }
+    .acv-side-pad { padding: 0 16px; display: flex; flex-direction: column; gap: 12px; }
+    .acv-pill { background: var(--r-secondary); color: #FFF; font-weight: 800; font-size: calc(11.5px * var(--fs-scale, 1)); text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 12px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; }
+    .acv-main { padding: 22px 26px; display: flex; flex-direction: column; gap: 10px; }
+    .acv-name h1 { font-size: calc(27px * var(--fs-scale, 1)); font-weight: 900; color: var(--r-primary); text-transform: uppercase; line-height: 1.05; }
+    .acv-name .sub { font-size: calc(11px * var(--fs-scale, 1)); font-weight: 800; letter-spacing: 0.16em; color: var(--r-secondary); text-transform: uppercase; margin-top: 4px; }
+    .acv-sec-pill { background: var(--r-secondary); color: #FFF; font-weight: 800; font-size: calc(11.6px * var(--fs-scale, 1)); text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 14px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+    .lay-ambercurve .edu-table th, .lay-ambercurve .edu-table td { padding: 5px 7px; }
+    .lay-ambercurve .decl-footer { margin-top: 8px; }
+
+    /* 4. TEAL GOLD HEADER (Ref 4: Top Deep Teal Banner + Gold Ring Avatar + Curved Left Sidebar) */
+    .lay-tealgold { display: grid; grid-template-columns: 235px 1fr; min-height: 1123px; background: #FFF; position: relative; }
+    .tlg-topband { grid-column: 1 / -1; background: var(--r-primary); color: #FFF; padding: 18px 24px 18px 158px; position: relative; min-height: 104px; display: flex; flex-direction: column; justify-content: center; border-bottom: 4px solid var(--r-secondary); }
+    .tlg-topband h1 { font-size: calc(26px * var(--fs-scale, 1)); font-weight: 900; letter-spacing: 0.03em; text-transform: uppercase; }
+    .tlg-topband h1 span { color: var(--r-secondary); }
+    .tlg-avatar { position: absolute; top: 14px; left: 22px; width: 122px; height: 122px; border-radius: 999px; border: 5px solid var(--r-secondary); padding: 3px; background: #FFF; z-index: 3; display: flex; align-items: center; justify-content: center; }
+    .tlg-avatar .photo-frame { width: 108px; height: 108px; border-radius: 999px !important; border: none !important; }
+    .tlg-side { background: var(--r-primary); color: #FFF; padding: 44px 16px 20px; border-radius: 0 90px 0 0; display: flex; flex-direction: column; gap: 12px; }
+    .tlg-side-h { font-size: calc(12px * var(--fs-scale, 1)); font-weight: 850; text-transform: uppercase; letter-spacing: 0.06em; color: var(--r-secondary); border-bottom: 1.5px solid rgba(255,255,255,0.2); padding-bottom: 3px; margin-bottom: 5px; }
+    .tlg-main { padding: 18px 26px; display: flex; flex-direction: column; gap: 10px; }
+    .tlg-main-h { font-size: calc(12.4px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 2px solid var(--r-secondary); padding-bottom: 3px; margin-bottom: 5px; }
+    .lay-tealgold .edu-table th, .lay-tealgold .edu-table td { padding: 5px 7px; }
+    .lay-tealgold .decl-footer { margin-top: 8px; }
+
+    /* 5. PRISM SWEEP (Asymmetric Diagonal Banner + Dual Accent Bars + Clean 2-Col) */
+    .lay-prismsweep { padding: 22px 34px; display: flex; flex-direction: column; gap: 10px; background: #FFF; min-height: 1123px; }
+    .ps-banner { background: linear-gradient(120deg, var(--r-primary) 0%, var(--r-primary) 68%, var(--r-secondary) 68.5%, var(--r-secondary) 100%); color: #FFF; border-radius: 16px; padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; gap: 14px; }
+    .ps-banner .photo-frame { width: 96px; height: 96px; border-radius: 999px !important; border: 3px solid #FFF !important; }
+    .ps-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .ps-head { background: var(--r-tint); border-left: 5px solid var(--r-primary); padding: 4px 12px; font-weight: 850; font-size: calc(12px * var(--fs-scale, 1)); text-transform: uppercase; letter-spacing: 0.06em; color: var(--r-primary); margin-bottom: 5px; }
+    .lay-prismsweep .edu-table th, .lay-prismsweep .edu-table td { padding: 5px 8px; }
+    .lay-prismsweep .decl-footer { margin-top: 8px; }
+
+    /* 6. CREST ORBIT (Circular Framed Photo + Pill Section Tags + Soft Tint Cards) */
+    .lay-crestorbit { padding: 22px 32px; display: flex; flex-direction: column; gap: 10px; background: #FAFBFD; min-height: 1123px; }
+    .co-head { background: #FFF; border: 1.5px solid var(--r-border); border-radius: 18px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+    .co-head .photo-frame { width: 96px; height: 96px; border-radius: 999px !important; border: 3.5px solid var(--r-secondary) !important; }
+    .co-card { background: #FFF; border: 1px solid var(--r-border); border-radius: 14px; padding: 10px 14px; }
+    .co-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .co-pill { background: var(--r-primary); color: #FFF; font-weight: 800; font-size: calc(11.4px * var(--fs-scale, 1)); text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 12px; border-radius: 999px; display: inline-block; margin-bottom: 5px; }
+    .lay-crestorbit .edu-table th, .lay-crestorbit .edu-table td { padding: 5px 8px; }
+    .lay-crestorbit .decl-footer { margin-top: 8px; }
+
+    /* 7. HORIZON ARCH (Dark Top Arch + Accent Trim + Crisp Two-Column) */
+    .lay-horizonarch { display: flex; flex-direction: column; min-height: 1123px; background: #FFF; }
+    .ha-top { background: var(--r-primary); color: #FFF; padding: 20px 34px; border-bottom: 6px solid var(--r-secondary); border-radius: 0 0 28px 28px; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+    .ha-top .photo-frame { width: 94px; height: 94px; border-radius: 999px !important; border: 3px solid #FFF !important; }
+    .ha-body { padding: 18px 34px; display: flex; flex-direction: column; gap: 10px; }
+    .ha-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .ha-head { font-size: calc(12px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary); text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 2px solid var(--r-secondary); padding-bottom: 3px; margin-bottom: 5px; }
+    .lay-horizonarch .edu-table th, .lay-horizonarch .edu-table td { padding: 5px 8px; }
+    .lay-horizonarch .decl-footer { margin-top: 8px; }
+
+    /* 8. VANGUARD SPLIT (Split Sidebar + Pill Badges + Clean Grid) */
+    .lay-vanguardsplit { display: grid; grid-template-columns: 230px 1fr; min-height: 1123px; background: #FFF; }
+    .vg-side { background: var(--r-tint); border-right: 2px solid var(--r-primary); padding: 22px 16px; display: flex; flex-direction: column; gap: 12px; }
+    .vg-side .photo-frame { width: 102px; height: 102px; border-radius: 999px !important; border: 3px solid var(--r-primary) !important; margin: 0 auto; }
+    .vg-badge { background: var(--r-primary); color: #FFF; font-weight: 800; font-size: calc(11.2px * var(--fs-scale, 1)); text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 11px; border-radius: 6px; display: inline-block; margin-bottom: 5px; }
+    .vg-main { padding: 22px 26px; display: flex; flex-direction: column; gap: 10px; }
+    .vg-title { border-bottom: 3px solid var(--r-secondary); padding-bottom: 8px; }
+    .vg-title h1 { font-size: calc(27px * var(--fs-scale, 1)); font-weight: 900; color: var(--r-primary); }
+    .vg-head { font-size: calc(12px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1.5px solid var(--r-border); padding-bottom: 3px; margin-bottom: 5px; }
+    .lay-vanguardsplit .edu-table th, .lay-vanguardsplit .edu-table td { padding: 5px 7px; }
+    .lay-vanguardsplit .decl-footer { margin-top: 8px; }
+
+    /* 9. AURORA FRAME (Framed Modern Sheet + Soft Tint Accent + 2-Column Grid) */
+    .lay-auroraframe { padding: 20px 32px; display: flex; flex-direction: column; gap: 10px; background: #FFF; border: 6px solid var(--r-primary); min-height: 1123px; }
+    .af-head { background: var(--r-tint); border-radius: 14px; padding: 14px 18px; border-left: 6px solid var(--r-secondary); display: flex; justify-content: space-between; align-items: center; gap: 14px; }
+    .af-head .photo-frame { width: 92px; height: 92px; border-radius: 999px !important; border: 3px solid var(--r-primary) !important; }
+    .af-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .af-head-sec { font-size: calc(12px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary); text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1.5px solid var(--r-secondary); padding-bottom: 3px; margin-bottom: 5px; }
+    .lay-auroraframe .edu-table th, .lay-auroraframe .edu-table td { padding: 5px 8px; }
+    .lay-auroraframe .decl-footer { margin-top: 8px; }
+
+    /* Measuring natural height overrides for 9 new layouts */
+    .a4-sheet.measuring-natural .lay-tealwave,
+    .a4-sheet.measuring-natural .lay-navyrb,
+    .a4-sheet.measuring-natural .lay-ambercurve,
+    .a4-sheet.measuring-natural .lay-tealgold,
+    .a4-sheet.measuring-natural .lay-prismsweep,
+    .a4-sheet.measuring-natural .lay-crestorbit,
+    .a4-sheet.measuring-natural .lay-horizonarch,
+    .a4-sheet.measuring-natural .lay-vanguardsplit,
+    .a4-sheet.measuring-natural .lay-auroraframe {
+      min-height: 0 !important;
+    }
+
+
+    /* ============================================================
+       7 NEW AESTHETIC MODERN LAYOUTS
+       (REPLACING: navyrb, tealgold, crestorbit, horizonarch,
+                   auroraframe, amberpro, vanguardsplit)
+       ============================================================ */
+
+    /* 1. SOLSTICE SPLIT (Asymmetric Curved Header + Soft Tint Column + Pill Section Bars) */
+    .lay-solstice { display: grid; grid-template-columns: 238px 1fr; min-height: 1123px; background: #FFF; }
+    .sols-side {
+      background: var(--r-tint); border-right: 1.5px solid var(--r-border);
+      padding: 22px 16px; display: flex; flex-direction: column; gap: 12px;
+      border-radius: 0 36px 0 0;
+    }
+    .sols-side .photo-frame { width: 108px; height: 108px; border-radius: 999px !important; border: 3.5px solid var(--r-primary) !important; margin: 0 auto; }
+    .sols-pill {
+      background: var(--r-primary); color: #FFF; font-weight: 800;
+      font-size: calc(11.2px * var(--fs-scale, 1)); text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 4px 12px; border-radius: 999px; display: inline-block; margin-bottom: 5px;
+    }
+    .sols-main { padding: 22px 26px; display: flex; flex-direction: column; gap: 10px; }
+    .sols-hero {
+      background: linear-gradient(135deg, var(--r-primary) 0%, var(--r-secondary) 100%);
+      color: #FFF; padding: 16px 20px; border-radius: 16px;
+    }
+    .sols-hero h1 { font-size: calc(27px * var(--fs-scale, 1)); font-weight: 900; letter-spacing: -0.015em; }
+    .sols-head {
+      font-size: calc(12px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary);
+      text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 2px solid var(--r-secondary);
+      padding-bottom: 3px; margin-bottom: 5px;
+    }
+    .lay-solstice .edu-table th, .lay-solstice .edu-table td { padding: 5px 7px; }
+    .lay-solstice .decl-footer { margin-top: 8px; }
+
+    /* 2. AETHER CURVE (Curved Arch Top Accent + Minimal Hairline Rules + Clean 2-Col) */
+    .lay-aether { display: flex; flex-direction: column; min-height: 1123px; background: #FFF; }
+    .aeth-top {
+      background: var(--r-tint); border-bottom: 2px solid var(--r-primary);
+      border-radius: 0 0 32px 32px; padding: 18px 32px;
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    }
+    .aeth-top .photo-frame { width: 96px; height: 96px; border-radius: 999px !important; border: 3px solid var(--r-secondary) !important; }
+    .aeth-name { font-size: calc(28px * var(--fs-scale, 1)); font-weight: 900; color: var(--r-primary); letter-spacing: -0.02em; }
+    .aeth-body { padding: 18px 32px; display: flex; flex-direction: column; gap: 10px; }
+    .aeth-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .aeth-head {
+      font-size: calc(12px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary);
+      text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 1.5px solid var(--r-secondary);
+      padding-bottom: 3px; margin-bottom: 5px;
+    }
+    .lay-aether .edu-table th, .lay-aether .edu-table td { padding: 5px 8px; }
+    .lay-aether .decl-footer { margin-top: 8px; }
+
+    /* 3. VERDANT ORBIT (Circular Framed Photo + Dual Accent Strip + Card Blocks) */
+    .lay-verdant { padding: 20px 30px; display: flex; flex-direction: column; gap: 10px; background: #F8FAFC; min-height: 1123px; border-top: 7px solid var(--r-primary); }
+    .vrd-head {
+      background: #FFF; border: 1px solid var(--r-border); border-left: 6px solid var(--r-secondary);
+      border-radius: 16px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; gap: 14px;
+    }
+    .vrd-head .photo-frame { width: 94px; height: 94px; border-radius: 999px !important; border: 3px solid var(--r-primary) !important; }
+    .vrd-card { background: #FFF; border: 1px solid var(--r-border); border-radius: 14px; padding: 10px 14px; }
+    .vrd-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .vrd-pill {
+      background: var(--r-tint); color: var(--r-primary); border: 1px solid var(--r-border);
+      font-weight: 800; font-size: calc(11.4px * var(--fs-scale, 1)); text-transform: uppercase;
+      letter-spacing: 0.08em; padding: 3px 11px; border-radius: 999px; display: inline-block; margin-bottom: 5px;
+    }
+    .lay-verdant .edu-table th, .lay-verdant .edu-table td { padding: 5px 8px; }
+    .lay-verdant .decl-footer { margin-top: 8px; }
+
+    /* 4. ECLIPSE BAND (Dark Top Header + Secondary Accent Bar + Balanced 2-Col Grid) */
+    .lay-eclipse { display: flex; flex-direction: column; min-height: 1123px; background: #FFF; }
+    .ecl-banner {
+      background: var(--r-primary); color: #FFF; padding: 20px 34px;
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    }
+    .ecl-banner .photo-frame { width: 92px; height: 92px; border-radius: 999px !important; border: 3px solid var(--r-secondary) !important; }
+    .ecl-bar { height: 5px; background: linear-gradient(90deg, var(--r-secondary), var(--r-primary)); }
+    .ecl-body { padding: 18px 34px; display: flex; flex-direction: column; gap: 10px; }
+    .ecl-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .ecl-head {
+      background: var(--r-tint); padding: 4px 12px; border-radius: 6px; border-left: 4px solid var(--r-secondary);
+      font-size: calc(12px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;
+    }
+    .lay-eclipse .edu-table th, .lay-eclipse .edu-table td { padding: 5px 8px; }
+    .lay-eclipse .decl-footer { margin-top: 8px; }
+
+    /* 5. LUMINA FRAME (Refined Outer Frame + Soft Header Tint + Crisp Section Rules) */
+    .lay-lumina { padding: 18px 24px; min-height: 1123px; display: flex; flex-direction: column; background: #FFF; }
+    .lum-box {
+      border: 2px solid var(--r-primary); border-radius: 14px; padding: 18px 24px; flex: 1;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .lum-head {
+      background: var(--r-tint); padding: 12px 16px; border-radius: 10px;
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+    }
+    .lum-head .photo-frame { width: 90px; height: 90px; border-radius: 999px !important; border: 2.5px solid var(--r-secondary) !important; }
+    .lum-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .lum-head-sec {
+      font-size: calc(12px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary);
+      text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1.5px solid var(--r-primary);
+      padding-bottom: 3px; margin-bottom: 5px;
+    }
+    .lay-lumina .edu-table th, .lay-lumina .edu-table td { padding: 5px 8px; }
+    .lay-lumina .decl-footer { margin-top: 8px; }
+
+    /* 6. ASTRA RIBBON (Dual Vertical Edge Strip + Clean Header + Structured 2-Col) */
+    .lay-astra { display: grid; grid-template-columns: 10px 5px 1fr; min-height: 1123px; background: #FFF; }
+    .ast-c1 { background: var(--r-primary); }
+    .ast-c2 { background: var(--r-secondary); }
+    .ast-body { padding: 20px 32px; display: flex; flex-direction: column; gap: 10px; }
+    .ast-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+      padding-bottom: 10px; border-bottom: 2px solid var(--r-tint);
+    }
+    .ast-head .photo-frame { width: 92px; height: 92px; border-radius: 999px !important; border: 3px solid var(--r-secondary) !important; }
+    .ast-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .ast-head-sec {
+      font-size: calc(12px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary);
+      text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1.5px solid var(--r-secondary);
+      padding-bottom: 3px; margin-bottom: 5px;
+    }
+    .lay-astra .edu-table th, .lay-astra .edu-table td { padding: 5px 8px; }
+    .lay-astra .decl-footer { margin-top: 8px; }
+
+    /* 7. HARMONY SPLIT (Modern Left Accent Panel + Clean Right Sections + Pill Tags) */
+    .lay-harmony { display: grid; grid-template-columns: 232px 1fr; min-height: 1123px; background: #FFF; }
+    .hrm-side {
+      background: var(--r-primary); color: #FFF; padding: 22px 16px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .hrm-side .photo-frame { width: 104px; height: 104px; border-radius: 999px !important; border: 3.5px solid var(--r-secondary) !important; margin: 0 auto; }
+    .hrm-pill {
+      background: var(--r-secondary); color: #FFF; font-weight: 800;
+      font-size: calc(11.2px * var(--fs-scale, 1)); text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 4px 11px; border-radius: 999px; display: inline-block; margin-bottom: 5px;
+    }
+    .hrm-main { padding: 22px 26px; display: flex; flex-direction: column; gap: 10px; }
+    .hrm-title { border-bottom: 2px solid var(--r-primary); padding-bottom: 8px; }
+    .hrm-title h1 { font-size: calc(27px * var(--fs-scale, 1)); font-weight: 900; color: var(--r-primary); }
+    .hrm-head {
+      font-size: calc(12px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary);
+      text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1.5px solid var(--r-border);
+      padding-bottom: 3px; margin-bottom: 5px;
+    }
+    .lay-harmony .edu-table th, .lay-harmony .edu-table td { padding: 5px 7px; }
+    .lay-harmony .decl-footer { margin-top: 8px; }
+
+    /* Measuring natural height overrides for 7 new layouts */
+    .a4-sheet.measuring-natural .lay-solstice,
+    .a4-sheet.measuring-natural .lay-aether,
+    .a4-sheet.measuring-natural .lay-verdant,
+    .a4-sheet.measuring-natural .lay-eclipse,
+    .a4-sheet.measuring-natural .lay-lumina,
+    .a4-sheet.measuring-natural .lay-astra,
+    .a4-sheet.measuring-natural .lay-harmony {
+      min-height: 0 !important;
+    }
+
+
+    /* ============================================================
+       6 DISTINCT CREATIVE MODERN LAYOUTS (UNIQUE STRUCTURES)
+       (REPLACING: aether, verdant, eclipse, lumina, ambercurve, prismsweep)
+       ============================================================ */
+
+    /* 1. DIAGONAL CHEVRON (Slanted Angled Header Banner + Offset Badge + Clean Grid) */
+    .lay-chevron { padding: 0 0 22px; display: flex; flex-direction: column; gap: 10px; background: #FFF; min-height: 1123px; position: relative; }
+    .chv-banner {
+      background: var(--r-primary); color: #FFF; padding: 22px 34px 28px;
+      clip-path: polygon(0 0, 100% 0, 100% 78%, 0 100%);
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    }
+    .chv-banner .photo-frame { width: 96px; height: 96px; border-radius: 18px !important; border: 3px solid var(--r-secondary) !important; transform: rotate(-2deg); }
+    .chv-body { padding: 6px 34px 0; display: flex; flex-direction: column; gap: 10px; }
+    .chv-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .chv-tag {
+      background: var(--r-secondary); color: #FFF; font-weight: 850; font-size: calc(11.4px * var(--fs-scale, 1));
+      text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 12px;
+      clip-path: polygon(0 0, 94% 0, 100% 100%, 0 100%); display: inline-block; margin-bottom: 5px;
+    }
+    .lay-chevron .edu-table th, .lay-chevron .edu-table td { padding: 5px 8px; }
+    .lay-chevron .decl-footer { margin-top: 8px; }
+
+    /* 2. TERMINAL CODE (Developer/Modern Monospace-Accent Header + Bracketed Section Titles) */
+    .lay-terminal { padding: 22px 32px; display: flex; flex-direction: column; gap: 10px; background: #FAFBFC; min-height: 1123px; border-top: 6px solid var(--r-primary); }
+    .trm-top {
+      background: #FFF; border: 1.5px solid var(--r-border); border-radius: 12px;
+      padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    }
+    .trm-top .photo-frame { width: 92px; height: 92px; border-radius: 12px !important; border: 2.5px solid var(--r-primary) !important; }
+    .trm-cmd { font-size: calc(11px * var(--fs-scale, 1)); font-weight: 800; color: var(--r-secondary); letter-spacing: 0.05em; }
+    .trm-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .trm-sec-bar {
+      font-size: calc(12px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary);
+      text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 10px;
+      background: var(--r-tint); border-radius: 6px; margin-bottom: 5px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .trm-sec-bar::before { content: "//"; color: var(--r-secondary); font-weight: 900; }
+    .lay-terminal .edu-table th, .lay-terminal .edu-table td { padding: 5px 8px; }
+    .lay-terminal .decl-footer { margin-top: 8px; }
+
+    /* 3. TICKET STUB (Right-Side Perforated Accent Strip + Stamp Badge + Crisp Sections) */
+    .lay-ticket { display: grid; grid-template-columns: 1fr 22px; min-height: 1123px; background: #FFF; }
+    .tkt-main { padding: 22px 26px; display: flex; flex-direction: column; gap: 10px; }
+    .tkt-stub {
+      background: var(--r-primary); border-left: 2px dashed #FFF;
+      display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 24px 2px;
+    }
+    .tkt-stub-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--r-secondary); }
+    .tkt-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+      padding-bottom: 10px; border-bottom: 2.5px solid var(--r-primary);
+    }
+    .tkt-head .photo-frame { width: 92px; height: 92px; border-radius: 999px !important; border: 3px solid var(--r-secondary) !important; }
+    .tkt-stamp {
+      display: inline-block; border: 2px solid var(--r-secondary); color: var(--r-secondary);
+      font-size: calc(10px * var(--fs-scale, 1)); font-weight: 900; letter-spacing: 0.16em;
+      text-transform: uppercase; padding: 2px 8px; border-radius: 5px; margin-bottom: 4px;
+    }
+    .tkt-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .tkt-sec {
+      font-size: calc(12px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary);
+      text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1.5px solid var(--r-border);
+      padding-bottom: 3px; margin-bottom: 5px;
+    }
+    .lay-ticket .edu-table th, .lay-ticket .edu-table td { padding: 5px 8px; }
+    .lay-ticket .decl-footer { margin-top: 8px; }
+
+    /* 4. MOSAIC QUAD (2x2 Quadrant Grid Layout + Floating Center Identity Header) */
+    .lay-mosaic { padding: 20px 28px; display: flex; flex-direction: column; gap: 10px; background: #F5F7FA; min-height: 1123px; }
+    .mos-top {
+      background: var(--r-primary); color: #FFF; border-radius: 16px; padding: 14px 20px;
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+      border-bottom: 5px solid var(--r-secondary);
+    }
+    .mos-top .photo-frame { width: 88px; height: 88px; border-radius: 14px !important; border: 2.5px solid #FFF !important; }
+    .mos-quad { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .mos-tile {
+      background: #FFF; border: 1px solid var(--r-border); border-radius: 14px; padding: 10px 13px;
+      border-top: 4px solid var(--r-primary);
+    }
+    .mos-tile.alt { border-top-color: var(--r-secondary); background: var(--r-tint); }
+    .mos-h {
+      font-size: calc(11.8px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary);
+      text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px;
+    }
+    .lay-mosaic .edu-table th, .lay-mosaic .edu-table td { padding: 4px 6px; }
+    .lay-mosaic .decl-footer { margin-top: 8px; }
+
+    /* 5. KINETIC STEP (Numbered Step Badges + Horizontal Accent Dividers + Clean Flow) */
+    .lay-kinetic { padding: 22px 34px; display: flex; flex-direction: column; gap: 10px; background: #FFF; min-height: 1123px; }
+    .kin-header {
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+      background: var(--r-tint); border: 1.5px solid var(--r-border); border-radius: 16px; padding: 14px 18px;
+    }
+    .kin-header .photo-frame { width: 92px; height: 92px; border-radius: 999px !important; border: 3px solid var(--r-primary) !important; }
+    .kin-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .kin-step-head {
+      display: flex; align-items: center; gap: 8px; font-size: calc(12px * var(--fs-scale, 1));
+      font-weight: 850; color: var(--r-primary); text-transform: uppercase; letter-spacing: 0.06em;
+      padding-bottom: 4px; border-bottom: 1.5px dashed var(--r-border); margin-bottom: 5px;
+    }
+    .kin-step-num {
+      width: calc(20px * var(--fs-scale, 1)); height: calc(20px * var(--fs-scale, 1)); border-radius: 999px;
+      background: var(--r-secondary); color: #FFF; font-size: calc(11px * var(--fs-scale, 1)); font-weight: 850;
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .lay-kinetic .edu-table th, .lay-kinetic .edu-table td { padding: 5px 8px; }
+    .lay-kinetic .decl-footer { margin-top: 8px; }
+
+    /* 6. SILK CASCADE (Soft Gradient Band + Floating Header Card + Two-Column Flow) */
+    .lay-silk { padding: 20px 32px; display: flex; flex-direction: column; gap: 10px; background: linear-gradient(180deg, var(--r-tint) 0%, #FFFFFF 28%, #FFFFFF 100%); min-height: 1123px; }
+    .slk-card {
+      background: #FFF; border: 1px solid var(--r-border); border-radius: 18px;
+      padding: 15px 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    }
+    .slk-card .photo-frame { width: 92px; height: 92px; border-radius: 999px !important; border: 3px solid var(--r-secondary) !important; }
+    .slk-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .slk-head {
+      font-size: calc(12px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary);
+      text-transform: uppercase; letter-spacing: 0.08em; border-left: 4px solid var(--r-primary);
+      padding-left: 9px; margin-bottom: 5px;
+    }
+    .lay-silk .edu-table th, .lay-silk .edu-table td { padding: 5px 8px; }
+    .lay-silk .decl-footer { margin-top: 8px; }
+
+    /* Measuring natural height overrides for 6 new layouts */
+    .a4-sheet.measuring-natural .lay-chevron,
+    .a4-sheet.measuring-natural .lay-terminal,
+    .a4-sheet.measuring-natural .lay-ticket,
+    .a4-sheet.measuring-natural .lay-mosaic,
+    .a4-sheet.measuring-natural .lay-kinetic,
+    .a4-sheet.measuring-natural .lay-silk {
+      min-height: 0 !important;
+    }
+
+
+    /* ============================================================
+       4 BRAND-NEW DISTINCT CREATIVE MODERN LAYOUTS
+       (REPLACING: terminal, mosaic, kinetic, silk)
+       ============================================================ */
+
+    /* 1. PRISM ARCADE (Top Curved Dome Header + Floating Pill Contact Bar + Soft Tint Columns) */
+    .lay-arcade { padding: 0 0 22px; display: flex; flex-direction: column; gap: 10px; background: #FFF; min-height: 1123px; }
+    .arc-dome {
+      background: linear-gradient(135deg, var(--r-primary) 0%, var(--r-secondary) 100%);
+      color: #FFF; padding: 22px 34px 30px;
+      border-radius: 0 0 50% 50% / 0 0 36px 36px;
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    }
+    .arc-dome .photo-frame { width: 96px; height: 96px; border-radius: 999px !important; border: 3.5px solid #FFF !important; box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
+    .arc-contact-strip {
+      margin: -16px auto 2px; background: #FFF; border: 1.5px solid var(--r-border);
+      border-radius: 999px; padding: 5px 18px; font-size: calc(11.6px * var(--fs-scale, 1));
+      font-weight: 700; color: var(--r-primary); box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      max-width: 90%; text-align: center;
+    }
+    .arc-body { padding: 4px 34px 0; display: flex; flex-direction: column; gap: 10px; }
+    .arc-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .arc-head {
+      text-align: center; font-size: calc(11.8px * var(--fs-scale, 1)); font-weight: 850;
+      color: var(--r-primary); text-transform: uppercase; letter-spacing: 0.14em;
+      background: var(--r-tint); padding: 4px 12px; border-radius: 999px; margin-bottom: 6px;
+    }
+    .lay-arcade .edu-table th, .lay-arcade .edu-table td { padding: 5px 8px; }
+    .lay-arcade .decl-footer { margin-top: 8px; }
+
+    /* 2. ORIGAMI FOLD (Notched Corner Identity Card + Vertical Accent Gutter + Clean Flow) */
+    .lay-origami { padding: 22px 30px; display: flex; flex-direction: column; gap: 10px; background: #FFF; min-height: 1123px; border-right: 10px solid var(--r-secondary); }
+    .ori-card {
+      background: var(--r-tint); border-left: 6px solid var(--r-primary);
+      padding: 16px 20px; clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 0 100%);
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    }
+    .ori-card .photo-frame { width: 92px; height: 92px; border-radius: 14px !important; border: 3px solid var(--r-primary) !important; }
+    .ori-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .ori-head {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--r-primary); color: #FFF; font-size: calc(11.5px * var(--fs-scale, 1));
+      font-weight: 850; text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 4px 14px 4px 10px; clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%);
+      margin-bottom: 5px;
+    }
+    .lay-origami .edu-table th, .lay-origami .edu-table td { padding: 5px 8px; }
+    .lay-origami .decl-footer { margin-top: 8px; }
+
+    /* 3. NEXUS TIMELINE (Center-Spine Editorial Header + Connected Dot-Line Sections) */
+    .lay-nexus { padding: 22px 34px; display: flex; flex-direction: column; gap: 10px; background: #FFF; min-height: 1123px; border-top: 6px solid var(--r-secondary); border-bottom: 6px solid var(--r-primary); }
+    .nex-head {
+      display: flex; align-items: center; gap: 16px; padding-bottom: 12px;
+      border-bottom: 2px solid var(--r-primary);
+    }
+    .nex-head .photo-frame { width: 94px; height: 94px; border-radius: 999px !important; border: 3.5px solid var(--r-secondary) !important; }
+    .nex-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .nex-sec { position: relative; padding-left: 14px; border-left: 2px solid var(--r-secondary); }
+    .nex-sec::before {
+      content: ""; position: absolute; left: -6px; top: 3px;
+      width: 10px; height: 10px; border-radius: 999px; background: var(--r-primary);
+    }
+    .nex-title {
+      font-size: calc(12px * var(--fs-scale, 1)); font-weight: 900; color: var(--r-primary);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;
+    }
+    .lay-nexus .edu-table th, .lay-nexus .edu-table td { padding: 5px 8px; }
+    .lay-nexus .decl-footer { margin-top: 8px; }
+
+    /* 4. HALO SIDEBAR (Floating Rounded Dark Pill Sidebar + Crisp White Canvas) */
+    .lay-halo { padding: 18px 22px; display: grid; grid-template-columns: 232px 1fr; gap: 18px; min-height: 1123px; background: #F7F8FB; }
+    .hlo-capsule {
+      background: var(--r-primary); color: #FFF; border-radius: 26px; padding: 22px 16px;
+      display: flex; flex-direction: column; gap: 12px; box-shadow: 0 8px 22px rgba(0,0,0,0.12);
+    }
+    .hlo-capsule .photo-frame { width: 106px; height: 106px; border-radius: 999px !important; border: 3.5px solid var(--r-secondary) !important; margin: 0 auto; }
+    .hlo-tag {
+      background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.28);
+      color: #FFF; font-weight: 800; font-size: calc(11px * var(--fs-scale, 1));
+      text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 999px;
+      display: inline-block; margin-bottom: 5px;
+    }
+    .hlo-main { padding: 6px 4px; display: flex; flex-direction: column; gap: 10px; }
+    .hlo-banner {
+      background: #FFF; border-radius: 20px; padding: 14px 18px;
+      border: 1px solid var(--r-border); border-bottom: 4px solid var(--r-secondary);
+    }
+    .hlo-banner h1 { font-size: calc(27px * var(--fs-scale, 1)); font-weight: 900; color: var(--r-primary); }
+    .hlo-sec-h {
+      font-size: calc(12px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary);
+      text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1.5px solid var(--r-secondary);
+      padding-bottom: 3px; margin-bottom: 5px;
+    }
+    .lay-halo .edu-table th, .lay-halo .edu-table td { padding: 5px 7px; }
+    .lay-halo .decl-footer { margin-top: 8px; }
+
+    /* Measuring natural height overrides for 4 new layouts */
+    .a4-sheet.measuring-natural .lay-arcade,
+    .a4-sheet.measuring-natural .lay-origami,
+    .a4-sheet.measuring-natural .lay-nexus,
+    .a4-sheet.measuring-natural .lay-halo {
+      min-height: 0 !important;
+    }
+
+
+    /* ============================================================
+       3 BRAND-NEW DISTINCT CREATIVE MODERN LAYOUTS
+       (REPLACING: arcade, nexus, halo)
+       ============================================================ */
+
+    /* 1. ORBIT RING (Concentric Orbital Rings Header + Asymmetric Split Grid) */
+    .lay-orbitring { padding: 20px 30px; display: flex; flex-direction: column; gap: 10px; background: #FFF; min-height: 1123px; border-top: 8px solid var(--r-primary); }
+    .orb-hero {
+      display: flex; align-items: center; gap: 18px;
+      background: var(--r-tint); border: 1.5px solid var(--r-border);
+      border-radius: 24px; padding: 14px 20px;
+    }
+    .orb-ring {
+      width: 104px; height: 104px; border-radius: 999px; flex-shrink: 0;
+      border: 3px dashed var(--r-secondary); padding: 4px;
+      display: flex; align-items: center; justify-content: center; background: #FFF;
+    }
+    .orb-ring .photo-frame { width: 90px; height: 90px; border-radius: 999px !important; border: 2.5px solid var(--r-primary) !important; }
+    .orb-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .orb-head {
+      display: flex; align-items: center; gap: 8px;
+      font-size: calc(12px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px;
+    }
+    .orb-head::after { content: ""; flex: 1; height: 1.5px; background: var(--r-border); }
+    .lay-orbitring .edu-table th, .lay-orbitring .edu-table td { padding: 5px 8px; }
+    .lay-orbitring .decl-footer { margin-top: 8px; }
+
+    /* 2. BLUEPRINT CAD (Technical Draft Header + Corner-Bracketed Section Blocks) */
+    .lay-blueprint { padding: 20px 30px; display: flex; flex-direction: column; gap: 10px; background: #F9FBFD; min-height: 1123px; border: 2px solid var(--r-border); }
+    .blp-top {
+      background: var(--r-primary); color: #FFF; padding: 15px 20px;
+      border-radius: 6px; border-left: 8px solid var(--r-secondary);
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+    }
+    .blp-top .photo-frame { width: 92px; height: 92px; border-radius: 6px !important; border: 2.5px solid var(--r-secondary) !important; }
+    .blp-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .blp-cell {
+      background: #FFF; border: 1px solid var(--r-border); border-radius: 6px;
+      padding: 9px 13px; position: relative;
+    }
+    .blp-title {
+      font-size: calc(11.6px * var(--fs-scale, 1)); font-weight: 900; color: var(--r-primary);
+      text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px;
+      display: inline-block; border-bottom: 2px solid var(--r-secondary); padding-bottom: 2px;
+    }
+    .lay-blueprint .edu-table th, .lay-blueprint .edu-table td { padding: 5px 7px; }
+    .lay-blueprint .decl-footer { margin-top: 8px; }
+
+    /* 3. PRISM TAB (Left Vertical Index Rail + Pill Badges + Crisp Two-Column Canvas) */
+    .lay-prismtab { display: grid; grid-template-columns: 52px 1fr; min-height: 1123px; background: #FFF; }
+    .pt-rail {
+      background: var(--r-primary); color: #FFF;
+      display: flex; flex-direction: column; align-items: center; justify-content: space-around;
+      padding: 24px 6px; font-size: calc(10.5px * var(--fs-scale, 1)); font-weight: 900; letter-spacing: 0.08em;
+    }
+    .pt-rail-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--r-secondary); }
+    .pt-content { padding: 20px 28px; display: flex; flex-direction: column; gap: 10px; }
+    .pt-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+      padding-bottom: 10px; border-bottom: 2.5px solid var(--r-secondary);
+    }
+    .pt-head .photo-frame { width: 92px; height: 92px; border-radius: 999px !important; border: 3px solid var(--r-primary) !important; }
+    .pt-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .pt-sec-h {
+      background: var(--r-tint); color: var(--r-primary); border-left: 4px solid var(--r-primary);
+      padding: 4px 11px; font-size: calc(11.8px * var(--fs-scale, 1)); font-weight: 850;
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px;
+    }
+    .lay-prismtab .edu-table th, .lay-prismtab .edu-table td { padding: 5px 8px; }
+    .lay-prismtab .decl-footer { margin-top: 8px; }
+
+    /* Measuring natural height overrides for 3 new layouts */
+    .a4-sheet.measuring-natural .lay-orbitring,
+    .a4-sheet.measuring-natural .lay-blueprint,
+    .a4-sheet.measuring-natural .lay-prismtab {
+      min-height: 0 !important;
+    }
+
+
+    /* Ensure sidebar text wraps cleanly and never overlaps when photo is hidden */
+    .aw-side, .ap-side, .cr-side, .og-side, .se-side, .es-side, .ac-side, .sols-side, .hrm-side, .hlo-capsule, .slate-side, .split-side {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
     /* PRINT: every document sheet is locked to exactly one A4 page. */
     @page { size: A4 portrait; margin: 0; }
     @media print {
@@ -2249,28 +3177,33 @@
           <button id="doc-both" type="button" class="seg-btn" onclick="setDocMode('both')">Both (2 Pages)</button>
         </div>
 
-        <!-- 23 Aesthetic Premium Layouts + Custom Layout Builder -->
+        <!-- 25 Aesthetic Premium Layouts -->
         <div id="layout-pill-strip" class="pill-strip no-scrollbar" role="radiogroup" aria-label="Layouts">
-          <button id="lay-folio" type="button" class="seg-btn active" onclick="setLayout('folio')">Folio</button>
+          <button id="lay-orbitring" type="button" class="seg-btn active" onclick="setLayout('orbitring')">Orbit Ring</button>
+          <button id="lay-blueprint" type="button" class="seg-btn" onclick="setLayout('blueprint')">Blueprint</button>
+          <button id="lay-prismtab" type="button" class="seg-btn" onclick="setLayout('prismtab')">Prism Tab</button>
+          <button id="lay-origami" type="button" class="seg-btn" onclick="setLayout('origami')">Origami Fold</button>
+          <button id="lay-chevron" type="button" class="seg-btn" onclick="setLayout('chevron')">Chevron</button>
+          <button id="lay-ticket" type="button" class="seg-btn" onclick="setLayout('ticket')">Ticket Stub</button>
+          <button id="lay-solstice" type="button" class="seg-btn" onclick="setLayout('solstice')">Solstice Split</button>
+          <button id="lay-astra" type="button" class="seg-btn" onclick="setLayout('astra')">Astra Ribbon</button>
+          <button id="lay-harmony" type="button" class="seg-btn" onclick="setLayout('harmony')">Harmony Split</button>
+          <button id="lay-tealwave" type="button" class="seg-btn" onclick="setLayout('tealwave')">Teal Wave</button>
+          <button id="lay-azurewave" type="button" class="seg-btn" onclick="setLayout('azurewave')">Azure Wave</button>
+          <button id="lay-crimsonribbon" type="button" class="seg-btn" onclick="setLayout('crimsonribbon')">Crimson Ribbon</button>
+          <button id="lay-onyxgold" type="button" class="seg-btn" onclick="setLayout('onyxgold')">Onyx Gold</button>
+          <button id="lay-scarletedge" type="button" class="seg-btn" onclick="setLayout('scarletedge')">Scarlet Edge</button>
+          <button id="lay-emeraldsplit" type="button" class="seg-btn" onclick="setLayout('emeraldsplit')">Emerald Split</button>
+          <button id="lay-archcurve" type="button" class="seg-btn" onclick="setLayout('archcurve')">Arch Curve</button>
+          <button id="lay-royalribbon" type="button" class="seg-btn" onclick="setLayout('royalribbon')">Royal Ribbon</button>
           <button id="lay-velvet" type="button" class="seg-btn" onclick="setLayout('velvet')">Velvet</button>
-          <button id="lay-opus" type="button" class="seg-btn" onclick="setLayout('opus')">Opus</button>
           <button id="lay-aurora2" type="button" class="seg-btn" onclick="setLayout('aurora2')">Aurora</button>
-          <button id="lay-crest" type="button" class="seg-btn" onclick="setLayout('crest')">Crest</button>
           <button id="lay-slate" type="button" class="seg-btn" onclick="setLayout('slate')">Slate Split</button>
           <button id="lay-pearl" type="button" class="seg-btn" onclick="setLayout('pearl')">Pearl</button>
-          <button id="lay-nova" type="button" class="seg-btn" onclick="setLayout('nova')">Nova Cards</button>
-          <button id="lay-meridian" type="button" class="seg-btn" onclick="setLayout('meridian')">Meridian</button>
-          <button id="lay-ivory" type="button" class="seg-btn" onclick="setLayout('ivory')">Ivory</button>
           <button id="lay-quartz" type="button" class="seg-btn" onclick="setLayout('quartz')">Quartz</button>
-          <button id="lay-botanical" type="button" class="seg-btn" onclick="setLayout('botanical')">Botanical</button>
           <button id="lay-oxford" type="button" class="seg-btn" onclick="setLayout('oxford')">Oxford</button>
-          <button id="lay-cobalt" type="button" class="seg-btn" onclick="setLayout('cobalt')">Cobalt</button>
           <button id="lay-solaris" type="button" class="seg-btn" onclick="setLayout('solaris')">Solaris</button>
-          <button id="lay-celeste" type="button" class="seg-btn" onclick="setLayout('celeste')">Celeste</button>
-          <button id="lay-monolith" type="button" class="seg-btn" onclick="setLayout('monolith')">Monolith</button>
-          <button id="lay-zenith2" type="button" class="seg-btn" onclick="setLayout('zenith2')">Zenith</button>
           <button id="lay-velour" type="button" class="seg-btn" onclick="setLayout('velour')">Velour</button>
-          <button id="lay-horizon2" type="button" class="seg-btn" onclick="setLayout('horizon2')">Horizon</button>
         </div>
 
         <!-- 12 Preset + Custom Color Combinations -->
@@ -2833,34 +3766,67 @@
         } catch (e) { return null; }
       }
 
-      const ALL_LAYOUTS = ['folio', 'velvet', 'opus', 'aurora2', 'crest', 'slate', 'pearl', 'nova', 'meridian', 'ivory', 'quartz', 'botanical', 'oxford', 'cobalt', 'solaris', 'celeste', 'monolith', 'zenith2', 'velour', 'horizon2'];
+      const ALL_LAYOUTS = ['orbitring', 'blueprint', 'prismtab', 'origami', 'chevron', 'ticket', 'solstice', 'astra', 'harmony', 'tealwave', 'azurewave', 'crimsonribbon', 'onyxgold', 'scarletedge', 'emeraldsplit', 'archcurve', 'royalribbon', 'velvet', 'aurora2', 'slate', 'pearl', 'quartz', 'oxford', 'solaris', 'velour'];
+
+      const LAYOUT_META = {
+        orbitring:     { name: 'Orbit Ring',     isNew: true },
+        blueprint:     { name: 'Blueprint',      isNew: true },
+        prismtab:      { name: 'Prism Tab',      isNew: true },
+        origami:       { name: 'Origami Fold',   isNew: false },
+        chevron:       { name: 'Chevron',        isNew: false },
+        ticket:        { name: 'Ticket Stub',    isNew: false },
+        solstice:      { name: 'Solstice Split', isNew: false },
+        astra:         { name: 'Astra Ribbon',   isNew: false },
+        harmony:       { name: 'Harmony Split',  isNew: false },
+        tealwave:      { name: 'Teal Wave',      isNew: false },
+        azurewave:     { name: 'Azure Wave',     isNew: false },
+        crimsonribbon: { name: 'Crimson Ribbon', isNew: false },
+        onyxgold:      { name: 'Onyx Gold',      isNew: false },
+        scarletedge:   { name: 'Scarlet Edge',   isNew: false },
+        emeraldsplit:  { name: 'Emerald Split',  isNew: false },
+        archcurve:     { name: 'Arch Curve',     isNew: false },
+        royalribbon:   { name: 'Royal Ribbon',   isNew: false },
+        velvet:        { name: 'Velvet',         isNew: false },
+        aurora2:       { name: 'Aurora',         isNew: false },
+        slate:         { name: 'Slate Split',    isNew: false },
+        pearl:         { name: 'Pearl',          isNew: false },
+        quartz:        { name: 'Quartz',         isNew: false },
+        oxford:        { name: 'Oxford',         isNew: false },
+        solaris:       { name: 'Solaris',        isNew: false },
+        velour:        { name: 'Velour',         isNew: false }
+      };
 
       const LAYOUT_SMART_PRESETS = {
-        folio:     { theme: 'emerald',    font: 'jakarta',      scale: 1.05 },
-        velvet:    { theme: 'roseGold',   font: 'poppins',      scale: 1.05 },
-        opus:      { theme: 'indigo',     font: 'dmsans',       scale: 1.05 },
-        aurora2:   { theme: 'iosBlue',    font: 'jakarta',      scale: 1.05 },
-        crest:     { theme: 'cobaltGold', font: 'merriweather', scale: 1.00 },
-        slate:     { theme: 'teal',       font: 'poppins',      scale: 1.05 },
-        pearl:     { theme: 'slateCyan',  font: 'sans',         scale: 1.05 },
-        nova:      { theme: 'indigo',     font: 'dmsans',       scale: 1.05 },
-        meridian:  { theme: 'midnight',   font: 'jakarta',      scale: 1.05 },
-        ivory:     { theme: 'burgundy',   font: 'editorial',    scale: 1.00 },
-        quartz:    { theme: 'terracotta', font: 'montserrat',   scale: 1.05 },
-        botanical: { theme: 'sage',       font: 'nunito',       scale: 1.05 },
-        oxford:    { theme: 'graphite',   font: 'serif',        scale: 1.00 },
-        cobalt:    { theme: 'cobaltGold', font: 'lato',         scale: 1.05 },
-        solaris:   { theme: 'velvetWine', font: 'raleway',      scale: 1.05 },
-        celeste:   { theme: 'iosBlue',    font: 'dmsans',       scale: 1.05 },
-        monolith:  { theme: 'slateCyan',  font: 'montserrat',   scale: 1.05 },
-        zenith2:   { theme: 'oliveMoss',  font: 'jakarta',      scale: 1.05 },
-        velour:    { theme: 'plum',       font: 'poppins',      scale: 1.05 },
-        horizon2:  { theme: 'emerald',    font: 'lato',         scale: 1.05 }
+        orbitring:     { theme: 'teal',       font: 'jakarta',      scale: 1.05 },
+        blueprint:     { theme: 'slateCyan',  font: 'montserrat',   scale: 1.05 },
+        prismtab:      { theme: 'indigo',     font: 'poppins',      scale: 1.05 },
+        origami:       { theme: 'emerald',    font: 'montserrat',   scale: 1.05 },
+        chevron:       { theme: 'velvetWine', font: 'montserrat',   scale: 1.05 },
+        ticket:        { theme: 'terracotta', font: 'jakarta',      scale: 1.05 },
+        solstice:      { theme: 'indigo',     font: 'jakarta',      scale: 1.05 },
+        astra:         { theme: 'iosBlue',    font: 'lato',         scale: 1.05 },
+        harmony:       { theme: 'terracotta', font: 'poppins',      scale: 1.05 },
+        tealwave:      { theme: 'teal',       font: 'montserrat',   scale: 1.05 },
+        azurewave:     { theme: 'slateCyan',  font: 'jakarta',      scale: 1.05 },
+        crimsonribbon: { theme: 'burgundy',   font: 'poppins',      scale: 1.05 },
+        onyxgold:      { theme: 'cobaltGold', font: 'montserrat',   scale: 1.05 },
+        scarletedge:   { theme: 'roseGold',   font: 'poppins',      scale: 1.05 },
+        emeraldsplit:  { theme: 'sage',       font: 'jakarta',      scale: 1.05 },
+        archcurve:     { theme: 'titanium',   font: 'poppins',      scale: 1.05 },
+        royalribbon:   { theme: 'cobaltGold', font: 'montserrat',   scale: 1.05 },
+        velvet:        { theme: 'roseGold',   font: 'poppins',      scale: 1.05 },
+        aurora2:       { theme: 'iosBlue',    font: 'jakarta',      scale: 1.05 },
+        slate:         { theme: 'teal',       font: 'poppins',      scale: 1.05 },
+        pearl:         { theme: 'slateCyan',  font: 'sans',         scale: 1.05 },
+        quartz:        { theme: 'terracotta', font: 'montserrat',   scale: 1.05 },
+        oxford:        { theme: 'graphite',   font: 'serif',        scale: 1.00 },
+        solaris:       { theme: 'velvetWine', font: 'raleway',      scale: 1.05 },
+        velour:        { theme: 'plum',       font: 'poppins',      scale: 1.05 }
       };
 
       const saved = loadSaved();
       const state = {
-        layout: (saved && saved.layout && ALL_LAYOUTS.indexOf(saved.layout) !== -1) ? saved.layout : 'folio',
+        layout: (saved && saved.layout && ALL_LAYOUTS.indexOf(saved.layout) !== -1) ? saved.layout : 'orbitring',
         customLayout: (saved && saved.customLayout) ? Object.assign({
           header: 'banner',
           structure: 'grid2',
@@ -2910,6 +3876,7 @@
         clearTimeout(window._tt);
         window._tt = setTimeout(function () { el.classList.remove('show'); }, 2200);
       }
+
 
       /* NAVIGATION & CONTROLS */
       window.goBack = function () {
@@ -4729,7 +5696,7 @@
         ctx.font = '800 17px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
         ctx.fillText('SCAN TO CREATE CV', W / 2, cardY + 441);
 
-        const pills = ['20 Layouts', 'Custom Colors', 'Instant A4 PDF'];
+        const pills = ['25 Layouts', 'Custom Colors', 'Instant A4 PDF'];
         const pW = 172, pGap = 14;
         const startX = (W - (pW * 3 + pGap * 2)) / 2;
         pills.forEach(function (label, idx) {
@@ -4837,7 +5804,7 @@
 
       window.shareStudioWhatsApp = function () {
         const url = getStudioShareUrl();
-        const msg = '*BikriPage Smart CV Studio*\n\nApna professional Resume & Covering Letter 2 minute me banayein (20 Layouts + 12 Aesthetic Colors):\n' + url;
+        const msg = '*BikriPage Smart CV Studio*\n\nApna professional Resume & Covering Letter 2 minute me banayein (25 Layouts + 12 Aesthetic Colors):\n' + url;
         window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
       };
 
@@ -4927,7 +5894,8 @@
       }
 
       /* 15 HIGH-CAPACITY (110%+) AESTHETIC CV LAYOUT RENDERERS */
-      function buildCVHtml(d) {
+      function buildCVHtml(d, forceLayout) {
+        const activeLayout = forceLayout || state.layout;
         const sec = function (n, title, body) {
           return '<section><div class="cv-sec-head"><span class="cv-sec-num">' + n + '</span><span>' + title + '</span></div>' + body + '</section>';
         };
@@ -4946,7 +5914,521 @@
           d.skills.map(function (s) { return '<li><span class="dot"></span><span>' + esc(s) + '</span></li>'; }).join('') +
         '</ul>';
 
-        if (state.layout === 'velvet') {
+        if (activeLayout === 'orbitring') {
+          return '<div class="lay-orbitring">' +
+            '<header class="orb-hero">' +
+              (d.showPhoto !== false ? '<div class="orb-ring">' + photoBoxHtml(d) + '</div>' : '') +
+              '<div style="flex:1; min-width:0;">' +
+                '<div style="font-size: calc(10.5px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.2em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:900; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12.2px * var(--fs-scale, 1)); color:var(--r-body); margin-top:2px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
+              '</div>' +
+            '</header>' +
+            '<div class="orb-2col">' +
+              '<div><div class="orb-head">Personal Details</div>' + pCompact + '</div>' +
+              '<div><div class="orb-head">Career Objective</div><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div>' +
+            '</div>' +
+            '<div><div class="orb-head">Educational Qualification</div>' + eduTableHtml(d) + '</div>' +
+            '<div class="orb-2col">' +
+              '<div><div class="orb-head">Skills</div>' + skillsPills + '</div>' +
+              '<div><div class="orb-head">Experience</div>' + expBlockHtml(d) + '</div>' +
+            '</div>' +
+            '<div class="orb-2col">' +
+              '<div><div class="orb-head">Achievements</div>' + achBlockHtml(d) + '</div>' +
+              '<div><div class="orb-head">Interests &amp; Strengths</div>' + extraPersonalKV(d) + '</div>' +
+            '</div>' +
+            '<div><div class="orb-head">Declaration</div>' + declHtml(d) + '</div>' +
+          '</div>';
+        }
+
+        if (activeLayout === 'blueprint') {
+          return '<div class="lay-blueprint">' +
+            '<header class="blp-top">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<div style="font-size: calc(10.5px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.2em; opacity:0.85; text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:900;">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12.2px * var(--fs-scale, 1)); opacity:0.92; margin-top:2px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="blp-2col">' +
+              '<div class="blp-cell"><div class="blp-title">Personal Details</div>' + pCompact + '</div>' +
+              '<div class="blp-cell"><div class="blp-title">Career Objective</div><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div>' +
+            '</div>' +
+            '<div class="blp-cell"><div class="blp-title">Educational Qualification</div>' + eduTableHtml(d) + '</div>' +
+            '<div class="blp-2col">' +
+              '<div class="blp-cell"><div class="blp-title">Skills</div>' + skillsPills + '</div>' +
+              '<div class="blp-cell"><div class="blp-title">Experience</div>' + expBlockHtml(d) + '</div>' +
+            '</div>' +
+            '<div class="blp-2col">' +
+              '<div class="blp-cell"><div class="blp-title">Achievements</div>' + achBlockHtml(d) + '</div>' +
+              '<div class="blp-cell"><div class="blp-title">Interests &amp; Strengths</div>' + extraPersonalKV(d) + '</div>' +
+            '</div>' +
+            '<div class="blp-cell"><div class="blp-title">Declaration</div>' + declHtml(d) + '</div>' +
+          '</div>';
+        }
+
+        if (activeLayout === 'prismtab') {
+          return '<div class="lay-prismtab">' +
+            '<div class="pt-rail">' +
+              '<span>C</span><span class="pt-rail-dot"></span><span>V</span><span class="pt-rail-dot"></span><span>2</span><span class="pt-rail-dot"></span><span>0</span><span class="pt-rail-dot"></span><span>2</span><span class="pt-rail-dot"></span><span>6</span>' +
+            '</div>' +
+            '<div class="pt-content">' +
+              '<header class="pt-head">' +
+                '<div style="flex:1; min-width:0;">' +
+                  '<div style="font-size: calc(10.5px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.2em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                  '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:900; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
+                  '<div style="font-size: calc(12.2px * var(--fs-scale, 1)); color:var(--r-body); margin-top:2px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
+                '</div>' + photoBoxHtml(d) +
+              '</header>' +
+              '<div class="pt-2col">' +
+                '<div><div class="pt-sec-h">Personal Details</div>' + pCompact + '</div>' +
+                '<div><div class="pt-sec-h">Career Objective</div><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div>' +
+              '</div>' +
+              '<div><div class="pt-sec-h">Educational Qualification</div>' + eduTableHtml(d) + '</div>' +
+              '<div class="pt-2col">' +
+                '<div><div class="pt-sec-h">Skills</div>' + skillsPills + '</div>' +
+                '<div><div class="pt-sec-h">Experience</div>' + expBlockHtml(d) + '</div>' +
+              '</div>' +
+              '<div class="pt-2col">' +
+                '<div><div class="pt-sec-h">Achievements</div>' + achBlockHtml(d) + '</div>' +
+                '<div><div class="pt-sec-h">Interests &amp; Strengths</div>' + extraPersonalKV(d) + '</div>' +
+              '</div>' +
+              '<div><div class="pt-sec-h">Declaration</div>' + declHtml(d) + '</div>' +
+            '</div>' +
+          '</div>';
+        }
+
+        if (activeLayout === 'origami') {
+          return '<div class="lay-origami">' +
+            '<header class="ori-card">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<div style="font-size: calc(10.5px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.2em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:900; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12.2px * var(--fs-scale, 1)); color:var(--r-body); margin-top:2px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="ori-2col">' +
+              '<div><div class="ori-head">Personal Details</div>' + pCompact + '</div>' +
+              '<div><div class="ori-head">Career Objective</div><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div>' +
+            '</div>' +
+            '<div><div class="ori-head">Educational Qualification</div>' + eduTableHtml(d) + '</div>' +
+            '<div class="ori-2col">' +
+              '<div><div class="ori-head">Skills</div>' + skillsPills + '</div>' +
+              '<div><div class="ori-head">Experience</div>' + expBlockHtml(d) + '</div>' +
+            '</div>' +
+            '<div class="ori-2col">' +
+              '<div><div class="ori-head">Achievements</div>' + achBlockHtml(d) + '</div>' +
+              '<div><div class="ori-head">Interests &amp; Strengths</div>' + extraPersonalKV(d) + '</div>' +
+            '</div>' +
+            '<div><div class="ori-head">Declaration</div>' + declHtml(d) + '</div>' +
+          '</div>';
+        }
+
+        if (activeLayout === 'chevron') {
+          return '<div class="lay-chevron">' +
+            '<header class="chv-banner">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<div style="font-size: calc(10.5px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.2em; opacity:0.85; text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:900;">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12.2px * var(--fs-scale, 1)); opacity:0.92; margin-top:3px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
+              '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="chv-body">' +
+              '<div class="chv-2col">' +
+                '<div><div class="chv-tag">Personal Details</div>' + pCompact + '</div>' +
+                '<div><div class="chv-tag">Career Objective</div><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div>' +
+              '</div>' +
+              '<div><div class="chv-tag">Educational Qualification</div>' + eduTableHtml(d) + '</div>' +
+              '<div class="chv-2col">' +
+                '<div><div class="chv-tag">Skills</div>' + skillsPills + '</div>' +
+                '<div><div class="chv-tag">Experience</div>' + expBlockHtml(d) + '</div>' +
+              '</div>' +
+              '<div class="chv-2col">' +
+                '<div><div class="chv-tag">Achievements</div>' + achBlockHtml(d) + '</div>' +
+                '<div><div class="chv-tag">Interests &amp; Strengths</div>' + extraPersonalKV(d) + '</div>' +
+              '</div>' +
+              '<div><div class="chv-tag">Declaration</div>' + declHtml(d) + '</div>' +
+            '</div>' +
+          '</div>';
+        }
+
+        if (activeLayout === 'ticket') {
+          return '<div class="lay-ticket">' +
+            '<div class="tkt-main">' +
+              '<header class="tkt-head">' +
+                '<div style="flex:1; min-width:0;">' +
+                  '<span class="tkt-stamp">Curriculum Vitae</span>' +
+                  '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:900; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
+                  '<div style="font-size: calc(12.2px * var(--fs-scale, 1)); color:var(--r-body); margin-top:2px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
+                '</div>' + photoBoxHtml(d) +
+              '</header>' +
+              '<div class="tkt-2col">' +
+                '<div><div class="tkt-sec">Personal Details</div>' + pCompact + '</div>' +
+                '<div><div class="tkt-sec">Career Objective</div><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div>' +
+              '</div>' +
+              '<div><div class="tkt-sec">Educational Qualification</div>' + eduTableHtml(d) + '</div>' +
+              '<div class="tkt-2col">' +
+                '<div><div class="tkt-sec">Skills</div>' + skillsPills + '</div>' +
+                '<div><div class="tkt-sec">Experience</div>' + expBlockHtml(d) + '</div>' +
+              '</div>' +
+              '<div class="tkt-2col">' +
+                '<div><div class="tkt-sec">Achievements</div>' + achBlockHtml(d) + '</div>' +
+                '<div><div class="tkt-sec">Interests &amp; Strengths</div>' + extraPersonalKV(d) + '</div>' +
+              '</div>' +
+              '<div><div class="tkt-sec">Declaration</div>' + declHtml(d) + '</div>' +
+            '</div>' +
+            '<div class="tkt-stub">' +
+              '<span class="tkt-stub-dot"></span><span class="tkt-stub-dot"></span><span class="tkt-stub-dot"></span><span class="tkt-stub-dot"></span><span class="tkt-stub-dot"></span>' +
+            '</div>' +
+          '</div>';
+        }
+
+        if (activeLayout === 'solstice') {
+          return '<div class="lay-solstice">' +
+            '<aside class="sols-side">' +
+              photoBoxHtml(d) +
+              '<div><span class="sols-pill">Contact</span>' +
+                '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); display:flex; flex-direction:column; gap:4px;">' +
+                  '<div><strong>Phone:</strong> ' + esc(d.phone) + '</div>' +
+                  '<div><strong>Email:</strong> ' + esc(d.email) + '</div>' +
+                  '<div><strong>Address:</strong> ' + esc(d.address) + '</div>' +
+                  '<div><strong>DOB:</strong> ' + esc(d.dob) + '</div>' +
+                  '<div><strong>Languages:</strong> ' + esc(d.languages) + '</div>' +
+                '</div></div>' +
+              '<div><span class="sols-pill">Skills</span>' + skillsBullets + '</div>' +
+              '<div><span class="sols-pill">Interests</span>' +
+                '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); display:flex; flex-direction:column; gap:4px;">' +
+                  '<div><strong>Hobbies:</strong> ' + esc(d.hobbies) + '</div>' +
+                  '<div><strong>Strengths:</strong> ' + esc(d.strengths) + '</div>' +
+                '</div></div>' +
+            '</aside>' +
+            '<div class="sols-main">' +
+              '<div class="sols-hero"><h1>' + esc(d.name) + '</h1><div style="font-size: calc(11.5px * var(--fs-scale, 1)); letter-spacing:0.14em; text-transform:uppercase; opacity:0.88; margin-top:2px;">' + esc(d.interest || 'Curriculum Vitae') + '</div></div>' +
+              '<div><div class="sols-head">Career Objective</div><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div>' +
+              '<div><div class="sols-head">Educational Qualification</div>' + eduTableHtml(d) + '</div>' +
+              '<div><div class="sols-head">Experience</div>' + expBlockHtml(d) + '</div>' +
+              '<div><div class="sols-head">Achievements</div>' + achBlockHtml(d) + '</div>' +
+              '<div><div class="sols-head">Declaration</div>' + declHtml(d) + '</div>' +
+            '</div>' +
+          '</div>';
+        }
+
+        if (activeLayout === 'astra') {
+          return '<div class="lay-astra">' +
+            '<div class="ast-c1"></div>' +
+            '<div class="ast-c2"></div>' +
+            '<div class="ast-body">' +
+              '<header class="ast-head">' +
+                '<div style="flex:1; min-width:0;">' +
+                  '<div style="font-size: calc(10.5px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                  '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:900; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
+                  '<div style="font-size: calc(12.2px * var(--fs-scale, 1)); color:var(--r-body); margin-top:2px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
+                '</div>' + photoBoxHtml(d) +
+              '</header>' +
+              '<div class="ast-2col">' +
+                '<div><div class="ast-head-sec">Personal Details</div>' + pCompact + '</div>' +
+                '<div><div class="ast-head-sec">Career Objective</div><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div>' +
+              '</div>' +
+              '<div><div class="ast-head-sec">Educational Qualification</div>' + eduTableHtml(d) + '</div>' +
+              '<div class="ast-2col">' +
+                '<div><div class="ast-head-sec">Skills</div>' + skillsPills + '</div>' +
+                '<div><div class="ast-head-sec">Experience</div>' + expBlockHtml(d) + '</div>' +
+              '</div>' +
+              '<div class="ast-2col">' +
+                '<div><div class="ast-head-sec">Achievements</div>' + achBlockHtml(d) + '</div>' +
+                '<div><div class="ast-head-sec">Interests &amp; Strengths</div>' + extraPersonalKV(d) + '</div>' +
+              '</div>' +
+              '<div><div class="ast-head-sec">Declaration</div>' + declHtml(d) + '</div>' +
+            '</div>' +
+          '</div>';
+        }
+
+        if (activeLayout === 'harmony') {
+          return '<div class="lay-harmony">' +
+            '<aside class="hrm-side">' +
+              photoBoxHtml(d) +
+              '<div><span class="hrm-pill">Contact</span>' +
+                '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); display:flex; flex-direction:column; gap:4px;">' +
+                  '<div><strong>Phone:</strong> ' + esc(d.phone) + '</div>' +
+                  '<div><strong>Email:</strong> ' + esc(d.email) + '</div>' +
+                  '<div><strong>Address:</strong> ' + esc(d.address) + '</div>' +
+                  '<div><strong>DOB:</strong> ' + esc(d.dob) + '</div>' +
+                  '<div><strong>Languages:</strong> ' + esc(d.languages) + '</div>' +
+                '</div></div>' +
+              '<div><span class="hrm-pill">Skills</span>' +
+                '<ul class="cv-bullets">' +
+                  d.skills.map(function (s) { return '<li style="color:#FFF;"><span class="dot" style="background:var(--r-secondary);"></span><span>' + esc(s) + '</span></li>'; }).join('') +
+                '</ul></div>' +
+              '<div><span class="hrm-pill">Interests</span>' +
+                '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); display:flex; flex-direction:column; gap:4px;">' +
+                  '<div><strong>Hobbies:</strong> ' + esc(d.hobbies) + '</div>' +
+                  '<div><strong>Strengths:</strong> ' + esc(d.strengths) + '</div>' +
+                '</div></div>' +
+            '</aside>' +
+            '<div class="hrm-main">' +
+              '<div class="hrm-title"><h1>' + esc(d.name) + '</h1><div style="font-size: calc(11.5px * var(--fs-scale, 1)); font-weight:700; color:var(--r-secondary); text-transform:uppercase; letter-spacing:0.14em;">Curriculum Vitae</div></div>' +
+              '<div><div class="hrm-head">Career Objective</div><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div>' +
+              '<div><div class="hrm-head">Educational Qualification</div>' + eduTableHtml(d) + '</div>' +
+              '<div><div class="hrm-head">Experience</div>' + expBlockHtml(d) + '</div>' +
+              '<div><div class="hrm-head">Achievements</div>' + achBlockHtml(d) + '</div>' +
+              '<div><div class="hrm-head">Declaration</div>' + declHtml(d) + '</div>' +
+            '</div>' +
+          '</div>';
+        }
+
+        if (activeLayout === 'tealwave') {
+          return '<div class="lay-tealwave"><div class="tw-grid">' +
+            '<div class="tw-left">' +
+              (d.showPhoto !== false ? '<div class="tw-avatar-ring">' + photoBoxHtml(d) + '</div>' : '') +
+              '<div class="tw-name-block"><h1>' + esc(d.name) + '</h1><div class="role">' + esc(d.interest || 'Curriculum Vitae') + '</div>' +
+                '<p style="font-size: calc(11.4px * var(--fs-scale, 1)); color:var(--r-body); margin-top:6px; line-height:1.42;">' + esc(d.objective) + '</p></div>' +
+              '<div><div class="tw-head-line">Contact</div>' +
+                '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); display:flex; flex-direction:column; gap:5px; color:var(--r-body);">' +
+                  '<div><strong>Phone:</strong> ' + esc(d.phone) + '</div>' +
+                  '<div><strong>Email:</strong> ' + esc(d.email) + '</div>' +
+                  '<div><strong>Address:</strong> ' + esc(d.address) + '</div>' +
+                  '<div><strong>DOB:</strong> ' + esc(d.dob) + '</div>' +
+                  '<div><strong>Gender:</strong> ' + esc(d.gender) + '</div>' +
+                '</div></div>' +
+              '<div><div class="tw-head-line">Skills</div>' + skillsBullets + '</div>' +
+            '</div>' +
+            '<div style="display:flex; flex-direction:column; gap:10px;">' +
+              '<div><div class="tw-pill-head">Education</div><div class="tw-tl-box">' + eduTableHtml(d) + '</div></div>' +
+              '<div><div class="tw-pill-head">Work Experience</div><div class="tw-tl-box">' + expBlockHtml(d) + '</div></div>' +
+              '<div><div class="tw-pill-head">Achievements &amp; Interests</div><div class="tw-tl-box">' + achBlockHtml(d) + '<div style="margin-top:6px;">' + extraPersonalKV(d) + '</div></div></div>' +
+              '<div><div class="tw-pill-head">Declaration</div><div class="tw-tl-box">' + declHtml(d) + '</div></div>' +
+            '</div>' +
+          '</div></div>';
+        }
+
+        if (activeLayout === 'azurewave') {
+          const parts = (d.name || 'Your Name').trim().split(/\s+/);
+          const first = parts[0] || '';
+          const rest = parts.slice(1).join(' ');
+          return '<div class="lay-azurewave' + (d.showPhoto === false ? ' no-photo' : '') + '">' +
+            '<aside class="aw-side">' +
+              '<div class="aw-corner"></div>' +
+              (d.showPhoto !== false ? '<div class="aw-photo-wrap">' + photoBoxHtml(d) + '</div>' : '') +
+              '<div><div class="aw-side-head"><span class="ap-dot-badge"></span><span>Contact Me</span></div>' +
+                '<div class="aw-side-line" style="margin-top:7px;">' +
+                  '<div><strong>Phone:</strong> ' + esc(d.phone) + '</div>' +
+                  '<div><strong>Email:</strong> ' + esc(d.email) + '</div>' +
+                  '<div><strong>Address:</strong> ' + esc(d.address) + '</div>' +
+                  '<div><strong>DOB:</strong> ' + esc(d.dob) + '</div>' +
+                  '<div><strong>Gender:</strong> ' + esc(d.gender) + '</div>' +
+                  '<div><strong>Nationality:</strong> ' + esc(d.nationality) + '</div>' +
+                '</div></div>' +
+              '<div><div class="aw-side-head"><span class="ap-dot-badge"></span><span>Languages</span></div>' +
+                '<div class="aw-side-line" style="margin-top:7px;"><div>' + esc(d.languages) + '</div></div></div>' +
+              '<div><div class="aw-side-head"><span class="ap-dot-badge"></span><span>Personal</span></div>' +
+                '<div class="aw-side-line" style="margin-top:7px;">' +
+                  '<div><strong>Hobbies:</strong> ' + esc(d.hobbies) + '</div>' +
+                  '<div><strong>Interest:</strong> ' + esc(d.interest) + '</div>' +
+                  '<div><strong>Strengths:</strong> ' + esc(d.strengths) + '</div>' +
+                '</div></div>' +
+            '</aside>' +
+            '<div class="aw-main">' +
+              '<div class="aw-name-band">' +
+                '<h1>' + esc(first) + (rest ? ' <span>' + esc(rest) + '</span>' : '') + '</h1>' +
+                '<div style="font-size: calc(11.5px * var(--fs-scale, 1)); font-weight:700; letter-spacing:0.16em; color:var(--r-muted); text-transform:uppercase; margin-top:3px;">Curriculum Vitae &bull; ' + esc(d.interest || 'Professional') + '</div>' +
+              '</div>' +
+              '<div><div class="aw-main-head"><span class="ap-dot-badge"></span><span>About Me</span></div>' +
+                '<div class="aw-main-line"><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div></div>' +
+              '<div><div class="aw-main-head"><span class="ap-dot-badge"></span><span>Job Experience</span></div>' +
+                '<div class="aw-main-line">' + expBlockHtml(d) + '</div></div>' +
+              '<div><div class="aw-main-head"><span class="ap-dot-badge"></span><span>Educational Qualification</span></div>' +
+                '<div class="aw-main-line">' + eduTableHtml(d) + '</div></div>' +
+              '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">' +
+                '<div><div class="aw-main-head"><span class="ap-dot-badge"></span><span>Skills</span></div><div class="aw-main-line">' + skillsBullets + '</div></div>' +
+                '<div><div class="aw-main-head"><span class="ap-dot-badge"></span><span>Achievements</span></div><div class="aw-main-line">' + achBlockHtml(d) + '</div></div>' +
+              '</div>' +
+              '<div><div class="aw-main-head"><span class="ap-dot-badge"></span><span>Declaration</span></div>' +
+                '<div class="aw-main-line">' + declHtml(d) + '</div></div>' +
+            '</div>' +
+          '</div>';
+        }
+
+        if (activeLayout === 'crimsonribbon') {
+          return '<div class="lay-crimsonribbon">' +
+            '<aside class="cr-side">' +
+              (d.showPhoto !== false ? '<div class="cr-photo-box">' + photoBoxHtml(d) + '</div>' : '') +
+              '<div class="cr-name-center">' +
+                '<h1>' + esc(d.name) + '</h1>' +
+                '<div class="sub">' + esc(d.interest || 'Curriculum Vitae') + '</div>' +
+              '</div>' +
+              '<div><div class="cr-side-head"><span>About Me</span></div>' +
+                '<p style="font-size: calc(11.6px * var(--fs-scale, 1)); line-height:1.45; margin-top:6px; opacity:0.92;">' + esc(d.objective) + '</p></div>' +
+              '<div><div class="cr-side-head"><span>Contact</span></div>' +
+                '<div style="font-size: calc(11.6px * var(--fs-scale, 1)); display:flex; flex-direction:column; gap:5px; margin-top:6px; opacity:0.95;">' +
+                  '<div><strong>Phone:</strong> ' + esc(d.phone) + '</div>' +
+                  '<div><strong>Email:</strong> ' + esc(d.email) + '</div>' +
+                  '<div><strong>Address:</strong> ' + esc(d.address) + '</div>' +
+                  '<div><strong>DOB:</strong> ' + esc(d.dob) + '</div>' +
+                  '<div><strong>Languages:</strong> ' + esc(d.languages) + '</div>' +
+                '</div></div>' +
+              '<div><div class="cr-side-head"><span>Skills</span></div>' +
+                '<ul class="cv-bullets" style="margin-top:6px;">' +
+                  d.skills.map(function (s) { return '<li style="color:#FFF;"><span class="dot" style="background:var(--r-secondary);"></span><span>' + esc(s) + '</span></li>'; }).join('') +
+                '</ul></div>' +
+            '</aside>' +
+            '<div class="cr-main">' +
+              '<div><div class="cr-ribbon">Education</div><div class="cr-sec-body">' + eduTableHtml(d) + '</div></div>' +
+              '<div><div class="cr-ribbon">Experience</div><div class="cr-sec-body">' + expBlockHtml(d) + '</div></div>' +
+              '<div><div class="cr-ribbon">Achievements</div><div class="cr-sec-body">' + achBlockHtml(d) + '</div></div>' +
+              '<div><div class="cr-ribbon">Interests &amp; Strengths</div><div class="cr-sec-body">' + extraPersonalKV(d) + '</div></div>' +
+              '<div><div class="cr-ribbon">Declaration</div><div class="cr-sec-body">' + declHtml(d) + '</div></div>' +
+            '</div>' +
+          '</div>';
+        }
+
+        if (activeLayout === 'onyxgold') {
+          return '<div class="lay-onyxgold">' +
+            '<aside class="og-side">' +
+              (d.showPhoto !== false ? '<div class="og-photo-ring">' + photoBoxHtml(d) + '</div>' : '') +
+              '<div><div class="og-side-pill">Contact Info</div>' +
+                '<div style="font-size: calc(11.6px * var(--fs-scale, 1)); display:flex; flex-direction:column; gap:5px; margin-top:7px;">' +
+                  '<div><strong>Phone:</strong> ' + esc(d.phone) + '</div>' +
+                  '<div><strong>Email:</strong> ' + esc(d.email) + '</div>' +
+                  '<div><strong>Address:</strong> ' + esc(d.address) + '</div>' +
+                  '<div><strong>DOB:</strong> ' + esc(d.dob) + '</div>' +
+                  '<div><strong>Gender:</strong> ' + esc(d.gender) + '</div>' +
+                  '<div><strong>Nationality:</strong> ' + esc(d.nationality) + '</div>' +
+                '</div></div>' +
+              '<div><div class="og-side-pill">Languages</div>' +
+                '<div style="font-size: calc(11.8px * var(--fs-scale, 1)); margin-top:7px;">' + esc(d.languages) + '</div></div>' +
+              '<div><div class="og-side-pill">Interests</div>' +
+                '<div style="font-size: calc(11.6px * var(--fs-scale, 1)); display:flex; flex-direction:column; gap:4px; margin-top:7px;">' +
+                  '<div><strong>Hobbies:</strong> ' + esc(d.hobbies) + '</div>' +
+                  '<div><strong>Interest:</strong> ' + esc(d.interest) + '</div>' +
+                  '<div><strong>Strengths:</strong> ' + esc(d.strengths) + '</div>' +
+                '</div></div>' +
+            '</aside>' +
+            '<div class="og-main">' +
+              '<div class="og-header">' +
+                '<h1>' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12px * var(--fs-scale, 1)); font-weight:700; color:var(--r-secondary); text-transform:uppercase; letter-spacing:0.14em;">Curriculum Vitae</div>' +
+              '</div>' +
+              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+              sec(3, 'Educational Qualification', eduTableHtml(d)) +
+              sec(5, 'Work Experience', expBlockHtml(d)) +
+              '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">' +
+                sec(4, 'Skills', skillsBullets) +
+                sec(6, 'Achievements', achBlockHtml(d)) +
+              '</div>' +
+              sec(8, 'Declaration', declHtml(d)) +
+            '</div>' +
+          '</div>';
+        }
+
+        if (activeLayout === 'scarletedge') {
+          return '<div class="lay-scarletedge">' +
+            '<aside class="se-side">' +
+              photoBoxHtml(d) +
+              '<div><div class="se-side-bar">Contact</div>' +
+                '<div style="font-size: calc(11.6px * var(--fs-scale, 1)); display:flex; flex-direction:column; gap:5px; margin-top:7px;">' +
+                  '<div><strong>Phone:</strong> ' + esc(d.phone) + '</div>' +
+                  '<div><strong>Email:</strong> ' + esc(d.email) + '</div>' +
+                  '<div><strong>Address:</strong> ' + esc(d.address) + '</div>' +
+                  '<div><strong>DOB:</strong> ' + esc(d.dob) + '</div>' +
+                  '<div><strong>Languages:</strong> ' + esc(d.languages) + '</div>' +
+                '</div></div>' +
+              '<div><div class="se-side-bar">Skills</div>' +
+                '<ul class="cv-bullets" style="margin-top:7px;">' +
+                  d.skills.map(function (s) { return '<li style="color:#FFF;"><span class="dot" style="background:var(--r-secondary);"></span><span>' + esc(s) + '</span></li>'; }).join('') +
+                '</ul></div>' +
+              '<div><div class="se-side-bar">Interests</div>' +
+                '<div style="font-size: calc(11.6px * var(--fs-scale, 1)); display:flex; flex-direction:column; gap:4px; margin-top:7px;">' +
+                  '<div><strong>Hobbies:</strong> ' + esc(d.hobbies) + '</div>' +
+                  '<div><strong>Strengths:</strong> ' + esc(d.strengths) + '</div>' +
+                '</div></div>' +
+            '</aside>' +
+            '<div class="se-main">' +
+              '<div class="se-name-wrap">' +
+                '<h1>' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(11.8px * var(--fs-scale, 1)); font-weight:700; color:var(--r-secondary); text-transform:uppercase; letter-spacing:0.14em;">Curriculum Vitae</div>' +
+              '</div>' +
+              '<div><div class="se-ribbon-head">Career Objective</div><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div>' +
+              '<div><div class="se-ribbon-head">Educational Qualification</div>' + eduTableHtml(d) + '</div>' +
+              '<div><div class="se-ribbon-head">Experience</div>' + expBlockHtml(d) + '</div>' +
+              '<div><div class="se-ribbon-head">Achievements</div>' + achBlockHtml(d) + '</div>' +
+              '<div><div class="se-ribbon-head">Declaration</div>' + declHtml(d) + '</div>' +
+            '</div>' +
+          '</div>';
+        }
+
+        if (activeLayout === 'emeraldsplit') {
+          return '<div class="lay-emeraldsplit">' +
+            '<aside class="es-side">' +
+              (d.showPhoto !== false ? '<div class="es-photo-ring">' + photoBoxHtml(d) + '</div>' : '') +
+              '<div><div class="es-side-pill">Contact &amp; Info</div>' +
+                '<div style="font-size: calc(11.8px * var(--fs-scale, 1)); display:flex; flex-direction:column; gap:5px; margin-top:8px; opacity:0.95;">' +
+                  '<div><strong>Mobile:</strong> ' + esc(d.phone) + '</div>' +
+                  '<div><strong>Email:</strong> ' + esc(d.email) + '</div>' +
+                  '<div><strong>Address:</strong> ' + esc(d.address) + '</div>' +
+                  '<div><strong>DOB:</strong> ' + esc(d.dob) + '</div>' +
+                  '<div><strong>Gender:</strong> ' + esc(d.gender) + '</div>' +
+                  '<div><strong>Nationality:</strong> ' + esc(d.nationality) + '</div>' +
+                '</div></div>' +
+              '<div><div class="es-side-pill">Languages</div>' +
+                '<div style="font-size: calc(12px * var(--fs-scale, 1)); margin-top:8px; opacity:0.95;">' + esc(d.languages) + '</div></div>' +
+              '<div><div class="es-side-pill">Interests</div>' +
+                '<div style="font-size: calc(11.8px * var(--fs-scale, 1)); display:flex; flex-direction:column; gap:4px; margin-top:8px; opacity:0.95;">' +
+                  '<div><strong>Hobbies:</strong> ' + esc(d.hobbies) + '</div>' +
+                  '<div><strong>Interest:</strong> ' + esc(d.interest) + '</div>' +
+                  '<div><strong>Strengths:</strong> ' + esc(d.strengths) + '</div>' +
+                '</div></div>' +
+            '</aside>' +
+            '<div class="es-main">' +
+              '<header class="es-banner">' +
+                '<div style="font-size: calc(10.5px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.2em; opacity:0.85; text-transform:uppercase; margin-bottom:3px;">Curriculum Vitae</div>' +
+                '<h1>' + esc(d.name) + '</h1>' +
+                '<p>' + esc(d.objective) + '</p>' +
+              '</header>' +
+              '<div class="es-body">' +
+                '<div><div class="es-main-pill">Educational Qualification</div>' + eduTableHtml(d) + '</div>' +
+                '<div><div class="es-main-pill">Work Experience</div>' + expBlockHtml(d) + '</div>' +
+                '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">' +
+                  '<div><div class="es-main-pill" style="min-width:140px;">Skills</div>' + skillsBullets + '</div>' +
+                  '<div><div class="es-main-pill" style="min-width:155px; margin-left:0; border-radius:999px; padding:5px 16px;">Achievements</div>' + achBlockHtml(d) + '</div>' +
+                '</div>' +
+                '<div><div class="es-main-pill">Declaration</div>' + declHtml(d) + '</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }
+
+        if (activeLayout === 'royalribbon') {
+          return '<div class="lay-royalribbon">' +
+            '<div class="rr-col1"></div>' +
+            '<div class="rr-col2"></div>' +
+            '<div class="rr-body">' +
+              '<header class="rr-head">' +
+                '<div style="flex:1; min-width:0;">' +
+                  '<div style="font-size: calc(10.5px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase; margin-bottom:2px;">Curriculum Vitae</div>' +
+                  '<h1 style="font-size: calc(26px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary); line-height:1.1;">' + esc(d.name) + '</h1>' +
+                  '<div style="font-size: calc(12.4px * var(--fs-scale, 1)); color:var(--r-body); margin-top:3px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
+                  '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
+                '</div>' + photoBoxHtml(d) +
+              '</header>' +
+              '<div class="rr-2col">' +
+                sec(1, 'Personal Details', pCompact) +
+                sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+              '</div>' +
+              sec(3, 'Educational Qualification', eduTableHtml(d)) +
+              '<div class="rr-2col">' +
+                sec(4, 'Skills', skillsPills) +
+                sec(5, 'Experience', expBlockHtml(d)) +
+              '</div>' +
+              '<div class="rr-2col">' +
+                sec(6, 'Achievements', achBlockHtml(d)) +
+                sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
+              '</div>' +
+              sec(8, 'Declaration', declHtml(d)) +
+            '</div>' +
+          '</div>';
+        }
+
+        if (activeLayout === 'velvet') {
           return '<div class="lay-velvet">' +
             '<header class="velvet-top">' +
               '<div style="flex:1; min-width:0;">' +
@@ -4974,35 +6456,7 @@
           '</div>';
         }
 
-        if (state.layout === 'opus') {
-          return '<div class="lay-opus">' +
-            '<header class="opus-head">' +
-              '<div style="flex:1; min-width:0;">' +
-                '<h1 class="opus-name">' + esc(d.name) + '</h1>' +
-                '<div style="font-size: calc(12.8px * var(--fs-scale, 1)); color:var(--r-body); margin-top:3px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
-                '<div style="font-size: calc(12.4px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
-              '</div>' + photoBoxHtml(d) +
-            '</header>' +
-            sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
-            sec(3, 'Educational Qualification', eduTableHtml(d)) +
-            '<div class="opus-2col">' +
-              sec(4, 'Skills', skillsPills) +
-              sec(5, 'Experience', expBlockHtml(d)) +
-            '</div>' +
-            '<div class="opus-2col">' +
-              sec(6, 'Achievements', achBlockHtml(d)) +
-              sec(1, 'Personal &amp; Strengths', '<div class="kv-grid" style="grid-template-columns:105px 8px 1fr;">' +
-                '<span class="kv-label">DOB</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
-                '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
-                '<span class="kv-label">Languages</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span>' +
-                '<span class="kv-label">Interest</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.interest) + '</span>' +
-                '<span class="kv-label">Strengths</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.strengths) + '</span></div>') +
-            '</div>' +
-            sec(8, 'Declaration', declHtml(d)) +
-          '</div>';
-        }
-
-        if (state.layout === 'aurora2') {
+        if (activeLayout === 'aurora2') {
           return '<div class="lay-aurora2">' +
             '<header class="au2-hero">' +
               '<div style="flex:1; min-width:0;">' +
@@ -5029,37 +6483,7 @@
           '</div>';
         }
 
-        if (state.layout === 'crest') {
-          const initials = (d.name || 'CV').trim().split(/\s+/).map(function (w) { return w[0] || ''; }).join('').slice(0, 2).toUpperCase() || 'CV';
-          return '<div class="lay-crest">' +
-            '<header class="crest-head">' +
-              '<div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">' +
-                '<div class="crest-mono">' + esc(initials) + '</div>' +
-                '<div style="min-width:0;">' +
-                  '<h1 style="font-size: calc(25px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary); line-height:1.1;">' + esc(d.name) + '</h1>' +
-                  '<div style="font-size: calc(12.4px * var(--fs-scale, 1)); color:var(--r-body); margin-top:2px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
-                  '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
-                '</div>' +
-              '</div>' + photoBoxHtml(d) +
-            '</header>' +
-            '<div class="crest-2col">' +
-              sec(1, 'Personal Details', pCompact) +
-              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
-            '</div>' +
-            sec(3, 'Educational Qualification', eduTableHtml(d)) +
-            '<div class="crest-2col">' +
-              sec(4, 'Skills', skillsBullets) +
-              sec(5, 'Experience', expBlockHtml(d)) +
-            '</div>' +
-            '<div class="crest-2col">' +
-              sec(6, 'Achievements', achBlockHtml(d)) +
-              sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
-            '</div>' +
-            sec(8, 'Declaration', declHtml(d)) +
-          '</div>';
-        }
-
-        if (state.layout === 'slate') {
+        if (activeLayout === 'slate') {
           return '<div class="lay-slate">' +
             '<aside class="slate-side">' +
               '<div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px;">' +
@@ -5097,7 +6521,7 @@
           '</div>';
         }
 
-        if (state.layout === 'pearl') {
+        if (activeLayout === 'pearl') {
           return '<div class="lay-pearl">' +
             '<header class="pearl-head">' +
               '<div style="flex:1; min-width:0;">' +
@@ -5123,94 +6547,7 @@
           '</div>';
         }
 
-        if (state.layout === 'nova') {
-          return '<div class="lay-nova">' +
-            '<div class="nova-card tint">' +
-              '<div style="display:flex; justify-content:space-between; align-items:center; gap:14px;">' +
-                '<div style="flex:1; min-width:0;">' +
-                  '<div style="font-size: calc(10.5px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
-                  '<h1 style="font-size: calc(26px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
-                  '<div style="font-size: calc(12.4px * var(--fs-scale, 1)); color:var(--r-body); margin-top:2px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
-                  '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
-                '</div>' + photoBoxHtml(d) +
-              '</div>' +
-            '</div>' +
-            '<div class="nova-2col">' +
-              '<div class="nova-card">' + sec(1, 'Personal Details', pCompact) + '</div>' +
-              '<div class="nova-card">' + sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') + '</div>' +
-            '</div>' +
-            '<div class="nova-card">' + sec(3, 'Educational Qualification', eduTableHtml(d)) + '</div>' +
-            '<div class="nova-2col">' +
-              '<div class="nova-card tint">' + sec(4, 'Skills', skillsPills) + '</div>' +
-              '<div class="nova-card">' + sec(5, 'Experience', expBlockHtml(d)) + '</div>' +
-            '</div>' +
-            '<div class="nova-2col">' +
-              '<div class="nova-card">' + sec(6, 'Achievements', achBlockHtml(d)) + '</div>' +
-              '<div class="nova-card tint">' + sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) + '</div>' +
-            '</div>' +
-            '<div class="nova-card">' + sec(8, 'Declaration', declHtml(d)) + '</div>' +
-          '</div>';
-        }
-
-        if (state.layout === 'meridian') {
-          return '<div class="lay-meridian">' +
-            '<header class="mer-banner">' +
-              '<div style="flex:1; min-width:0;">' +
-                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:850;">' + esc(d.name) + '</h1>' +
-                '<div style="font-size: calc(12.6px * var(--fs-scale, 1)); opacity:0.9; margin-top:3px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
-                '<div style="font-size: calc(12.2px * var(--fs-scale, 1)); opacity:0.85; margin-top:2px;">' + esc(d.address) + '</div>' +
-              '</div>' + photoBoxHtml(d) +
-            '</header>' +
-            '<div class="mer-strip"></div>' +
-            '<div class="mer-body">' +
-              '<div class="mer-2col">' +
-                sec(1, 'Personal Details', pCompact) +
-                sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
-              '</div>' +
-              sec(3, 'Educational Qualification', eduTableHtml(d)) +
-              '<div class="mer-2col">' +
-                sec(4, 'Skills', skillsBullets) +
-                sec(5, 'Experience', expBlockHtml(d)) +
-              '</div>' +
-              '<div class="mer-2col">' +
-                sec(6, 'Achievements', achBlockHtml(d)) +
-                sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
-              '</div>' +
-              sec(8, 'Declaration', declHtml(d)) +
-            '</div>' +
-          '</div>';
-        }
-
-        if (state.layout === 'ivory') {
-          return '<div class="lay-ivory">' +
-            '<header class="ivory-mast">' +
-              '<div style="font-size: calc(11px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.24em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
-              '<h1 class="ivory-name">' + esc(d.name) + '</h1>' +
-              '<div class="ivory-meta">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
-            '</header>' +
-            '<div style="display:flex; justify-content:space-between; align-items:center; gap:14px;">' +
-              '<div style="flex:1; min-width:0;">' + sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') + '</div>' +
-              photoBoxHtml(d) +
-            '</div>' +
-            sec(3, 'Educational Qualification', eduTableHtml(d)) +
-            '<div class="ivory-2col">' +
-              sec(4, 'Skills', skillsBullets) +
-              sec(5, 'Experience', expBlockHtml(d)) +
-            '</div>' +
-            '<div class="ivory-2col">' +
-              sec(6, 'Achievements', achBlockHtml(d)) +
-              sec(1, 'Personal &amp; Strengths', '<div class="kv-grid" style="grid-template-columns:105px 8px 1fr;">' +
-                '<span class="kv-label">DOB</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.dob) + '</span>' +
-                '<span class="kv-label">Gender</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.gender) + '</span>' +
-                '<span class="kv-label">Languages</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span>' +
-                '<span class="kv-label">Hobbies</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.hobbies) + '</span>' +
-                '<span class="kv-label">Strengths</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.strengths) + '</span></div>') +
-            '</div>' +
-            sec(8, 'Declaration', declHtml(d)) +
-          '</div>';
-        }
-
-        if (state.layout === 'quartz') {
+        if (activeLayout === 'quartz') {
           return '<div class="lay-quartz">' +
             '<div class="quartz-bar"></div>' +
             '<header class="quartz-head">' +
@@ -5238,33 +6575,7 @@
           '</div>';
         }
 
-        if (state.layout === 'botanical') {
-          return '<div class="lay-botanical">' +
-            '<header class="bot-head">' +
-              '<div style="flex:1; min-width:0;">' +
-                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
-                '<div style="font-size: calc(12.6px * var(--fs-scale, 1)); color:var(--r-body); margin-top:3px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
-                '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
-              '</div>' + photoBoxHtml(d) +
-            '</header>' +
-            '<div class="bot-2col">' +
-              sec(1, 'Personal Details', pCompact) +
-              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
-            '</div>' +
-            sec(3, 'Educational Qualification', eduTableHtml(d)) +
-            '<div class="bot-2col">' +
-              sec(4, 'Skills', skillsPills) +
-              sec(5, 'Experience', expBlockHtml(d)) +
-            '</div>' +
-            '<div class="bot-2col">' +
-              sec(6, 'Achievements', achBlockHtml(d)) +
-              sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
-            '</div>' +
-            sec(8, 'Declaration', declHtml(d)) +
-          '</div>';
-        }
-
-        if (state.layout === 'oxford') {
+        if (activeLayout === 'oxford') {
           return '<div class="lay-oxford"><div class="ox-frame">' +
             '<div class="cv-doc-title" style="font-size: calc(19px * var(--fs-scale, 1)); margin-bottom:4px; padding-bottom:6px;">Curriculum Vitae (CV)</div>' +
             '<div style="display:flex; justify-content:space-between; align-items:center; gap:14px;">' +
@@ -5290,7 +6601,7 @@
           '</div></div>';
         }
 
-        if (state.layout === 'cobalt') {
+        if (activeLayout === 'cobalt') {
           return '<div class="lay-cobalt">' +
             '<div class="cob-top">' +
               '<div class="cob-id">' +
@@ -5316,7 +6627,7 @@
           '</div>';
         }
 
-        if (state.layout === 'solaris') {
+        if (activeLayout === 'solaris') {
           return '<div class="lay-solaris">' +
             '<div class="sol-bar"></div>' +
             '<div class="sol-body">' +
@@ -5346,85 +6657,7 @@
           '</div>';
         }
 
-        if (state.layout === 'celeste') {
-          return '<div class="lay-celeste">' +
-            '<header class="cel-head">' +
-              '<div style="flex:1; min-width:0;">' +
-                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
-                '<div style="font-size: calc(12.6px * var(--fs-scale, 1)); color:var(--r-body); margin-top:3px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
-                '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
-              '</div>' + photoBoxHtml(d) +
-            '</header>' +
-            '<div class="cel-2col">' +
-              sec(1, 'Personal Details', pCompact) +
-              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
-            '</div>' +
-            sec(3, 'Educational Qualification', eduTableHtml(d)) +
-            '<div class="cel-2col">' +
-              sec(4, 'Skills', skillsPills) +
-              sec(5, 'Experience', expBlockHtml(d)) +
-            '</div>' +
-            '<div class="cel-2col">' +
-              sec(6, 'Achievements', achBlockHtml(d)) +
-              sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
-            '</div>' +
-            sec(8, 'Declaration', declHtml(d)) +
-          '</div>';
-        }
-
-        if (state.layout === 'monolith') {
-          return '<div class="lay-monolith">' +
-            '<header class="mono2-head">' +
-              '<div style="flex:1; min-width:0;">' +
-                '<div style="font-size: calc(11px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.18em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
-                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
-                '<div style="font-size: calc(12.6px * var(--fs-scale, 1)); color:var(--r-body); margin-top:2px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
-              '</div>' + photoBoxHtml(d) +
-            '</header>' +
-            '<div class="mono2-2col">' +
-              sec(1, 'Personal Details', pCompact) +
-              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
-            '</div>' +
-            sec(3, 'Educational Qualification', eduTableHtml(d)) +
-            '<div class="mono2-2col">' +
-              sec(4, 'Skills', skillsBullets) +
-              sec(5, 'Experience', expBlockHtml(d)) +
-            '</div>' +
-            '<div class="mono2-2col">' +
-              sec(6, 'Achievements', achBlockHtml(d)) +
-              sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
-            '</div>' +
-            sec(8, 'Declaration', declHtml(d)) +
-          '</div>';
-        }
-
-        if (state.layout === 'zenith2') {
-          return '<div class="lay-zenith2">' +
-            '<header class="zen2-head">' +
-              '<div style="flex:1; min-width:0;">' +
-                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
-                '<div style="font-size: calc(12.6px * var(--fs-scale, 1)); color:var(--r-body); margin-top:3px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
-                '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
-              '</div>' + photoBoxHtml(d) +
-            '</header>' +
-            '<div class="zen2-2col">' +
-              sec(1, 'Personal Details', pCompact) +
-              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
-            '</div>' +
-            sec(3, 'Educational Qualification', eduTableHtml(d)) +
-            '<div class="zen2-2col">' +
-              sec(4, 'Skills', skillsPills) +
-              sec(5, 'Experience', expBlockHtml(d)) +
-            '</div>' +
-            '<div class="zen2-2col">' +
-              sec(6, 'Achievements', achBlockHtml(d)) +
-              sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
-            '</div>' +
-            sec(8, 'Declaration', declHtml(d)) +
-          '</div>';
-        }
-
-        if (state.layout === 'velour') {
+        if (activeLayout === 'velour') {
           return '<div class="lay-velour">' +
             '<header class="vlr-head">' +
               '<div style="flex:1; min-width:0;">' +
@@ -5449,55 +6682,31 @@
           '</div>';
         }
 
-        if (state.layout === 'horizon2') {
-          return '<div class="lay-horizon2">' +
-            '<header class="hz2-head">' +
-              '<div style="flex:1; min-width:0;">' +
-                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:850; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
-                '<div style="font-size: calc(12.6px * var(--fs-scale, 1)); color:var(--r-body); margin-top:3px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
-                '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:2px;">' + esc(d.address) + '</div>' +
-              '</div>' + photoBoxHtml(d) +
-            '</header>' +
-            '<div class="hz2-2col">' +
-              sec(1, 'Personal Details', pCompact) +
-              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
-            '</div>' +
-            sec(3, 'Educational Qualification', eduTableHtml(d)) +
-            '<div class="hz2-2col">' +
-              sec(4, 'Skills', skillsPills) +
-              sec(5, 'Experience', expBlockHtml(d)) +
-            '</div>' +
-            '<div class="hz2-2col">' +
-              sec(6, 'Achievements', achBlockHtml(d)) +
-              sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
-            '</div>' +
-            sec(8, 'Declaration', declHtml(d)) +
-          '</div>';
-        }
-
-        // DEFAULT: FOLIO (115%+ CAPACITY)
-        return '<div class="lay-folio">' +
-          '<header class="folio-head">' +
+        // DEFAULT FALLBACK: CHEVRON
+        return '<div class="lay-chevron">' +
+          '<header class="chv-banner">' +
             '<div style="flex:1; min-width:0;">' +
-              '<h1 class="folio-name">' + esc(d.name) + '</h1>' +
-              '<div class="folio-sub">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + '</div>' +
-              '<div class="folio-sub" style="color:var(--r-muted);">' + esc(d.address) + '</div>' +
+              '<div style="font-size: calc(10.5px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.2em; opacity:0.85; text-transform:uppercase;">Curriculum Vitae</div>' +
+              '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:900;">' + esc(d.name) + '</h1>' +
+              '<div style="font-size: calc(12.2px * var(--fs-scale, 1)); opacity:0.92; margin-top:3px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
             '</div>' + photoBoxHtml(d) +
           '</header>' +
-          '<div class="folio-2col">' +
-            sec(1, 'Personal Details', pCompact) +
-            sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
+          '<div class="chv-body">' +
+            '<div class="chv-2col">' +
+              '<div><div class="chv-tag">Personal Details</div>' + pCompact + '</div>' +
+              '<div><div class="chv-tag">Career Objective</div><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div>' +
+            '</div>' +
+            '<div><div class="chv-tag">Educational Qualification</div>' + eduTableHtml(d) + '</div>' +
+            '<div class="chv-2col">' +
+              '<div><div class="chv-tag">Skills</div>' + skillsPills + '</div>' +
+              '<div><div class="chv-tag">Experience</div>' + expBlockHtml(d) + '</div>' +
+            '</div>' +
+            '<div class="chv-2col">' +
+              '<div><div class="chv-tag">Achievements</div>' + achBlockHtml(d) + '</div>' +
+              '<div><div class="chv-tag">Interests &amp; Strengths</div>' + extraPersonalKV(d) + '</div>' +
+            '</div>' +
+            '<div><div class="chv-tag">Declaration</div>' + declHtml(d) + '</div>' +
           '</div>' +
-          sec(3, 'Educational Qualification', eduTableHtml(d)) +
-          '<div class="folio-2col">' +
-            sec(4, 'Skills', skillsPills) +
-            sec(5, 'Experience', expBlockHtml(d)) +
-          '</div>' +
-          '<div class="folio-2col">' +
-            sec(6, 'Achievements', achBlockHtml(d)) +
-            sec(7, 'Interests &amp; Strengths', extraPersonalKV(d)) +
-          '</div>' +
-          sec(8, 'Declaration', declHtml(d)) +
         '</div>';
       }
 

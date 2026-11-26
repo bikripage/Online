@@ -803,6 +803,19 @@
       border: none; border-radius: 999px;
     }
 
+    .skills-pill-box {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 6px;
+      padding-top: 2px;
+    }
+    .skills-pill-box .opus-pill {
+      font-size: calc(12.2px * var(--fs-scale, 1));
+      padding: 4px 10px;
+      line-height: 1.35;
+    }
+
     /* Shared CV Elements */
     .cv-doc-title {
       text-align: center; font-size: calc(22px * var(--fs-scale, 1)); font-weight: 800; letter-spacing: 0.14em;
@@ -3097,18 +3110,25 @@
                 role: e.role || '',
                 company: e.company || '',
                 duration: e.duration || '',
-                bullets: ['<Action bullet 1 for ' + (e.role || role) + '>', '<Action bullet 2 for ' + (e.role || role) + '>', '<Action bullet 3 for ' + (e.role || role) + '>']
+                bullets: ['<Max 9 words action bullet 1>', '<Max 9 words action bullet 2>', '<Max 9 words action bullet 3>']
               };
             })
           : [];
 
         return [
-          'Indian HR & ATS Resume + Covering Letter JSON Generator for BikriPage Studio.',
+          'Indian HR & ATS 1-Page Resume + Covering Letter JSON Generator for BikriPage Studio.',
           'Target Role: ' + role,
           'Candidate Data (keep 100% exact): ' + JSON.stringify(facts),
+          'STRICT LENGTH LIMIT (Must fit 1 A4 page with large readable font — NEVER write long paragraphs):',
+          '- objective: MAX 22-28 words (2 short crisp lines only).',
+          '- skills: 7-9 short skills (2-4 words each, e.g. "MS Excel", "Data Entry", "Typing Speed").',
+          '- fresherNote / experience bullets: MAX 25-30 words total (or 3 short bullets of 7-9 words each).',
+          '- achievements: EXACTLY 3 short points (7-9 words each).',
+          '- hobbies / interest / strengths: MAX 3-4 words each (comma-separated).',
+          '- coverLetter p1, p2, p3: MAX 25-32 words per paragraph.',
           'Step 1: Greet ' + (facts.name ? facts.name.split(' ')[0] : 'candidate') + ' briefly and ask ONLY: "Do you want (1) CV only, (2) Covering Letter only, or (3) Both?" Wait for reply.',
-          'Step 2: Output ONLY a single ```json ... ``` block filling ALL fields below (write 3 crisp action-verb bullets for each experience entry; NEVER leave any string or array empty):',
-          '{"docMode":"cv|cl|both","name":"' + (facts.name || '') + '","phone":"' + (facts.phone || '') + '","email":"' + (facts.email || '') + '","dob":"' + (facts.dob || '') + '","gender":"' + (facts.gender || '') + '","nationality":"' + (facts.nationality || 'Indian') + '","address":"' + (facts.address || '') + '","languages":"' + (facts.languages || 'Hindi, English') + '","objective":"<2 crisp sentences for ' + role + '>","education":' + JSON.stringify(facts.education || []) + ',"skills":["<6 ATS skills for ' + role + '>"],"isFresher":' + JSON.stringify(Boolean(facts.isFresher)) + ',"fresherNote":"<2 crisp fresher readiness sentences>","experience":' + JSON.stringify(expSchema) + ',"achievements":["<3 realistic achievements>"],"hobbies":"<3 hobbies>","interest":"<2-3 interests for ' + role + '>","strengths":"<3 strengths>","declaration":"I hereby declare that the above information is true and correct to the best of my knowledge and belief.","declDate":"' + (facts.declDate || todayStr) + '","declPlace":"' + place + '","signature":"' + (facts.name || '') + '","coverLetter":{"to":' + JSON.stringify(defaultTo) + ',"subject":"Application for the Position of ' + role + '.","salutation":"Respected Sir/Madam,","p1":"<Opening para 2-3 sentences>","p2":"<Skills & education para 2-3 sentences>","p3":"<Interview request para 2 sentences>","closing":"Thank you for your time and consideration. I look forward to hearing from you.","signoff":"Yours faithfully,","enclosure":"Curriculum Vitae (CV)"}}',
+          'Step 2: Output ONLY a single ```json ... ``` block filling ALL fields below within the strict word limits above (NEVER leave any field empty):',
+          '{"docMode":"cv|cl|both","name":"' + (facts.name || '') + '","phone":"' + (facts.phone || '') + '","email":"' + (facts.email || '') + '","dob":"' + (facts.dob || '') + '","gender":"' + (facts.gender || '') + '","nationality":"' + (facts.nationality || 'Indian') + '","address":"' + (facts.address || '') + '","languages":"' + (facts.languages || 'Hindi, English') + '","objective":"<Max 25 words crisp objective for ' + role + '>","education":' + JSON.stringify(facts.education || []) + ',"skills":["<7-9 short skills, 2-4 words each>"],"isFresher":' + JSON.stringify(Boolean(facts.isFresher)) + ',"fresherNote":"<Max 28 words crisp fresher summary>","experience":' + JSON.stringify(expSchema) + ',"achievements":["<Short point 1 (max 9 words)>","<Short point 2 (max 9 words)>","<Short point 3 (max 9 words)>"],"hobbies":"<3 short hobbies>","interest":"<2-3 short interests>","strengths":"<3 short strengths>","declaration":"I hereby declare that the above information is true and correct to the best of my knowledge and belief.","declDate":"' + (facts.declDate || todayStr) + '","declPlace":"' + place + '","signature":"' + (facts.name || '') + '","coverLetter":{"to":' + JSON.stringify(defaultTo) + ',"subject":"Application for the Position of ' + role + '.","salutation":"Respected Sir/Madam,","p1":"<Max 28 words opening>","p2":"<Max 32 words skills & qualification>","p3":"<Max 22 words interview request>","closing":"Thank you for your time and consideration. I look forward to hearing from you.","signoff":"Yours faithfully,","enclosure":"Curriculum Vitae (CV)"}}',
           'End with: "Copy code dabakar BikriPage Studio me Paste & Upload karein!"'
         ].join('\n');
       }
@@ -4638,7 +4658,7 @@
           '<span class="kv-label">Nationality</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.nationality) + '</span>' +
           '<span class="kv-label">Languages</span><span class="kv-colon">:</span><span class="kv-val">' + esc(d.languages) + '</span></div>';
 
-        const skillsPills = '<div style="display:flex; flex-wrap:wrap; gap:5px;">' +
+        const skillsPills = '<div class="skills-pill-box">' +
           d.skills.map(function (s) { return '<span class="opus-pill">' + esc(s) + '</span>'; }).join('') +
         '</div>';
 

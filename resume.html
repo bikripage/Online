@@ -544,10 +544,10 @@
       --r-muted: #5A5A60;
       --r-font: var(--font-sans);
       --fs-scale: 1;
-      --d-pad: 30px;
-      --d-gap: 11px;
-      --d-text: calc(14.8px * var(--fs-scale, 1));
-      --d-lh: 1.48;
+      --d-pad: 34px;
+      --d-gap: 13px;
+      --d-text: calc(15px * var(--fs-scale, 1));
+      --d-lh: 1.54;
 
       width: 794px;
       height: 1123px;
@@ -807,12 +807,23 @@
       display: flex;
       flex-wrap: wrap;
       align-content: flex-start;
-      gap: 6px;
-      padding-top: 2px;
+      gap: 7px;
+      padding-top: 3px;
+    }
+    .opus-pill {
+      display: inline-block;
+      padding: 5px 11px;
+      border-radius: 8px;
+      background: var(--r-tint);
+      color: var(--r-primary);
+      border: 1px solid var(--r-border);
+      font-size: calc(12.4px * var(--fs-scale, 1));
+      font-weight: 650;
+      line-height: 1.35;
     }
     .skills-pill-box .opus-pill {
-      font-size: calc(12.2px * var(--fs-scale, 1));
-      padding: 4px 10px;
+      font-size: calc(12.4px * var(--fs-scale, 1));
+      padding: 5px 11px;
       line-height: 1.35;
     }
 
@@ -1376,15 +1387,6 @@
     .lay-archwave .edu-table th, .lay-archwave .edu-table td { padding: 5px 7px; }
     .lay-archwave .decl-footer { margin-top: 8px; }
 
-    /* 6. SLANT CUT: Diagonal Clipped Header + Full-Width Single-Column Flow */
-    .lay-slantcut { padding: 0 0 22px; display: flex; flex-direction: column; gap: 10px; background: #FFF; min-height: 1123px; }
-    .sc-banner { background: var(--r-primary); color: #FFF; padding: 22px 36px 32px; clip-path: polygon(0 0, 100% 0, 100% 75%, 0 100%); display: flex; justify-content: space-between; align-items: center; gap: 16px; }
-    .sc-banner .photo-frame { width: 94px; height: 94px; border-radius: 16px !important; border: 3px solid var(--r-secondary) !important; transform: rotate(-3deg); }
-    .sc-body { padding: 2px 34px 0; display: flex; flex-direction: column; gap: 7px; }
-    .sc-tag { background: var(--r-secondary); color: #FFF; font-weight: 850; font-size: calc(11.4px * var(--fs-scale, 1)); text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 16px 3px 10px; clip-path: polygon(0 0, 93% 0, 100% 100%, 0 100%); display: inline-block; margin-bottom: 4px; }
-    .lay-slantcut .edu-table th, .lay-slantcut .edu-table td { padding: 5px 8px; }
-    .lay-slantcut .decl-footer { margin-top: 8px; }
-
     /* 7. RIGHT SIDEBAR PRO: Content on Left (68%) + Soft Tinted Sidebar on Right (32%) */
     .lay-rightside { display: grid; grid-template-columns: 1fr 252px; min-height: 1123px; background: #FFF; }
     .rs-main { padding: 24px 26px; display: flex; flex-direction: column; gap: 10px; }
@@ -1564,7 +1566,6 @@
     .a4-sheet.measuring-natural .lay-swissgrid,
     .a4-sheet.measuring-natural .lay-ribbonflag,
     .a4-sheet.measuring-natural .lay-archwave,
-    .a4-sheet.measuring-natural .lay-slantcut,
     .a4-sheet.measuring-natural .lay-rightside,
     .a4-sheet.measuring-natural .lay-vogueed,
     .a4-sheet.measuring-natural .lay-bentoios,
@@ -1583,6 +1584,73 @@
     .a4-sheet.measuring-natural .lay-horizonstep,
     .a4-sheet.measuring-natural .cl-wrap {
       min-height: 0 !important;
+    }
+
+
+    /* Full-page A4 vertical balance for layouts */
+    .lay-execnoir .en-body,
+    .lay-swissgrid,
+    .lay-vogueed,
+    .lay-bentoios,
+    .lay-ticketstub .ts-main,
+    .lay-metroblock,
+    .lay-auroramist,
+    .lay-timelinepro .tp-track,
+    .lay-prismrail .pr-body,
+    .lay-halocapsule .hc-main,
+    .lay-origamifold,
+    .lay-dualstripe .ds-body,
+    .lay-splitcurtain .spc-body,
+    .lay-crestcenter,
+    .lay-glassfloat .gf-body,
+    .lay-sidearch .sa-main,
+    .lay-horizonstep {
+      flex: 1;
+      justify-content: space-between;
+    }
+    .lay-execnoir,
+    .lay-ticketstub,
+    .lay-timelinepro,
+    .lay-prismrail,
+    .lay-halocapsule,
+    .lay-dualstripe,
+    .lay-splitcurtain,
+    .lay-glassfloat,
+    .lay-sidearch {
+      height: 1123px;
+    }
+    .a4-sheet.measuring-natural .lay-execnoir,
+    .a4-sheet.measuring-natural .lay-ticketstub,
+    .a4-sheet.measuring-natural .lay-timelinepro,
+    .a4-sheet.measuring-natural .lay-prismrail,
+    .a4-sheet.measuring-natural .lay-halocapsule,
+    .a4-sheet.measuring-natural .lay-dualstripe,
+    .a4-sheet.measuring-natural .lay-splitcurtain,
+    .a4-sheet.measuring-natural .lay-glassfloat,
+    .a4-sheet.measuring-natural .lay-sidearch {
+      height: auto !important;
+      flex: none !important;
+      justify-content: flex-start !important;
+    }
+    .a4-sheet.measuring-natural .en-body,
+    .a4-sheet.measuring-natural .lay-swissgrid,
+    .a4-sheet.measuring-natural .lay-vogueed,
+    .a4-sheet.measuring-natural .lay-bentoios,
+    .a4-sheet.measuring-natural .ts-main,
+    .a4-sheet.measuring-natural .lay-metroblock,
+    .a4-sheet.measuring-natural .lay-auroramist,
+    .a4-sheet.measuring-natural .tp-track,
+    .a4-sheet.measuring-natural .pr-body,
+    .a4-sheet.measuring-natural .hc-main,
+    .a4-sheet.measuring-natural .lay-origamifold,
+    .a4-sheet.measuring-natural .ds-body,
+    .a4-sheet.measuring-natural .spc-body,
+    .a4-sheet.measuring-natural .lay-crestcenter,
+    .a4-sheet.measuring-natural .gf-body,
+    .a4-sheet.measuring-natural .sa-main,
+    .a4-sheet.measuring-natural .lay-horizonstep {
+      flex: none !important;
+      justify-content: flex-start !important;
     }
 
     /* PRINT: every document sheet is locked to exactly one A4 page. */
@@ -1934,7 +2002,6 @@
           <button id="lay-swissgrid" type="button" class="seg-btn" onclick="setLayout('swissgrid')">Swiss Grid</button>
           <button id="lay-ribbonflag" type="button" class="seg-btn" onclick="setLayout('ribbonflag')">Ribbon Flag</button>
           <button id="lay-archwave" type="button" class="seg-btn" onclick="setLayout('archwave')">Arch Wave</button>
-          <button id="lay-slantcut" type="button" class="seg-btn" onclick="setLayout('slantcut')">Slant Cut</button>
           <button id="lay-rightside" type="button" class="seg-btn" onclick="setLayout('rightside')">Right Sidebar</button>
           <button id="lay-vogueed" type="button" class="seg-btn" onclick="setLayout('vogueed')">Vogue Editorial</button>
           <button id="lay-bentoios" type="button" class="seg-btn" onclick="setLayout('bentoios')">Bento iOS</button>
@@ -2515,7 +2582,7 @@
 
       const ALL_LAYOUTS = [
         'execnoir', 'swissgrid', 'ribbonflag', 'archwave',
-        'slantcut', 'rightside', 'vogueed', 'bentoios', 'ticketstub',
+'rightside', 'vogueed', 'bentoios', 'ticketstub',
         'metroblock', 'auroramist', 'timelinepro', 'prismrail',
         'halocapsule', 'origamifold', 'dualstripe',
         'splitcurtain', 'crestcenter', 'glassfloat', 'sidearch', 'horizonstep'
@@ -2526,7 +2593,6 @@
         swissgrid:    { name: 'Swiss Grid',       isNew: true },
         ribbonflag:   { name: 'Ribbon Flag',      isNew: true },
         archwave:     { name: 'Arch Wave',        isNew: true },
-        slantcut:     { name: 'Slant Cut',        isNew: true },
         rightside:    { name: 'Right Sidebar',    isNew: true },
         vogueed:      { name: 'Vogue Editorial',  isNew: true },
         bentoios:     { name: 'Bento iOS',        isNew: true },
@@ -2550,7 +2616,6 @@
         swissgrid:    { theme: 'graphite',   font: 'sans',         scale: 1.05 },
         ribbonflag:   { theme: 'burgundy',   font: 'montserrat',   scale: 1.05 },
         archwave:     { theme: 'cobaltGold', font: 'poppins',      scale: 1.05 },
-        slantcut:     { theme: 'velvetWine', font: 'montserrat',   scale: 1.05 },
         rightside:    { theme: 'teal',       font: 'dmsans',       scale: 1.05 },
         vogueed:      { theme: 'roseGold',   font: 'editorial',    scale: 1.05 },
         bentoios:     { theme: 'iosBlue',    font: 'jakarta',      scale: 1.05 },
@@ -2571,7 +2636,7 @@
 
       const saved = loadSaved();
       const state = {
-        layout: (saved && saved.layout && ALL_LAYOUTS.indexOf(saved.layout) !== -1) ? saved.layout : 'execnoir',
+        layout: (saved && saved.layout && saved.layout !== 'slantcut' && ALL_LAYOUTS.indexOf(saved.layout) !== -1) ? saved.layout : 'execnoir',
         customLayout: (saved && saved.customLayout) ? Object.assign({
           header: 'banner',
           structure: 'grid2',
@@ -4775,28 +4840,6 @@
               sec(5, 'Work Experience', expBlockHtml(d)) +
               sec(6, 'Achievements', achBlockHtml(d)) +
               sec(8, 'Declaration', declHtml(d)) +
-            '</div>' +
-          '</div>';
-        }
-
-        // 6. SLANT CUT (Diagonal Clipped Header + Full-Width Single-Column Flow)
-        if (activeLayout === 'slantcut') {
-          return '<div class="lay-slantcut">' +
-            '<header class="sc-banner">' +
-              '<div style="flex:1; min-width:0;">' +
-                '<div style="font-size: calc(10.5px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.2em; opacity:0.85; text-transform:uppercase;">Curriculum Vitae</div>' +
-                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:900;">' + esc(d.name) + '</h1>' +
-                '<div style="font-size: calc(12.2px * var(--fs-scale, 1)); opacity:0.92; margin-top:3px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
-              '</div>' + photoBoxHtml(d) +
-            '</header>' +
-            '<div class="sc-body">' +
-              '<div><div class="sc-tag">Career Objective</div><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div>' +
-              '<div><div class="sc-tag">Educational Qualification</div>' + eduTableHtml(d) + '</div>' +
-              '<div><div class="sc-tag">Core Skills</div>' + skillsPills + '</div>' +
-              '<div><div class="sc-tag">Work Experience</div>' + expBlockHtml(d) + '</div>' +
-              '<div><div class="sc-tag">Achievements</div>' + achBlockHtml(d) + '</div>' +
-              '<div><div class="sc-tag">Personal Details &amp; Interests</div>' + pCompact + '<div style="margin-top:4px;">' + extraPersonalKV(d) + '</div></div>' +
-              '<div><div class="sc-tag">Declaration</div>' + declHtml(d) + '</div>' +
             '</div>' +
           '</div>';
         }

@@ -461,6 +461,73 @@
       transition: none !important;
     }
 
+
+    /* DRAG-AND-DROP SECTION REORDERING */
+    .acc-card {
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease, opacity 0.18s ease, border-color 0.18s ease;
+    }
+    .acc-card.is-dragging {
+      opacity: 0.92;
+      transform: scale(1.018);
+      box-shadow: 0 14px 32px rgba(0, 122, 255, 0.20), 0 4px 12px rgba(0, 0, 0, 0.10);
+      border-color: var(--ios-blue);
+      z-index: 30;
+      position: relative;
+      background: #FFFFFF;
+    }
+    .acc-card.drag-over-top {
+      border-top: 2.5px solid var(--ios-blue);
+    }
+    .acc-card.drag-over-bottom {
+      border-bottom: 2.5px solid var(--ios-blue);
+    }
+    .acc-drag-handle {
+      width: 28px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--subtle);
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      border-radius: 8px;
+      margin-left: -4px;
+      flex-shrink: 0;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    .acc-drag-handle:hover, .acc-card.is-dragging .acc-drag-handle {
+      background: rgba(0, 122, 255, 0.10);
+      color: var(--ios-blue);
+    }
+    .acc-drag-handle:active {
+      cursor: grabbing;
+    }
+    .order-hint-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 11px;
+      background: rgba(118, 118, 128, 0.08);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .btn-reset-order {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ios-blue);
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(0, 122, 255, 0.10);
+    }
+    .btn-reset-order:active {
+      transform: scale(0.95);
+    }
+
     /* ACCORDIONS */
     .acc-card {
       background: var(--card); border-radius: 16px; border: 1px solid var(--border);
@@ -634,7 +701,6 @@
     .a4-sheet.auto-fit-compact .luxe-head { padding-bottom: 11px; }
     .a4-sheet.auto-fit-compact .lay-diplomat { padding: 20px 28px; }
     .a4-sheet.auto-fit-compact .dip-head { padding: 11px 14px; }
-    .a4-sheet.auto-fit-compact .lay-zenith { padding: 20px 26px; gap: 11px; }
     .a4-sheet.auto-fit-compact .zen-hero { padding: 17px 20px; }
     .a4-sheet.font-sans { --r-font: "Inter", var(--font-sans); }
     .a4-sheet.font-jakarta { --r-font: "Plus Jakarta Sans", var(--font-sans); }
@@ -1351,41 +1417,17 @@
     .lay-execnoir .edu-table th, .lay-execnoir .edu-table td { padding: 5px 8px; }
     .lay-execnoir .decl-footer { margin-top: 8px; }
 
-    /* 2. SWISS GRID: Left-Margin Label Column (165px) + Right Content Column */
-    .lay-swissgrid { padding: 20px 34px; display: flex; flex-direction: column; gap: 7.5px; background: #FFF; min-height: 1123px; }
-    .sg-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; padding-bottom: 10px; border-bottom: 3px solid var(--r-primary); }
-    .sg-name { font-size: calc(33px * var(--fs-scale, 1)); font-weight: 900; letter-spacing: -0.035em; color: var(--r-primary); line-height: 1.02; }
-    .sg-head .photo-frame { width: 86px; height: 86px; border-radius: 4px !important; border: 2px solid var(--r-primary) !important; }
-    .sg-row { display: grid; grid-template-columns: 155px 1fr; gap: 12px; padding-top: 5.5px; border-top: 1px solid var(--r-border); align-items: start; }
-    .sg-row:first-of-type { border-top: none; padding-top: 2px; }
-    .sg-label { font-size: calc(11px * var(--fs-scale, 1)); font-weight: 850; text-transform: uppercase; letter-spacing: 0.12em; color: var(--r-secondary); padding-top: 2px; }
-    .lay-swissgrid .edu-table th, .lay-swissgrid .edu-table td { padding: 5px 7px; }
-    .lay-swissgrid .decl-footer { margin-top: 6px; }
-
-    /* 4. RIBBON FLAG: Dark Left Sidebar + 3D Folded Overlapping Ribbon Flags */
-    .lay-ribbonflag { display: grid; grid-template-columns: 252px 1fr; min-height: 1123px; background: #F7F8FA; }
-    .rf-side { background: var(--r-primary); color: #FFF; padding: 22px 16px; display: flex; flex-direction: column; gap: 12px; }
-    .rf-side .photo-frame { width: 104px; height: 104px; border-radius: 999px !important; border: 3.5px solid var(--r-secondary) !important; margin: 0 auto; }
-    .rf-side-h { font-size: calc(11.6px * var(--fs-scale, 1)); font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; padding-bottom: 4px; border-bottom: 1.5px solid rgba(255,255,255,0.25); }
-    .rf-main { padding: 20px 24px 20px 0; display: flex; flex-direction: column; gap: 10px; }
-    .rf-flag { background: var(--r-secondary); color: #FFF; padding: 6px 18px 6px 24px; margin-left: -12px; position: relative; font-size: calc(12px * var(--fs-scale, 1)); font-weight: 850; letter-spacing: 0.07em; text-transform: uppercase; box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
-    .rf-flag::before { content: ""; position: absolute; left: 0; bottom: -9px; border-top: 9px solid rgba(0,0,0,0.45); border-left: 12px solid transparent; }
-    .rf-body { padding-left: 20px; padding-top: 5px; }
-    .lay-ribbonflag .edu-table th, .lay-ribbonflag .edu-table td { padding: 5px 7px; }
-    .lay-ribbonflag .decl-footer { margin-top: 8px; }
-
-    /* 5. ARCH WAVE: Curved S-Wave Left Panel + Inverted Pill Tabs */
-    .lay-archwave { display: grid; grid-template-columns: 252px 1fr; min-height: 1123px; background: #FFF; border-top: 10px solid var(--r-primary); }
-    .awv-side { background: var(--r-primary); color: #FFF; padding: 20px 16px; border-radius: 0 0 85px 0; display: flex; flex-direction: column; gap: 12px; }
-    .awv-ring { width: 114px; height: 114px; border-radius: 999px; background: var(--r-secondary); padding: 5px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
-    .awv-ring .photo-frame { width: 102px; height: 102px; border-radius: 999px !important; border: 3px solid #FFF !important; }
-    .awv-tab { background: #FFF; color: var(--r-primary); font-weight: 850; font-size: calc(11.4px * var(--fs-scale, 1)); padding: 4px 12px; border-radius: 999px 0 0 999px; margin-right: -16px; text-transform: uppercase; letter-spacing: 0.06em; }
-    .awv-main { padding: 20px 26px; display: flex; flex-direction: column; gap: 10px; }
-    .awv-title { text-align: center; padding-bottom: 8px; border-bottom: 2px solid var(--r-primary); }
-    .awv-title h1 { font-size: calc(27px * var(--fs-scale, 1)); font-weight: 900; color: var(--r-primary); text-transform: uppercase; letter-spacing: 0.03em; }
-    .lay-archwave .cv-sec-head { border-bottom: 1.5px solid var(--r-secondary); margin-bottom: 4px; padding-bottom: 2px; font-size: calc(12px * var(--fs-scale, 1)); }
-    .lay-archwave .edu-table th, .lay-archwave .edu-table td { padding: 5px 7px; }
-    .lay-archwave .decl-footer { margin-top: 8px; }
+    /* 2. MONOLITH LUXE: Double-Line Editorial Frame + Centered Crest Header + Diamond Section Rules */
+    .lay-monolith { padding: 16px; background: #FFF; min-height: 1123px; display: flex; flex-direction: column; }
+    .ml-frame { border: 2px solid var(--r-primary); outline: 1px solid var(--r-secondary); outline-offset: -6px; padding: 18px 26px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 7px; }
+    .ml-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--r-primary); }
+    .ml-head .photo-frame { width: 88px; height: 88px; border-radius: 12px !important; border: 2.5px solid var(--r-secondary) !important; }
+    .ml-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .ml-h { display: flex; align-items: center; gap: 8px; font-size: calc(11.6px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary); text-transform: uppercase; letter-spacing: 0.11em; margin-bottom: 5px; }
+    .ml-h::after { content: ""; flex: 1; height: 1px; background: var(--r-border); }
+    .ml-diamond { width: 7px; height: 7px; background: var(--r-secondary); transform: rotate(45deg); flex-shrink: 0; }
+    .lay-monolith .edu-table th, .lay-monolith .edu-table td { padding: 4.5px 7px; }
+    .lay-monolith .decl-footer { margin-top: 6px; }
 
     /* 7. RIGHT SIDEBAR PRO: Content on Left (68%) + Soft Tinted Sidebar on Right (32%) */
     .lay-rightside { display: grid; grid-template-columns: 1fr 252px; min-height: 1123px; background: #FFF; }
@@ -1435,15 +1477,15 @@
     .lay-ticketstub .edu-table th, .lay-ticketstub .edu-table td { padding: 5px 8px; }
     .lay-ticketstub .decl-footer { margin-top: 8px; }
 
-    /* 11. METRO BLOCK: Bold Solid Color-Blocked Header + Numbered Solid Primary Section Bars */
-    .lay-metroblock { padding: 18px 32px; display: flex; flex-direction: column; gap: 8px; background: #FFF; min-height: 1123px; }
-    .mb-top { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: stretch; }
-    .mb-id { background: var(--r-primary); color: #FFF; padding: 15px 20px; border-radius: 6px; border-bottom: 5px solid var(--r-secondary); display: flex; flex-direction: column; justify-content: center; }
-    .mb-top .photo-frame { width: 92px; height: 104px; border-radius: 6px !important; border: 2.5px solid var(--r-primary) !important; }
-    .mb-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .mb-h { background: var(--r-primary); color: #FFF; padding: 4px 10px; border-radius: 4px; font-size: calc(11.8px * var(--fs-scale, 1)); font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
-    .lay-metroblock .edu-table th, .lay-metroblock .edu-table td { padding: 5px 8px; }
-    .lay-metroblock .decl-footer { margin-top: 8px; }
+    /* 11. ATELIER NORDIC: Soft Tinted Header Card + Minimalist Hairline Dividers + Airy Two-Column */
+    .lay-atelier { padding: 20px 34px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; background: #FFF; min-height: 1123px; border-top: 6px solid var(--r-secondary); }
+    .at-head { background: var(--r-tint); border-radius: 20px; padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+    .at-head .photo-frame { width: 92px; height: 92px; border-radius: 999px !important; border: 3px solid #FFF !important; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .at-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .at-h { font-size: calc(11.6px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary); text-transform: uppercase; letter-spacing: 0.12em; padding-bottom: 4px; border-bottom: 1.5px solid var(--r-border); margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
+    .at-h span.at-dot { width: 6px; height: 6px; border-radius: 99px; background: var(--r-secondary); }
+    .lay-atelier .edu-table th, .lay-atelier .edu-table td { padding: 5px 8px; }
+    .lay-atelier .decl-footer { margin-top: 6px; }
 
     /* 12. AURORA MIST: Top/Bottom Gradient Band + Single-Column Airy Editorial Flow */
     .lay-auroramist { padding: 18px 34px; display: flex; flex-direction: column; gap: 7px; background: linear-gradient(180deg, var(--r-tint) 0%, #FFFFFF 30%, #FFFFFF 100%); min-height: 1123px; border-bottom: 8px solid var(--r-secondary); }
@@ -1476,17 +1518,6 @@
     .pr-h { background: var(--r-tint); color: var(--r-primary); border-left: 4px solid var(--r-primary); padding: 4px 10px; font-size: calc(11.8px * var(--fs-scale, 1)); font-weight: 850; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px; }
     .lay-prismrail .edu-table th, .lay-prismrail .edu-table td { padding: 5px 8px; }
     .lay-prismrail .decl-footer { margin-top: 8px; }
-
-    /* 17. HALO CAPSULE: Detached Floating Dark Rounded-Pill Sidebar on Soft Tinted Canvas */
-    .lay-halocapsule { padding: 18px 22px; display: grid; grid-template-columns: 248px 1fr; gap: 18px; min-height: 1123px; background: #F5F7FA; }
-    .hc-pill-side { background: var(--r-primary); color: #FFF; border-radius: 26px; padding: 20px 15px; display: flex; flex-direction: column; gap: 11px; box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
-    .hc-pill-side .photo-frame { width: 102px; height: 102px; border-radius: 999px !important; border: 3.5px solid var(--r-secondary) !important; margin: 0 auto; }
-    .hc-badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.28); color: #FFF; font-weight: 800; font-size: calc(10.8px * var(--fs-scale, 1)); text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 999px; display: inline-block; margin-bottom: 4px; }
-    .hc-main { padding: 4px; display: flex; flex-direction: column; gap: 10px; }
-    .hc-banner { background: #FFF; border-radius: 18px; padding: 14px 18px; border: 1px solid var(--r-border); border-bottom: 4px solid var(--r-secondary); }
-    .hc-h { font-size: calc(12px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary); text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1.5px solid var(--r-secondary); padding-bottom: 3px; margin-bottom: 5px; }
-    .lay-halocapsule .edu-table th, .lay-halocapsule .edu-table td { padding: 5px 7px; }
-    .lay-halocapsule .decl-footer { margin-top: 8px; }
 
     /* 18. ORIGAMI FOLD: Notched-Corner Identity Block + Pointed Flag Headers + Right Gutter */
     .lay-origamifold { padding: 18px 28px; display: flex; flex-direction: column; gap: 8px; background: #FFF; min-height: 1123px; border-right: 10px solid var(--r-secondary); }
@@ -1540,17 +1571,6 @@
     .lay-glassfloat .edu-table th, .lay-glassfloat .edu-table td { padding: 5px 8px; }
     .lay-glassfloat .decl-footer { margin-top: 8px; }
 
-    /* 24. SIDE ARCH: Curved Top-Right Tinted Sidebar + Capsule Outlined Headings */
-    .lay-sidearch { display: grid; grid-template-columns: 252px 1fr; min-height: 1123px; background: #FFF; }
-    .sa-side { background: var(--r-tint); border-right: 2px solid var(--r-secondary); border-radius: 0 42px 0 0; padding: 22px 16px; display: flex; flex-direction: column; gap: 12px; }
-    .sa-side .photo-frame { width: 104px; height: 104px; border-radius: 999px !important; border: 3.5px solid var(--r-primary) !important; margin: 0 auto; }
-    .sa-cap { border: 1.5px solid var(--r-primary); color: var(--r-primary); border-radius: 999px; padding: 3px 11px; font-size: calc(11.2px * var(--fs-scale, 1)); font-weight: 850; text-transform: uppercase; letter-spacing: 0.07em; display: inline-block; margin-bottom: 5px; }
-    .sa-main { padding: 22px 26px; display: flex; flex-direction: column; gap: 10px; }
-    .sa-hero { background: var(--r-primary); color: #FFF; padding: 15px 20px; border-radius: 14px; }
-    .sa-h { font-size: calc(12px * var(--fs-scale, 1)); font-weight: 850; color: var(--r-primary); text-transform: uppercase; letter-spacing: 0.07em; border-bottom: 1.5px solid var(--r-secondary); padding-bottom: 3px; margin-bottom: 5px; }
-    .lay-sidearch .edu-table th, .lay-sidearch .edu-table td { padding: 5px 7px; }
-    .lay-sidearch .decl-footer { margin-top: 8px; }
-
     /* 25. HORIZON STEP: Numbered Circular Step Badges + Dashed Horizon Dividers */
     .lay-horizonstep { padding: 18px 32px; display: flex; flex-direction: column; gap: 8px; background: #FFF; min-height: 1123px; border-bottom: 7px solid var(--r-primary); }
     .hs-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 18px; background: var(--r-tint); border-radius: 16px; border: 1px solid var(--r-border); }
@@ -1563,24 +1583,20 @@
 
     /* Measuring natural height overrides for all 25 unique layouts */
     .a4-sheet.measuring-natural .lay-execnoir,
-    .a4-sheet.measuring-natural .lay-swissgrid,
-    .a4-sheet.measuring-natural .lay-ribbonflag,
-    .a4-sheet.measuring-natural .lay-archwave,
+    .a4-sheet.measuring-natural .lay-monolith,
     .a4-sheet.measuring-natural .lay-rightside,
     .a4-sheet.measuring-natural .lay-vogueed,
     .a4-sheet.measuring-natural .lay-bentoios,
     .a4-sheet.measuring-natural .lay-ticketstub,
-    .a4-sheet.measuring-natural .lay-metroblock,
+    .a4-sheet.measuring-natural .lay-atelier,
     .a4-sheet.measuring-natural .lay-auroramist,
     .a4-sheet.measuring-natural .lay-timelinepro,
     .a4-sheet.measuring-natural .lay-prismrail,
-    .a4-sheet.measuring-natural .lay-halocapsule,
     .a4-sheet.measuring-natural .lay-origamifold,
     .a4-sheet.measuring-natural .lay-dualstripe,
     .a4-sheet.measuring-natural .lay-splitcurtain,
     .a4-sheet.measuring-natural .lay-crestcenter,
     .a4-sheet.measuring-natural .lay-glassfloat,
-    .a4-sheet.measuring-natural .lay-sidearch,
     .a4-sheet.measuring-natural .lay-horizonstep,
     .a4-sheet.measuring-natural .cl-wrap {
       min-height: 0 !important;
@@ -1589,21 +1605,19 @@
 
     /* Full-page A4 vertical balance for layouts */
     .lay-execnoir .en-body,
-    .lay-swissgrid,
+    .lay-monolith .ml-frame,
     .lay-vogueed,
     .lay-bentoios,
     .lay-ticketstub .ts-main,
-    .lay-metroblock,
+    .lay-atelier,
     .lay-auroramist,
     .lay-timelinepro .tp-track,
     .lay-prismrail .pr-body,
-    .lay-halocapsule .hc-main,
     .lay-origamifold,
     .lay-dualstripe .ds-body,
     .lay-splitcurtain .spc-body,
     .lay-crestcenter,
     .lay-glassfloat .gf-body,
-    .lay-sidearch .sa-main,
     .lay-horizonstep {
       flex: 1;
       justify-content: space-between;
@@ -1612,42 +1626,36 @@
     .lay-ticketstub,
     .lay-timelinepro,
     .lay-prismrail,
-    .lay-halocapsule,
     .lay-dualstripe,
     .lay-splitcurtain,
-    .lay-glassfloat,
-    .lay-sidearch {
+    .lay-glassfloat {
       height: 1123px;
     }
     .a4-sheet.measuring-natural .lay-execnoir,
     .a4-sheet.measuring-natural .lay-ticketstub,
     .a4-sheet.measuring-natural .lay-timelinepro,
     .a4-sheet.measuring-natural .lay-prismrail,
-    .a4-sheet.measuring-natural .lay-halocapsule,
     .a4-sheet.measuring-natural .lay-dualstripe,
     .a4-sheet.measuring-natural .lay-splitcurtain,
-    .a4-sheet.measuring-natural .lay-glassfloat,
-    .a4-sheet.measuring-natural .lay-sidearch {
+    .a4-sheet.measuring-natural .lay-glassfloat {
       height: auto !important;
       flex: none !important;
       justify-content: flex-start !important;
     }
     .a4-sheet.measuring-natural .en-body,
-    .a4-sheet.measuring-natural .lay-swissgrid,
+    .a4-sheet.measuring-natural .lay-monolith,
     .a4-sheet.measuring-natural .lay-vogueed,
     .a4-sheet.measuring-natural .lay-bentoios,
     .a4-sheet.measuring-natural .ts-main,
-    .a4-sheet.measuring-natural .lay-metroblock,
+    .a4-sheet.measuring-natural .lay-atelier,
     .a4-sheet.measuring-natural .lay-auroramist,
     .a4-sheet.measuring-natural .tp-track,
     .a4-sheet.measuring-natural .pr-body,
-    .a4-sheet.measuring-natural .hc-main,
     .a4-sheet.measuring-natural .lay-origamifold,
     .a4-sheet.measuring-natural .ds-body,
     .a4-sheet.measuring-natural .spc-body,
     .a4-sheet.measuring-natural .lay-crestcenter,
     .a4-sheet.measuring-natural .gf-body,
-    .a4-sheet.measuring-natural .sa-main,
     .a4-sheet.measuring-natural .lay-horizonstep {
       flex: none !important;
       justify-content: flex-start !important;
@@ -1791,12 +1799,16 @@
       </div>
 
       <!-- CV EDITOR SECTIONS -->
+      <div id="cv-order-bar" class="order-hint-bar">
+        <span>Hold &amp; drag <strong>⋮⋮</strong> to reorder CV sections</span>
+        <button id="btn-reset-sec-order" type="button" class="btn-reset-order hidden" onclick="resetSectionOrder()">Reset Order</button>
+      </div>
       <div id="cv-editor-group" style="display:flex; flex-direction:column; gap:10px;">
 
         <!-- 1. Personal Details -->
-        <div id="acc-1" class="acc-card open">
+        <div id="acc-1" data-sec-id="1" class="acc-card open">
           <button type="button" class="acc-trigger" onclick="toggleAcc('acc-1')">
-            <div class="acc-left"><span class="acc-num">1</span><span class="acc-title">Personal Details &amp; Photo <span class="req-star">*</span></span></div>
+            <div class="acc-left"><span class="acc-drag-handle" title="Hold &amp; drag to reorder" aria-label="Hold and drag to reorder"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="5.5" cy="3.5" r="1.2"/><circle cx="10.5" cy="3.5" r="1.2"/><circle cx="5.5" cy="8" r="1.2"/><circle cx="10.5" cy="8" r="1.2"/><circle cx="5.5" cy="12.5" r="1.2"/><circle cx="10.5" cy="12.5" r="1.2"/></svg></span><span class="acc-num">1</span><span class="acc-title">Personal Details &amp; Photo <span class="req-star">*</span></span></div>
             <span class="acc-chevron">▾</span>
           </button>
           <div class="acc-body"><div class="acc-inner">
@@ -1865,9 +1877,9 @@
         </div>
 
         <!-- 2. Career Objective -->
-        <div id="acc-2" class="acc-card">
+        <div id="acc-2" data-sec-id="2" class="acc-card">
           <button type="button" class="acc-trigger" onclick="toggleAcc('acc-2')">
-            <div class="acc-left"><span class="acc-num">2</span><span class="acc-title">Career Objective</span></div>
+            <div class="acc-left"><span class="acc-drag-handle" title="Hold &amp; drag to reorder" aria-label="Hold and drag to reorder"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="5.5" cy="3.5" r="1.2"/><circle cx="10.5" cy="3.5" r="1.2"/><circle cx="5.5" cy="8" r="1.2"/><circle cx="10.5" cy="8" r="1.2"/><circle cx="5.5" cy="12.5" r="1.2"/><circle cx="10.5" cy="12.5" r="1.2"/></svg></span><span class="acc-num">2</span><span class="acc-title">Career Objective</span></div>
             <span class="acc-chevron">▾</span>
           </button>
           <div class="acc-body"><div class="acc-inner">
@@ -1876,9 +1888,9 @@
         </div>
 
         <!-- 3. Educational Qualification -->
-        <div id="acc-3" class="acc-card">
+        <div id="acc-3" data-sec-id="3" class="acc-card">
           <button type="button" class="acc-trigger" onclick="toggleAcc('acc-3')">
-            <div class="acc-left"><span class="acc-num">3</span><span class="acc-title">Educational Qualification <span class="req-star">*</span></span></div>
+            <div class="acc-left"><span class="acc-drag-handle" title="Hold &amp; drag to reorder" aria-label="Hold and drag to reorder"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="5.5" cy="3.5" r="1.2"/><circle cx="10.5" cy="3.5" r="1.2"/><circle cx="5.5" cy="8" r="1.2"/><circle cx="10.5" cy="8" r="1.2"/><circle cx="5.5" cy="12.5" r="1.2"/><circle cx="10.5" cy="12.5" r="1.2"/></svg></span><span class="acc-num">3</span><span class="acc-title">Educational Qualification <span class="req-star">*</span></span></div>
             <span class="acc-chevron">▾</span>
           </button>
           <div class="acc-body"><div class="acc-inner">
@@ -1888,9 +1900,9 @@
         </div>
 
         <!-- 4. Skills -->
-        <div id="acc-4" class="acc-card">
+        <div id="acc-4" data-sec-id="4" class="acc-card">
           <button type="button" class="acc-trigger" onclick="toggleAcc('acc-4')">
-            <div class="acc-left"><span class="acc-num">4</span><span class="acc-title">Skills</span></div>
+            <div class="acc-left"><span class="acc-drag-handle" title="Hold &amp; drag to reorder" aria-label="Hold and drag to reorder"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="5.5" cy="3.5" r="1.2"/><circle cx="10.5" cy="3.5" r="1.2"/><circle cx="5.5" cy="8" r="1.2"/><circle cx="10.5" cy="8" r="1.2"/><circle cx="5.5" cy="12.5" r="1.2"/><circle cx="10.5" cy="12.5" r="1.2"/></svg></span><span class="acc-num">4</span><span class="acc-title">Skills</span></div>
             <span class="acc-chevron">▾</span>
           </button>
           <div class="acc-body"><div class="acc-inner">
@@ -1903,9 +1915,9 @@
         </div>
 
         <!-- 5. Experience -->
-        <div id="acc-5" class="acc-card">
+        <div id="acc-5" data-sec-id="5" class="acc-card">
           <button type="button" class="acc-trigger" onclick="toggleAcc('acc-5')">
-            <div class="acc-left"><span class="acc-num">5</span><span class="acc-title">Experience / Fresher <span class="req-star">*</span></span></div>
+            <div class="acc-left"><span class="acc-drag-handle" title="Hold &amp; drag to reorder" aria-label="Hold and drag to reorder"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="5.5" cy="3.5" r="1.2"/><circle cx="10.5" cy="3.5" r="1.2"/><circle cx="5.5" cy="8" r="1.2"/><circle cx="10.5" cy="8" r="1.2"/><circle cx="5.5" cy="12.5" r="1.2"/><circle cx="10.5" cy="12.5" r="1.2"/></svg></span><span class="acc-num">5</span><span class="acc-title">Experience / Fresher <span class="req-star">*</span></span></div>
             <span class="acc-chevron">▾</span>
           </button>
           <div class="acc-body"><div class="acc-inner">
@@ -1925,9 +1937,9 @@
         </div>
 
         <!-- 6. Achievements -->
-        <div id="acc-6" class="acc-card">
+        <div id="acc-6" data-sec-id="6" class="acc-card">
           <button type="button" class="acc-trigger" onclick="toggleAcc('acc-6')">
-            <div class="acc-left"><span class="acc-num">6</span><span class="acc-title">Achievements</span></div>
+            <div class="acc-left"><span class="acc-drag-handle" title="Hold &amp; drag to reorder" aria-label="Hold and drag to reorder"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="5.5" cy="3.5" r="1.2"/><circle cx="10.5" cy="3.5" r="1.2"/><circle cx="5.5" cy="8" r="1.2"/><circle cx="10.5" cy="8" r="1.2"/><circle cx="5.5" cy="12.5" r="1.2"/><circle cx="10.5" cy="12.5" r="1.2"/></svg></span><span class="acc-num">6</span><span class="acc-title">Achievements</span></div>
             <span class="acc-chevron">▾</span>
           </button>
           <div class="acc-body"><div class="acc-inner">
@@ -1937,9 +1949,9 @@
         </div>
 
         <!-- 7. Hobbies, Interest & Strengths -->
-        <div id="acc-7" class="acc-card">
+        <div id="acc-7" data-sec-id="7" class="acc-card">
           <button type="button" class="acc-trigger" onclick="toggleAcc('acc-7')">
-            <div class="acc-left"><span class="acc-num">7</span><span class="acc-title">Hobbies, Interest &amp; Strengths</span></div>
+            <div class="acc-left"><span class="acc-drag-handle" title="Hold &amp; drag to reorder" aria-label="Hold and drag to reorder"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="5.5" cy="3.5" r="1.2"/><circle cx="10.5" cy="3.5" r="1.2"/><circle cx="5.5" cy="8" r="1.2"/><circle cx="10.5" cy="8" r="1.2"/><circle cx="5.5" cy="12.5" r="1.2"/><circle cx="10.5" cy="12.5" r="1.2"/></svg></span><span class="acc-num">7</span><span class="acc-title">Hobbies, Interest &amp; Strengths</span></div>
             <span class="acc-chevron">▾</span>
           </button>
           <div class="acc-body"><div class="acc-inner">
@@ -1950,9 +1962,9 @@
         </div>
 
         <!-- 8. Declaration -->
-        <div id="acc-8" class="acc-card">
+        <div id="acc-8" data-sec-id="8" class="acc-card">
           <button type="button" class="acc-trigger" onclick="toggleAcc('acc-8')">
-            <div class="acc-left"><span class="acc-num">8</span><span class="acc-title">Declaration &amp; Signature</span></div>
+            <div class="acc-left"><span class="acc-drag-handle" title="Hold &amp; drag to reorder" aria-label="Hold and drag to reorder"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="5.5" cy="3.5" r="1.2"/><circle cx="10.5" cy="3.5" r="1.2"/><circle cx="5.5" cy="8" r="1.2"/><circle cx="10.5" cy="8" r="1.2"/><circle cx="5.5" cy="12.5" r="1.2"/><circle cx="10.5" cy="12.5" r="1.2"/></svg></span><span class="acc-num">8</span><span class="acc-title">Declaration &amp; Signature</span></div>
             <span class="acc-chevron">▾</span>
           </button>
           <div class="acc-body"><div class="acc-inner">
@@ -1999,24 +2011,20 @@
         <!-- 21 Aesthetic Premium Layouts -->
         <div id="layout-pill-strip" class="pill-strip no-scrollbar" role="radiogroup" aria-label="Layouts">
           <button id="lay-execnoir" type="button" class="seg-btn active" onclick="setLayout('execnoir')">Noir Executive</button>
-          <button id="lay-swissgrid" type="button" class="seg-btn" onclick="setLayout('swissgrid')">Swiss Grid</button>
-          <button id="lay-ribbonflag" type="button" class="seg-btn" onclick="setLayout('ribbonflag')">Ribbon Flag</button>
-          <button id="lay-archwave" type="button" class="seg-btn" onclick="setLayout('archwave')">Arch Wave</button>
+          <button id="lay-monolith" type="button" class="seg-btn" onclick="setLayout('monolith')">Monolith Luxe</button>
           <button id="lay-rightside" type="button" class="seg-btn" onclick="setLayout('rightside')">Right Sidebar</button>
           <button id="lay-vogueed" type="button" class="seg-btn" onclick="setLayout('vogueed')">Vogue Editorial</button>
           <button id="lay-bentoios" type="button" class="seg-btn" onclick="setLayout('bentoios')">Bento iOS</button>
           <button id="lay-ticketstub" type="button" class="seg-btn" onclick="setLayout('ticketstub')">Ticket Stub</button>
-          <button id="lay-metroblock" type="button" class="seg-btn" onclick="setLayout('metroblock')">Metro Block</button>
+          <button id="lay-atelier" type="button" class="seg-btn" onclick="setLayout('atelier')">Atelier Nordic</button>
           <button id="lay-auroramist" type="button" class="seg-btn" onclick="setLayout('auroramist')">Aurora Mist</button>
           <button id="lay-timelinepro" type="button" class="seg-btn" onclick="setLayout('timelinepro')">Timeline Pro</button>
           <button id="lay-prismrail" type="button" class="seg-btn" onclick="setLayout('prismrail')">Prism Rail</button>
-          <button id="lay-halocapsule" type="button" class="seg-btn" onclick="setLayout('halocapsule')">Halo Capsule</button>
           <button id="lay-origamifold" type="button" class="seg-btn" onclick="setLayout('origamifold')">Origami Fold</button>
           <button id="lay-dualstripe" type="button" class="seg-btn" onclick="setLayout('dualstripe')">Dual Stripe</button>
           <button id="lay-splitcurtain" type="button" class="seg-btn" onclick="setLayout('splitcurtain')">Split Curtain</button>
           <button id="lay-crestcenter" type="button" class="seg-btn" onclick="setLayout('crestcenter')">Crest Center</button>
           <button id="lay-glassfloat" type="button" class="seg-btn" onclick="setLayout('glassfloat')">Glass Float</button>
-          <button id="lay-sidearch" type="button" class="seg-btn" onclick="setLayout('sidearch')">Side Arch</button>
           <button id="lay-horizonstep" type="button" class="seg-btn" onclick="setLayout('horizonstep')">Horizon Step</button>
         </div>
 
@@ -2029,11 +2037,11 @@
           <div class="color-pick-group">
             <label class="color-pick-item">
               <span>Primary</span>
-              <input id="pick-primary" type="color" value="#1B2A4A" oninput="applyCustomColors()" />
+              <input id="pick-primary" type="color" value="#7F1D1D" oninput="applyCustomColors()" />
             </label>
             <label class="color-pick-item">
               <span>Accent</span>
-              <input id="pick-secondary" type="color" value="#4A6FA5" oninput="applyCustomColors()" />
+              <input id="pick-secondary" type="color" value="#F43F5E" oninput="applyCustomColors()" />
             </label>
           </div>
         </div>
@@ -2197,7 +2205,7 @@
         <button id="pay-opt-cv" type="button" class="pay-opt" onclick="selectPayTier('cv')">
           <div>
             <div class="pay-opt-title">Resume / CV Only</div>
-            <div class="pay-opt-sub">1-Page Clean A4 PDF (All 20 Layouts)</div>
+            <div class="pay-opt-sub">1-Page Clean A4 PDF (All 16 Layouts)</div>
           </div>
           <div class="pay-opt-price">₹19</div>
         </button>
@@ -2581,56 +2589,48 @@
       }
 
       const ALL_LAYOUTS = [
-        'execnoir', 'swissgrid', 'ribbonflag', 'archwave',
-'rightside', 'vogueed', 'bentoios', 'ticketstub',
-        'metroblock', 'auroramist', 'timelinepro', 'prismrail',
-        'halocapsule', 'origamifold', 'dualstripe',
-        'splitcurtain', 'crestcenter', 'glassfloat', 'sidearch', 'horizonstep'
+        'execnoir', 'monolith',
+        'rightside', 'vogueed', 'bentoios', 'ticketstub',
+        'atelier', 'auroramist', 'timelinepro', 'prismrail',
+        'origamifold', 'dualstripe',
+        'splitcurtain', 'crestcenter', 'glassfloat', 'horizonstep'
       ];
 
       const LAYOUT_META = {
         execnoir:     { name: 'Noir Executive',   isNew: true },
-        swissgrid:    { name: 'Swiss Grid',       isNew: true },
-        ribbonflag:   { name: 'Ribbon Flag',      isNew: true },
-        archwave:     { name: 'Arch Wave',        isNew: true },
+        monolith:     { name: 'Monolith Luxe',    isNew: true },
         rightside:    { name: 'Right Sidebar',    isNew: true },
         vogueed:      { name: 'Vogue Editorial',  isNew: true },
         bentoios:     { name: 'Bento iOS',        isNew: true },
         ticketstub:   { name: 'Ticket Stub',      isNew: true },
-        metroblock:   { name: 'Metro Block',      isNew: true },
+        atelier:      { name: 'Atelier Nordic',   isNew: true },
         auroramist:   { name: 'Aurora Mist',      isNew: true },
         timelinepro:  { name: 'Timeline Pro',     isNew: true },
         prismrail:    { name: 'Prism Rail',       isNew: true },
-        halocapsule:  { name: 'Halo Capsule',     isNew: true },
         origamifold:  { name: 'Origami Fold',     isNew: true },
         dualstripe:   { name: 'Dual Stripe',      isNew: true },
         splitcurtain: { name: 'Split Curtain',    isNew: true },
         crestcenter:  { name: 'Crest Center',     isNew: true },
         glassfloat:   { name: 'Glass Float',      isNew: true },
-        sidearch:     { name: 'Side Arch',        isNew: true },
         horizonstep:  { name: 'Horizon Step',     isNew: true }
       };
 
       const LAYOUT_SMART_PRESETS = {
-        execnoir:     { theme: 'midnight',   font: 'jakarta',      scale: 1.05 },
-        swissgrid:    { theme: 'graphite',   font: 'sans',         scale: 1.05 },
-        ribbonflag:   { theme: 'burgundy',   font: 'montserrat',   scale: 1.05 },
-        archwave:     { theme: 'cobaltGold', font: 'poppins',      scale: 1.05 },
+        execnoir:     { theme: 'burgundy',   font: 'jakarta',      scale: 1.05 },
+        monolith:     { theme: 'cobaltGold', font: 'editorial',    scale: 1.05 },
         rightside:    { theme: 'teal',       font: 'dmsans',       scale: 1.05 },
         vogueed:      { theme: 'roseGold',   font: 'editorial',    scale: 1.05 },
         bentoios:     { theme: 'iosBlue',    font: 'jakarta',      scale: 1.05 },
         ticketstub:   { theme: 'terracotta', font: 'jakarta',      scale: 1.05 },
-        metroblock:   { theme: 'slateCyan',  font: 'montserrat',   scale: 1.05 },
+        atelier:      { theme: 'nordicSand', font: 'dmsans',       scale: 1.05 },
         auroramist:   { theme: 'indigo',     font: 'lato',         scale: 1.05 },
         timelinepro:  { theme: 'teal',       font: 'dmsans',       scale: 1.05 },
         prismrail:    { theme: 'plum',       font: 'poppins',      scale: 1.05 },
-        halocapsule:  { theme: 'midnight',   font: 'dmsans',       scale: 1.05 },
         origamifold:  { theme: 'emerald',    font: 'montserrat',   scale: 1.05 },
         dualstripe:   { theme: 'iosBlue',    font: 'lato',         scale: 1.05 },
         splitcurtain: { theme: 'cobaltGold', font: 'jakarta',      scale: 1.05 },
         crestcenter:  { theme: 'roseGold',   font: 'lora',         scale: 1.05 },
         glassfloat:   { theme: 'plum',       font: 'poppins',      scale: 1.05 },
-        sidearch:     { theme: 'oliveMoss',  font: 'jakarta',      scale: 1.05 },
         horizonstep:  { theme: 'terracotta', font: 'poppins',      scale: 1.05 }
       };
 
@@ -2650,12 +2650,13 @@
           frame: 'topaccent',
           skills: 'pills'
         },
-        theme: (saved && (THEMES[saved.theme] || saved.theme === 'custom')) ? saved.theme : 'midnight',
+        theme: (saved && (THEMES[saved.theme] || saved.theme === 'custom')) ? saved.theme : 'burgundy',
         customTheme: (saved && saved.customTheme) ? saved.customTheme : { primary: '#1B2A4A', secondary: '#4A6FA5' },
         fontMode: (saved && (saved.fontMode === 'single' || saved.fontMode === 'combine')) ? saved.fontMode : 'single',
         fontPair: (saved && saved.fontPair) || 'editorialJakartaMono',
         font: (saved && saved.font) || 'sans',
         fontScale: (saved && typeof saved.fontScale === 'number' && saved.fontScale >= 0.75 && saved.fontScale <= 1.45) ? saved.fontScale : 1,
+        sectionOrder: (saved && Array.isArray(saved.sectionOrder) && saved.sectionOrder.length === 8) ? saved.sectionOrder : [1, 2, 3, 4, 5, 6, 7, 8],
         docMode: (saved && saved.docMode) || 'cv',
         mobileView: 'edit',
         editTab: 'cv',
@@ -3556,6 +3557,8 @@
         document.getElementById('edit-mode-cv').classList.toggle('active', t === 'cv');
         document.getElementById('edit-mode-cl').classList.toggle('active', t === 'cl');
         document.getElementById('cv-editor-group').classList.toggle('hidden', t !== 'cv');
+        const ob = document.getElementById('cv-order-bar');
+        if (ob) ob.classList.toggle('hidden', t !== 'cv');
         document.getElementById('cl-editor-group').classList.toggle('hidden', t !== 'cl');
         updateProgressBar();
       };
@@ -4513,7 +4516,7 @@
         ctx.font = '800 17px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
         ctx.fillText('SCAN TO CREATE CV', W / 2, cardY + 441);
 
-        const pills = ['25 Layouts', 'Custom Colors', 'Instant A4 PDF'];
+        const pills = ['16 Layouts', 'Custom Colors', 'Instant A4 PDF'];
         const pW = 172, pGap = 14;
         const startX = (W - (pW * 3 + pGap * 2)) / 2;
         pills.forEach(function (label, idx) {
@@ -4621,7 +4624,7 @@
 
       window.shareStudioWhatsApp = function () {
         const url = getStudioShareUrl();
-        const msg = '*BikriPage Smart CV Studio*\n\nApna professional Resume & Covering Letter 2 minute me banayein (25 Layouts + 12 Aesthetic Colors):\n' + url;
+        const msg = '*BikriPage Smart CV Studio*\n\nApna professional Resume & Covering Letter 2 minute me banayein (16 Layouts + Custom Colors):\n' + url;
         window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
       };
 
@@ -4780,66 +4783,31 @@
           '</div>';
         }
 
-        // 2. SWISS GRID (3-Zone Left-Label / Right-Content Architectural Grid)
-        if (activeLayout === 'swissgrid') {
-          const row = function (lbl, body) {
-            return '<div class="sg-row"><div class="sg-label">' + lbl + '</div><div>' + body + '</div></div>';
-          };
-          return '<div class="lay-swissgrid">' +
-            '<header class="sg-head">' +
-              '<div style="flex:1; min-width:0;">' +
-                '<div style="font-size: calc(10.5px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.22em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
-                '<div class="sg-name">' + esc(d.name) + '</div>' +
-                '<div style="font-size: calc(12.2px * var(--fs-scale, 1)); color:var(--r-muted); margin-top:4px;">' + esc(d.phone) + ' &nbsp;/&nbsp; ' + esc(d.email) + ' &nbsp;/&nbsp; ' + esc(d.address) + '</div>' +
-              '</div>' + photoBoxHtml(d) +
-            '</header>' +
-            row('01 / Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
-            row('02 / Profile', pCompact) +
-            row('03 / Education', eduTableHtml(d)) +
-            row('04 / Skills', skillsPills) +
-            row('05 / Experience', expBlockHtml(d)) +
-            row('06 / Achievements', achBlockHtml(d)) +
-            row('07 / Personal', extraPersonalKV(d)) +
-            row('08 / Declaration', declHtml(d)) +
-          '</div>';
-        }
-
-        // 4. RIBBON FLAG
-        if (activeLayout === 'ribbonflag') {
-          return '<div class="lay-ribbonflag">' +
-            '<aside class="rf-side u-wrap-safe">' +
-              photoBoxHtml(d) +
-              '<div style="text-align:center;"><h1 style="font-size: calc(21px * var(--fs-scale, 1)); font-weight:900; text-transform:uppercase;">' + esc(d.name) + '</h1><div style="font-size: calc(11px * var(--fs-scale, 1)); opacity:0.85; margin-top:2px;">' + esc(d.interest || 'Curriculum Vitae') + '</div></div>' +
-              '<div><div class="rf-side-h">Contact</div><div style="margin-top:6px;">' + sideContactHtml + '</div></div>' +
-              '<div><div class="rf-side-h">Skills</div><div style="margin-top:6px;">' + whiteBullets + '</div></div>' +
-              '<div><div class="rf-side-h">Interests</div><div style="margin-top:6px;">' + sideInterestHtml + '</div></div>' +
-            '</aside>' +
-            '<div class="rf-main">' +
-              '<div><div class="rf-flag">Career Objective</div><div class="rf-body"><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div></div>' +
-              '<div><div class="rf-flag">Educational Qualification</div><div class="rf-body">' + eduTableHtml(d) + '</div></div>' +
-              '<div><div class="rf-flag">Work Experience</div><div class="rf-body">' + expBlockHtml(d) + '</div></div>' +
-              '<div><div class="rf-flag">Achievements</div><div class="rf-body">' + achBlockHtml(d) + '</div></div>' +
-              '<div><div class="rf-flag">Declaration</div><div class="rf-body">' + declHtml(d) + '</div></div>' +
-            '</div>' +
-          '</div>';
-        }
-
-        // 5. ARCH WAVE
-        if (activeLayout === 'archwave') {
-          return '<div class="lay-archwave">' +
-            '<aside class="awv-side u-wrap-safe">' +
-              (d.showPhoto !== false ? '<div class="awv-ring">' + photoBoxHtml(d) + '</div>' : '') +
-              '<div><div class="awv-tab">Contact</div><div style="margin-top:6px;">' + sideContactHtml + '</div></div>' +
-              '<div><div class="awv-tab">Skills</div><div style="margin-top:6px;">' + whiteBullets + '</div></div>' +
-              '<div><div class="awv-tab">Interests</div><div style="margin-top:6px;">' + sideInterestHtml + '</div></div>' +
-            '</aside>' +
-            '<div class="awv-main">' +
-              '<div class="awv-title"><h1>' + esc(d.name) + '</h1><div style="font-size: calc(11px * var(--fs-scale, 1)); font-weight:800; color:var(--r-secondary); letter-spacing:0.18em; text-transform:uppercase;">Curriculum Vitae</div></div>' +
-              sec(2, 'Career Objective', '<p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p>') +
-              sec(3, 'Educational Qualification', eduTableHtml(d)) +
-              sec(5, 'Work Experience', expBlockHtml(d)) +
-              sec(6, 'Achievements', achBlockHtml(d)) +
-              sec(8, 'Declaration', declHtml(d)) +
+        // 2. MONOLITH LUXE (Double-Line Editorial Frame + Diamond Rules)
+        if (activeLayout === 'monolith') {
+          return '<div class="lay-monolith">' +
+            '<div class="ml-frame">' +
+              '<header class="ml-head">' +
+                '<div style="flex:1; min-width:0;">' +
+                  '<div style="font-size: calc(10px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.24em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                  '<h1 style="font-size: calc(28px * var(--fs-scale, 1)); font-weight:900; color:var(--r-primary); line-height:1.08;">' + esc(d.name) + '</h1>' +
+                  '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-body); margin-top:3px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + ' &nbsp;&bull;&nbsp; ' + esc(d.address) + '</div>' +
+                '</div>' + photoBoxHtml(d) +
+              '</header>' +
+              '<div class="ml-2col">' +
+                '<div><div class="ml-h"><span class="ml-diamond"></span><span>Personal Details</span></div>' + pCompact + '</div>' +
+                '<div><div class="ml-h"><span class="ml-diamond"></span><span>Career Objective</span></div><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div>' +
+              '</div>' +
+              '<div><div class="ml-h"><span class="ml-diamond"></span><span>Educational Qualification</span></div>' + eduTableHtml(d) + '</div>' +
+              '<div class="ml-2col">' +
+                '<div><div class="ml-h"><span class="ml-diamond"></span><span>Core Skills</span></div>' + skillsPills + '</div>' +
+                '<div><div class="ml-h"><span class="ml-diamond"></span><span>Experience</span></div>' + expBlockHtml(d) + '</div>' +
+              '</div>' +
+              '<div class="ml-2col">' +
+                '<div><div class="ml-h"><span class="ml-diamond"></span><span>Achievements</span></div>' + achBlockHtml(d) + '</div>' +
+                '<div><div class="ml-h"><span class="ml-diamond"></span><span>Interests &amp; Strengths</span></div>' + extraPersonalKV(d) + '</div>' +
+              '</div>' +
+              '<div><div class="ml-h"><span class="ml-diamond"></span><span>Declaration</span></div>' + declHtml(d) + '</div>' +
             '</div>' +
           '</div>';
         }
@@ -4947,30 +4915,30 @@
           '</div>';
         }
 
-        // 11. METRO BLOCK
-        if (activeLayout === 'metroblock') {
-          return '<div class="lay-metroblock">' +
-            '<div class="mb-top">' +
-              '<div class="mb-id">' +
-                '<div style="font-size: calc(10.5px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.2em; opacity:0.85; text-transform:uppercase;">Curriculum Vitae</div>' +
-                '<h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:900;">' + esc(d.name) + '</h1>' +
-                '<div style="font-size: calc(12.2px * var(--fs-scale, 1)); opacity:0.92; margin-top:2px;">' + esc(d.phone) + ' &nbsp;|&nbsp; ' + esc(d.email) + ' &nbsp;|&nbsp; ' + esc(d.address) + '</div>' +
+        // 11. ATELIER NORDIC (Soft Tinted Header Pill + Airy Minimalist Hairline Sections)
+        if (activeLayout === 'atelier') {
+          return '<div class="lay-atelier">' +
+            '<header class="at-head">' +
+              '<div style="flex:1; min-width:0;">' +
+                '<div style="font-size: calc(10px * var(--fs-scale, 1)); font-weight:800; letter-spacing:0.22em; color:var(--r-secondary); text-transform:uppercase;">Curriculum Vitae</div>' +
+                '<h1 style="font-size: calc(28px * var(--fs-scale, 1)); font-weight:900; color:var(--r-primary);">' + esc(d.name) + '</h1>' +
+                '<div style="font-size: calc(12px * var(--fs-scale, 1)); color:var(--r-body); margin-top:3px;">' + esc(d.phone) + ' &nbsp;&bull;&nbsp; ' + esc(d.email) + ' &nbsp;&bull;&nbsp; ' + esc(d.address) + '</div>' +
               '</div>' + photoBoxHtml(d) +
+            '</header>' +
+            '<div class="at-2col">' +
+              '<div><div class="at-h"><span>Personal Details</span><span class="at-dot"></span></div>' + pCompact + '</div>' +
+              '<div><div class="at-h"><span>Career Objective</span><span class="at-dot"></span></div><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div>' +
             '</div>' +
-            '<div class="mb-2col">' +
-              '<div><div class="mb-h">01. Personal Details</div>' + pCompact + '</div>' +
-              '<div><div class="mb-h">02. Career Objective</div><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div>' +
+            '<div><div class="at-h"><span>Educational Qualification</span><span class="at-dot"></span></div>' + eduTableHtml(d) + '</div>' +
+            '<div class="at-2col">' +
+              '<div><div class="at-h"><span>Skills</span><span class="at-dot"></span></div>' + skillsPills + '</div>' +
+              '<div><div class="at-h"><span>Experience</span><span class="at-dot"></span></div>' + expBlockHtml(d) + '</div>' +
             '</div>' +
-            '<div><div class="mb-h">03. Educational Qualification</div>' + eduTableHtml(d) + '</div>' +
-            '<div class="mb-2col">' +
-              '<div><div class="mb-h">04. Skills</div>' + skillsBullets + '</div>' +
-              '<div><div class="mb-h">05. Experience</div>' + expBlockHtml(d) + '</div>' +
+            '<div class="at-2col">' +
+              '<div><div class="at-h"><span>Achievements</span><span class="at-dot"></span></div>' + achBlockHtml(d) + '</div>' +
+              '<div><div class="at-h"><span>Interests &amp; Strengths</span><span class="at-dot"></span></div>' + extraPersonalKV(d) + '</div>' +
             '</div>' +
-            '<div class="mb-2col">' +
-              '<div><div class="mb-h">06. Achievements</div>' + achBlockHtml(d) + '</div>' +
-              '<div><div class="mb-h">07. Interests &amp; Strengths</div>' + extraPersonalKV(d) + '</div>' +
-            '</div>' +
-            '<div><div class="mb-h">08. Declaration</div>' + declHtml(d) + '</div>' +
+            '<div><div class="at-h"><span>Declaration</span><span class="at-dot"></span></div>' + declHtml(d) + '</div>' +
           '</div>';
         }
 
@@ -5042,26 +5010,6 @@
                 '<div><div class="pr-h">Interests &amp; Strengths</div>' + extraPersonalKV(d) + '</div>' +
               '</div>' +
               '<div><div class="pr-h">Declaration</div>' + declHtml(d) + '</div>' +
-            '</div>' +
-          '</div>';
-        }
-
-        // 17. HALO CAPSULE
-        if (activeLayout === 'halocapsule') {
-          return '<div class="lay-halocapsule">' +
-            '<aside class="hc-pill-side u-wrap-safe">' +
-              photoBoxHtml(d) +
-              '<div><span class="hc-badge">Contact</span>' + sideContactHtml + '</div>' +
-              '<div><span class="hc-badge">Skills</span>' + whiteBullets + '</div>' +
-              '<div><span class="hc-badge">Interests</span>' + sideInterestHtml + '</div>' +
-            '</aside>' +
-            '<div class="hc-main">' +
-              '<div class="hc-banner"><h1 style="font-size: calc(27px * var(--fs-scale, 1)); font-weight:900; color:var(--r-primary);">' + esc(d.name) + '</h1><div style="font-size: calc(11.5px * var(--fs-scale, 1)); font-weight:700; color:var(--r-secondary); text-transform:uppercase; letter-spacing:0.14em;">Curriculum Vitae</div></div>' +
-              '<div><div class="hc-h">Career Objective</div><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div>' +
-              '<div><div class="hc-h">Educational Qualification</div>' + eduTableHtml(d) + '</div>' +
-              '<div><div class="hc-h">Experience</div>' + expBlockHtml(d) + '</div>' +
-              '<div><div class="hc-h">Achievements</div>' + achBlockHtml(d) + '</div>' +
-              '<div><div class="hc-h">Declaration</div>' + declHtml(d) + '</div>' +
             '</div>' +
           '</div>';
         }
@@ -5203,26 +5151,6 @@
                 '<div><div class="gf-h">Interests &amp; Strengths</div>' + extraPersonalKV(d) + '</div>' +
               '</div>' +
               '<div><div class="gf-h">Declaration</div>' + declHtml(d) + '</div>' +
-            '</div>' +
-          '</div>';
-        }
-
-        // 24. SIDE ARCH
-        if (activeLayout === 'sidearch') {
-          return '<div class="lay-sidearch">' +
-            '<aside class="sa-side u-wrap-safe">' +
-              photoBoxHtml(d) +
-              '<div><span class="sa-cap">Contact</span>' + sideContactHtml + '</div>' +
-              '<div><span class="sa-cap">Skills</span>' + skillsBullets + '</div>' +
-              '<div><span class="sa-cap">Interests</span>' + sideInterestHtml + '</div>' +
-            '</aside>' +
-            '<div class="sa-main">' +
-              '<div class="sa-hero"><h1 style="font-size: calc(26px * var(--fs-scale, 1)); font-weight:900;">' + esc(d.name) + '</h1><div style="font-size: calc(11px * var(--fs-scale, 1)); letter-spacing:0.16em; text-transform:uppercase; opacity:0.88; margin-top:2px;">Curriculum Vitae</div></div>' +
-              '<div><div class="sa-h">Career Objective</div><p style="font-size:var(--d-text); line-height:var(--d-lh);">' + esc(d.objective) + '</p></div>' +
-              '<div><div class="sa-h">Educational Qualification</div>' + eduTableHtml(d) + '</div>' +
-              '<div><div class="sa-h">Experience</div>' + expBlockHtml(d) + '</div>' +
-              '<div><div class="sa-h">Achievements</div>' + achBlockHtml(d) + '</div>' +
-              '<div><div class="sa-h">Declaration</div>' + declHtml(d) + '</div>' +
             '</div>' +
           '</div>';
         }
@@ -5588,6 +5516,298 @@
         syncChatGPTButtonState();
       }
 
+
+      /* SECTION ORDERING ENGINE (HOLD & DRAG ON MOBILE & DESKTOP) */
+      const DEFAULT_SEC_ORDER = [1, 2, 3, 4, 5, 6, 7, 8];
+
+      function getNormalizedSectionOrder() {
+        const ord = Array.isArray(state.sectionOrder) ? state.sectionOrder.map(Number) : [];
+        const valid = ord.filter(function (n, idx) {
+          return DEFAULT_SEC_ORDER.indexOf(n) !== -1 && ord.indexOf(n) === idx;
+        });
+        DEFAULT_SEC_ORDER.forEach(function (n) {
+          if (valid.indexOf(n) === -1) valid.push(n);
+        });
+        return valid;
+      }
+
+      function applyEditorSectionOrder() {
+        const group = document.getElementById('cv-editor-group');
+        if (!group) return;
+        const order = getNormalizedSectionOrder();
+        order.forEach(function (secId, idx) {
+          const card = document.getElementById('acc-' + secId);
+          if (!card) return;
+          const numEl = card.querySelector('.acc-num');
+          if (numEl) numEl.textContent = String(idx + 1);
+          group.appendChild(card);
+        });
+        const isCustom = order.some(function (n, i) { return n !== DEFAULT_SEC_ORDER[i]; });
+        const resetBtn = document.getElementById('btn-reset-sec-order');
+        if (resetBtn) resetBtn.classList.toggle('hidden', !isCustom);
+      }
+
+      window.resetSectionOrder = function () {
+        state.sectionOrder = [1, 2, 3, 4, 5, 6, 7, 8];
+        applyEditorSectionOrder();
+        renderPreview();
+        save();
+        toast('Section order reset to 1–8');
+      };
+
+      function initSectionDragAndDrop() {
+        const group = document.getElementById('cv-editor-group');
+        if (!group) return;
+
+        let activeCard = null;
+        let holdTimer = null;
+        let isDragging = false;
+        let startY = 0;
+
+        function clearDragIndicators() {
+          group.querySelectorAll('.acc-card').forEach(function (c) {
+            c.classList.remove('is-dragging', 'drag-over-top', 'drag-over-bottom');
+          });
+        }
+
+        function startDrag(card, clientY) {
+          isDragging = true;
+          activeCard = card;
+          startY = clientY;
+          card.classList.add('is-dragging');
+          if (navigator.vibrate) {
+            try { navigator.vibrate(25); } catch (e) {}
+          }
+        }
+
+        function moveDrag(clientY) {
+          if (!isDragging || !activeCard) return;
+          const cards = Array.prototype.slice.call(group.querySelectorAll('.acc-card'));
+          for (let i = 0; i < cards.length; i++) {
+            const target = cards[i];
+            if (target === activeCard) continue;
+            const rect = target.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+            if (clientY >= rect.top && clientY <= rect.bottom) {
+              if (clientY < midY) {
+                group.insertBefore(activeCard, target);
+              } else {
+                group.insertBefore(activeCard, target.nextSibling);
+              }
+              break;
+            }
+          }
+        }
+
+        function endDrag() {
+          clearTimeout(holdTimer);
+          holdTimer = null;
+          if (!isDragging) {
+            activeCard = null;
+            return;
+          }
+          isDragging = false;
+          clearDragIndicators();
+          activeCard = null;
+
+          const newOrder = Array.prototype.slice.call(group.querySelectorAll('.acc-card')).map(function (c) {
+            return Number(c.getAttribute('data-sec-id'));
+          });
+          state.sectionOrder = newOrder;
+          applyEditorSectionOrder();
+          renderPreview();
+          save();
+          toast('Section order updated');
+        }
+
+        // Bind hold-to-drag on handles (instant drag) & triggers (240ms hold-to-drag)
+        group.querySelectorAll('.acc-card').forEach(function (card) {
+          const handle = card.querySelector('.acc-drag-handle');
+          const trigger = card.querySelector('.acc-trigger');
+
+          if (handle) {
+            handle.addEventListener('pointerdown', function (e) {
+              e.stopPropagation();
+              e.preventDefault();
+              try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+              startDrag(card, e.clientY);
+            });
+            handle.addEventListener('pointermove', function (e) {
+              if (!isDragging) return;
+              e.preventDefault();
+              moveDrag(e.clientY);
+            });
+            handle.addEventListener('pointerup', function (e) {
+              try { handle.releasePointerCapture(e.pointerId); } catch (err) {}
+              endDrag();
+            });
+            handle.addEventListener('pointercancel', endDrag);
+          }
+
+          if (trigger) {
+            trigger.addEventListener('pointerdown', function (e) {
+              if (e.target.closest('.acc-drag-handle')) return;
+              const y0 = e.clientY;
+              const x0 = e.clientX;
+              clearTimeout(holdTimer);
+              holdTimer = setTimeout(function () {
+                startDrag(card, y0);
+                // Suppress click toggle right after drag
+                card.dataset.suppressClick = '1';
+              }, 260);
+
+              const onMoveCheck = function (mv) {
+                if (!isDragging && (Math.abs(mv.clientY - y0) > 8 || Math.abs(mv.clientX - x0) > 8)) {
+                  clearTimeout(holdTimer);
+                  holdTimer = null;
+                } else if (isDragging) {
+                  mv.preventDefault();
+                  moveDrag(mv.clientY);
+                }
+              };
+              const onUpCleanup = function () {
+                window.removeEventListener('pointermove', onMoveCheck);
+                window.removeEventListener('pointerup', onUpCleanup);
+                window.removeEventListener('pointercancel', onUpCleanup);
+                endDrag();
+              };
+              window.addEventListener('pointermove', onMoveCheck, { passive: false });
+              window.addEventListener('pointerup', onUpCleanup);
+              window.addEventListener('pointercancel', onUpCleanup);
+            });
+
+            trigger.addEventListener('click', function (e) {
+              if (card.dataset.suppressClick === '1') {
+                delete card.dataset.suppressClick;
+                e.stopImmediatePropagation();
+                e.preventDefault();
+              }
+            }, true);
+          }
+        });
+      }
+
+      /* IDENTIFY & REORDER CV SECTIONS IN ANY LAYOUT */
+      function classifyCvBlock(el) {
+        const txt = (el.textContent || '').toLowerCase();
+        if (txt.includes('declaration') && (txt.includes('place') || txt.includes('signature'))) return 8;
+        if (txt.includes('personal detail') || txt.includes('personal dossier') || txt.includes('02 / profile')) return 1;
+        if (txt.includes('career objective') || txt.includes('01 / objective')) return 2;
+        if (txt.includes('educational qualification') || txt.includes('academic credentials') || el.querySelector('.edu-table')) return 3;
+        if (txt.includes('skills') || txt.includes('core competencies') || el.querySelector('.skills-pill-box')) return 4;
+        if (txt.includes('experience') || txt.includes('fresher')) return 5;
+        if (txt.includes('achievement') || txt.includes('honours')) return 6;
+        if (txt.includes('hobbies') || txt.includes('interests & strengths') || txt.includes('strengths')) return 7;
+        return null;
+      }
+
+      function applyPreviewSectionOrder(sheet) {
+        const order = getNormalizedSectionOrder();
+        const isDefault = order.every(function (n, i) { return n === DEFAULT_SEC_ORDER[i]; });
+        if (isDefault) return;
+
+        // Build clean universal ordered blocks for main flow or 2-column layouts
+        const root = sheet.querySelector('.sheet-content');
+        if (!root) return;
+
+        // Collect all direct section-bearing blocks inside main flow containers
+        const containers = Array.prototype.slice.call(root.querySelectorAll(
+          '.en-body, .ml-frame, .rs-main, .lay-vogueed, .lay-bentoios, .ts-main, .lay-atelier, .lay-auroramist, .tp-track, .pr-body, .lay-origamifold, .ds-body, .spc-body, .lay-crestcenter, .gf-body, .lay-horizonstep'
+        ));
+
+        containers.forEach(function (container) {
+          // Flatten any 2-col pairs temporarily so individual sections can reorder freely in 2-col or 1-col!
+          const children = Array.prototype.slice.call(container.children);
+          const sortableItems = [];
+          const headerNodes = [];
+
+          children.forEach(function (child) {
+            if (child.matches('header, .rs-hero, .ve-quote')) {
+              headerNodes.push(child);
+              return;
+            }
+            const is2Col = child.classList.contains('en-2col') || child.classList.contains('ml-2col') ||
+              child.classList.contains('ve-2col') || child.classList.contains('bi-2col') ||
+              child.classList.contains('ts-2col') || child.classList.contains('at-2col') ||
+              child.classList.contains('pr-2col') || child.classList.contains('of-2col') ||
+              child.classList.contains('spc-2col') || child.classList.contains('cc-2col') ||
+              child.classList.contains('gf-2col') || child.classList.contains('hs-2col');
+
+            if (is2Col && child.children.length === 2) {
+              const subA = child.children[0];
+              const subB = child.children[1];
+              const idA = classifyCvBlock(subA);
+              const idB = classifyCvBlock(subB);
+              if (idA && idB) {
+                sortableItems.push({ secId: idA, node: subA, wasPaired: true, pairClass: child.className });
+                sortableItems.push({ secId: idB, node: subB, wasPaired: true, pairClass: child.className });
+                return;
+              }
+            }
+            const idSingle = classifyCvBlock(child);
+            if (idSingle) {
+              sortableItems.push({ secId: idSingle, node: child, wasPaired: false });
+            } else {
+              headerNodes.push(child);
+            }
+          });
+
+          if (sortableItems.length < 2) return;
+
+          sortableItems.sort(function (a, b) {
+            return order.indexOf(a.secId) - order.indexOf(b.secId);
+          });
+
+          // Rebuild container cleanly: keep headers on top, re-pair consecutive paired items if layout uses 2-col
+          container.innerHTML = '';
+          headerNodes.forEach(function (h) { container.appendChild(h); });
+
+          let i = 0;
+          while (i < sortableItems.length) {
+            const cur = sortableItems[i];
+            const nxt = sortableItems[i + 1];
+            // Never pair Education (3) or Declaration (8) as half-width so tables & signatures stay full width
+            const curFull = (cur.secId === 3 || cur.secId === 8);
+            const nxtFull = nxt ? (nxt.secId === 3 || nxt.secId === 8) : true;
+            if (cur.wasPaired && nxt && nxt.wasPaired && !curFull && !nxtFull) {
+              const wrapper = document.createElement('div');
+              wrapper.className = cur.pairClass;
+              wrapper.appendChild(cur.node);
+              wrapper.appendChild(nxt.node);
+              container.appendChild(wrapper);
+              i += 2;
+            } else {
+              container.appendChild(cur.node);
+              i += 1;
+            }
+          }
+
+          // Update step numbers if Horizon Step layout is active
+          const stepNums = container.querySelectorAll('.hs-num');
+          if (stepNums.length) {
+            stepNums.forEach(function (sn, idx) { sn.textContent = String(idx + 1); });
+          }
+        });
+
+        // Also reorder sidebar blocks (Skills vs Interests) for Right Sidebar layout
+        const sidebars = Array.prototype.slice.call(root.querySelectorAll('.rs-side'));
+        sidebars.forEach(function (side) {
+          const kids = Array.prototype.slice.call(side.children);
+          const photoNode = kids.find(function (k) { return k.classList.contains('photo-frame'); });
+          const blocks = kids.filter(function (k) { return !k.classList.contains('photo-frame'); }).map(function (k) {
+            const t = (k.textContent || '').toLowerCase();
+            let id = 1;
+            if (t.includes('skills')) id = 4;
+            else if (t.includes('interests')) id = 7;
+            return { secId: id, node: k };
+          });
+          blocks.sort(function (a, b) { return order.indexOf(a.secId) - order.indexOf(b.secId); });
+          side.innerHTML = '';
+          if (photoNode) side.appendChild(photoNode);
+          blocks.forEach(function (b) { side.appendChild(b.node); });
+        });
+      }
+
       function renderPreview() {
         const outer = document.getElementById('preview-scale-outer');
         outer.innerHTML = '';
@@ -5603,6 +5823,9 @@
           sheet.innerHTML = '<div class="sheet-content">' +
             (kind === 'cv' ? buildCVHtml(state.data) : buildCLHtml(state.data)) +
             '</div>' + wm;
+          if (kind === 'cv') {
+            applyPreviewSectionOrder(sheet);
+          }
           box.appendChild(sheet);
           outer.appendChild(box);
         });
@@ -5728,6 +5951,8 @@
         } else {
           setFont(state.font);
         }
+        applyEditorSectionOrder();
+        initSectionDragAndDrop();
         setMobileView('edit');
         detectBikriPagePlan();
       }
